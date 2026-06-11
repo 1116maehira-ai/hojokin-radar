@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TENOHIRA 補助金レーダー</title>
+<style>
+  :root{
+    --ink:#1b2733; --paper:#f6f4ee; --sea:#0e7490; --sea-deep:#155e75;
+    --coral:#e0533d; --sand:#e8e2d4; --ok:#1a7f4e; --muted:#7d8590;
+  }
+  *{box-sizing:border-box;margin:0}
+  body{font-family:"Hiragino Sans","Noto Sans JP",sans-serif;background:var(--paper);color:var(--ink);padding:0 0 60px}
+  header{background:var(--ink);color:#fff;padding:26px 24px 22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  .scope{width:44px;height:44px;border-radius:50%;border:2px solid var(--sea);position:relative;flex:none;overflow:hidden}
+  .scope::after{content:"";position:absolute;inset:0;background:conic-gradient(from 0deg,rgba(14,116,144,.85),transparent 70deg);animation:sweep 3.2s linear infinite}
+  @keyframes sweep{to{transform:rotate(360deg)}}
+  @media (prefers-reduced-motion: reduce){.scope::after{animation:none}}
+  h1{font-size:19px;font-weight:700;letter-spacing:.06em}
+  h1 small{display:block;font-size:11px;color:#9fb3bd;font-weight:400;letter-spacing:.12em;margin-top:3px}
+  #updated{margin-left:auto;font:11px/1.6 ui-monospace,monospace;color:#9fb3bd}
+  .filters{display:flex;gap:8px;padding:16px 24px;flex-wrap:wrap}
+  .filters button{border:1px solid var(--sand);background:#fff;border-radius:999px;padding:6px 14px;font-size:12px;cursor:pointer;color:var(--ink)}
+  .filters button.on{background:var(--sea);border-color:var(--sea);color:#fff}
+  main{padding:0 24px;max-width:880px;margin:0 auto}
+  .card{background:#fff;border:1px solid var(--sand);border-left:4px solid var(--sea);border-radius:10px;padding:14px 18px;margin-bottom:12px}
+  .card.client{border-left-color:var(--coral)}
+  .card.both{border-left-color:var(--ok)}
+  .top{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+  .title{font-size:14.5px;font-weight:600;line-height:1.5}
+  .title a{color:var(--ink);text-decoration:none}
+  .title a:hover{color:var(--sea-deep);text-decoration:underline}
+  .meta{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;font-size:11px}
+  .tag{background:var(--paper);border:1px solid var(--sand);border-radius:4px;padding:2px 8px}
+  .tag.dir-self{color:var(--sea-deep)} .tag.dir-client{color:var(--coral)} .tag.dir-both{color:var(--ok)}
+  .score{font:700 11px ui-monospace,monospace;color:var(--sea-deep)}
+  .reason{font-size:12px;color:var(--muted);margin-top:6px}
+  .sharoushi{color:var(--coral);font-size:11px;font-weight:600}
+  .empty{text-align:center;color:var(--muted);padding:60px 0;font-size:13px}
+</style>
+</head>
+<body>
+<header>
+  <div class="scope"></div>
+  <h1>補助金レーダー<small>TENOHIRA SUBSIDY RADAR / OKINAWA</small></h1>
+  <span id="updated"></span>
+</header>
+<div class="filters" id="filters">
+  <button data-f="all" class="on">すべて</button>
+  <button data-f="self">自社エントリー</button>
+  <button data-f="client">顧客提案</button>
+  <button data-f="both">両方</button>
+</div>
+<main id="list"><div class="empty">読み込み中…</div></main>
+<script>
+const DIR_LABEL={self:"自社エントリー",client:"顧客提案",both:"両方",skip:"対象外"};
+let items=[],filter="all";
+fetch("../data/items.json").then(r=>r.json()).then(d=>{
+  items=d.filter(i=>i.direction!=="skip");
+  if(d.length) document.getElementById("updated").textContent="last: "+d[0].found_at;
+  render();
+}).catch(()=>{document.getElementById("list").innerHTML='<div class="empty">data/items.json がまだありません。初回の巡回後に表示されます。</div>'});
+function render(){
+  const el=document.getElementById("list");
+  const v=items.filter(i=>filter==="all"||i.direction===filter);
+  if(!v.length){el.innerHTML='<div class="empty">該当なし。レーダーは毎朝7:30に巡回します。</div>';return}
+  el.innerHTML=v.map(i=>`
+    <div class="card ${i.direction}">
+      <div class="top"><span class="title"><a href="${i.url}" target="_blank" rel="noopener">${esc(i.title)}</a></span>
+      <span class="score">${i.score}</span></div>
+      <div class="meta">
+        <span class="tag dir-${i.direction}">${DIR_LABEL[i.direction]||i.direction}</span>
+        <span class="tag">${esc(i.category||"")}</span>
+        <span class="tag">${esc(i.source||"")}</span>
+        <span class="tag">${i.found_at}</span>
+        ${i.needs_sharoushi?'<span class="sharoushi">⚠ 社労士提出</span>':''}
+      </div>
+      ${i.reason?`<div class="reason">${esc(i.reason)}</div>`:""}
+    </div>`).join("");
+}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+document.getElementById("filters").addEventListener("click",e=>{
+  if(e.target.dataset.f){filter=e.target.dataset.f;
+    document.querySelectorAll(".filters button").forEach(b=>b.classList.toggle("on",b===e.target));render();}
+});
+</script>
+</body>
+</html>

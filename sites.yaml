@@ -39,4 +39,17 @@ sites:
     include: "(公募|募集|委託|プロポーザル|企画)"
 
 # 通知の足切り：マッチ度スコア（0-100）がこの値以上のものだけLINE通知
+- id: ogb_koubo
+    name: 内閣府 沖縄総合事務局 公募情報
+    type: links
+    url: https://www.ogb.go.jp/keisan/3842
+    selector: "main, .contents, body"
+    include: "(公募|募集|補助|助成|委託|プロポーザル|企画競争)"
+
+  - id: pref_sangyo
+    name: 沖縄県庁 公募・補助金等（産業）
+    type: links
+    url: https://www.pref.okinawa.lg.jp/shigoto/keizai/1009879/1010143/index.html
+    selector: "main, .contents, body"
+    include: "(公募|募集|補助|助成|委託|支援事業|ICT|DX)"
 notify_threshold: 60

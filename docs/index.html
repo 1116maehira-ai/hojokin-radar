@@ -58,7 +58,7 @@ fetch("/hojokin-radar/data/items.json?t="+Date.now())
     render();
   })
   .catch(()=>{
-    document.getElementById("list").innerHTML='<div class="empty">data/items.json がまだありません。初回の巡回後に表示されます。</div>';
+    document.getElementById("list").innerHTML='<div class="empty">データを読み込めませんでした。</div>';
   });
 function render(){
   const el=document.getElementById("list");

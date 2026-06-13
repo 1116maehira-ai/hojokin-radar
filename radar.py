@@ -155,7 +155,7 @@ def main():
         for it in found:
             h = hashlib.sha1(it["url"].encode()).hexdigest()[:16]
             current_ids.append(h)
-            if h in seen_ids or first_run:
+            if h in seen_ids:
                 continue
             it.update({"id": h, "source": site["name"], "found_at": today})
             new_items.append(it)

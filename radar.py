@@ -14,14 +14,13 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 SEEN_PATH = os.path.join(ROOT, "data", "seen.json")
 ITEMS_PATH = os.path.join(ROOT, "data", "items.json")
 PROFILE_PATH = os.path.join(ROOT, "company_profile.md")
-UA = {"User-Agent": "Mozilla/5.0 (TENOHIRA hojokin-radar; +https://github.com/)"}
+UA = {"User-Agent": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"}
 
-# ---------- HTML リンク抽出 ----------
 class LinkParser(HTMLParser):
     def __init__(self, base):
         super().__init__()
         self.base = base
-        self.links = []          # (url, text)
+        self.links = []
         self._href = None
         self._text = []
 
@@ -77,7 +76,6 @@ def fetch_rss(site):
             out.append({"url": link, "title": title})
     return out
 
-# ---------- Claude 分類 ----------
 CLASSIFY_PROMPT = """あなたは沖縄の中小企業「株式会社TENOHIRA」の補助金リサーチ担当です。
 会社プロフィール:
 {profile}
@@ -97,12 +95,12 @@ URL: {url}
   "needs_sharoushi": true | false
 }}
 direction: self=自社エントリー向け, client=顧客提案向け（TENOHIRAが受託/連携先になれる）, both=両方, skip=関係なし。
-needs_sharoushi: 厚労省系助成金で社労士の提出代行が必要そうなら true。タイトルだけで判断できない項目は推定で構いません。"""
+needs_sharoushi: 厚労省系助成金で社労士の提出代行が必要そうなら true。"""
 
 
 def classify(item, profile, api_key):
     body = {
-        "model": "claude-sonnet-4-5",
+        "model": "claude-sonnet-4-6",
         "max_tokens": 300,
         "messages": [{"role": "user", "content": CLASSIFY_PROMPT.format(
             profile=profile, title=item["title"], url=item["url"])}],
@@ -121,7 +119,6 @@ def classify(item, profile, api_key):
         return {"direction": "skip", "category": "その他", "score": 0,
                 "reason": "分類失敗", "needs_sharoushi": False}
 
-# ---------- LINE 通知 ----------
 def notify_line(items, token, to):
     lines = ["📡 補助金レーダー 新着 {}件".format(len(items))]
     for it in items[:5]:
@@ -133,7 +130,6 @@ def notify_line(items, token, to):
                   json={"to": to, "messages": [{"type": "text",
                         "text": "\n".join(lines)[:4900]}]}, timeout=30)
 
-# ---------- main ----------
 def main():
     cfg = yaml.safe_load(open(os.path.join(ROOT, "sites.yaml"), encoding="utf-8"))
     seen = json.load(open(SEEN_PATH, encoding="utf-8")) if os.path.exists(SEEN_PATH) else {}
@@ -143,46 +139,4 @@ def main():
     today = datetime.date.today().isoformat()
 
     new_items = []
-    for site in cfg["sites"]:
-        try:
-            found = fetch_rss(site) if site["type"] == "rss" else fetch_links(site)
-        except Exception as e:
-            print(f"[WARN] {site['id']}: {e}", file=sys.stderr)
-            continue
-        seen_ids = set(seen.get(site["id"], []))
-        first_run = site["id"] not in seen
-        current_ids = []
-        for it in found:
-            h = hashlib.sha1(it["url"].encode()).hexdigest()[:16]
-            current_ids.append(h)
-            if h in seen_ids:
-                continue
-            it.update({"id": h, "source": site["name"], "found_at": today})
-            new_items.append(it)
-        # 初回はベースライン登録のみ（過去分を全部通知しないため）
-        seen[site["id"]] = list(set(seen.get(site["id"], []) + current_ids))
-        print(f"[OK] {site['id']}: {len(found)} links, baseline={first_run}")
-
-    print(f"new items: {len(new_items)}")
-    for it in new_items:
-        c = classify(it, profile, api_key) if api_key else {
-            "direction": "self", "category": "その他", "score": 50,
-            "reason": "未分類（APIキー未設定）", "needs_sharoushi": False}
-        it.update(c)
-        items.insert(0, it)
-
-    os.makedirs(os.path.dirname(SEEN_PATH), exist_ok=True)
-    json.dump(seen, open(SEEN_PATH, "w", encoding="utf-8"), ensure_ascii=False)
-    json.dump(items, open(ITEMS_PATH, "w", encoding="utf-8"),
-              ensure_ascii=False, indent=1)
-
-    th = cfg.get("notify_threshold", 60)
-    hot = [i for i in new_items if i.get("score", 0) >= th and i.get("direction") != "skip"]
-    token, to = os.environ.get("LINE_CHANNEL_TOKEN"), os.environ.get("LINE_TO")
-    if hot and token and to:
-        notify_line(hot, token, to)
-        print(f"LINE notified: {len(hot)}")
-
-
-if __name__ == "__main__":
-    main()
+    for site

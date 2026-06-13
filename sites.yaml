@@ -1,6 +1,12 @@
+# 補助金レーダー 監視対象設定
+# type: rss … RSSフィードをそのまま読む
+# type: links … ページ内のリンク一覧を取得し、前回との差分を新着とみなす
+#   selector: 新着リンクを含む範囲を絞るCSSセレクタ（広めでOK、差分方式なのでノイズは初回に吸収される）
+#   include / exclude: リンクテキストやURLの絞り込み（正規表現）
+
 sites:
   - id: jnet21
-    name: J-Net21 支援情報ヘッドライン
+    name: J-Net21 支援情報ヘッドライン（補助金・助成金/沖縄+全国）
     type: rss
     url: https://j-net21.smrj.go.jp/snavi/articles.rss
 
@@ -12,7 +18,7 @@ sites:
     include: "(公募|募集|補助|助成|委託|支援事業|プロポーザル)"
 
   - id: isco
-    name: ISCO 沖縄ITイノベーション戦略センター
+    name: ISCO 沖縄ITイノベーション戦略センター 新着
     type: links
     url: https://isc-okinawa.org/information/
     selector: "main, .post-list, article, body"
@@ -26,24 +32,11 @@ sites:
     include: "(公募|募集|補助|助成|委託|支援事業)"
 
   - id: ocvb
-    name: OCVB 沖縄観光コンベンションビューロー
+    name: OCVB 沖縄観光コンベンションビューロー 公募情報
     type: links
     url: https://www.ocvb.or.jp/
     selector: "body"
     include: "(公募|募集|委託|プロポーザル|企画)"
 
-  - id: ogb_koubo
-    name: 内閣府 沖縄総合事務局 公募情報
-    type: links
-    url: https://www.ogb.go.jp/keisan/3842
-    selector: "main, .contents, body"
-    include: "(公募|募集|補助|助成|委託|プロポーザル|企画競争)"
-
-  - id: pref_sangyo
-    name: 沖縄県庁 公募・補助金等（産業）
-    type: links
-    url: https://www.pref.okinawa.lg.jp/shigoto/keizai/1009879/1010143/index.html
-    selector: "main, .contents, body"
-    include: "(公募|募集|補助|助成|委託|支援事業|ICT|DX)"
-
+# 通知の足切り：マッチ度スコア（0-100）がこの値以上のものだけLINE通知
 notify_threshold: 60

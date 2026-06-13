@@ -50,11 +50,16 @@ main{padding:0 24px;max-width:880px;margin:0 auto}
 <script>
 const DIR={self:"自社エントリー",client:"顧客提案",both:"両方",skip:"対象外"};
 let items=[],filter="all";
-fetch("/hojokin-radar/data/items.json?"+Date.now()).then(r=>r.json()).then(d=>{
-  items=d.filter(i=>i.direction!=="skip");
-  if(d.length) document.getElementById("updated").textContent="last: "+d[0].found_at;
-  render();
-}).catch(e=>{document.getElementById("list").innerHTML='<div class="empty">data/items.json がまだありません。初回の巡回後に表示されます。</div>'});
+fetch("/hojokin-radar/data/items.json?t="+Date.now())
+  .then(r=>r.json())
+  .then(d=>{
+    items=d.filter(i=>i.direction!=="skip");
+    if(d.length) document.getElementById("updated").textContent="last: "+d[0].found_at;
+    render();
+  })
+  .catch(()=>{
+    document.getElementById("list").innerHTML='<div class="empty">data/items.json がまだありません。初回の巡回後に表示されます。</div>';
+  });
 function render(){
   const el=document.getElementById("list");
   const v=filter==="all"?items:items.filter(i=>i.direction===filter);
@@ -75,9 +80,12 @@ function render(){
 }
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
 document.getElementById("filters").addEventListener("click",e=>{
-  if(e.target.dataset.f){filter=e.target.dataset.f;
-    document.querySelectorAll(".filters button").forEach(b=>b.classList.toggle("on",b===e.target));render();}
+  if(e.target.dataset.f){
+    filter=e.target.dataset.f;
+    document.querySelectorAll(".filters button").forEach(b=>b.classList.toggle("on",b===e.target));
+    render();
+  }
 });
 </script>
 </body>
-</html
+</html>

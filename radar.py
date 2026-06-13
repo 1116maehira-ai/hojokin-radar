@@ -139,4 +139,45 @@ def main():
     today = datetime.date.today().isoformat()
 
     new_items = []
-    for site
+    for site in cfg["sites"]:
+        try:
+            found = fetch_rss(site) if site["type"] == "rss" else fetch_links(site)
+        except Exception as e:
+            print(f"[WARN] {site['id']}: {e}", file=sys.stderr)
+            continue
+        seen_ids = set(seen.get(site["id"], []))
+        first_run = site["id"] not in seen
+        current_ids = []
+        for it in found:
+            h = hashlib.sha1(it["url"].encode()).hexdigest()[:16]
+            current_ids.append(h)
+            if h in seen_ids:
+                continue
+            it.update({"id": h, "source": site["name"], "found_at": today})
+            new_items.append(it)
+        seen[site["id"]] = list(set(seen.get(site["id"], []) + current_ids))
+        print(f"[OK] {site['id']}: {len(found)} links, new={sum(1 for i in current_ids if i not in seen_ids)}, first={first_run}")
+
+    print(f"new items: {len(new_items)}")
+    for it in new_items:
+        c = classify(it, profile, api_key) if api_key else {
+            "direction": "self", "category": "その他", "score": 50,
+            "reason": "未分類（APIキー未設定）", "needs_sharoushi": False}
+        it.update(c)
+        items.insert(0, it)
+
+    os.makedirs(os.path.dirname(SEEN_PATH), exist_ok=True)
+    json.dump(seen, open(SEEN_PATH, "w", encoding="utf-8"), ensure_ascii=False)
+    json.dump(items, open(ITEMS_PATH, "w", encoding="utf-8"),
+              ensure_ascii=False, indent=1)
+
+    th = cfg.get("notify_threshold", 60)
+    hot = [i for i in new_items if i.get("score", 0) >= th and i.get("direction") != "skip"]
+    token, to = os.environ.get("LINE_CHANNEL_TOKEN"), os.environ.get("LINE_TO")
+    if hot and token and to:
+        notify_line(hot, token, to)
+        print(f"LINE notified: {len(hot)}")
+
+
+if __name__ == "__main__":
+    main()

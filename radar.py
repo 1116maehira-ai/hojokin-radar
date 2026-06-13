@@ -11,8 +11,8 @@ from urllib.parse import urljoin
 from xml.etree import ElementTree
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
-SEEN_PATH = os.path.join(ROOT, "data", "seen.json")
-ITEMS_PATH = os.path.join(ROOT, "data", "items.json")
+SEEN_PATH = os.path.join(ROOT, "docs", "data", "seen.json")
+ITEMS_PATH = os.path.join(ROOT, "docs", "data", "items.json")
 PROFILE_PATH = os.path.join(ROOT, "company_profile.md")
 UA = {"User-Agent": "Mozilla/5.0 (TENOHIRA hojokin-radar; +https://github.com/)"}
 

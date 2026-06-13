@@ -25,6 +25,6 @@ jobs:
         run: |
           git config user.name "radar-bot"
           git config user.email "bot@tenohira.local"
-          git add data/
+          git add docs/data/
           git diff --cached --quiet || git commit -m "radar: $(date +%F)"
           git push

@@ -1,5 +1,53 @@
 [
  {
+  "url": "https://www.ocvb.or.jp/topics/4784",
+  "title": "【国内事業部】令和8年度 離島観光活性化促進事業 沖縄本島周辺15離島実態調査業務の業務執行及び企画コンペティションについて（終了・結果発表）",
+  "id": "152e4e8e65f7f4f3",
+  "source": "OCVB 沖縄観光コンベンションビューロー 公募情報",
+  "found_at": "2026-06-16",
+  "direction": "self",
+  "category": "委託・コンテンツ公募型",
+  "score": 85,
+  "reason": "離島観光の実態調査業務という委託公募で、観光PR映像制作実績と自治体公募提案経験を持つTENOHIRAが元請を狙える案件",
+  "needs_sharoushi": false
+ },
+ {
+  "url": "https://www.pref.okinawa.lg.jp/shigoto/nyusatsukeiyaku/1015342/1025067/1037594/1040375.html",
+  "title": "教育事務LAN配線及び無線アクセスポイント等導入委託",
+  "id": "c06577d55a74905a",
+  "source": "沖縄県庁 商工労働部 公募・募集",
+  "found_at": "2026-06-16",
+  "direction": "skip",
+  "category": "設備・ツール導入型",
+  "score": 15,
+  "reason": "教育事務用のLAN配線・無線AP導入という設備工事案件で、TENOHIRAの映像制作・Web・システム開発・マーケティング事業との接点が乏しい",
+  "needs_sharoushi": false
+ },
+ {
+  "url": "https://www.pref.okinawa.lg.jp/shigoto/nyusatsukeiyaku/1015342/1025064/1037584/1039771.html",
+  "title": "沖縄県知事選挙及び沖縄県議会議員補欠選挙啓発事業業務委託に係る企画提案の公募",
+  "id": "d730ec810e20248f",
+  "source": "沖縄県庁 商工労働部 公募・募集",
+  "found_at": "2026-06-16",
+  "direction": "self",
+  "category": "委託・コンテンツ公募型",
+  "score": 75,
+  "reason": "沖縄県の選挙啓発事業の企画提案公募で、TENOHIRAの映像制作・Web制作・SNS運用の実績を活かして元請として応募可能な業務委託案件",
+  "needs_sharoushi": false
+ },
+ {
+  "url": "https://www.pref.okinawa.lg.jp/shigoto/nyusatsukeiyaku/1015342/1025077/1037589/1040379.html",
+  "title": "沖縄県消防学校草刈業務委託（単価契約）",
+  "id": "1b6f32a558f9f27f",
+  "source": "沖縄県庁 商工労働部 公募・募集",
+  "found_at": "2026-06-16",
+  "direction": "skip",
+  "category": "その他",
+  "score": 0,
+  "reason": "消防学校の草刈業務委託であり、TENOHIRAの事業領域（映像・Web・システム・マーケティング）と全く関連性がない",
+  "needs_sharoushi": false
+ },
+ {
   "url": "https://www.pref.okinawa.lg.jp/shigoto/nyusatsukeiyaku/1015342/1025078/1040270.html",
   "title": "「令和8年度赤土等流出防止対策実践ツアー委託業務」に係る企画提案の募集",
   "id": "38d8067e722bc6b5",

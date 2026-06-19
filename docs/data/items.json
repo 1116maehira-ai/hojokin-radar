@@ -1,5 +1,29 @@
 [
  {
+  "url": "https://www.pref.okinawa.lg.jp/shigoto/nyusatsukeiyaku/1015342/1025067/1037594/1040462.html",
+  "title": "沖縄県立名護特別支援学校給食及び舎食調理業務委託",
+  "id": "61779113376e8e2e",
+  "source": "沖縄県庁 商工労働部 公募・募集",
+  "found_at": "2026-06-19",
+  "direction": "skip",
+  "category": "その他",
+  "score": 0,
+  "reason": "特別支援学校の給食調理業務委託であり、TENOHIRAの事業領域（映像・Web・システム開発・マーケティング）と全く関連性がない。",
+  "needs_sharoushi": false
+ },
+ {
+  "url": "https://www.pref.okinawa.lg.jp/shigoto/nyusatsukeiyaku/1015342/1025074/1037587/1040289.html",
+  "title": "令和8年度「沖縄県平和ガイド人材育成事業補助金」に係る公募",
+  "id": "12553def836683f6",
+  "source": "沖縄県庁 商工労働部 公募・募集",
+  "found_at": "2026-06-19",
+  "direction": "client",
+  "category": "人材開発型",
+  "score": 72,
+  "reason": "平和ガイド育成という専門分野だが、TENOHIRAが研修映像制作・教材Web制作・SNS運用支援の提供者として顧客（観光・文化団体）の申請に協力し受託収入を得られる可能性がある",
+  "needs_sharoushi": false
+ },
+ {
   "url": "https://www.ocvb.or.jp/topics/4822",
   "title": "【海外PR課】インバウンド向け観光コンテンツ・サービス発信事業者を募集します（JNTOウェブサイト）",
   "id": "77f1694ee70f5c29",
@@ -48,18 +72,6 @@
   "needs_sharoushi": false
  },
  {
-  "url": "https://okinawa-ric.jp/news/seminar/8731.html",
-  "title": "2026年06月17日セミナー【経営者対象】ワークショップ型集合研修（全8回）受講者募集中！（7/31〆切）",
-  "id": "728277ebcfc65bf7",
-  "source": "沖縄県産業振興公社 新着情報",
-  "found_at": "2026-06-17",
-  "direction": "skip",
-  "category": "人材開発型",
-  "score": 25,
-  "reason": "経営者向けワークショップ研修の受講者募集であり、補助金・公募・委託事業ではなく、TENOHIRAが提供者側として関与する余地もないため対象外",
-  "needs_sharoushi": false
- },
- {
   "url": "https://www.pref.okinawa.lg.jp/shigoto/nyusatsukeiyaku/1015342/1025075/1037593/1040100.html",
   "title": "令和8年度物流対策総合支援事業（輸出実証）業務委託に係る企画提案募集",
   "id": "f146a3017af474e9",
@@ -81,18 +93,6 @@
   "category": "委託・コンテンツ公募型",
   "score": 95,
   "reason": "沖縄県の観光インバウンド事業の委託業務公募で、TENOHIRAの観光PR映像制作・Webマーケティング実績と完全に合致し元請として応募可能",
-  "needs_sharoushi": false
- },
- {
-  "url": "https://www.ocvb.or.jp/topics/4784",
-  "title": "【国内事業部】令和8年度 離島観光活性化促進事業 沖縄本島周辺15離島実態調査業務の業務執行及び企画コンペティションについて（終了・結果発表）",
-  "id": "152e4e8e65f7f4f3",
-  "source": "OCVB 沖縄観光コンベンションビューロー 公募情報",
-  "found_at": "2026-06-16",
-  "direction": "self",
-  "category": "委託・コンテンツ公募型",
-  "score": 85,
-  "reason": "離島観光の実態調査業務という委託公募で、観光PR映像制作実績と自治体公募提案経験を持つTENOHIRAが元請を狙える案件",
   "needs_sharoushi": false
  },
  {
@@ -237,18 +237,6 @@
   "category": "新規事業型",
   "score": 62,
   "reason": "沖縄県のスタートアップ起業支援金はTENOHIRAが新規事業（AI研修・ポスマネ等）の事業化・展開を名目に自社エントリーを検討できる可能性があるが、既存法人向けか創業者向けかによって適用可否が変わるため要確認。",
-  "needs_sharoushi": false
- },
- {
-  "url": "https://www.pref.okinawa.lg.jp/shigoto/keizai/1009879/1010143/1010153.html",
-  "title": "令和4年度沖縄県産業振興基金事業の募集 （※募集は終了しました）",
-  "id": "f938e6a1ad999fba",
-  "source": "沖縄県庁 公募・補助金等（産業）",
-  "found_at": "2026-06-13",
-  "direction": "skip",
-  "category": "その他",
-  "score": 5,
-  "reason": "募集終了済みの令和4年度案件であり、現時点で申請不可のため実務活用できない。",
   "needs_sharoushi": false
  },
  {
@@ -564,42 +552,6 @@
   "needs_sharoushi": false
  },
  {
-  "url": "https://www.ocvb.or.jp/topics/4782",
-  "title": "【国内事業部】令和8年度 離島観光活性化促進事業「沖縄しまさんぽ」WEB記事制作業務の業務執行及び企画コンペティションについて(終了・結果発表)",
-  "id": "6562b42c8fefd912",
-  "source": "OCVB 沖縄観光コンベンションビューロー",
-  "found_at": "2026-06-13",
-  "direction": "self",
-  "category": "委託・コンテンツ公募型",
-  "score": 72,
-  "reason": "沖縄観光局発注の離島観光WEB記事制作コンペで、TENOHIRAの映像・Web制作・観光PR実績と合致するが、既に終了・結果発表済みのため次回サイクルの情報収集・参考事例として価値がある案件。",
-  "needs_sharoushi": false
- },
- {
-  "url": "https://www.ocvb.or.jp/topics/4793",
-  "title": "【海外・MICE事業部】令和８年度「沖縄MICEセミナー＆商談会」運営業務にかかる公募について(終了・結果発表)",
-  "id": "c17df1d4b1820ce1",
-  "source": "OCVB 沖縄観光コンベンションビューロー",
-  "found_at": "2026-06-13",
-  "direction": "self",
-  "category": "委託・コンテンツ公募型",
-  "score": 62,
-  "reason": "沖縄MICEセミナー＆商談会の運営業務委託公募であり、TENOHIRAの映像制作・イベント制作・Webマーケティング実績を活かして元請応募が狙える案件だが、すでに終了・結果発表済みのため今回は情報収集・次回備えとして参照価値がある。",
-  "needs_sharoushi": false
- },
- {
-  "url": "https://www.ocvb.or.jp/topics/4786",
-  "title": "【国内事業部】令和８年度 ツーリズムEXPOジャパン2026 出展業務にかかる企画コンペティションについて(終了・結果発表)",
-  "id": "6920a6ce5a41d31e",
-  "source": "OCVB 沖縄観光コンベンションビューロー",
-  "found_at": "2026-06-13",
-  "direction": "skip",
-  "category": "委託・コンテンツ公募型",
-  "score": 12,
-  "reason": "ツーリズムEXPOジャパン出展業務の企画コンペだが、既に「終了・結果発表」済みのため現時点でエントリー不可であり、実質的な活用機会がない。",
-  "needs_sharoushi": false
- },
- {
   "url": "https://www.ocvb.or.jp/offering",
   "title": "公募・支援情報",
   "id": "68bbf8484135efec",
@@ -816,54 +768,6 @@
   "needs_sharoushi": false
  },
  {
-  "url": "https://okinawa-ric.jp/news/seminar/7-527-1.html",
-  "title": "令和8年度『後継者育成塾(八重山)』受講生募集！6/3(水)～7/24(金) ※定員に達し次第終了",
-  "id": "26b5eaf8924c3c88",
-  "source": "沖縄県産業振興公社 新着情報",
-  "found_at": "2026-06-13",
-  "direction": "skip",
-  "category": "人材開発型",
-  "score": 8,
-  "reason": "八重山地区限定の後継者育成塾（受講生募集）であり、TENOHIRAの所在地（宜野湾市）や事業領域とは地理的・業務的に合致せず、自社エントリーも顧客提案も活用余地がほとんどない。",
-  "needs_sharoushi": false
- },
- {
-  "url": "https://okinawa-ric.jp/news/seminar/7-527-2.html",
-  "title": "令和8年度『後継者育成塾(宮古)』受講生募集！6/3(水)～7/24(金) ※定員に達し次第終了",
-  "id": "198b5ad4aecc1507",
-  "source": "沖縄県産業振興公社 新着情報",
-  "found_at": "2026-06-13",
-  "direction": "skip",
-  "category": "人材開発型",
-  "score": 8,
-  "reason": "後継者育成塾は宮古島の後継者候補個人向け受講生募集であり、TENOHIRAが自社エントリーする補助金でも顧客向け受託サービスにも該当しない。",
-  "needs_sharoushi": false
- },
- {
-  "url": "https://okinawa-ric.jp/news/seminar/7-527-1.html",
-  "title": "令和8年度『後継者育成塾(八重山)』受講生募集！6/3(水)～7/24(金) ※定員に達し次第終了",
-  "id": "26b5eaf8924c3c88",
-  "source": "沖縄県産業振興公社 新着情報",
-  "found_at": "2026-06-13",
-  "direction": "skip",
-  "category": "人材開発型",
-  "score": 10,
-  "reason": "八重山地区の後継者育成塾は受講生募集の研修プログラムであり、TENOHIRAが研修提供者や受託者として関与できる構造ではなく、自社エントリーとしても事業内容との合致が低い。",
-  "needs_sharoushi": false
- },
- {
-  "url": "https://okinawa-ric.jp/news/seminar/7-527-2.html",
-  "title": "令和8年度『後継者育成塾(宮古)』受講生募集！6/3(水)～7/24(金) ※定員に達し次第終了",
-  "id": "198b5ad4aecc1507",
-  "source": "沖縄県産業振興公社 新着情報",
-  "found_at": "2026-06-13",
-  "direction": "skip",
-  "category": "人材開発型",
-  "score": 8,
-  "reason": "宮古島エリア限定の後継者育成塾（受講生募集）であり、TENOHIRAの事業領域・所在地・支援サービスとの接点がほぼなく、自社エントリーも顧客提案活用も見込みにくい。",
-  "needs_sharoushi": false
- },
- {
   "url": "https://okinawa-ric.jp/news/info/8-4.html",
   "title": "令和8年度「稼ぐ海外展開モデル支援事業」において、「海外展開活動支援補助金」の受付を開始しました。",
   "id": "369b2bb33d5ec23c",
@@ -897,42 +801,6 @@
   "category": "その他",
   "score": 10,
   "reason": "URLは沖縄産業振興公社の補助金・助成金一覧ページであり、特定の公募内容ではなくポータルページのため、具体的な適合判断が不可能。",
-  "needs_sharoushi": false
- },
- {
-  "url": "https://okinawa-ric.jp/news/entry/7-531-1.html",
-  "title": "2026年06月02日補助金関連令和８年度 沖縄物流デジタル技術活用推進事業に係る採択事業者の決定について",
-  "id": "77265da4ffb8aff4",
-  "source": "沖縄県産業振興公社 新着情報",
-  "found_at": "2026-06-13",
-  "direction": "skip",
-  "category": "その他",
-  "score": 8,
-  "reason": "採択事業者の決定通知であり新規申請ではなく、物流デジタル化特化の事業でTENOHIRAの映像・Web・AI研修等の主力サービスとの接点も薄い。",
-  "needs_sharoushi": false
- },
- {
-  "url": "https://okinawa-ric.jp/news/others/post-352.html",
-  "title": "2026年06月09日他機関情報【参加無料】理系人材の採用・活用に関心のある県内企業募集",
-  "id": "80db72b0937450b9",
-  "source": "沖縄県産業振興公社 新着情報",
-  "found_at": "2026-06-13",
-  "direction": "skip",
-  "category": "その他",
-  "score": 8,
-  "reason": "理系人材の採用・活用に関する情報提供イベントであり、TENOHIRAの事業領域（映像・Web・DX・研修等）への直接的な補助金・受託機会との関連性が極めて低い。",
-  "needs_sharoushi": false
- },
- {
-  "url": "https://okinawa-ric.jp/news/others/sdgs4.html",
-  "title": "2026年06月09日他機関情報おきなわSDGs認証制度の第4回公募開始及び説明会の開催について",
-  "id": "074edf162f348127",
-  "source": "沖縄県産業振興公社 新着情報",
-  "found_at": "2026-06-13",
-  "direction": "both",
-  "category": "その他",
-  "score": 42,
-  "reason": "おきなわSDGs認証は自社のブランディング・信頼性向上に活用できるほか、TENOHIRAが支援するクライアント企業への認証取得提案（SDGs対応PR・映像制作・Web発信との連携）にもつながる可能性があるが、直接的な資金獲得や受託収益には結びつきにくく優先度は中程度。",
   "needs_sharoushi": false
  },
  {

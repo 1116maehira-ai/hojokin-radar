@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """
-TENOHIRA 補助金レーダー
-巡回 → 差分検出 → Claude分類 → data/items.json 更新 → LINE通知
-GitHub Actions から毎朝実行する想定。
+TENOHIRA 補助金レーダー v2
+巡回 → 差分検出 → 期限切れ除去 → Claude分類 → data/items.json 更新 → LINE通知
 """
 import json, os, re, sys, hashlib, datetime
 import requests, yaml
@@ -16,12 +15,51 @@ ITEMS_PATH = os.path.join(ROOT, "docs", "data", "items.json")
 PROFILE_PATH = os.path.join(ROOT, "company_profile.md")
 UA = {"User-Agent": "Mozilla/5.0 (TENOHIRA hojokin-radar; +https://github.com/)"}
 
+# ---------- 期限切れ判定 ----------
+# タイトルやURLに含まれる「終了・締切済」キーワード
+EXPIRED_PATTERN = re.compile(
+    r"(終了|締切済|受付終了|募集終了|公募終了|採択結果|結果発表|終了しました|終了いたしました)",
+    re.IGNORECASE
+)
+
+# タイトルから日付を抽出して過去かどうか判定
+DATE_PATTERNS = [
+    r"(\d{4})[年/\-](\d{1,2})[月/\-](\d{1,2})[日]?",   # 2024年3月31日 / 2024/3/31
+    r"令和(\d+)年(\d{1,2})月(\d{1,2})日",                 # 令和6年3月31日
+]
+
+def is_expired(title: str, url: str) -> bool:
+    """期限切れっぽいものをはじく"""
+    text = title + " " + url
+
+    # キーワードで即アウト
+    if EXPIRED_PATTERN.search(text):
+        return True
+
+    # 日付抽出して過去ならアウト
+    today = datetime.date.today()
+    for pat in DATE_PATTERNS:
+        for m in re.finditer(pat, text):
+            try:
+                if "令和" in pat:
+                    year = 2018 + int(m.group(1))
+                    month, day = int(m.group(2)), int(m.group(3))
+                else:
+                    year, month, day = int(m.group(1)), int(m.group(2)), int(m.group(3))
+                d = datetime.date(year, month, day)
+                if d < today:
+                    return True
+            except (ValueError, OverflowError):
+                pass
+    return False
+
+
 # ---------- HTML リンク抽出 ----------
 class LinkParser(HTMLParser):
     def __init__(self, base):
         super().__init__()
         self.base = base
-        self.links = []          # (url, text)
+        self.links = []
         self._href = None
         self._text = []
 
@@ -61,6 +99,9 @@ def fetch_links(site):
             continue
         if exc and exc.search(text + url):
             continue
+        # ★ 期限切れ除去
+        if is_expired(text, url):
+            continue
         out.append({"url": url, "title": text})
     return out
 
@@ -72,10 +113,25 @@ def fetch_rss(site):
     out = []
     for item in root.iter("item"):
         title = (item.findtext("title") or "").strip()
-        link = (item.findtext("link") or "").strip()
-        if title and link:
-            out.append({"url": link, "title": title})
+        link  = (item.findtext("link")  or "").strip()
+        pub   = (item.findtext("pubDate") or "").strip()
+        if not (title and link):
+            continue
+        # ★ 期限切れ除去
+        if is_expired(title, link):
+            continue
+        # ★ pubDate が60日以上前なら除外
+        if pub:
+            try:
+                from email.utils import parsedate_to_datetime
+                pub_dt = parsedate_to_datetime(pub).date()
+                if (datetime.date.today() - pub_dt).days > 60:
+                    continue
+            except Exception:
+                pass
+        out.append({"url": link, "title": title})
     return out
+
 
 # ---------- Claude 分類 ----------
 CLASSIFY_PROMPT = """あなたは沖縄の中小企業「株式会社TENOHIRA」の補助金リサーチ担当です。
@@ -97,7 +153,7 @@ URL: {url}
   "needs_sharoushi": true | false
 }}
 direction: self=自社エントリー向け, client=顧客提案向け（TENOHIRAが受託/連携先になれる）, both=両方, skip=関係なし。
-needs_sharoushi: 厚労省系助成金で社労士の提出代行が必要そうなら true。タイトルだけで判断できない項目は推定で構いません。"""
+needs_sharoushi: 厚労省系助成金で社労士の提出代行が必要そうなら true。"""
 
 
 def classify(item, profile, api_key):
@@ -121,11 +177,23 @@ def classify(item, profile, api_key):
         return {"direction": "skip", "category": "その他", "score": 0,
                 "reason": "分類失敗", "needs_sharoushi": False}
 
+
+# ---------- 既存アイテムの期限切れ掃除 ----------
+def purge_expired_items(items):
+    """items.json に残ってる期限切れをまとめて削除"""
+    before = len(items)
+    items = [i for i in items if not is_expired(i.get("title",""), i.get("url",""))]
+    removed = before - len(items)
+    if removed:
+        print(f"[PURGE] 期限切れ {removed} 件を削除")
+    return items
+
+
 # ---------- LINE 通知 ----------
 def notify_line(items, token, to):
     lines = ["📡 補助金レーダー 新着 {}件".format(len(items))]
     for it in items[:5]:
-        lines.append("\n▶ {}\n  {} / score {} \n  {}".format(
+        lines.append("\n▶ {}\n  {} / score {}\n  {}".format(
             it["title"], it["category"], it["score"], it["url"]))
     requests.post("https://api.line.me/v2/bot/message/push",
                   headers={"Authorization": f"Bearer {token}",
@@ -133,14 +201,18 @@ def notify_line(items, token, to):
                   json={"to": to, "messages": [{"type": "text",
                         "text": "\n".join(lines)[:4900]}]}, timeout=30)
 
+
 # ---------- main ----------
 def main():
-    cfg = yaml.safe_load(open(os.path.join(ROOT, "sites.yaml"), encoding="utf-8"))
-    seen = json.load(open(SEEN_PATH, encoding="utf-8")) if os.path.exists(SEEN_PATH) else {}
-    items = json.load(open(ITEMS_PATH, encoding="utf-8")) if os.path.exists(ITEMS_PATH) else []
+    cfg     = yaml.safe_load(open(os.path.join(ROOT, "sites.yaml"), encoding="utf-8"))
+    seen    = json.load(open(SEEN_PATH, encoding="utf-8")) if os.path.exists(SEEN_PATH) else {}
+    items   = json.load(open(ITEMS_PATH, encoding="utf-8")) if os.path.exists(ITEMS_PATH) else []
     profile = open(PROFILE_PATH, encoding="utf-8").read()
     api_key = os.environ.get("ANTHROPIC_API_KEY", "")
-    today = datetime.date.today().isoformat()
+    today   = datetime.date.today().isoformat()
+
+    # ★ 既存アイテムの期限切れを先に掃除
+    items = purge_expired_items(items)
 
     new_items = []
     for site in cfg["sites"]:
@@ -149,8 +221,8 @@ def main():
         except Exception as e:
             print(f"[WARN] {site['id']}: {e}", file=sys.stderr)
             continue
-        seen_ids = set(seen.get(site["id"], []))
-        first_run = site["id"] not in seen
+        seen_ids   = set(seen.get(site["id"], []))
+        first_run  = site["id"] not in seen
         current_ids = []
         for it in found:
             h = hashlib.sha1(it["url"].encode()).hexdigest()[:16]
@@ -159,7 +231,6 @@ def main():
                 continue
             it.update({"id": h, "source": site["name"], "found_at": today})
             new_items.append(it)
-        # 初回はベースライン登録のみ（過去分を全部通知しないため）
         seen[site["id"]] = list(set(seen.get(site["id"], []) + current_ids))
         print(f"[OK] {site['id']}: {len(found)} links, baseline={first_run}")
 
@@ -172,9 +243,8 @@ def main():
         items.insert(0, it)
 
     os.makedirs(os.path.dirname(SEEN_PATH), exist_ok=True)
-    json.dump(seen, open(SEEN_PATH, "w", encoding="utf-8"), ensure_ascii=False)
-    json.dump(items, open(ITEMS_PATH, "w", encoding="utf-8"),
-              ensure_ascii=False, indent=1)
+    json.dump(seen,  open(SEEN_PATH,  "w", encoding="utf-8"), ensure_ascii=False)
+    json.dump(items, open(ITEMS_PATH, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 
     th = cfg.get("notify_threshold", 60)
     hot = [i for i in new_items if i.get("score", 0) >= th and i.get("direction") != "skip"]

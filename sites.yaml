@@ -1,12 +1,11 @@
-# 補助金レーダー 監視対象設定
+# 補助金レーダー 監視対象設定 v2
 # type: rss … RSSフィードをそのまま読む
 # type: links … ページ内のリンク一覧を取得し、前回との差分を新着とみなす
-#   selector: 新着リンクを含む範囲を絞るCSSセレクタ（広めでOK、差分方式なのでノイズは初回に吸収される）
-#   include / exclude: リンクテキストやURLの絞り込み（正規表現）
 
 sites:
+  # ===== 既存（沖縄ローカル）=====
   - id: jnet21
-    name: J-Net21 支援情報ヘッドライン（補助金・助成金/沖縄+全国）
+    name: J-Net21 支援情報ヘッドライン
     type: rss
     url: https://j-net21.smrj.go.jp/snavi/articles.rss
 
@@ -14,29 +13,106 @@ sites:
     name: 沖縄県庁 商工労働部 公募・募集
     type: links
     url: https://www.pref.okinawa.lg.jp/shigoto/index.html
-    selector: "main"
     include: "(公募|募集|補助|助成|委託|支援事業|プロポーザル)"
 
   - id: isco
-    name: ISCO 沖縄ITイノベーション戦略センター 新着
+    name: ISCO 沖縄ITイノベーション戦略センター
     type: links
     url: https://isc-okinawa.org/information/
-    selector: "main, .post-list, article, body"
     include: "(公募|募集|補助|助成|委託|支援|採択)"
 
   - id: okinawa_ric
-    name: 沖縄県産業振興公社 新着情報
+    name: 沖縄県産業振興公社
     type: links
     url: https://okinawa-ric.jp/
-    selector: "body"
     include: "(公募|募集|補助|助成|委託|支援事業)"
 
   - id: ocvb
-    name: OCVB 沖縄観光コンベンションビューロー 公募情報
+    name: OCVB 沖縄観光コンベンションビューロー
     type: links
     url: https://www.ocvb.or.jp/
-    selector: "body"
     include: "(公募|募集|委託|プロポーザル|企画)"
 
-# 通知の足切り：マッチ度スコア（0-100）がこの値以上のものだけLINE通知
+  # ===== 追加：国の主要補助金 =====
+  - id: chusho_shindan
+    name: 中小企業庁 補助金・助成金
+    type: links
+    url: https://www.chusho.meti.go.jp/shien/index.html
+    include: "(補助|助成|公募|募集|支援)"
+    exclude: "(終了|締切済|受付終了)"
+
+  - id: meti_koubo
+    name: 経済産業省 公募情報
+    type: links
+    url: https://www.meti.go.jp/information/publicoffer/kobo/index.html
+    include: "(補助|助成|委託|公募|支援|DX|デジタル|映像|コンテンツ|観光|中小)"
+    exclude: "(終了|締切済|受付終了)"
+
+  - id: monodzukuri
+    name: ものづくり・商業・サービス生産性向上促進補助金
+    type: links
+    url: https://portal.monodukuri-hojo.jp/
+    include: "(公募|締切|補助|申請|採択)"
+
+  - id: shokibo
+    name: 小規模事業者持続化補助金
+    type: links
+    url: https://r3.jizokukahojokin.info/
+    include: "(公募|締切|補助|申請|受付)"
+
+  - id: it_hojo
+    name: IT導入補助金
+    type: links
+    url: https://it-shien.smrj.go.jp/
+    include: "(公募|締切|補助|申請|受付|IT|デジタル)"
+
+  - id: jizokukahojokin_smrj
+    name: 中小機構 補助金・助成金情報
+    type: links
+    url: https://www.smrj.go.jp/sme/fund/index.html
+    include: "(補助|助成|公募|募集|支援)"
+
+  - id: kousei_hojo
+    name: 厚生労働省 助成金（人材開発・雇用）
+    type: links
+    url: https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/koyou_roudou/koyou/kyufukin/index.html
+    include: "(助成|補助|人材|研修|リスキリング|雇用|訓練)"
+
+  - id: reskilling
+    name: リスキリングを通じたキャリアアップ支援事業
+    type: links
+    url: https://tokutei-kyouiku.mhlw.go.jp/
+    include: "(公募|募集|補助|助成|リスキリング|訓練|キャリア)"
+
+  - id: ai_jinzai
+    name: 経産省 AI人材育成・DX推進
+    type: links
+    url: https://www.meti.go.jp/policy/it_policy/jinzai/index.html
+    include: "(公募|補助|助成|AI|人材|DX|デジタル|育成)"
+
+  - id: nta_chiiki
+    name: 内閣府 地方創生・地域活性化
+    type: links
+    url: https://www.chisou.go.jp/sousei/about/chiiki/index.html
+    include: "(公募|補助|助成|地域|創生|観光|コンテンツ)"
+
+  - id: bunka_cho
+    name: 文化庁 文化芸術・コンテンツ振興
+    type: links
+    url: https://www.bunka.go.jp/shinsei_boshu/kobo/index.html
+    include: "(公募|補助|助成|映像|コンテンツ|文化|芸術|観光)"
+
+  - id: kanko_cho
+    name: 観光庁 補助金・公募
+    type: links
+    url: https://www.mlit.go.jp/kankocho/shisaku/index.html
+    include: "(公募|補助|助成|観光|コンテンツ|映像|地域)"
+
+  - id: jigyou_saikouchiku
+    name: 事業再構築補助金
+    type: links
+    url: https://jigyou-saikouchiku.go.jp/
+    include: "(公募|締切|補助|申請|採択|結果)"
+
+# 通知の足切り：スコアがこの値以上のものだけLINE通知
 notify_threshold: 60

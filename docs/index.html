@@ -17,13 +17,16 @@ body{font-family:"Hiragino Sans","Noto Sans JP",sans-serif;background:#f5f5f5;pa
 .controls{background:#fff;padding:14px 24px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;border-bottom:2px solid #f0f0f0}
 .filter-btn{border:1.5px solid #ddd;background:#fff;border-radius:999px;padding:7px 16px;font-size:13px;cursor:pointer;color:#444;font-weight:500}
 .filter-btn.on{background:#ff5722;border-color:#ff5722;color:#fff}
+.filter-btn.expired-toggle{border-color:#999;color:#777}
+.filter-btn.expired-toggle.on{background:#777;border-color:#777;color:#fff}
 .sort-select{border:1.5px solid #ddd;border-radius:8px;padding:7px 12px;font-size:13px;color:#444;background:#fff;cursor:pointer;margin-left:auto}
 .list{padding:16px 24px;display:flex;flex-direction:column;gap:12px;max-width:900px;margin:0 auto}
-.card{background:#fff;border-radius:12px;border:1.5px solid #eee;border-left:5px solid #ff5722;padding:16px 20px}
+.card{background:#fff;border-radius:12px;border:1.5px solid #eee;border-left:5px solid #ff5722;padding:16px 20px;position:relative}
 .card.client{border-left-color:#ffc107}
 .card.both{border-left-color:#4caf50}
 .card.urgent{border:2px solid #d32f2f;border-left:5px solid #d32f2f}
-.card-title{font-size:16px;font-weight:700;color:#1a1a1a;line-height:1.5;margin-bottom:10px}
+.card.is-expired{opacity:0.35;background:#f0f0f0;border-left-color:#bbb!important;border-color:#ddd!important}
+.card-title{font-size:16px;font-weight:700;color:#1a1a1a;line-height:1.5;margin-bottom:10px;padding-right:36px}
 .card-title a{color:inherit;text-decoration:none}
 .card-title a:hover{color:#ff5722}
 .card-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
@@ -42,6 +45,9 @@ body{font-family:"Hiragino Sans","Noto Sans JP",sans-serif;background:#f5f5f5;pa
 .score-lo{background:#ff8a65}
 .reason{font-size:13px;color:#666;margin-top:10px;line-height:1.7;border-top:1px solid #f0f0f0;padding-top:10px}
 .sharoushi{font-size:12px;font-weight:700;color:#d32f2f;background:#ffebee;border:1px solid #ffcdd2;border-radius:6px;padding:2px 8px}
+.expired-btn{position:absolute;top:14px;right:14px;border:none;background:none;cursor:pointer;font-size:18px;opacity:0.4;transition:opacity .2s}
+.expired-btn:hover{opacity:1}
+.card.is-expired .expired-btn{opacity:0.7}
 .empty{text-align:center;color:#aaa;padding:60px;font-size:15px}
 .count-badge{background:rgba(0,0,0,.08);color:inherit;border-radius:6px;padding:2px 8px;font-size:11px;margin-left:4px}
 .filter-btn.on .count-badge{background:rgba(255,255,255,.25)}
@@ -61,6 +67,7 @@ body{font-family:"Hiragino Sans","Noto Sans JP",sans-serif;background:#f5f5f5;pa
   <button class="filter-btn" data-f="self">自社エントリー<span class="count-badge" id="cnt-self">0</span></button>
   <button class="filter-btn" data-f="client">顧客提案<span class="count-badge" id="cnt-client">0</span></button>
   <button class="filter-btn" data-f="both">両方<span class="count-badge" id="cnt-both">0</span></button>
+  <button class="filter-btn expired-toggle" id="expired-toggle-btn" onclick="toggleExpired()">期限切れも表示</button>
   <select class="sort-select" id="sort">
     <option value="score">スコア高い順</option>
     <option value="date">新着順</option>
@@ -68,69 +75,108 @@ body{font-family:"Hiragino Sans","Noto Sans JP",sans-serif;background:#f5f5f5;pa
   </select>
 </div>
 <div class="list" id="list"><div class="empty">読み込み中…</div></div>
+
 <script>
-const DIR={self:"自社エントリー",client:"顧客提案",both:"両方",skip:"対象外"};
-let items=[],filter="all";
+const SB_URL = 'https://osipzwbsfbgbegjowydm.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9zaXB6d2JzZmJnYmVnam93eWRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyOTc4ODgsImV4cCI6MjA4OTg3Mzg4OH0.7oSHOKGPJK-Y-yD13G_c3WaMa7DIvghd7y87oS0a19Y';
+const SB_H = {'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Content-Type': 'application/json'};
 
-fetch("data/items.json?t="+Date.now())
-  .then(r=>r.json())
-  .then(d=>{
-    items=d.filter(i=>i.direction!=="skip");
-    if(d.length) document.getElementById("last-update").textContent="last: "+d[0].found_at;
-    updateCounts();
-    render();
-  })
-  .catch(()=>{
-    document.getElementById("list").innerHTML='<div class="empty">データを読み込めませんでした。</div>';
-  });
+const DIR = {self:"自社エントリー", client:"顧客提案", both:"両方", skip:"対象外"};
+let items = [], filter = "all", expiredIds = new Set(), showExpired = false;
 
-function updateCounts(){
-  document.getElementById("cnt-all").textContent=items.length;
-  document.getElementById("cnt-self").textContent=items.filter(i=>i.direction==="self").length;
-  document.getElementById("cnt-client").textContent=items.filter(i=>i.direction==="client").length;
-  document.getElementById("cnt-both").textContent=items.filter(i=>i.direction==="both").length;
+async function loadExpiredIds() {
+  try {
+    const res = await fetch(`${SB_URL}/rest/v1/expired_ids?select=id`, {headers: SB_H});
+    const data = await res.json();
+    expiredIds = new Set(data.map(r => r.id));
+  } catch(e) { console.error('expired load error', e); }
 }
 
-function daysUntil(dateStr){
-  if(!dateStr) return null;
-  const today=new Date(); today.setHours(0,0,0,0);
-  const d=new Date(dateStr); d.setHours(0,0,0,0);
-  return Math.round((d-today)/(1000*60*60*24));
+async function toggleExpiredFlag(id) {
+  if (expiredIds.has(id)) {
+    // 復活
+    await fetch(`${SB_URL}/rest/v1/expired_ids?id=eq.${id}`, {method:'DELETE', headers: SB_H});
+    expiredIds.delete(id);
+  } else {
+    // 期限切れ
+    await fetch(`${SB_URL}/rest/v1/expired_ids`, {method:'POST', headers: {...SB_H, 'Prefer':'return=minimal'}, body: JSON.stringify({id})});
+    expiredIds.add(id);
+  }
+  render();
 }
 
-function deadlineBadge(dateStr){
-  if(!dateStr) return "";
-  const days=daysUntil(dateStr);
-  if(days===null) return "";
-  if(days<0) return ""; // 期限切れは表示しない
+function toggleExpired() {
+  showExpired = !showExpired;
+  const btn = document.getElementById('expired-toggle-btn');
+  btn.classList.toggle('on', showExpired);
+  btn.textContent = showExpired ? '期限切れを隠す' : '期限切れも表示';
+  render();
+}
+
+function daysUntil(dateStr) {
+  if (!dateStr) return null;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const d = new Date(dateStr); d.setHours(0,0,0,0);
+  return Math.round((d - today) / (1000*60*60*24));
+}
+
+function deadlineBadge(dateStr) {
+  if (!dateStr) return "";
+  const days = daysUntil(dateStr);
+  if (days === null || days < 0) return "";
   let cls, label;
-  if(days<=3){cls="deadline-danger"; label=`🔥 あと${days}日`;}
-  else if(days<=7){cls="deadline-warn"; label=`⚠ あと${days}日`;}
-  else{cls="deadline-ok"; label=`📅 あと${days}日`;}
+  if (days <= 3)      { cls = "deadline-danger"; label = `🔥 あと${days}日`; }
+  else if (days <= 7) { cls = "deadline-warn";   label = `⚠ あと${days}日`; }
+  else                { cls = "deadline-ok";     label = `📅 あと${days}日`; }
   return `<span class="tag deadline-badge ${cls}">${label}（${dateStr}）</span>`;
 }
 
-function render(){
-  const sort=document.getElementById("sort").value;
-  let v=filter==="all"?[...items]:items.filter(i=>i.direction===filter);
+function updateCounts() {
+  const visible = items.filter(i => i.direction !== "skip");
+  document.getElementById("cnt-all").textContent    = visible.length;
+  document.getElementById("cnt-self").textContent   = visible.filter(i=>i.direction==="self").length;
+  document.getElementById("cnt-client").textContent = visible.filter(i=>i.direction==="client").length;
+  document.getElementById("cnt-both").textContent   = visible.filter(i=>i.direction==="both").length;
+}
 
-  if(sort==="score") v.sort((a,b)=>b.score-a.score);
-  else if(sort==="date") v.sort((a,b)=>b.found_at.localeCompare(a.found_at));
-  else if(sort==="deadline"){
-    v.sort((a,b)=>{
-      const da=a.deadline?daysUntil(a.deadline):9999;
-      const db=b.deadline?daysUntil(b.deadline):9999;
-      return da-db;
+function render() {
+  const sort = document.getElementById("sort").value;
+  let v = items.filter(i => i.direction !== "skip");
+  if (filter !== "all") v = v.filter(i => i.direction === filter);
+
+  // 期限切れ除外/表示
+  if (!showExpired) v = v.filter(i => !expiredIds.has(i.id));
+
+  if (sort === "score")    v.sort((a,b) => b.score - a.score);
+  else if (sort === "date") v.sort((a,b) => b.found_at.localeCompare(a.found_at));
+  else if (sort === "deadline") {
+    v.sort((a,b) => {
+      const da = a.deadline ? daysUntil(a.deadline) : 9999;
+      const db = b.deadline ? daysUntil(b.deadline) : 9999;
+      return da - db;
     });
   }
 
-  const el=document.getElementById("list");
-  if(!v.length){el.innerHTML='<div class="empty">該当なし。レーダーは毎朝7:30に巡回します。</div>';return}
-  el.innerHTML=v.map(i=>{
-    const sc=i.score>=85?"hi":i.score>=70?"mid":"lo";
-    const days=i.deadline?daysUntil(i.deadline):null;
-    const urgent=days!==null&&days<=3?"urgent":"";
-    return`<div class="card ${i.direction} ${urgent}">
+  // 期限切れを表示する場合はグレーを後ろに
+  if (showExpired) {
+    const active  = v.filter(i => !expiredIds.has(i.id));
+    const expired = v.filter(i =>  expiredIds.has(i.id));
+    v = [...active, ...expired];
+  }
+
+  const el = document.getElementById("list");
+  if (!v.length) { el.innerHTML = '<div class="empty">該当なし。レーダーは毎朝7:30に巡回します。</div>'; return; }
+
+  el.innerHTML = v.map(i => {
+    const sc      = i.score >= 85 ? "hi" : i.score >= 70 ? "mid" : "lo";
+    const days    = i.deadline ? daysUntil(i.deadline) : null;
+    const urgent  = days !== null && days <= 3 ? "urgent" : "";
+    const isExp   = expiredIds.has(i.id);
+    const expCls  = isExp ? "is-expired" : "";
+    const expIcon = isExp ? "↩️" : "🗑";
+    const expTip  = isExp ? "期限切れ解除" : "期限切れにする";
+    return `<div class="card ${i.direction} ${urgent} ${expCls}">
+      <button class="expired-btn" title="${expTip}" onclick="toggleExpiredFlag('${i.id}')">${expIcon}</button>
       <div class="card-title"><a href="${i.url}" target="_blank" rel="noopener">${esc(i.title)}</a></div>
       <div class="card-meta">
         <span class="tag tag-dir-${i.direction}">${DIR[i.direction]||i.direction}</span>
@@ -138,20 +184,38 @@ function render(){
         <span class="tag tag-src">${esc(i.source||"")}</span>
         <span class="tag tag-date">${i.found_at}</span>
         ${deadlineBadge(i.deadline)}
-        ${i.needs_sharoushi?'<span class="sharoushi">⚠ 社労士提出</span>':''}
+        ${i.needs_sharoushi ? '<span class="sharoushi">⚠ 社労士提出</span>' : ''}
         <span class="score-badge score-${sc}">${i.score}pt</span>
       </div>
-      ${i.reason?`<div class="reason">${esc(i.reason)}</div>`:""}
-    </div>`}).join("");
+      ${i.reason ? `<div class="reason">${esc(i.reason)}</div>` : ""}
+    </div>`;
+  }).join("");
 }
 
-function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function esc(s) { return String(s).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
 
-document.querySelector(".controls").addEventListener("click",e=>{
-  const btn=e.target.closest("[data-f]");
-  if(btn){filter=btn.dataset.f;document.querySelectorAll(".filter-btn").forEach(b=>b.classList.toggle("on",b===btn));render();}
+document.querySelector(".controls").addEventListener("click", e => {
+  const btn = e.target.closest("[data-f]");
+  if (btn) {
+    filter = btn.dataset.f;
+    document.querySelectorAll(".filter-btn[data-f]").forEach(b => b.classList.toggle("on", b === btn));
+    render();
+  }
 });
-document.getElementById("sort").addEventListener("change",render);
+document.getElementById("sort").addEventListener("change", render);
+
+// 起動
+Promise.all([
+  fetch("data/items.json?t=" + Date.now()).then(r=>r.json()),
+  loadExpiredIds()
+]).then(([data]) => {
+  items = data.filter(i => i.direction !== "skip");
+  if (data.length) document.getElementById("last-update").textContent = "last: " + data[0].found_at;
+  updateCounts();
+  render();
+}).catch(() => {
+  document.getElementById("list").innerHTML = '<div class="empty">データを読み込めませんでした。</div>';
+});
 </script>
 </body>
 </html>

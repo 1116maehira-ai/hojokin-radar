@@ -22,6 +22,7 @@ body{font-family:"Hiragino Sans","Noto Sans JP",sans-serif;background:#f5f5f5;pa
 .card{background:#fff;border-radius:12px;border:1.5px solid #eee;border-left:5px solid #ff5722;padding:16px 20px}
 .card.client{border-left-color:#ffc107}
 .card.both{border-left-color:#4caf50}
+.card.urgent{border:2px solid #d32f2f;border-left:5px solid #d32f2f}
 .card-title{font-size:16px;font-weight:700;color:#1a1a1a;line-height:1.5;margin-bottom:10px}
 .card-title a{color:inherit;text-decoration:none}
 .card-title a:hover{color:#ff5722}
@@ -31,6 +32,10 @@ body{font-family:"Hiragino Sans","Noto Sans JP",sans-serif;background:#f5f5f5;pa
 .tag-dir-client{background:#fffde7;color:#f57f17;border:1px solid #fff9c4}
 .tag-dir-both{background:#f1f8e9;color:#33691e;border:1px solid #dcedc8}
 .tag-cat,.tag-src,.tag-date{background:#f5f5f5;color:#555;border:1px solid #e0e0e0}
+.deadline-badge{font-size:12px;padding:3px 10px;border-radius:6px;font-weight:700}
+.deadline-danger{background:#ffebee;color:#c62828;border:1px solid #ef9a9a}
+.deadline-warn{background:#fff8e1;color:#e65100;border:1px solid #ffe082}
+.deadline-ok{background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7}
 .score-badge{margin-left:auto;border-radius:8px;padding:4px 12px;font-size:13px;font-weight:700;font-family:monospace;color:#fff}
 .score-hi{background:#d32f2f}
 .score-mid{background:#ff5722}
@@ -59,12 +64,14 @@ body{font-family:"Hiragino Sans","Noto Sans JP",sans-serif;background:#f5f5f5;pa
   <select class="sort-select" id="sort">
     <option value="score">スコア高い順</option>
     <option value="date">新着順</option>
+    <option value="deadline">締切が近い順</option>
   </select>
 </div>
 <div class="list" id="list"><div class="empty">読み込み中…</div></div>
 <script>
 const DIR={self:"自社エントリー",client:"顧客提案",both:"両方",skip:"対象外"};
 let items=[],filter="all";
+
 fetch("data/items.json?t="+Date.now())
   .then(r=>r.json())
   .then(d=>{
@@ -76,35 +83,70 @@ fetch("data/items.json?t="+Date.now())
   .catch(()=>{
     document.getElementById("list").innerHTML='<div class="empty">データを読み込めませんでした。</div>';
   });
+
 function updateCounts(){
   document.getElementById("cnt-all").textContent=items.length;
   document.getElementById("cnt-self").textContent=items.filter(i=>i.direction==="self").length;
   document.getElementById("cnt-client").textContent=items.filter(i=>i.direction==="client").length;
   document.getElementById("cnt-both").textContent=items.filter(i=>i.direction==="both").length;
 }
+
+function daysUntil(dateStr){
+  if(!dateStr) return null;
+  const today=new Date(); today.setHours(0,0,0,0);
+  const d=new Date(dateStr); d.setHours(0,0,0,0);
+  return Math.round((d-today)/(1000*60*60*24));
+}
+
+function deadlineBadge(dateStr){
+  if(!dateStr) return "";
+  const days=daysUntil(dateStr);
+  if(days===null) return "";
+  if(days<0) return ""; // 期限切れは表示しない
+  let cls, label;
+  if(days<=3){cls="deadline-danger"; label=`🔥 あと${days}日`;}
+  else if(days<=7){cls="deadline-warn"; label=`⚠ あと${days}日`;}
+  else{cls="deadline-ok"; label=`📅 あと${days}日`;}
+  return `<span class="tag deadline-badge ${cls}">${label}（${dateStr}）</span>`;
+}
+
 function render(){
   const sort=document.getElementById("sort").value;
   let v=filter==="all"?[...items]:items.filter(i=>i.direction===filter);
+
   if(sort==="score") v.sort((a,b)=>b.score-a.score);
-  else v.sort((a,b)=>b.found_at.localeCompare(a.found_at));
+  else if(sort==="date") v.sort((a,b)=>b.found_at.localeCompare(a.found_at));
+  else if(sort==="deadline"){
+    v.sort((a,b)=>{
+      const da=a.deadline?daysUntil(a.deadline):9999;
+      const db=b.deadline?daysUntil(b.deadline):9999;
+      return da-db;
+    });
+  }
+
   const el=document.getElementById("list");
   if(!v.length){el.innerHTML='<div class="empty">該当なし。レーダーは毎朝7:30に巡回します。</div>';return}
   el.innerHTML=v.map(i=>{
     const sc=i.score>=85?"hi":i.score>=70?"mid":"lo";
-    return`<div class="card ${i.direction}">
+    const days=i.deadline?daysUntil(i.deadline):null;
+    const urgent=days!==null&&days<=3?"urgent":"";
+    return`<div class="card ${i.direction} ${urgent}">
       <div class="card-title"><a href="${i.url}" target="_blank" rel="noopener">${esc(i.title)}</a></div>
       <div class="card-meta">
         <span class="tag tag-dir-${i.direction}">${DIR[i.direction]||i.direction}</span>
         <span class="tag tag-cat">${esc(i.category||"")}</span>
         <span class="tag tag-src">${esc(i.source||"")}</span>
         <span class="tag tag-date">${i.found_at}</span>
+        ${deadlineBadge(i.deadline)}
         ${i.needs_sharoushi?'<span class="sharoushi">⚠ 社労士提出</span>':''}
         <span class="score-badge score-${sc}">${i.score}pt</span>
       </div>
       ${i.reason?`<div class="reason">${esc(i.reason)}</div>`:""}
     </div>`}).join("");
 }
+
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+
 document.querySelector(".controls").addEventListener("click",e=>{
   const btn=e.target.closest("[data-f]");
   if(btn){filter=btn.dataset.f;document.querySelectorAll(".filter-btn").forEach(b=>b.classList.toggle("on",b===btn));render();}

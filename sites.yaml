@@ -1,9 +1,9 @@
-# 補助金レーダー 監視対象設定 v2
+# 補助金レーダー 監視対象設定 v3
 # type: rss … RSSフィードをそのまま読む
 # type: links … ページ内のリンク一覧を取得し、前回との差分を新着とみなす
 
 sites:
-  # ===== 既存（沖縄ローカル）=====
+  # ===== 沖縄ローカル =====
   - id: jnet21
     name: J-Net21 支援情報ヘッドライン
     type: rss
@@ -22,7 +22,13 @@ sites:
     include: "(公募|募集|補助|助成|委託|支援|採択)"
 
   - id: okinawa_ric
-    name: 沖縄県産業振興公社
+    name: 沖縄県産業振興公社 補助金・助成金
+    type: links
+    url: https://okinawa-ric.jp/service/subsidy.html
+    include: "(公募|募集|補助|助成|委託|支援|リスキリング|事業承継)"
+
+  - id: okinawa_ric_news
+    name: 沖縄県産業振興公社 新着情報
     type: links
     url: https://okinawa-ric.jp/
     include: "(公募|募集|補助|助成|委託|支援事業)"
@@ -33,7 +39,13 @@ sites:
     url: https://www.ocvb.or.jp/
     include: "(公募|募集|委託|プロポーザル|企画)"
 
-  # ===== 追加：国の主要補助金 =====
+  - id: ogb_okinawa
+    name: 内閣府 沖縄総合事務局 公募情報
+    type: links
+    url: https://www.ogb.go.jp/keisan/3842
+    include: "(公募|募集|補助|助成|委託|支援|事業)"
+
+  # ===== 国・全国系 =====
   - id: chusho_shindan
     name: 中小企業庁 補助金・助成金
     type: links
@@ -48,25 +60,37 @@ sites:
     include: "(補助|助成|委託|公募|支援|DX|デジタル|映像|コンテンツ|観光|中小)"
     exclude: "(終了|締切済|受付終了)"
 
+  - id: shokibo_shokokai
+    name: 小規模事業者持続化補助金（商工会地区）
+    type: links
+    url: https://official.jizokukanb.com/news/
+    include: "(公募|締切|補助|申請|受付|スケジュール)"
+
+  - id: shokibo_shokokaigi
+    name: 小規模事業者持続化補助金（商工会議所地区）
+    type: links
+    url: https://r6.jizokukahojokin.info/
+    include: "(公募|締切|補助|申請|受付)"
+
   - id: monodzukuri
-    name: ものづくり・商業・サービス生産性向上促進補助金
+    name: ものづくり・商業・サービス補助金
     type: links
     url: https://portal.monodukuri-hojo.jp/
     include: "(公募|締切|補助|申請|採択)"
 
-  - id: shokibo
-    name: 小規模事業者持続化補助金
-    type: links
-    url: https://r3.jizokukahojokin.info/
-    include: "(公募|締切|補助|申請|受付)"
-
-  - id: it_hojo
-    name: IT導入補助金
+  - id: digital_ai_hojo
+    name: デジタル化・AI導入補助金（旧IT導入補助金）
     type: links
     url: https://it-shien.smrj.go.jp/
-    include: "(公募|締切|補助|申請|受付|IT|デジタル)"
+    include: "(公募|締切|補助|申請|受付|IT|デジタル|AI)"
 
-  - id: jizokukahojokin_smrj
+  - id: shinjigyo
+    name: 中小企業新事業進出補助金
+    type: links
+    url: https://www.chusho.meti.go.jp/keiei/sapoin/shinjigyo/index.html
+    include: "(公募|締切|補助|申請|受付|新事業)"
+
+  - id: smrj_hojo
     name: 中小機構 補助金・助成金情報
     type: links
     url: https://www.smrj.go.jp/sme/fund/index.html
@@ -108,11 +132,20 @@ sites:
     url: https://www.mlit.go.jp/kankocho/shisaku/index.html
     include: "(公募|補助|助成|観光|コンテンツ|映像|地域)"
 
-  - id: jigyou_saikouchiku
-    name: 事業再構築補助金
+  # ===== 補助金集約サイト =====
+  - id: hojyokin_portal_okinawa
+    name: 補助金ポータル（沖縄県絞り込み）
     type: links
-    url: https://jigyou-saikouchiku.go.jp/
-    include: "(公募|締切|補助|申請|採択|結果)"
+    url: https://hojyokin-portal.jp/subsidies/list?pref_id=47
+    include: "(公募|補助|助成|申請|支援|募集)"
+    exclude: "(終了|締切済|受付終了)"
+
+  - id: smart_hojokin_okinawa
+    name: スマート補助金（沖縄県）
+    type: links
+    url: https://www.smart-hojokin.jp/subsidy/prefectures/47
+    include: "(公募|補助|助成|申請|支援|募集)"
+    exclude: "(終了|締切済|受付終了)"
 
 # 通知の足切り：スコアがこの値以上のものだけLINE通知
 notify_threshold: 60

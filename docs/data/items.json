@@ -1,5 +1,57 @@
 [
  {
+  "url": "https://okinawa-ric.jp/news/seminar/814-in-2.html",
+  "title": "【7/16開催】補助金活用セミナー＆個別相談会（開催地:伊是名村）",
+  "deadline": "2025-07-16",
+  "id": "97ed717ee4078c16",
+  "source": "沖縄県産業振興公社 新着情報",
+  "found_at": "2026-06-21",
+  "direction": "skip",
+  "category": "その他",
+  "score": 15,
+  "reason": "補助金そのものではなく補助金活用を学ぶセミナー・相談会の告知であり、TENOHIRAが申請できる制度や受託できる公募ではない。",
+  "needs_sharoushi": false
+ },
+ {
+  "url": "https://okinawa-ric.jp/news/seminar/814-in-2.html",
+  "title": "【7/16開催】補助金活用セミナー＆個別相談会（開催地:伊是名村）",
+  "deadline": "2025-07-16",
+  "id": "97ed717ee4078c16",
+  "source": "沖縄県産業振興公社 新着情報",
+  "found_at": "2026-06-21",
+  "direction": "skip",
+  "category": "その他",
+  "score": 15,
+  "reason": "補助金の紹介セミナーであり、特定の補助金公募ではなく、TENOHIRAが直接申請または提案できる案件ではない。",
+  "needs_sharoushi": false
+ },
+ {
+  "url": "https://okinawa-ric.jp/news/seminar/814-in-2.html",
+  "title": "2026年06月22日セミナー【7/16開催】補助金活用セミナー＆個別相談会（開催地:伊是名村）",
+  "deadline": null,
+  "id": "97ed717ee4078c16",
+  "source": "沖縄県産業振興公社 新着情報",
+  "found_at": "2026-06-21",
+  "direction": "skip",
+  "category": "その他",
+  "score": 10,
+  "reason": "補助金制度そのものではなく、7/16開催の説明会・相談会イベントの告知であり申請対象ではない。",
+  "needs_sharoushi": false
+ },
+ {
+  "url": "https://www.pref.okinawa.lg.jp/shigoto/nyusatsukeiyaku/1015342/1025067/1037594/1040321.html",
+  "title": "令和8年度沖縄県水道地図作成委託業務の一般競争入札",
+  "deadline": null,
+  "id": "8967bac4b706554c",
+  "source": "沖縄県庁 商工労働部 公募・募集",
+  "found_at": "2026-06-21",
+  "direction": "skip",
+  "category": "その他",
+  "score": 5,
+  "reason": "水道地図作成という専門的な測量・GIS業務であり、TENOHIRAの映像・Web・システム開発・マーケティング事業領域とは関連性が極めて低い。",
+  "needs_sharoushi": false
+ },
+ {
   "url": "https://okinawa-ric.jp/service/post-56.html",
   "title": "課題解決集中支援事業",
   "deadline": null,

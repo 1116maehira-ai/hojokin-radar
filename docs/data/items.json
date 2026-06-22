@@ -1,5 +1,57 @@
 [
  {
+  "url": "https://it-shien.smrj.go.jp/antifraud/",
+  "title": "Exclamation icon デジタル化・AI導入補助金（旧：IT導入補助金）は不正を絶対に許しません",
+  "deadline": null,
+  "id": "65fe7caa781e5447",
+  "source": "デジタル化・AI導入補助金（旧IT導入補助金）",
+  "found_at": "2026-06-22",
+  "direction": "skip",
+  "category": "その他",
+  "score": 0,
+  "reason": "IT導入補助金の不正防止に関する注意喚起ページであり、新規公募案内ではない。",
+  "needs_sharoushi": false
+ },
+ {
+  "url": "https://www.ogb.go.jp/keisan/3842/f_00/260622_01",
+  "title": "令和８年度「国内温室効果ガス排出削減・吸収量認証制度実施事業費（J-クレジット制度推進のための地域支援事業）の公募を開始します。",
+  "deadline": null,
+  "id": "e82cae80d4800c79",
+  "source": "内閣府 沖縄総合事務局 公募情報",
+  "found_at": "2026-06-22",
+  "direction": "skip",
+  "category": "その他",
+  "score": 5,
+  "reason": "J-クレジット制度は温室効果ガス削減プロジェクトの認証・売買を支援する制度であり、映像制作・Web制作・システム開発を主業とするTENOHIRAの事業領域と直接の関連性がない。",
+  "needs_sharoushi": false
+ },
+ {
+  "url": "https://www.ocvb.or.jp/topics/4809",
+  "title": "【国内事業部】令和8年度スポーツアイランド沖縄 動画活用プロモーション業務にかかる企画公募型コンペティションについて(2026.06.22更新）",
+  "deadline": null,
+  "id": "1d1b11ff0fdaff39",
+  "source": "OCVB 沖縄観光コンベンションビューロー",
+  "found_at": "2026-06-22",
+  "direction": "self",
+  "category": "委託・コンテンツ公募型",
+  "score": 95,
+  "reason": "沖縄観光系の動画制作業務委託公募で、TENOHIRAの主力事業（観光PR映像制作）と完全一致し元請を狙える案件。",
+  "needs_sharoushi": false
+ },
+ {
+  "url": "https://www.pref.okinawa.lg.jp/shigoto/nyusatsukeiyaku/1015342/1025064/1037584/1040471.html",
+  "title": "令和8年度県民等参画促進事業委託業務に係る企画提案公募",
+  "deadline": null,
+  "id": "b08d7c5b145ac0f1",
+  "source": "沖縄県庁 商工労働部 公募・募集",
+  "found_at": "2026-06-22",
+  "direction": "self",
+  "category": "委託・コンテンツ公募型",
+  "score": 85,
+  "reason": "沖縄県による県民参画促進事業の企画提案公募で、観光・文化系コンテンツ制作やPR映像制作の実績を活かし元請として応札できる可能性が高い。",
+  "needs_sharoushi": false
+ },
+ {
   "url": "https://okinawa-ric.jp/news/seminar/814-in-2.html",
   "title": "【7/16開催】補助金活用セミナー＆個別相談会（開催地:伊是名村）",
   "deadline": "2025-07-16",

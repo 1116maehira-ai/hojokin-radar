@@ -152,6 +152,11 @@ def fetch_rss(site):
     return out
 
 # ---------- jGrants 公式API ----------
+# 採択後フェーズ（新規公募ではない）のレコードを除外するパターン
+JGRANTS_SKIP_TITLE = re.compile(
+    r"(交付申請|実績報告|完了報告|変更承認|上乗せ措置|促進上乗せ|共同申請者|"
+    r"事業化状況報告|繰越|概算払|取下げ)")
+
 def _iso_date(s):
     """'2026-07-03T08:00:00.000Z' -> '2026-07-03'"""
     return s[:10] if s else None
@@ -159,10 +164,12 @@ def _iso_date(s):
 def fetch_jgrants(site):
     """デジタル庁jGrants公開APIから受付中(acceptance=1)の補助金を取得。
     複数キーワードで叩いてid重複排除し、対象地域が全国/沖縄県のものだけ残す。
-    締切・補助上限・対象従業員が構造化データで最初から取れる。"""
+    締切・補助上限・対象従業員が構造化データで最初から取れる。
+    採択後フェーズ・締切が極端に先のレコードは新規公募でないため除外。"""
     areas = site.get("areas", [])
     keywords = site.get("keywords", ["事業"])
     seen_ids, out = set(), []
+    today = datetime.date.today()
     for kw in keywords:
         try:
             r = requests.get(JGRANTS_API, headers=UA, timeout=30, params={
@@ -177,17 +184,29 @@ def fetch_jgrants(site):
             jid = it.get("id")
             if not jid or jid in seen_ids:
                 continue
+            title = it.get("title") or it.get("name") or "(無題)"
+            # 採択後フェーズ（交付申請・実績報告等）は新規公募でないので除外
+            if JGRANTS_SKIP_TITLE.search(title):
+                continue
             area = it.get("target_area_search") or ""
             # 沖縄企業が使えるもの＝対象地域に全国 or 沖縄県を含むもののみ
             if areas and not any(a in area for a in areas):
                 continue
+            deadline = _iso_date(it.get("acceptance_end_datetime"))
+            # 締切が1年半(540日)以上先＝新規公募でなく手続き期限の可能性が高く除外
+            if deadline:
+                try:
+                    if (datetime.date.fromisoformat(deadline) - today).days > 540:
+                        continue
+                except ValueError:
+                    pass
             seen_ids.add(jid)
             url = it.get("front_subsidy_detail_page_url") \
                   or f"https://www.jgrants-portal.go.jp/subsidy/{jid}"
             out.append({
                 "url": url,
-                "title": it.get("title") or it.get("name") or "(無題)",
-                "deadline": _iso_date(it.get("acceptance_end_datetime")),
+                "title": title,
+                "deadline": deadline,
                 "subsidy_max_limit": it.get("subsidy_max_limit"),
                 "target_area": area,
                 "target_employees": it.get("target_number_of_employees"),
@@ -275,6 +294,7 @@ def main():
     today   = datetime.date.today().isoformat()
 
     items = purge_expired_items(items)
+    items = [i for i in items if i.get("direction") != "skip"]  # 無関係(skip)を一掃
 
     new_items = []
     for site in cfg["sites"]:
@@ -316,6 +336,8 @@ def main():
         else:
             c.pop("deadline", None)
         it.update(c)
+        if it.get("direction") == "skip":
+            continue  # 無関係はレーダーに乗せない
         items.insert(0, it)
 
     os.makedirs(os.path.dirname(SEEN_PATH), exist_ok=True)

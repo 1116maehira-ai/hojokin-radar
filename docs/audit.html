@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>補助金レーダー ─ 取得実測</title>
+<style>
+  :root{
+    --bg:#ffffff; --ink:#1a1a1a; --sub:#6b7280; --line:#e5e7eb;
+    --ok:#15803d; --ok-bg:#dcfce7; --empty:#9ca3af; --empty-bg:#f3f4f6;
+    --js:#b45309; --js-bg:#fef3c7; --blk:#c2410c; --blk-bg:#ffedd5;
+    --err:#b91c1c; --err-bg:#fee2e2; --accent:#ea580c;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,"Hiragino Kaku Gothic ProN",sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.6;padding:20px}
+  .wrap{max-width:1100px;margin:0 auto}
+  h1{font-size:1.5rem;margin:0 0 4px;display:flex;align-items:center;gap:8px}
+  .gen{color:var(--sub);font-size:.8rem;margin-bottom:18px}
+  .summary{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px}
+  .card{flex:1;min-width:120px;border:1px solid var(--line);border-radius:10px;
+    padding:12px 14px;text-align:center}
+  .card .n{font-size:1.7rem;font-weight:700;line-height:1.1}
+  .card .l{font-size:.75rem;color:var(--sub);margin-top:2px}
+  .card.big{background:#fff7ed;border-color:#fed7aa}
+  table{width:100%;border-collapse:collapse;font-size:.85rem}
+  th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-size:.72rem;color:var(--sub);font-weight:600;text-transform:uppercase;
+    letter-spacing:.03em;white-space:nowrap}
+  td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:.72rem;font-weight:700;white-space:nowrap}
+  .ok{color:var(--ok);background:var(--ok-bg)}
+  .empty{color:var(--empty);background:var(--empty-bg)}
+  .js_suspect{color:var(--js);background:var(--js-bg)}
+  .blocked{color:var(--blk);background:var(--blk-bg)}
+  .error{color:var(--err);background:var(--err-bg)}
+  .site{font-weight:600}
+  .note{color:var(--sub);font-size:.78rem;margin-top:2px}
+  .funnel{font-size:.72rem;color:var(--sub);white-space:nowrap}
+  .drop{color:var(--err);font-weight:600}
+  details summary{cursor:pointer;color:var(--accent);font-size:.78rem;margin-top:4px;list-style:none}
+  details summary::-webkit-details-marker{display:none}
+  details summary::before{content:"▸ ";}
+  details[open] summary::before{content:"▾ ";}
+  .samples{margin:6px 0 2px;padding-left:16px}
+  .samples li{font-size:.8rem;color:#374151;margin:2px 0}
+  .err-row{font-size:.95rem;color:var(--err)}
+  #loading{padding:40px;text-align:center;color:var(--sub)}
+  .legend{font-size:.75rem;color:var(--sub);margin:14px 0 6px}
+  .legend b{color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>📡 補助金レーダー ─ 取得実測</h1>
+  <div class="gen" id="gen"></div>
+  <div id="loading">実測データを読み込み中…（まだ無い場合は Actions の「radar-audit」を1回実行してな）</div>
+  <div id="content" style="display:none">
+    <div class="summary" id="summary"></div>
+    <div class="legend">
+      <b>final</b>＝今レーダーに乗る件数（実測）／<b>raw</b>＝ページ内リンク総数／
+      <b>締切</b>＝finalのうちタイトルから締切が取れた数。
+      <span class="drop">赤字</span>はフィルタで大量脱落＝穴の疑い。
+    </div>
+    <table>
+      <thead><tr>
+        <th>状態</th><th>サイト</th><th class="num">final</th>
+        <th class="num">raw</th><th>絞り込みの流れ</th>
+        <th class="num">締切</th>
+      </tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+</div>
+<script>
+const STATUS_LABEL={ok:"✅ OK",empty:"⬜ 0件",js_suspect:"🟡 JS疑い",blocked:"🚫 ブロック",error:"❌ エラー"};
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+
+function funnel(s){
+  if(s.type==="rss") return `RSS item ${s.raw_links} → 有効 ${s.final}`;
+  const drop=(a,b)=> (a>0&&b<a*0.2&&a-b>3) ? `<span class="drop">${b}</span>` : b;
+  return `raw ${s.raw_links} → len≥6 ${drop(s.raw_links,s.after_len6)}`
+       + ` → include ${drop(s.after_len6,s.after_include)}`
+       + ` → 期限内 ${drop(s.after_include,s.final)}`;
+}
+
+fetch('data/audit.json?'+Date.now()).then(r=>{
+  if(!r.ok) throw new Error('no audit.json'); return r.json();
+}).then(d=>{
+  document.getElementById('loading').style.display='none';
+  document.getElementById('content').style.display='block';
+  document.getElementById('gen').textContent='実測日時：'+d.generated_at.replace('T',' ');
+  const t=d.totals;
+  document.getElementById('summary').innerHTML=`
+    <div class="card big"><div class="n">${t.total_final}</div><div class="l">取得総数</div></div>
+    <div class="card"><div class="n" style="color:var(--ok)">${t.ok}</div><div class="l">取得OK</div></div>
+    <div class="card"><div class="n" style="color:var(--empty)">${t.empty}</div><div class="l">0件</div></div>
+    <div class="card"><div class="n" style="color:var(--js)">${t.js_suspect}</div><div class="l">JS描画疑い</div></div>
+    <div class="card"><div class="n" style="color:var(--blk)">${t.blocked}</div><div class="l">ブロック</div></div>
+    <div class="card"><div class="n" style="color:var(--err)">${t.error}</div><div class="l">エラー</div></div>
+    <div class="card"><div class="n">${Math.round(100*t.total_deadline_hit/Math.max(t.total_final,1))}%</div><div class="l">締切抽出率</div></div>`;
+  // final降順→状態順
+  const order={error:0,blocked:1,js_suspect:2,empty:3,ok:4};
+  d.sites.sort((a,b)=> (order[a.status]-order[b.status]) || (b.final-a.final));
+  document.getElementById('rows').innerHTML=d.sites.map(s=>{
+    const samp=(s.samples&&s.samples.length)
+      ? `<details><summary>中身を見る (${s.samples.length})</summary><ul class="samples">${
+          s.samples.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></details>`
+      : "";
+    const note=s.note?`<div class="note">${esc(s.note)}</div>`:"";
+    const http=s.http_code?` <span style="color:var(--sub);font-size:.7rem">HTTP${s.http_code}</span>`:"";
+    return `<tr>
+      <td><span class="badge ${s.status}">${STATUS_LABEL[s.status]}</span></td>
+      <td><div class="site">${esc(s.name)}</div>
+          <div class="note" style="color:#9ca3af">${esc(s.id)} · ${s.type}${http}</div>
+          ${note}${samp}</td>
+      <td class="num" style="font-weight:700;font-size:1rem">${s.final}</td>
+      <td class="num">${s.raw_links}</td>
+      <td><span class="funnel">${funnel(s)}</span></td>
+      <td class="num">${s.deadline_hit}</td>
+    </tr>`;
+  }).join("");
+}).catch(e=>{
+  document.getElementById('loading').innerHTML=
+    '実測データ(data/audit.json)がまだありません。<br>GitHubの Actions タブ → <b>radar-audit</b> → Run workflow を1回押してください。';
+});
+</script>
+</body>
+</html>

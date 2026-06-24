@@ -1,0 +1,32 @@
+name: radar-audit
+
+# Actions タブから手動で「Run workflow」を押すと実測が走る
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deps
+        run: pip install requests pyyaml
+
+      - name: Run audit
+        run: python audit.py
+
+      - name: Commit result
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/data/audit.json
+          git commit -m "audit: 取得実測を更新" || echo "no changes"
+          git push

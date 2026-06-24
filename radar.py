@@ -14,6 +14,7 @@ SEEN_PATH = os.path.join(ROOT, "docs", "data", "seen.json")
 ITEMS_PATH = os.path.join(ROOT, "docs", "data", "items.json")
 PROFILE_PATH = os.path.join(ROOT, "company_profile.md")
 UA = {"User-Agent": "Mozilla/5.0 (TENOHIRA hojokin-radar; +https://github.com/)"}
+JGRANTS_API = "https://api.jgrants-portal.go.jp/exp/v1/public/subsidies"
 
 # ---------- 締切日抽出 ----------
 DEADLINE_PATTERNS = [
@@ -150,6 +151,50 @@ def fetch_rss(site):
         out.append({"url": link, "title": title})
     return out
 
+# ---------- jGrants 公式API ----------
+def _iso_date(s):
+    """'2026-07-03T08:00:00.000Z' -> '2026-07-03'"""
+    return s[:10] if s else None
+
+def fetch_jgrants(site):
+    """デジタル庁jGrants公開APIから受付中(acceptance=1)の補助金を取得。
+    複数キーワードで叩いてid重複排除し、対象地域が全国/沖縄県のものだけ残す。
+    締切・補助上限・対象従業員が構造化データで最初から取れる。"""
+    areas = site.get("areas", [])
+    keywords = site.get("keywords", ["事業"])
+    seen_ids, out = set(), []
+    for kw in keywords:
+        try:
+            r = requests.get(JGRANTS_API, headers=UA, timeout=30, params={
+                "keyword": kw, "sort": "acceptance_end_datetime",
+                "order": "ASC", "acceptance": 1})
+            r.raise_for_status()
+            result = r.json().get("result", [])
+        except Exception as e:
+            print(f"[WARN] jgrants kw={kw}: {e}", file=sys.stderr)
+            continue
+        for it in result:
+            jid = it.get("id")
+            if not jid or jid in seen_ids:
+                continue
+            area = it.get("target_area_search") or ""
+            # 沖縄企業が使えるもの＝対象地域に全国 or 沖縄県を含むもののみ
+            if areas and not any(a in area for a in areas):
+                continue
+            seen_ids.add(jid)
+            url = it.get("front_subsidy_detail_page_url") \
+                  or f"https://www.jgrants-portal.go.jp/subsidy/{jid}"
+            out.append({
+                "url": url,
+                "title": it.get("title") or it.get("name") or "(無題)",
+                "deadline": _iso_date(it.get("acceptance_end_datetime")),
+                "subsidy_max_limit": it.get("subsidy_max_limit"),
+                "target_area": area,
+                "target_employees": it.get("target_number_of_employees"),
+            })
+    print(f"[jGrants] {len(out)} 件（受付中・全国/沖縄対象・{len(keywords)}キーワード）")
+    return out
+
 # ---------- Claude 分類 ----------
 CLASSIFY_PROMPT = """あなたは沖縄の中小企業「株式会社TENOHIRA」の補助金リサーチ担当です。
 会社プロフィール:
@@ -159,7 +204,7 @@ CLASSIFY_PROMPT = """あなたは沖縄の中小企業「株式会社TENOHIRA」
 
 新着情報:
 タイトル: {title}
-URL: {url}
+URL: {url}{extra}
 
 出力フォーマット:
 {{
@@ -172,11 +217,20 @@ URL: {url}
 }}"""
 
 def classify(item, profile, api_key):
+    extra = ""
+    if item.get("subsidy_max_limit"):
+        extra += f"\n補助上限額: {item['subsidy_max_limit']:,}円"
+    if item.get("target_area"):
+        extra += f"\n対象地域: {item['target_area']}"
+    if item.get("target_employees"):
+        extra += f"\n対象規模: {item['target_employees']}"
+    if item.get("deadline"):
+        extra += f"\n締切: {item['deadline']}"
     body = {
         "model": "claude-sonnet-4-5",
         "max_tokens": 300,
         "messages": [{"role": "user", "content": CLASSIFY_PROMPT.format(
-            profile=profile, title=item["title"], url=item["url"])}],
+            profile=profile, title=item["title"], url=item["url"], extra=extra)}],
     }
     r = requests.post(
         "https://api.anthropic.com/v1/messages",
@@ -225,7 +279,12 @@ def main():
     new_items = []
     for site in cfg["sites"]:
         try:
-            found = fetch_rss(site) if site["type"] == "rss" else fetch_links(site)
+            if site["type"] == "rss":
+                found = fetch_rss(site)
+            elif site["type"] == "jgrants":
+                found = fetch_jgrants(site)
+            else:
+                found = fetch_links(site)
         except Exception as e:
             print(f"[WARN] {site['id']}: {e}", file=sys.stderr)
             continue
@@ -235,10 +294,12 @@ def main():
         for it in found:
             h = hashlib.sha1(it["url"].encode()).hexdigest()[:16]
             current_ids.append(h)
-            if h in seen_ids or first_run:
+            # jGrantsは受付中＝今出すべき情報なので初回からnew_itemsに入れる
+            if h in seen_ids or (first_run and site["type"] != "jgrants"):
                 continue
-            # タイトルから締切日を抽出
-            it["deadline"] = extract_deadline(it["title"])
+            # 締切が未取得の場合のみタイトルから抽出（jGrantsは正規の締切を保持）
+            if not it.get("deadline"):
+                it["deadline"] = extract_deadline(it["title"])
             it.update({"id": h, "source": site["name"], "found_at": today})
             new_items.append(it)
         seen[site["id"]] = list(set(seen.get(site["id"], []) + current_ids))

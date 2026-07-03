@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>人材開発支援助成金｜大企業向けご説明</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif;
+  background: #f5f5f3;
+  color: #1a1a1a;
+  line-height: 1.7;
+}
+
+/* HERO */
+.hero {
+  background: #0a1929;
+  color: #fff;
+  padding: 52px 24px 44px;
+  text-align: center;
+}
+.hero-eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: #90b8d4;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+}
+.hero h1 {
+  font-size: clamp(24px, 5vw, 44px);
+  font-weight: 900;
+  line-height: 1.2;
+  margin-bottom: 10px;
+}
+.hero h1 em {
+  font-style: normal;
+  color: #f5c518;
+}
+.hero-sub {
+  font-size: 13px;
+  color: #90b8d4;
+  margin-bottom: 36px;
+}
+.hero-badge {
+  display: inline-block;
+  background: rgba(245,197,24,0.15);
+  border: 1px solid #f5c518;
+  color: #f5c518;
+  font-size: 12px;
+  padding: 5px 16px;
+  border-radius: 20px;
+  letter-spacing: 0.05em;
+}
+
+/* NUMBERS ROW */
+.nums {
+  display: flex;
+  justify-content: center;
+  gap: 1px;
+  margin-top: 32px;
+  flex-wrap: wrap;
+}
+.num-block {
+  background: rgba(255,255,255,0.06);
+  padding: 20px 28px;
+  text-align: center;
+  min-width: 120px;
+  flex: 1;
+  max-width: 200px;
+}
+.num-block:first-child { border-radius: 10px 0 0 10px; }
+.num-block:last-child  { border-radius: 0 10px 10px 0; }
+.num-val {
+  font-size: 38px;
+  font-weight: 900;
+  color: #f5c518;
+  line-height: 1;
+}
+.num-unit { font-size: 16px; font-weight: 700; color: #f5c518; }
+.num-desc { font-size: 11px; color: #90b8d4; margin-top: 6px; }
+
+/* BODY */
+.wrap {
+  max-width: 660px;
+  margin: 0 auto;
+  padding: 48px 20px 80px;
+}
+
+/* SECTION LABEL */
+.slabel {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #90b8d4;
+  border-left: 3px solid #90b8d4;
+  padding-left: 10px;
+  margin-bottom: 16px;
+}
+
+/* CARD */
+.card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 22px 24px;
+  margin-bottom: 12px;
+}
+.card h3 {
+  font-size: 15px;
+  font-weight: 700;
+  color: #0a1929;
+  margin-bottom: 6px;
+}
+.card p { font-size: 13px; color: #555; }
+.card .tag {
+  display: inline-block;
+  background: #e8f4fd;
+  color: #0a6a9e;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+/* CALCULATOR */
+.calc-wrap {
+  background: #fff;
+  border-radius: 14px;
+  padding: 28px 24px;
+  margin-bottom: 12px;
+  border: 2px solid #0a1929;
+}
+.calc-wrap h3 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0a1929;
+  margin-bottom: 20px;
+}
+.slider-row {
+  margin-bottom: 20px;
+}
+.slider-row label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 6px;
+}
+.slider-row label span {
+  font-weight: 700;
+  color: #0a1929;
+}
+input[type=range] {
+  width: 100%;
+  accent-color: #0a1929;
+  height: 4px;
+  cursor: pointer;
+}
+.result-box {
+  background: #0a1929;
+  border-radius: 10px;
+  padding: 20px;
+  margin-top: 20px;
+}
+.result-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: #90b8d4;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.result-row:last-child { border: none; }
+.result-row .rv { font-weight: 700; color: #fff; }
+.result-total {
+  margin-top: 12px;
+  text-align: center;
+}
+.result-total .big {
+  font-size: 36px;
+  font-weight: 900;
+  color: #f5c518;
+  line-height: 1;
+}
+.result-total .label {
+  font-size: 12px;
+  color: #90b8d4;
+  margin-top: 4px;
+}
+
+/* FLOW */
+.flow { margin-bottom: 12px; }
+.flow-item {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  background: #fff;
+  border-radius: 10px;
+  padding: 16px 18px;
+  margin-bottom: 4px;
+}
+.flow-num {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  background: #0a1929;
+  color: #f5c518;
+  font-size: 12px;
+  font-weight: 900;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.flow-content strong {
+  display: block;
+  font-size: 13px;
+  color: #0a1929;
+  margin-bottom: 2px;
+}
+.flow-content p { font-size: 12px; color: #666; }
+.flow-arrow {
+  text-align: center;
+  color: #ccc;
+  font-size: 18px;
+  margin: 2px 0;
+}
+
+/* NOTICE */
+.notice {
+  background: #fff8e1;
+  border-left: 4px solid #f5c518;
+  border-radius: 0 10px 10px 0;
+  padding: 14px 18px;
+  font-size: 13px;
+  color: #7a5c00;
+  margin-bottom: 12px;
+}
+.notice strong { display: block; margin-bottom: 4px; }
+
+/* SOURCE */
+.source {
+  background: #fff;
+  border-radius: 10px;
+  padding: 16px 20px;
+  font-size: 12px;
+  color: #444;
+}
+.source a { color: #0a6a9e; word-break: break-all; }
+
+/* FOOTER */
+.footer {
+  background: #0a1929;
+  color: #90b8d4;
+  text-align: center;
+  padding: 32px 24px;
+  font-size: 13px;
+}
+.footer .name {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.footer p { margin-bottom: 4px; }
+
+/* SECTION GAP */
+.sec { margin-bottom: 36px; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-eyebrow">厚生労働省 人材開発支援助成金</div>
+  <h1>マーケ・採用部門の<br>研修費が<em>国から戻ります。</em></h1>
+  <p class="hero-sub">事業展開等リスキリング支援コース｜2027年3月末まで期間限定</p>
+  <div class="hero-badge">大企業も対象 ✓</div>
+
+  <div class="nums">
+    <div class="num-block">
+      <div class="num-val">60<span class="num-unit">%</span></div>
+      <div class="num-desc">研修費が戻る</div>
+    </div>
+    <div class="num-block">
+      <div class="num-val">500<span class="num-unit">円</span></div>
+      <div class="num-desc">賃金助成/人/時間</div>
+    </div>
+    <div class="num-block">
+      <div class="num-val">1<span class="num-unit">億</span></div>
+      <div class="num-desc">年間上限（笑）</div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- 何に使えるか -->
+  <div class="sec">
+    <div class="slabel">このコースで何ができるか</div>
+
+    <div class="card">
+      <div class="tag">対象コース</div>
+      <h3>事業展開等リスキリング支援コース</h3>
+      <p>DX推進・マーケ・採用・コンテンツ運用・AI活用など、<br>新たなスキルを社員に習得させる研修費用が対象になります。</p>
+    </div>
+
+    <div class="card">
+      <h3>採択審査なし「要件を満たせば受給できる」</h3>
+      <p>補助金と違い、競争倍率がありません。雇用保険に加入していれば大企業でも申請できます。</p>
+    </div>
+
+    <div class="card">
+      <h3>2026年3月の改正で対象が大幅拡大</h3>
+      <p>「具体的なDX計画がなくても、<br>人材育成計画があれば申請できる」ようになりました。</p>
+    </div>
+  </div>
+
+  <!-- 試算シミュレーター -->
+  <div class="sec">
+    <div class="slabel">試算シミュレーター（大企業）</div>
+    <div class="calc-wrap">
+      <h3>スライダーを動かしてみてください</h3>
+
+      <div class="slider-row">
+        <label>受講人数<span id="pLabel">10名</span></label>
+        <input type="range" id="persons" min="1" max="50" value="10">
+      </div>
+      <div class="slider-row">
+        <label>訓練時間<span id="hLabel">40時間</span></label>
+        <input type="range" id="hours" min="10" max="200" value="40" step="10">
+      </div>
+      <div class="slider-row">
+        <label>1人あたり研修費<span id="cLabel">30万円</span></label>
+        <input type="range" id="cost" min="10" max="100" value="30" step="5">
+      </div>
+
+      <div class="result-box">
+        <div class="result-row">
+          <span>研修費合計</span>
+          <span class="rv" id="rTotal">300万円</span>
+        </div>
+        <div class="result-row">
+          <span>経費助成（60%）</span>
+          <span class="rv" id="rKeihiAid">▲180万円</span>
+        </div>
+        <div class="result-row">
+          <span>賃金助成（500円×時間×人数）</span>
+          <span class="rv" id="rChinginAid">▲20万円</span>
+        </div>
+        <div class="result-total">
+          <div class="big" id="rBurden">約100万円</div>
+          <div class="label">実質の企業負担</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 手続きの流れ -->
+  <div class="sec">
+    <div class="slabel">手続きの流れ</div>
+    <div class="flow">
+      <div class="flow-item">
+        <div class="flow-num">0</div>
+        <div class="flow-content">
+          <strong>研修内容・カリキュラムを決める</strong>
+          <p>前平が一緒に作ります</p>
+        </div>
+      </div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-item">
+        <div class="flow-num">1</div>
+        <div class="flow-content">
+          <strong>計画届を提出（研修開始の1ヶ月前まで）</strong>
+          <p>これが最重要。前平が書類を作ります</p>
+        </div>
+      </div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-item">
+        <div class="flow-num">2</div>
+        <div class="flow-content">
+          <strong>研修を実施</strong>
+          <p>前平が講師として実施します</p>
+        </div>
+      </div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-item">
+        <div class="flow-num">3</div>
+        <div class="flow-content">
+          <strong>支給申請（研修終了後2ヶ月以内）</strong>
+          <p>前平が申請書類を作ります。御社のご負担は最小限</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 注意 -->
+  <div class="sec">
+    <div class="notice">
+      <strong>⚠️ 唯一の注意点</strong>
+      研修開始前に計画届を出さないと全額対象外になります。<br>
+      「まず動き出すこと」だけがリスク回避の方法です。
+    </div>
+  </div>
+
+  <!-- 公式根拠 -->
+  <div class="sec">
+    <div class="slabel">公式根拠</div>
+    <div class="source">
+      厚生労働省 公式リーフレット（大企業の助成率・上限額を明記）<br>
+      <a href="https://www.mhlw.go.jp/content/11800000/001687619.pdf">
+        https://www.mhlw.go.jp/content/11800000/001687619.pdf
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  <div class="name">株式会社TENOHIRA　前平 雄一朗</div>
+  <p>申請書類はすべて私が作ります。費用はいただきません。</p>
+  <p>資料・手順書を持って30分だけご説明させてください。</p>
+  <p style="margin-top:8px; color:#f5c518;">担当の方へのメールでも大丈夫です🙇</p>
+</div>
+
+<script>
+function fmt(n) {
+  if (n >= 10000) return Math.round(n/10000) + '億円';
+  if (n >= 1000) return Math.round(n/10)/100 + '億円';
+  return Math.round(n/10)/10 + '万円';
+}
+function fmtM(n) {
+  return Math.round(n) + '万';
+}
+
+function calc() {
+  const p = +document.getElementById('persons').value;
+  const h = +document.getElementById('hours').value;
+  const c = +document.getElementById('cost').value; // 万円/人
+
+  document.getElementById('pLabel').textContent = p + '名';
+  document.getElementById('hLabel').textContent = h + '時間';
+  document.getElementById('cLabel').textContent = c + '万円';
+
+  // 経費助成上限（大企業）
+  let cap = 20; // 万円
+  if (h >= 200) cap = 30;
+  else if (h >= 100) cap = 25;
+
+  const total = c * p; // 万円
+  const keihiBase = c * 0.6;
+  const keihiPerPerson = Math.min(keihiBase, cap);
+  const keihi = keihiPerPerson * p;
+  const chingin = h * 500 * p / 10000; // 万円
+  const burden = Math.max(0, total - keihi - chingin);
+
+  document.getElementById('rTotal').textContent = fmtM(total) + '円';
+  document.getElementById('rKeihiAid').textContent = '▲' + fmtM(keihi) + '円';
+  document.getElementById('rChinginAid').textContent = '▲' + fmtM(chingin) + '円';
+  document.getElementById('rBurden').textContent = '約' + fmtM(burden) + '円';
+}
+
+document.getElementById('persons').addEventListener('input', calc);
+document.getElementById('hours').addEventListener('input', calc);
+document.getElementById('cost').addEventListener('input', calc);
+calc();
+</script>
+</body>
+</html>

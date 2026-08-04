@@ -174,6 +174,7 @@
       vx:0, facing: fromRight?-1:1, hp:cfg.enemyHp, maxHp:cfg.enemyHp,
       pow:cfg.enemyPow, spd:cfg.enemySpd, atkCd: 0.15+Math.random()*0.35, hitFlash:0, lunge:0,
       phase: Math.random()*6.28,                       // 揺れ位相
+      pose:'enemy', poseTimer:0,                        // ランダムに切り替わる表示ポーズ
       hue: [0, 285, 200][Math.floor(Math.random()*3)]  // 赤/紫/青の鬼
     });
   }
@@ -306,6 +307,7 @@
           addFloater(en.x, GROUND_Y-150, dmg, col, false);
           spawnBurst(en.x, GROUND_Y-110, col, 9);
           addShake(4);
+          hero.energy = Math.min(hero.maxEnergy, hero.energy + 4); updateHud(); // 殴っても気力が少し溜まる
         }
       }
     }
@@ -342,6 +344,10 @@
       if(en.hp<=0){ en.dead=(en.dead||0)+dt; continue; }
       en.facing = hero.x>=en.x?1:-1;
       if(en.hitFlash>0) en.hitFlash-=dt;
+      // ぐにゃぐにゃ中に高速ランダムでポーズ切替（ジタバタ）
+      en.poseTimer -= dt;
+      if(en.poseTimer<=0){ en.poseTimer = 0.07+Math.random()*0.11;
+        const r=Math.random(); en.pose = r<0.34?'enemy':(r<0.67?'enemy_punch':'enemy_kick'); }
       // knockback friction
       en.x += en.vx*dt; en.vx *= 0.86;
       const d = hero.x-en.x;
@@ -547,8 +553,7 @@
   function drawEnemy(en){
     const x=en.x, alive=en.hp>0; const f=en.facing;
     if(IMG.enemy){
-      let img=IMG.enemy;
-      if(en.lunge>0 && en.atkType && IMG['enemy_'+en.atkType]) img=IMG['enemy_'+en.atkType]; // 攻撃ポーズ
+      let img = IMG[en.pose] || IMG.enemy;   // ランダムに切り替わるポーズ
       const h=206, w=h*(img.width/img.height);
       ctx.fillStyle='rgba(0,0,0,.30)'; ctx.beginPath(); ctx.ellipse(x,GROUND_Y+26,48,12,0,0,7); ctx.fill();
       ctx.save(); ctx.translate(x+(en.lunge>0?f*12:0), en.y);

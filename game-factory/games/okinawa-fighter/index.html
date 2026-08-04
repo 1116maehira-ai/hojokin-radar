@@ -90,7 +90,7 @@
         <h1>沖縄ファイター <span style="font-size:.5em;opacity:.7">(仮)</span></h1>
         <div class="help">
           <b>ドラッグ</b>=移動／<b>上スワイプ</b>=ジャンプ<br>
-          <b>タップ</b>=攻撃（1回弱・2回中・3回強）<br>
+          <b>タップ</b>=パンチ（連打OK！）<br>
           <b>長押し</b>=ガード → 気力満タンで<b>気の玉</b>
           <div style="opacity:.65;margin-top:4px;font-size:.85em">PC: ←→ / ↑ / J / K / L</div>
         </div>
@@ -174,18 +174,14 @@
   let tapCount=0, tapTimer=null;
   const frame=$('frame');
 
-  function registerTap(){
-    tapCount = Math.min(3, tapCount+1);
-    if(tapTimer) clearTimeout(tapTimer);
-    tapTimer = setTimeout(()=>{ doAttack(tapCount); tapCount=0; }, 230);
-  }
+  function registerTap(){ doAttack(); }   // タップ＝即1発（連打OK）
 
-  function doAttack(strength){
+  function doAttack(){
     if(state!=='playing' || hero.atk>0) return;
-    hero.atkStr = strength;                 // 1..3
+    hero.atkStr = 2;                         // 描画用の一定リーチ（強弱は廃止）
     hero.atkType = Math.random()<0.5 ? 'punch':'kick';
-    hero.atk = 0.22;                         // 攻撃継続時間
-    hero.lunge = 0.14;                       // 前進の踏み込み
+    hero.atk = 0.15;                         // 短め＝連打が効く
+    hero.lunge = 0.10;                       // 前進の踏み込み
   }
 
   function doJump(){
@@ -286,22 +282,21 @@
   }
   function heroAttackHit(){
     // 攻撃の当たり判定：踏み込み中の前方
-    const reach = hero.atkType==='kick' ? 150 : 120;
+    const reach = hero.atkType==='kick' ? 150 : 125;
     const hx = hero.x + hero.facing*(60);
-    const dmg = [0,9,15,24][hero.atkStr] * (hero.atkType==='kick'?1.15:1);
+    const dmg = 14; // 全攻撃 均等の強さ
     for(const en of enemies){
       if(en.hp<=0) continue;
       const dx = (en.x) - hx;
       if(hero.facing>0 ? (dx>-20 && dx<reach) : (dx<20 && dx>-reach)){
         if(Math.abs(en.y-hero.y)<10){
           en.hp -= dmg; en.hitFlash=0.12;
-          en.vx = hero.facing*(150+hero.atkStr*80); // ノックバック(強いほど大)
+          en.vx = hero.facing*240; // ノックバック(一定)
           combo++; comboTimer=1.3;
-          const col=['#fff','#ffffff','#ffe07a','#ff8a3f'][hero.atkStr];
-          addFloater(en.x, GROUND_Y-150, Math.round(dmg), col, hero.atkStr===3);
-          spawnBurst(en.x, GROUND_Y-110, col, 6+hero.atkStr*4);
-          addShake(3+hero.atkStr*3);
-          if(hero.atkStr===3) hitstop=0.07;   // 強でヒットストップ(手応え)
+          const col='#ffe07a';
+          addFloater(en.x, GROUND_Y-150, dmg, col, false);
+          spawnBurst(en.x, GROUND_Y-110, col, 9);
+          addShake(4);
         }
       }
     }

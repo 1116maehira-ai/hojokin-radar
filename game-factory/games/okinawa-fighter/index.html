@@ -213,6 +213,9 @@
     e.preventDefault();
     ptr={ id:e.pointerId, x0:e.clientX, y0:e.clientY, x:e.clientX, y:e.clientY,
           t0:performance.now(), heroX0:hero.x, moved:false, jumped:false, guardOn:false };
+    const my=ptr;                              // 指を止めたまま押し続けたらガード
+    my.guardTimer=setTimeout(()=>{ if(ptr===my && !my.moved && !my.jumped){
+      hero.guarding=true; my.guardOn=true; } }, 190);
   }, {passive:false});
 
   frame.addEventListener('pointermove', e=>{
@@ -222,21 +225,25 @@
     const rect=frame.getBoundingClientRect();
     const scale = W/rect.width;
     const dx=(ptr.x-ptr.x0), dy=(ptr.y-ptr.y0);
-    // swipe up = jump
-    if(dy < -38 && !ptr.jumped){ ptr.jumped=true; doJump(); }
-    // horizontal drag = move
+    // swipe up = jump（ガード解除）
+    if(dy < -38 && !ptr.jumped){ ptr.jumped=true; clearTimeout(ptr.guardTimer);
+      if(ptr.guardOn){ hero.guarding=false; ptr.guardOn=false; } doJump(); }
+    // horizontal drag = move（ガード解除）
     if(Math.abs(dx) > 8){
-      ptr.moved=true;
+      ptr.moved=true; clearTimeout(ptr.guardTimer);
+      if(ptr.guardOn){ hero.guarding=false; ptr.guardOn=false; }
       hero.x = Math.max(90, Math.min(W-90, ptr.heroX0 + dx*scale));
     }
   }, {passive:false});
 
   function endPtr(e){
     if(!ptr || (e.pointerId!==ptr.id)) return;
+    clearTimeout(ptr.guardTimer);
     const dt=performance.now()-ptr.t0;
     const dx=ptr.x-ptr.x0, dy=ptr.y-ptr.y0, dist=Math.hypot(dx,dy);
     hero.guarding=false;
-    if(!ptr.moved && !ptr.jumped && dist<16 && dt<240){ registerTap(); }
+    // 素早いタップ（ガードにならなかった短押し）＝攻撃
+    if(!ptr.moved && !ptr.jumped && !ptr.guardOn && dist<16 && dt<200){ registerTap(); }
     ptr=null;
   }
   frame.addEventListener('pointerup', endPtr, {passive:false});

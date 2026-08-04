@@ -11,3 +11,6 @@ game-factory/node_modules/
 # generated / temp
 game-factory/assets/tmp/
 *.log
+
+# Claude Code local settings (personal, do not commit)
+.claude/settings.local.json

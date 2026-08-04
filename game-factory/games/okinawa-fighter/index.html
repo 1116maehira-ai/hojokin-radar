@@ -118,7 +118,8 @@
   const IMG={};
   (function(){ const load=(k,src)=>{ const im=new Image();
     im.onload=()=>{IMG[k]=im;}; im.onerror=()=>{IMG[k]=null;}; im.src=src; };
-    load('hero','assets/hero.png'); load('enemy','assets/enemy.png'); load('bg','assets/bg.jpg'); })();
+    load('hero','assets/hero.png'); load('enemy','assets/enemy.png'); load('bg','assets/bg.jpg');
+    load('hero_punch','assets/hero_punch.png'); load('hero_kick','assets/hero_kick.png'); })();
 
   // ---------- Game state ----------
   let state='ready', stage=1, totalKills=0, last=0;
@@ -127,11 +128,11 @@
 
   function stageConfig(n){
     return {
-      target: 3 + n*2,                       // 撃破目標
-      time: Math.max(10, 26 - n*3),          // 制限時間(秒)
-      enemyHp: 28 + n*10,                     // 敵HP
-      enemyPow: 6 + n*2,                      // 敵攻撃力
-      enemySpd: 175 + n*22,                   // 敵移動速度
+      target: 4 + n*2,                       // 撃破目標
+      time: Math.max(12, 28 - n*3),          // 制限時間(秒)
+      enemyHp: 30 + n*10,                     // 敵HP
+      enemyPow: 4 + n*1.5,                    // 1発は軽い（が乱れ打ちで削る）
+      enemySpd: 215 + n*22,                   // 速く群がる
     };
   }
 
@@ -170,7 +171,8 @@
     enemies.push({
       x: fromRight ? W+70 : -70, y:GROUND_Y,
       vx:0, facing: fromRight?-1:1, hp:cfg.enemyHp, maxHp:cfg.enemyHp,
-      pow:cfg.enemyPow, spd:cfg.enemySpd, atkCd: 0.6+Math.random()*0.6, hitFlash:0, lunge:0,
+      pow:cfg.enemyPow, spd:cfg.enemySpd, atkCd: 0.15+Math.random()*0.35, hitFlash:0, lunge:0,
+      phase: Math.random()*6.28,                       // 揺れ位相
       hue: [0, 285, 200][Math.floor(Math.random()*3)]  // 赤/紫/青の鬼
     });
   }
@@ -342,19 +344,19 @@
       // knockback friction
       en.x += en.vx*dt; en.vx *= 0.86;
       const d = hero.x-en.x;
-      if(Math.abs(d) > 96){
-        en.x += Math.sign(d)*en.spd*dt;   // 接近
-        en.atkCd = Math.max(0.25, en.atkCd);
+      if(Math.abs(d) > 74){
+        en.x += Math.sign(d)*en.spd*dt;   // 接近（近くまで群がる）
+        en.atkCd = Math.max(0.12, en.atkCd);
       } else {
         en.atkCd -= dt;
         if(en.atkCd<=0){
-          en.atkCd = 1.0+Math.random()*0.6;
-          en.lunge=0.16;
+          en.atkCd = 0.32+Math.random()*0.32;   // 乱れ打ち（高頻度）
+          en.lunge=0.13;
           // 攻撃命中
           const guarded = hero.guarding && (hero.facing === (en.x>hero.x?1:-1));
           if(guarded){
             hero.hp -= en.pow*0.25;
-            hero.energy = Math.min(hero.maxEnergy, hero.energy + 22);
+            hero.energy = Math.min(hero.maxEnergy, hero.energy + 11);
             spawnBurst(hero.x+hero.facing*40, GROUND_Y-110, '#7fd0ff', 6);
           } else {
             hero.hp -= en.pow; hero.hitFlash=0.16;
@@ -393,7 +395,7 @@
     // spawn to keep pressure (max ~3 alive)
     spawnTimer-=dt;
     const alive=enemies.filter(e=>e.hp>0).length;
-    if(spawnTimer<=0 && alive<3){ spawnEnemy(); spawnTimer=1.1; }
+    if(spawnTimer<=0 && alive<5){ spawnEnemy(); spawnTimer=0.55; }   // 群れで押し寄せる
 
     // timer
     timeLeft -= dt;
@@ -471,10 +473,11 @@
   function drawHero(){
     const x=hero.x, y=hero.y, f=hero.facing;
     if(IMG.hero){
-      const img=IMG.hero, h=214*(hero.atk>0?1.03:1), w=h*(img.width/img.height);
+      let img=IMG.hero;
+      if(hero.atk>0 && IMG['hero_'+hero.atkType]) img=IMG['hero_'+hero.atkType]; // 攻撃時は伸びたポーズ
+      const h=216*(hero.atk>0?1.02:1), w=h*(img.width/img.height);
       ctx.fillStyle='rgba(0,0,0,.30)'; ctx.beginPath(); ctx.ellipse(x,GROUND_Y+26,56,13,0,0,7); ctx.fill();
       ctx.save(); ctx.translate(x,y); ctx.scale(f,1);
-      if(hero.atk>0) ctx.transform(1,0,-0.12,1,0,0);   // 踏み込みリーン
       ctx.drawImage(img,-w/2,-(h-16),w,h);
       ctx.restore();
       if(hero.guarding){ ctx.strokeStyle='rgba(120,200,255,.85)'; ctx.lineWidth=5;
@@ -546,6 +549,10 @@
       const img=IMG.enemy, h=206, w=h*(img.width/img.height);
       ctx.fillStyle='rgba(0,0,0,.30)'; ctx.beginPath(); ctx.ellipse(x,GROUND_Y+26,48,12,0,0,7); ctx.fill();
       ctx.save(); ctx.translate(x+(en.lunge>0?f*12:0), en.y);
+      if(alive && Math.abs(hero.x-x)<160){          // 手足ブンブンの揺れ（乱れ打ち）
+        let rot=Math.sin(clock*17+ (en.phase||0))*0.05; if(en.lunge>0) rot*=2.6;
+        ctx.rotate(rot);
+      }
       if(!alive){ ctx.globalAlpha=Math.max(0,(0.35-(en.dead||0))/0.35); ctx.rotate(0.5); }
       if(en.hitFlash>0){ ctx.globalAlpha*=0.6; }   // 被弾チラつき
       ctx.scale(-f,1);                              // 画像は左向き基準

@@ -549,9 +549,13 @@
       const img=IMG.enemy, h=206, w=h*(img.width/img.height);
       ctx.fillStyle='rgba(0,0,0,.30)'; ctx.beginPath(); ctx.ellipse(x,GROUND_Y+26,48,12,0,0,7); ctx.fill();
       ctx.save(); ctx.translate(x+(en.lunge>0?f*12:0), en.y);
-      if(alive && Math.abs(hero.x-x)<160){          // 手足ブンブンの揺れ（乱れ打ち）
-        let rot=Math.sin(clock*17+ (en.phase||0))*0.05; if(en.lunge>0) rot*=2.6;
+      if(alive){                                    // 狂気の手足ブンブン（見た目のみ）
+        const t=clock, ph=en.phase||0;
+        let rot = Math.sin(t*24+ph)*0.34 + Math.sin(t*41+ph*1.7)*0.18 + Math.sin(t*67+ph)*0.07;
+        if(en.lunge>0) rot *= 1.5;                   // 攻撃時さらに暴れる
         ctx.rotate(rot);
+        ctx.translate(Math.sin(t*47+ph)*6, Math.cos(t*35+ph)*4);   // ガタガタ振動
+        ctx.scale(1 + Math.sin(t*53+ph)*0.05, 1 + Math.sin(t*29+ph)*0.09); // 伸び縮み
       }
       if(!alive){ ctx.globalAlpha=Math.max(0,(0.35-(en.dead||0))/0.35); ctx.rotate(0.5); }
       if(en.hitFlash>0){ ctx.globalAlpha*=0.6; }   // 被弾チラつき

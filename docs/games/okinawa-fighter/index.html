@@ -118,6 +118,7 @@
   // ---------- Game state ----------
   let state='ready', stage=1, totalKills=0, last=0;
   let hero, enemies, projectiles, spawnTimer, killsThisStage, target, timeLeft, particles;
+  let floaters, shake={x:0,y:0}, hitstop=0, combo=0, comboTimer=0, clock=0;
 
   function stageConfig(n){
     return {
@@ -135,7 +136,8 @@
     hero = { x:280, y:GROUND_Y, vx:0, vy:0, facing:1, hp:100, maxHp:100,
              onGround:true, guarding:false, energy:0, maxEnergy:100,
              atk:0, atkType:null, atkStr:0, hitFlash:0, lunge:0 };
-    enemies=[]; projectiles=[]; particles=[];
+    enemies=[]; projectiles=[]; particles=[]; floaters=[];
+    shake={x:0,y:0}; hitstop=0; combo=0; comboTimer=0;
     spawnTimer=0; killsThisStage=0; target=cfg.target; timeLeft=cfg.time;
     updateHud();
     spawnEnemy(); spawnEnemy();
@@ -195,7 +197,7 @@
     hero.energy=0; updateHud();
     projectiles.push({ x: hero.x + 60*hero.facing, y: GROUND_Y-90, vx: 720*hero.facing, life:2.4, r:26 });
     specialBtn.classList.remove('ready');
-    spawnBurst(hero.x+60*hero.facing, GROUND_Y-90, '#8fd0ff', 14);
+    spawnBurst(hero.x+60*hero.facing, GROUND_Y-90, '#8fd0ff', 16); addShake(7);
   }
 
   // pointer gesture handling on the play field
@@ -272,6 +274,17 @@
       particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-80,life:.4+Math.random()*.3,color});
     }
   }
+  function addShake(a){ shake.x=(Math.random()*2-1)*a; shake.y=(Math.random()*2-1)*a; }
+  function addFloater(x,y,text,color,big){ floaters.push({x,y,vy:-170,life:.8,text:String(text),color,big:!!big}); }
+  function decayEffects(dt){
+    clock+=dt;
+    shake.x*=0.82; shake.y*=0.82;
+    if(comboTimer>0){ comboTimer-=dt; if(comboTimer<=0) combo=0; }
+    for(const fl of floaters){ fl.y+=fl.vy*dt; fl.vy+=260*dt; fl.life-=dt; }
+    floaters=floaters.filter(f=>f.life>0);
+    for(const pt of particles){ pt.vy+=900*dt; pt.x+=pt.vx*dt; pt.y+=pt.vy*dt; pt.life-=dt; }
+    particles=particles.filter(p=>p.life>0);
+  }
   function heroAttackHit(){
     // 攻撃の当たり判定：踏み込み中の前方
     const reach = hero.atkType==='kick' ? 150 : 120;
@@ -283,8 +296,13 @@
       if(hero.facing>0 ? (dx>-20 && dx<reach) : (dx<20 && dx>-reach)){
         if(Math.abs(en.y-hero.y)<10){
           en.hp -= dmg; en.hitFlash=0.12;
-          en.vx = hero.facing*220; // ノックバック
-          spawnBurst(en.x, GROUND_Y-100, '#ffd23f', 8);
+          en.vx = hero.facing*(150+hero.atkStr*80); // ノックバック(強いほど大)
+          combo++; comboTimer=1.3;
+          const col=['#fff','#ffffff','#ffe07a','#ff8a3f'][hero.atkStr];
+          addFloater(en.x, GROUND_Y-150, Math.round(dmg), col, hero.atkStr===3);
+          spawnBurst(en.x, GROUND_Y-110, col, 6+hero.atkStr*4);
+          addShake(3+hero.atkStr*3);
+          if(hero.atkStr===3) hitstop=0.07;   // 強でヒットストップ(手応え)
         }
       }
     }
@@ -342,6 +360,7 @@
             hero.hp -= en.pow; hero.hitFlash=0.16;
             hero.vx=0; hero.x += (en.x>hero.x?-1:1)*30;
             spawnBurst(hero.x, GROUND_Y-110, '#ff5a5a', 8);
+            combo=0; comboTimer=0; addShake(6);
           }
           updateHud();
           if(hero.hp<=0){ hero.hp=0; updateHud(); return gameOver(false); }
@@ -363,8 +382,9 @@
       p.x += p.vx*dt; p.life-=dt;
       for(const en of enemies){
         if(en.hp>0 && Math.abs(en.x-p.x)<44 && p.life>0){
-          en.hp -= 40; en.hitFlash=0.12; en.vx=p.vx>0?360:-360;
-          spawnBurst(en.x, GROUND_Y-100, '#8fd0ff', 12); p.life=0;
+          en.hp -= 40; en.hitFlash=0.12; en.vx=p.vx>0?420:-420;
+          addFloater(en.x, GROUND_Y-150, 40, '#8fd0ff', true);
+          spawnBurst(en.x, GROUND_Y-100, '#8fd0ff', 14); addShake(7); p.life=0;
         }
       }
     }
@@ -374,10 +394,6 @@
     spawnTimer-=dt;
     const alive=enemies.filter(e=>e.hp>0).length;
     if(spawnTimer<=0 && alive<3){ spawnEnemy(); spawnTimer=1.1; }
-
-    // particles
-    for(const pt of particles){ pt.vy+=900*dt; pt.x+=pt.vx*dt; pt.y+=pt.vy*dt; pt.life-=dt; }
-    particles = particles.filter(p=>p.life>0);
 
     // timer
     timeLeft -= dt;
@@ -412,6 +428,10 @@
     const g=ctx.createLinearGradient(0,0,0,H);
     g.addColorStop(0,'#5fb8ff'); g.addColorStop(.55,'#bfe8ff'); g.addColorStop(.56,'#8fd0e8');
     ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+    // sun
+    ctx.fillStyle='rgba(255,244,200,.9)'; ctx.beginPath(); ctx.arc(W-220,120,54,0,Math.PI*2); ctx.fill();
+    // drifting clouds
+    for(let i=0;i<3;i++){ const cx=((clock*16 + i*520) % (W+340))-170; drawCloud(cx, 80+i*46); }
     // ocean band
     ctx.fillStyle='#3aa5c9'; ctx.fillRect(0,H*0.5,W,60);
     ctx.fillStyle='#2f93b8'; ctx.fillRect(0,H*0.5+30,W,30);
@@ -429,6 +449,13 @@
     ctx.fillStyle='#b6a483'; ctx.fillRect(0,GROUND_Y+20,W,10);
     ctx.strokeStyle='rgba(0,0,0,.12)'; ctx.lineWidth=3;
     for(let x=40;x<W;x+=110){ ctx.beginPath(); ctx.moveTo(x,GROUND_Y+30); ctx.lineTo(x,H); ctx.stroke(); }
+  }
+  function drawCloud(x,y){
+    ctx.fillStyle='rgba(255,255,255,.9)';
+    ctx.beginPath();
+    ctx.arc(x,y,26,0,Math.PI*2); ctx.arc(x+30,y+6,32,0,Math.PI*2);
+    ctx.arc(x+66,y,24,0,Math.PI*2); ctx.arc(x+34,y-14,24,0,Math.PI*2);
+    ctx.fill();
   }
   function drawPalm(x,baseY){
     ctx.strokeStyle='#7a5230'; ctx.lineWidth=16; ctx.lineCap='round';
@@ -531,31 +558,53 @@
   }
 
   function draw(){
+    ctx.save(); ctx.translate(shake.x, shake.y);
     drawBackground();
     // draw enemies behind/around
     enemies.slice().sort((a,b)=>a.x-b.x).forEach(drawEnemy);
     // projectiles
     for(const p of projectiles){
-      const grd=ctx.createRadialGradient(p.x,p.y,4,p.x,p.y,p.r);
+      const grd=ctx.createRadialGradient(p.x,p.y,4,p.x,p.y,p.r*1.4);
       grd.addColorStop(0,'#eaf6ff'); grd.addColorStop(.5,'#5aa8ff'); grd.addColorStop(1,'rgba(40,90,220,0)');
-      ctx.fillStyle=grd; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle=grd; ctx.beginPath(); ctx.arc(p.x,p.y,p.r*1.4,0,Math.PI*2); ctx.fill();
+      // trail
+      ctx.globalAlpha=.4; ctx.beginPath(); ctx.arc(p.x-p.vx*0.03,p.y,p.r,0,Math.PI*2); ctx.fill(); ctx.globalAlpha=1;
     }
     drawHero();
     // particles
     for(const pt of particles){ ctx.globalAlpha=Math.max(0,pt.life*2.2); ctx.fillStyle=pt.color;
       ctx.beginPath(); ctx.arc(pt.x,pt.y,4,0,Math.PI*2); ctx.fill(); }
     ctx.globalAlpha=1;
+    // damage numbers
+    ctx.textAlign='center';
+    for(const fl of floaters){ ctx.globalAlpha=Math.max(0,Math.min(1,fl.life/0.5));
+      ctx.font=`900 ${fl.big?56:36}px system-ui, sans-serif`;
+      ctx.lineWidth=7; ctx.strokeStyle='rgba(0,0,0,.6)'; ctx.strokeText(fl.text, fl.x, fl.y);
+      ctx.fillStyle=fl.color; ctx.fillText(fl.text, fl.x, fl.y); }
+    ctx.globalAlpha=1; ctx.textAlign='start';
+    ctx.restore();
+    // combo (screen space, no shake)
+    if(combo>=2){ ctx.globalAlpha=Math.min(1,comboTimer*2.2); ctx.textAlign='center';
+      ctx.font='900 46px system-ui, sans-serif';
+      ctx.lineWidth=8; ctx.strokeStyle='rgba(0,0,0,.55)'; ctx.strokeText(combo+' HIT!!', W/2, 165);
+      const cg=ctx.createLinearGradient(0,130,0,175); cg.addColorStop(0,'#fff3b0'); cg.addColorStop(1,'#ff9b2f');
+      ctx.fillStyle=cg; ctx.fillText(combo+' HIT!!', W/2, 165);
+      ctx.globalAlpha=1; ctx.textAlign='start'; }
   }
 
   function roundRect(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y);
     ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
 
   function loop(now){
-    if(state!=='playing') { if(state==='over'||state==='between'){ draw(); } return; }
     let dt=(now-last)/1000; last=now; if(dt>0.05) dt=0.05;
-    update(dt);
-    if(state==='playing'){ draw(); requestAnimationFrame(loop); }
-    else { draw(); }
+    if(state==='playing'){
+      if(hitstop>0){ hitstop=Math.max(0,hitstop-dt); } else { update(dt); }
+      decayEffects(dt);
+      draw();
+      if(state==='playing') requestAnimationFrame(loop); else draw();
+    } else {
+      draw();
+    }
   }
 
   // init idle frame

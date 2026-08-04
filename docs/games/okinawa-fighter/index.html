@@ -12,7 +12,8 @@
     background: #0b1020; color: #fff; display: flex; align-items: center; justify-content: center;
     min-height: 100dvh; padding: 10px; overflow: hidden; -webkit-user-select: none; user-select: none;
   }
-  .wrap { width: 100%; max-width: 860px; }
+  /* フレームが画面(縦)からはみ出さないよう、高さからも幅を制限する */
+  .wrap { width: 100%; max-width: min(860px, calc((100dvh - 20px) * 16 / 9)); }
   .frame {
     position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: 14px; overflow: hidden;
     box-shadow: 0 12px 40px rgba(0,0,0,.55); background:#7fc7ff; touch-action: none;
@@ -52,7 +53,8 @@
 
   /* Overlays */
   .overlay { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
-             gap:12px; text-align:center; padding:22px; background:rgba(6,12,26,.72); backdrop-filter:blur(2px); }
+             gap:10px; text-align:center; padding:14px; background:rgba(6,12,26,.72); backdrop-filter:blur(2px);
+             overflow-y:auto; }
   .overlay h1 { font-size: clamp(22px,6.5vw,42px); text-shadow:0 3px 8px rgba(0,0,0,.5); }
   .overlay p { font-size: clamp(13px,3.6vw,17px); line-height:1.7; opacity:.95; }
   .tag { letter-spacing:.28em; font-size:12px; opacity:.75; }
@@ -87,13 +89,10 @@
         <div class="tag">OKINAWA FIGHTER</div>
         <h1>沖縄ファイター <span style="font-size:.5em;opacity:.7">(仮)</span></h1>
         <div class="help">
-          <b>スマホ操作</b><br>
-          ・指を左右に<b>ドラッグ</b>＝移動<br>
-          ・指を<b>上にスワイプ</b>＝ジャンプ<br>
-          ・<b>タップ</b>＝攻撃（1回＝弱／2回＝中／3回＝強・パンチかキックはランダム）<br>
-          ・<b>長押し</b>＝ガード（受けると気力が溜まる）<br>
-          ・気力満タンで右下の<b>気の玉</b>ボタン→飛び道具！<br>
-          <span style="opacity:.7">PC: ←→移動 / ↑ジャンプ / J攻撃 / K長押しガード / L気の玉</span>
+          <b>ドラッグ</b>=移動／<b>上スワイプ</b>=ジャンプ<br>
+          <b>タップ</b>=攻撃（1回弱・2回中・3回強）<br>
+          <b>長押し</b>=ガード → 気力満タンで<b>気の玉</b>
+          <div style="opacity:.65;margin-top:4px;font-size:.85em">PC: ←→ / ↑ / J / K / L</div>
         </div>
         <button class="btn" id="startBtn">試合開始</button>
       </div>

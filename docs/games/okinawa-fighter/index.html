@@ -119,7 +119,8 @@
   (function(){ const load=(k,src)=>{ const im=new Image();
     im.onload=()=>{IMG[k]=im;}; im.onerror=()=>{IMG[k]=null;}; im.src=src; };
     load('hero','assets/hero.png'); load('enemy','assets/enemy.png'); load('bg','assets/bg.jpg');
-    load('hero_punch','assets/hero_punch.png'); load('hero_kick','assets/hero_kick.png'); })();
+    load('hero_punch','assets/hero_punch.png'); load('hero_kick','assets/hero_kick.png');
+    load('enemy_punch','assets/enemy_punch.png'); load('enemy_kick','assets/enemy_kick.png'); })();
 
   // ---------- Game state ----------
   let state='ready', stage=1, totalKills=0, last=0;
@@ -351,7 +352,7 @@
         en.atkCd -= dt;
         if(en.atkCd<=0){
           en.atkCd = 0.32+Math.random()*0.32;   // 乱れ打ち（高頻度）
-          en.lunge=0.13;
+          en.lunge=0.18; en.atkType = Math.random()<0.5?'punch':'kick';
           // 攻撃命中
           const guarded = hero.guarding && (hero.facing === (en.x>hero.x?1:-1));
           if(guarded){
@@ -546,7 +547,9 @@
   function drawEnemy(en){
     const x=en.x, alive=en.hp>0; const f=en.facing;
     if(IMG.enemy){
-      const img=IMG.enemy, h=206, w=h*(img.width/img.height);
+      let img=IMG.enemy;
+      if(en.lunge>0 && en.atkType && IMG['enemy_'+en.atkType]) img=IMG['enemy_'+en.atkType]; // 攻撃ポーズ
+      const h=206, w=h*(img.width/img.height);
       ctx.fillStyle='rgba(0,0,0,.30)'; ctx.beginPath(); ctx.ellipse(x,GROUND_Y+26,48,12,0,0,7); ctx.fill();
       ctx.save(); ctx.translate(x+(en.lunge>0?f*12:0), en.y);
       if(alive){                                    // 狂気の手足ブンブン（見た目のみ）

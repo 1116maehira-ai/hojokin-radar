@@ -86,18 +86,33 @@
   const fill        = document.getElementById('fill');
   const distEl      = document.getElementById('dist');
 
-  const GOAL_DIST = 900;      // ゴールまでの距離(m相当)
-  const GRAVITY   = 2600;     // 重力
-  const JUMP_V    = -1050;    // ジャンプ初速
+  // --- 本番グラフィックの読み込み（失敗時は図形描画にフォールバック） ---
+  const IMG = {};
+  const SRC = {
+    player: 'assets/player.png',
+    rock:   'assets/rock.png',
+    flag:   'assets/flag.png',
+    bg:     'assets/background.jpg',
+  };
+  for (const k in SRC) {
+    const im = new Image();
+    im.onload = () => { IMG[k] = im; };
+    im.onerror = () => { IMG[k] = null; };
+    im.src = SRC[k];
+  }
 
-  let state = 'ready';        // ready | playing | over | clear
+  const GOAL_DIST = 900;
+  const GRAVITY   = 2600;
+  const JUMP_V    = -1050;
+
+  let state = 'ready';
   let player, obstacles, dist, speed, spawnTimer, nextGap, t, last;
 
   function reset() {
     player = { x: 220, y: GROUND_Y, vy: 0, r: 46, onGround: true, squash: 0 };
     obstacles = [];
     dist = 0;
-    speed = 520;              // 初期スピード
+    speed = 520;
     spawnTimer = 0;
     nextGap = 1.1;
     t = 0;
@@ -122,7 +137,7 @@
   }
 
   function spawnObstacle() {
-    const h = 60 + Math.random() * 70;       // 岩の高さ
+    const h = 60 + Math.random() * 70;
     obstacles.push({ x: W + 60, w: 54 + Math.random()*20, h, passed:false });
   }
 
@@ -137,115 +152,135 @@
 
   function update(dt) {
     t += dt;
-    // 徐々に加速（理不尽にならないよう上限あり）
     speed = Math.min(1000, 520 + dist * 0.55);
     dist += speed * dt / 60;
 
-    // プレイヤー物理
     player.vy += GRAVITY * dt;
     player.y += player.vy * dt;
     if (player.y >= GROUND_Y) { player.y = GROUND_Y; player.vy = 0; player.onGround = true; }
     player.squash = Math.max(0, player.squash - dt*4);
 
-    // 障害物スポーン（スピードに応じて間隔調整）
     spawnTimer += dt;
     if (spawnTimer >= nextGap) {
       spawnTimer = 0;
       spawnObstacle();
-      const base = Math.max(0.75, 1.25 - dist*0.0006);   // 進むほど詰まる
+      const base = Math.max(0.75, 1.25 - dist*0.0006);
       nextGap = base + Math.random() * 0.5;
     }
 
-    // 障害物移動 & 当たり判定
     for (const o of obstacles) {
       o.x -= speed * dt;
-      // 円 vs 矩形の簡易当たり判定
       const rx = Math.max(o.x, Math.min(player.x, o.x + o.w));
       const topY = GROUND_Y - o.h;
       const ry = Math.max(topY, Math.min(player.y, GROUND_Y));
       const dx = player.x - rx, dy = player.y - ry;
-      if (dx*dx + dy*dy < (player.r*0.72)*(player.r*0.72)) {
+      if (dx*dx + dy*dy < (player.r*0.66)*(player.r*0.66)) {
         player.squash = 1; draw(); gameOver(false); return;
       }
     }
     obstacles = obstacles.filter(o => o.x + o.w > -40);
 
-    // ゴール判定
     if (dist >= GOAL_DIST) { draw(); gameOver(true); return; }
 
-    // HUD
     const pct = Math.min(100, dist / GOAL_DIST * 100);
     fill.style.width = pct + '%';
     distEl.textContent = Math.floor(dist) + 'm';
   }
 
-  function draw() {
-    // 空
-    const g = ctx.createLinearGradient(0,0,0,H);
-    g.addColorStop(0,'#8ec9ff'); g.addColorStop(1,'#d6efff');
-    ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
-
-    // 遠景の丘（パララックス）
-    ctx.fillStyle = '#bfe6a8';
-    for (let i=0;i<4;i++){
-      const bx = ((-dist*3 + i*420) % (W+420) + (W+420)) % (W+420) - 210;
-      ctx.beginPath(); ctx.arc(bx, GROUND_Y+40, 180, Math.PI, 0); ctx.fill();
+  function drawBackground() {
+    if (IMG.bg) {
+      // カバー描画 + ゆっくり横スクロール（パララックス）
+      const img = IMG.bg;
+      const scale = Math.max(W / img.width, H / img.height);
+      const dw = img.width * scale, dh = img.height * scale;
+      const off = ((dist * 0.5) % dw);
+      const y = H - dh; // 下端合わせ
+      ctx.drawImage(img, -off, y, dw, dh);
+      ctx.drawImage(img, dw - off, y, dw, dh);
+    } else {
+      const g = ctx.createLinearGradient(0,0,0,H);
+      g.addColorStop(0,'#8ec9ff'); g.addColorStop(1,'#d6efff');
+      ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+      ctx.fillStyle = '#bfe6a8';
+      for (let i=0;i<4;i++){
+        const bx = ((-dist*3 + i*420) % (W+420) + (W+420)) % (W+420) - 210;
+        ctx.beginPath(); ctx.arc(bx, GROUND_Y+40, 180, Math.PI, 0); ctx.fill();
+      }
     }
-
-    // 地面
+    // 走行面（地面バンド）— 画像の有無に関わらず一定にして接地感を安定させる
     ctx.fillStyle = '#6bbf59'; ctx.fillRect(0, GROUND_Y+40, W, H-GROUND_Y);
-    ctx.fillStyle = '#8a5a2b'; ctx.fillRect(0, GROUND_Y+64, W, H-GROUND_Y);
-    // 地面の模様（スクロール）
+    ctx.fillStyle = '#8a5a2b'; ctx.fillRect(0, GROUND_Y+70, W, H-GROUND_Y);
     ctx.strokeStyle = 'rgba(255,255,255,.25)'; ctx.lineWidth = 4;
     for (let i=0;i<14;i++){
       const lx = ((-dist*6 + i*120) % (W+120) + (W+120)) % (W+120);
-      ctx.beginPath(); ctx.moveTo(lx, GROUND_Y+52); ctx.lineTo(lx-30, GROUND_Y+52); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(lx, GROUND_Y+54); ctx.lineTo(lx-30, GROUND_Y+54); ctx.stroke();
     }
+  }
 
-    // ゴール旗（近づくと右から出現）
-    const goalScreenX = W + (GOAL_DIST - dist) * (speed>0? 2.2:2.2);
+  function drawGoal() {
+    const goalScreenX = W + (GOAL_DIST - dist) * 2.2;
     if (goalScreenX < W + 80) {
-      ctx.fillStyle = '#c0392b';
-      ctx.fillRect(goalScreenX, GROUND_Y-120, 8, 160);
-      ctx.beginPath();
-      ctx.moveTo(goalScreenX+8, GROUND_Y-120);
-      ctx.lineTo(goalScreenX+70, GROUND_Y-100);
-      ctx.lineTo(goalScreenX+8, GROUND_Y-80);
-      ctx.fill();
+      if (IMG.flag) {
+        const fh = 190, fw = fh * (IMG.flag.width / IMG.flag.height);
+        ctx.drawImage(IMG.flag, goalScreenX - 6, GROUND_Y + 42 - fh, fw, fh);
+      } else {
+        ctx.fillStyle = '#c0392b';
+        ctx.fillRect(goalScreenX, GROUND_Y-120, 8, 160);
+        ctx.beginPath();
+        ctx.moveTo(goalScreenX+8, GROUND_Y-120);
+        ctx.lineTo(goalScreenX+70, GROUND_Y-100);
+        ctx.lineTo(goalScreenX+8, GROUND_Y-80);
+        ctx.fill();
+      }
     }
+  }
 
-    // 障害物（岩）
-    for (const o of obstacles) {
-      const topY = GROUND_Y - o.h;
+  function drawObstacle(o) {
+    const topY = GROUND_Y - o.h;
+    if (IMG.rock) {
+      // 岩画像を当たり判定ボックスに合わせて（少し大きめに見栄え）描画
+      const iw = o.w * 1.7, ih = iw * (IMG.rock.height / IMG.rock.width);
+      ctx.drawImage(IMG.rock, o.x + o.w/2 - iw/2, GROUND_Y + 44 - ih, iw, ih);
+    } else {
       ctx.fillStyle = '#7a7f87';
       roundRect(o.x, topY, o.w, o.h, 10); ctx.fill();
       ctx.fillStyle = 'rgba(255,255,255,.18)';
       roundRect(o.x+6, topY+6, o.w-12, o.h*0.4, 8); ctx.fill();
     }
+  }
 
-    // プレイヤー（緑スライム・仮グラフィック）
+  function drawPlayer() {
     const sq = player.squash;
-    const rx = player.r * (1 + sq*0.25);
-    const ry = player.r * (1 - sq*0.35);
     // 影
     ctx.fillStyle = 'rgba(0,0,0,.18)';
     const shadowScale = 1 - (GROUND_Y - player.y)/500;
-    ctx.beginPath(); ctx.ellipse(player.x, GROUND_Y+38, 44*shadowScale, 12*shadowScale, 0,0,Math.PI*2); ctx.fill();
-    // 体
-    ctx.fillStyle = '#57c977';
-    ctx.beginPath(); ctx.ellipse(player.x, player.y - ry, rx, ry, 0, 0, Math.PI*2); ctx.fill();
-    ctx.fillStyle = '#3ba85c';
-    ctx.beginPath(); ctx.ellipse(player.x, player.y - ry + ry*0.35, rx*0.9, ry*0.55, 0, 0, Math.PI*2); ctx.fill();
-    // 目
-    ctx.fillStyle = '#fff';
-    ctx.beginPath(); ctx.arc(player.x-14, player.y-ry-6, 11, 0, Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.arc(player.x+14, player.y-ry-6, 11, 0, Math.PI*2); ctx.fill();
-    ctx.fillStyle = '#1a2b1f';
-    ctx.beginPath(); ctx.arc(player.x-11, player.y-ry-5, 5, 0, Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.arc(player.x+17, player.y-ry-5, 5, 0, Math.PI*2); ctx.fill();
-    // 口
-    ctx.strokeStyle = '#1a2b1f'; ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.arc(player.x+2, player.y-ry+6, 8, 0.1*Math.PI, 0.9*Math.PI); ctx.stroke();
+    ctx.beginPath(); ctx.ellipse(player.x, GROUND_Y+40, 46*shadowScale, 12*shadowScale, 0,0,Math.PI*2); ctx.fill();
+
+    if (IMG.player) {
+      const base = 128;
+      const w = base * (1 + sq*0.22);
+      const h = base * (1 - sq*0.30);
+      // 接地: プレイヤーの足元(player.y)に画像の下端を合わせる
+      ctx.drawImage(IMG.player, player.x - w/2, player.y + 44 - h, w, h);
+    } else {
+      const rx = player.r * (1 + sq*0.25);
+      const ry = player.r * (1 - sq*0.35);
+      ctx.fillStyle = '#57c977';
+      ctx.beginPath(); ctx.ellipse(player.x, player.y - ry, rx, ry, 0, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.beginPath(); ctx.arc(player.x-14, player.y-ry-6, 11, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(player.x+14, player.y-ry-6, 11, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#1a2b1f';
+      ctx.beginPath(); ctx.arc(player.x-11, player.y-ry-5, 5, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(player.x+17, player.y-ry-5, 5, 0, Math.PI*2); ctx.fill();
+    }
+  }
+
+  function draw() {
+    drawBackground();
+    drawGoal();
+    for (const o of obstacles) drawObstacle(o);
+    drawPlayer();
   }
 
   function roundRect(x,y,w,h,r){
@@ -262,12 +297,11 @@
     if (state !== 'playing') return;
     let dt = (now - last) / 1000;
     last = now;
-    if (dt > 0.05) dt = 0.05;   // タブ復帰時などの暴走防止
+    if (dt > 0.05) dt = 0.05;
     update(dt);
     if (state === 'playing') { draw(); requestAnimationFrame(loop); }
   }
 
-  // 入力
   const frame = document.getElementById('frame');
   frame.addEventListener('pointerdown', (e)=>{ e.preventDefault(); jump(); });
   window.addEventListener('keydown', (e)=>{
@@ -276,7 +310,6 @@
   document.getElementById('startBtn').addEventListener('click', (e)=>{ e.stopPropagation(); start(); });
   document.getElementById('retryBtn').addEventListener('click', (e)=>{ e.stopPropagation(); start(); });
 
-  // 初期描画
   reset(); draw();
 })();
 </script>

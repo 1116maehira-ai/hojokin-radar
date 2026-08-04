@@ -125,7 +125,7 @@
   // ---------- Game state ----------
   let state='ready', stage=1, totalKills=0, last=0;
   let hero, enemies, projectiles, spawnTimer, killsThisStage, target, timeLeft, particles;
-  let floaters, shake={x:0,y:0}, hitstop=0, combo=0, comboTimer=0, clock=0;
+  let floaters, shake={x:0,y:0}, hitstop=0, combo=0, comboTimer=0, clock=0, flash=0;
 
   function stageConfig(n){
     return {
@@ -144,7 +144,7 @@
              onGround:true, guarding:false, energy:0, maxEnergy:100,
              atk:0, atkType:null, atkStr:0, hitFlash:0, lunge:0 };
     enemies=[]; projectiles=[]; particles=[]; floaters=[];
-    shake={x:0,y:0}; hitstop=0; combo=0; comboTimer=0;
+    shake={x:0,y:0}; hitstop=0; combo=0; comboTimer=0; flash=0;
     spawnTimer=0; killsThisStage=0; target=cfg.target; timeLeft=cfg.time;
     updateHud();
     spawnEnemy(); spawnEnemy();
@@ -200,9 +200,11 @@
   function fireSpecial(){
     if(state!=='playing' || hero.energy < hero.maxEnergy) return;
     hero.energy=0; updateHud();
-    projectiles.push({ x: hero.x + 60*hero.facing, y: GROUND_Y-90, vx: 720*hero.facing, life:2.4, r:26 });
+    projectiles.push({ x: hero.x + 60*hero.facing, y: GROUND_Y-95, vx: 800*hero.facing,
+                       life:3, r:42, kills:0, hit:[] });     // 貫通・4体まで即死
     specialBtn.classList.remove('ready');
-    spawnBurst(hero.x+60*hero.facing, GROUND_Y-90, '#8fd0ff', 16); addShake(7);
+    fireworks(hero.x + 60*hero.facing, GROUND_Y-95);          // 花火エフェクト
+    addShake(13); flash=0.55;
   }
 
   // pointer gesture handling on the play field
@@ -288,9 +290,28 @@
   }
   function addShake(a){ shake.x=(Math.random()*2-1)*a; shake.y=(Math.random()*2-1)*a; }
   function addFloater(x,y,text,color,big){ floaters.push({x,y,vy:-170,life:.8,text:String(text),color,big:!!big}); }
+  // 敵が気弾でバラバラに破裂
+  function spawnGibs(x,y,hue){
+    const col=`hsl(${hue} 72% 52%)`;
+    for(let i=0;i<30;i++){ const a=Math.random()*Math.PI*2, s=220+Math.random()*460;
+      particles.push({x,y:y-Math.random()*70, vx:Math.cos(a)*s, vy:Math.sin(a)*s-180,
+        life:.55+Math.random()*.55, color: i%4? col:'#3a0d0d', big:true}); }
+    for(let i=0;i<8;i++){ const a=Math.random()*Math.PI*2, s=120+Math.random()*160;
+      particles.push({x,y:y-30, vx:Math.cos(a)*s, vy:Math.sin(a)*s-120, life:.5, color:'#ffffff', big:true}); }
+  }
+  // 気弾発射時の花火
+  function fireworks(x,y){
+    const cols=['#ff4d4d','#ffd23f','#4db5ff','#b06bff','#ffffff','#5fff8a'];
+    for(let ring=0; ring<3; ring++){
+      for(let i=0;i<26;i++){ const a=(i/26)*Math.PI*2, s=(170+ring*150)+Math.random()*70;
+        particles.push({x,y,vx:Math.cos(a)*s, vy:Math.sin(a)*s, life:.7+Math.random()*.6,
+          color:cols[(i+ring)%cols.length], big:true}); }
+    }
+  }
   function decayEffects(dt){
     clock+=dt;
     shake.x*=0.82; shake.y*=0.82;
+    if(flash>0) flash=Math.max(0, flash-dt*2.2);
     if(comboTimer>0){ comboTimer-=dt; if(comboTimer<=0) combo=0; }
     for(const fl of floaters){ fl.y+=fl.vy*dt; fl.vy+=260*dt; fl.life-=dt; }
     floaters=floaters.filter(f=>f.life>0);
@@ -397,10 +418,14 @@
     for(const p of projectiles){
       p.x += p.vx*dt; p.life-=dt;
       for(const en of enemies){
-        if(en.hp>0 && Math.abs(en.x-p.x)<44 && p.life>0){
-          en.hp -= 40; en.hitFlash=0.12; en.vx=p.vx>0?420:-420;
-          addFloater(en.x, GROUND_Y-150, 40, '#8fd0ff', true);
-          spawnBurst(en.x, GROUND_Y-100, '#8fd0ff', 14); addShake(7); p.life=0;
+        if(en.hp>0 && p.hit.indexOf(en)<0 && Math.abs(en.x-p.x)<62 && p.kills<4){
+          p.hit.push(en);
+          en.hp=0; en.burst=true; en.dead=1;          // 即死＋破裂（即時消滅）
+          p.kills++;
+          spawnGibs(en.x, GROUND_Y-100, en.hue);        // バラバラ破裂
+          addFloater(en.x, GROUND_Y-170, 'K.O.', '#fff', true);
+          addShake(9); flash=Math.max(flash,0.3);
+          if(p.kills>=4) p.life=0;                       // 4体倒したら消滅
         }
       }
     }
@@ -558,6 +583,7 @@
   }
 
   function drawEnemy(en){
+    if(en.burst) return;                       // 破裂した敵は描かない（破片で表現）
     const x=en.x, alive=en.hp>0; const f=en.facing;
     if(IMG.enemy){
       let img = IMG[en.pose] || IMG.enemy;   // ランダムに切り替わるポーズ
@@ -653,7 +679,7 @@
     drawHero();
     // particles
     for(const pt of particles){ ctx.globalAlpha=Math.max(0,pt.life*2.2); ctx.fillStyle=pt.color;
-      ctx.beginPath(); ctx.arc(pt.x,pt.y,4,0,Math.PI*2); ctx.fill(); }
+      ctx.beginPath(); ctx.arc(pt.x,pt.y,pt.big?7:4,0,Math.PI*2); ctx.fill(); }
     ctx.globalAlpha=1;
     // damage numbers
     ctx.textAlign='center';
@@ -663,6 +689,8 @@
       ctx.fillStyle=fl.color; ctx.fillText(fl.text, fl.x, fl.y); }
     ctx.globalAlpha=1; ctx.textAlign='start';
     ctx.restore();
+    // 気弾の閃光フラッシュ（全画面）
+    if(flash>0){ ctx.globalAlpha=Math.min(0.6,flash); ctx.fillStyle='#eaf4ff'; ctx.fillRect(0,0,W,H); ctx.globalAlpha=1; }
     // combo (screen space, no shake)
     if(combo>=2){ ctx.globalAlpha=Math.min(1,comboTimer*2.2); ctx.textAlign='center';
       ctx.font='900 46px system-ui, sans-serif';

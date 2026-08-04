@@ -1,0 +1,13 @@
+# secrets — never commit
+.env
+.env.local
+game-factory/.env.local
+**/.env.local
+
+# node
+node_modules/
+game-factory/node_modules/
+
+# generated / temp
+game-factory/assets/tmp/
+*.log

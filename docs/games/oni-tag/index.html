@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>オニごっこパックン（仮）</title>
+<style>
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html,body { height:100%; }
+  body { font-family: system-ui,-apple-system,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;
+    background:#12002a; color:#fff; display:flex; align-items:center; justify-content:center;
+    min-height:100dvh; padding:10px; overflow:hidden; -webkit-user-select:none; user-select:none; }
+  .wrap { width:100%; max-width: min(900px, calc((100dvh - 20px) * 5 / 3)); }
+  .frame { position:relative; width:100%; aspect-ratio:5/3; border-radius:14px; overflow:hidden;
+    box-shadow:0 12px 40px rgba(0,0,0,.55); background:#1b1030; touch-action:none; }
+  canvas { display:block; width:100%; height:100%; image-rendering:pixelated; }
+  .hud { position:absolute; top:0; left:0; right:0; height:56px; display:flex; align-items:center;
+    gap:10px; padding:0 14px; pointer-events:none; font-weight:800; }
+  .hud .t { font-size: clamp(18px,5vw,30px); text-shadow:0 2px 3px rgba(0,0,0,.6); }
+  .hud .s { font-size: clamp(12px,3.4vw,17px); opacity:.95; }
+  .hud .right { margin-left:auto; text-align:right; }
+  .drop { position:absolute; right:14px; bottom:14px; width:clamp(70px,19vw,104px); aspect-ratio:1;
+    border-radius:50%; border:4px solid #fff; background:radial-gradient(circle at 35% 30%,#bfefff,#2a7bff 60%,#0e2f8a);
+    color:#fff; font-weight:900; font-size:clamp(11px,3vw,15px); display:flex; flex-direction:column; align-items:center; justify-content:center;
+    box-shadow:0 6px 16px rgba(0,0,0,.5); pointer-events:auto; cursor:pointer; line-height:1.1; }
+  .drop:active { transform:scale(.93); }
+  .drop.empty { opacity:.4; }
+  .drop b { font-size:1.5em; }
+  .overlay { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:12px; text-align:center; padding:16px; background:rgba(10,0,26,.72); backdrop-filter:blur(2px); overflow-y:auto; }
+  .overlay h1 { font-size:clamp(22px,6.5vw,40px); text-shadow:0 3px 8px rgba(0,0,0,.5); }
+  .overlay p { font-size:clamp(13px,3.6vw,17px); line-height:1.7; }
+  .tag { letter-spacing:.25em; font-size:12px; opacity:.7; }
+  .btn { margin-top:6px; border:none; cursor:pointer; font-weight:900; font-size:clamp(15px,4.2vw,20px); color:#2a0e3a;
+    background:linear-gradient(#ffe07a,#ffc23f); padding:12px 28px; border-radius:999px;
+    box-shadow:0 6px 0 #d99a1e,0 8px 18px rgba(0,0,0,.4); }
+  .btn:active { transform:translateY(3px); box-shadow:0 3px 0 #d99a1e; }
+  .help { font-size:clamp(11px,3vw,14px); line-height:1.85; background:rgba(255,255,255,.08); padding:12px 16px; border-radius:12px; max-width:440px; text-align:left; }
+  .help b { color:#ffe07a; }
+  .hide { display:none !important; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="frame" id="frame">
+      <canvas id="c" width="1000" height="600"></canvas>
+      <div class="hud">
+        <div><div class="t" id="timer">30</div><div class="s">逃げ切れ！</div></div>
+        <div class="right"><div class="t" id="stage">面 1</div><div class="s" id="onispd">鬼速 --</div></div>
+      </div>
+      <div class="drop" id="drop"><b id="stock">3</b>玉を置く</div>
+
+      <div class="overlay" id="startScreen">
+        <div class="tag">ONI TAG PAKKUN</div>
+        <h1>オニごっこパックン<span style="font-size:.5em;opacity:.7">(仮)</span></h1>
+        <div class="help">
+          <b>逃げろ！</b> 鬼(👹)に捕まらないように迷路を逃げ回る<br>
+          <b>スワイプ</b>（上下左右）＝進む向きを変える<br>
+          <b>「玉を置く」ボタン</b>＝青い玉を設置。鬼が食べると<b>スタン＋減速</b>！🛡<br>
+          鬼は床の<b>黄色い玉</b>を食べるほど<b>加速</b>する⚡<br>
+          <b>制限時間を逃げ切ればクリア</b>！ 面が進むほど鬼は速くなる🔥<br>
+          <span style="opacity:.7">PC: 矢印/WASDで移動、スペースで玉</span>
+        </div>
+        <button class="btn" id="startBtn">スタート</button>
+      </div>
+      <div class="overlay hide" id="overScreen">
+        <h1 id="overTitle"></h1>
+        <p id="overMsg"></p>
+        <button class="btn" id="retryBtn">もう一度</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+(() => {
+  const cv=document.getElementById('c'), ctx=cv.getContext('2d');
+  const W=cv.width, H=cv.height;
+  const $=id=>document.getElementById(id);
+  const OY=56, CELL=40, COLS=25, ROWS=13;   // 迷路 1000x520, 上56はHUD
+  const timerEl=$('timer'), stageEl=$('stage'), onispdEl=$('onispd'), stockEl=$('stock');
+  const dropBtn=$('drop'), startScreen=$('startScreen'), overScreen=$('overScreen'), overTitle=$('overTitle'), overMsg=$('overMsg');
+
+  function isWall(c,r){
+    if(c<0||r<0||c>=COLS||r>=ROWS) return true;
+    if(c===0||r===0||c===COLS-1||r===ROWS-1) return true; // 外周
+    if(c%2===0 && r%2===0) return true;                   // 柱
+    return false;
+  }
+  const cCX=c=>c*CELL+CELL/2, cCY=r=>OY+r*CELL+CELL/2;
+  const colOf=px=>Math.floor(px/CELL), rowOf=py=>Math.floor((py-OY)/CELL);
+  const open=(c,r)=>!isWall(c,r);
+
+  let state='ready', stage=1, clock=0, last=0;
+  let player, oni, pellets, stunBalls, stunStock, stockTimer, timeLeft, pops;
+
+  function cfg(n){ return {
+    time: 28 + n*4,
+    oniBase: 108 + n*14,
+    oniCap: 195 + n*12,
+    boost: 1.1 + n*0.35,
+    maxStock: 5,
+    recharge: Math.max(2.2, 4.2 - n*0.25),
+  };}
+
+  function reset(fullNew){
+    if(fullNew){ stage=1; }
+    const k=cfg(stage);
+    // pellets on all path cells
+    pellets=[];
+    for(let r=0;r<ROWS;r++){ pellets[r]=[]; for(let c=0;c<COLS;c++) pellets[r][c]= open(c,r); }
+    // start positions
+    player={ px:cCX(1), py:cCY(ROWS-2), dir:{x:0,y:0}, want:{x:0,y:0}, speed:158, r:15 };
+    oni={ px:cCX(COLS-2), py:cCY(1), dir:{x:0,y:0}, want:{x:-1,y:0}, base:k.oniBase, cap:k.oniCap, boost:k.boost, speed:k.oniBase, stun:0, r:16 };
+    pellets[rowOf(player.py)][colOf(player.px)]=false;
+    pellets[rowOf(oni.py)][colOf(oni.px)]=false;
+    stunBalls=[]; stunStock=3; stockTimer=k.recharge; timeLeft=k.time; pops=[];
+    updateHud();
+  }
+
+  function start(fullNew){
+    reset(fullNew); state='playing';
+    startScreen.classList.add('hide'); overScreen.classList.add('hide');
+    last=performance.now(); requestAnimationFrame(loop);
+  }
+
+  function updateHud(){
+    timerEl.textContent=Math.max(0,Math.ceil(timeLeft));
+    stageEl.textContent='面 '+stage;
+    stockEl.textContent=stunStock;
+    dropBtn.classList.toggle('empty', stunStock<1);
+    onispdEl.textContent='鬼速 '+Math.round(oni.speed);
+  }
+
+  function setWant(x,y){ if(state==='playing'){ player.want={x,y};
+    // 逆方向は即反映（キビキビ）
+    if(x===-player.dir.x && y===-player.dir.y){ player.dir={x,y}; } } }
+
+  function dropBall(){
+    if(state!=='playing' || stunStock<1) return;
+    const c=colOf(player.px), r=rowOf(player.py);
+    if(stunBalls.some(b=>b.c===c&&b.r===r)) return;
+    stunBalls.push({c,r,t:0}); stunStock--; updateHud();
+  }
+
+  function moveEntity(e,dt){
+    let step=e.speed*dt;
+    // 停止中：中心に整列していて want 方向が開いていれば発進
+    if(e.dir.x===0 && e.dir.y===0){
+      const c=colOf(e.px), r=rowOf(e.py);
+      if(e.want && (e.want.x||e.want.y) && open(c+e.want.x,r+e.want.y)){ e.dir={x:e.want.x,y:e.want.y}; }
+      else return;
+    }
+    let guard=64;
+    while(step>0 && guard-->0){
+      const c=colOf(e.px), r=rowOf(e.py);
+      const cx=cCX(c), cy=cCY(r);
+      const toCenter = e.dir.x!==0 ? (cx-e.px)*e.dir.x : (cy-e.py)*e.dir.y;
+      if(toCenter>0.0001 && toCenter<=step){
+        // このステップで中心に到達 → 中心で曲がる判定
+        e.px=cx; e.py=cy; step-=toCenter;
+        let d=e.dir;
+        if(e.want && (e.want.x||e.want.y) && open(c+e.want.x,r+e.want.y)) d={x:e.want.x,y:e.want.y};
+        if(!open(c+d.x,r+d.y)) d={x:0,y:0};
+        e.dir=d;
+        if(d.x===0 && d.y===0) break;
+      } else {
+        e.px+=e.dir.x*step; e.py+=e.dir.y*step; step=0;
+      }
+    }
+  }
+
+  function oniThink(){
+    const c=colOf(oni.px), r=rowOf(oni.py);
+    const dirs=[{x:1,y:0},{x:-1,y:0},{x:0,y:1},{x:0,y:-1}];
+    let best=null,bd=1e9;
+    for(const d of dirs){
+      if(d.x===-oni.dir.x && d.y===-oni.dir.y) continue;
+      if(isWall(c+d.x,r+d.y)) continue;
+      const nx=cCX(c+d.x), ny=cCY(r+d.y);
+      const dist=(nx-player.px)**2+(ny-player.py)**2;
+      if(dist<bd){ bd=dist; best=d; }
+    }
+    if(best) oni.want=best;
+    else oni.want={x:-oni.dir.x,y:-oni.dir.y}; // 行き止まりは反転
+  }
+
+  function eatAt(c,r,who){
+    if(pellets[r] && pellets[r][c]){
+      pellets[r][c]=false;
+      if(who==='oni'){ oni.speed=Math.min(oni.cap, oni.speed+oni.boost); }
+    }
+  }
+
+  function update(dt){
+    clock+=dt;
+    // player
+    moveEntity(player,dt);
+    // oni
+    oniThink();
+    if(oni.stun>0){ oni.stun-=dt; }
+    else moveEntity(oni,dt);
+
+    // eating (near cell center)
+    const pc=colOf(player.px), pr=rowOf(player.py);
+    const oc=colOf(oni.px), orr=rowOf(oni.py);
+    if(oni.stun<=0) eatAt(oc,orr,'oni');
+    // oni eats stun ball
+    const bi=stunBalls.findIndex(b=>b.c===oc&&b.r===orr);
+    if(bi>=0 && oni.stun<=0){
+      stunBalls.splice(bi,1);
+      oni.stun=1.5; oni.speed=oni.base;      // スタン＋加速リセット（防御）
+      for(let i=0;i<18;i++){ const a=Math.random()*6.28,s=100+Math.random()*180;
+        pops.push({x:cCX(oc),y:cCY(orr),vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:.5,color:'#7fd0ff'}); }
+      updateHud();
+    }
+
+    // stock recharge
+    if(stunStock<cfg(stage).maxStock){ stockTimer-=dt; if(stockTimer<=0){ stunStock++; stockTimer=cfg(stage).recharge; updateHud(); } }
+
+    // pops
+    for(const p of pops){ p.x+=p.vx*dt; p.y+=p.vy*dt; p.vy+=300*dt; p.life-=dt; }
+    pops=pops.filter(p=>p.life>0);
+
+    // catch?
+    const dx=player.px-oni.px, dy=player.py-oni.py;
+    if(oni.stun<=0 && dx*dx+dy*dy < (CELL*0.62)**2){ return gameOver(); }
+
+    // timer
+    timeLeft-=dt;
+    timerEl.textContent=Math.max(0,Math.ceil(timeLeft));
+    onispdEl.textContent='鬼速 '+Math.round(oni.speed);
+    if(timeLeft<=0){ return stageClear(); }
+  }
+
+  function stageClear(){
+    state='between';
+    overTitle.textContent='面'+stage+' 逃げ切った！🎉';
+    overMsg.innerHTML='ナイス回避！<br>次の面は鬼がもっと速い…🔥';
+    overScreen.classList.remove('hide');
+    $('retryBtn').textContent='次の面へ';
+    $('retryBtn').onclick=(e)=>{ e.stopPropagation(); stage++; start(false);
+      $('retryBtn').textContent='もう一度'; $('retryBtn').onclick=(ev)=>{ev.stopPropagation();start(true);}; };
+  }
+  function gameOver(){
+    state='over';
+    overTitle.textContent='つかまった…👹';
+    overMsg.innerHTML='到達 <b>面'+stage+'</b>！<br>鬼から逃げ切れ！';
+    overScreen.classList.remove('hide');
+    $('retryBtn').textContent='もう一度'; $('retryBtn').onclick=(e)=>{e.stopPropagation();start(true);};
+    draw();
+  }
+
+  // ---------- draw ----------
+  function draw(){
+    // bg
+    ctx.fillStyle='#1b1030'; ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='#0e0820'; ctx.fillRect(0,OY,W,H-OY);
+    // walls (ちゃっちい)
+    for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
+      if(!isWall(c,r)) continue;
+      const x=c*CELL, y=OY+r*CELL;
+      ctx.fillStyle='#3a2fae'; ctx.fillRect(x+2,y+2,CELL-4,CELL-4);
+      ctx.fillStyle='#6a5bff'; ctx.fillRect(x+4,y+4,CELL-8,6);
+    }
+    // pellets (鬼のエサ)
+    ctx.fillStyle='#ffd23f';
+    for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
+      if(pellets[r][c]){ ctx.beginPath(); ctx.arc(cCX(c),cCY(r),3.5,0,6.3); ctx.fill(); }
+    }
+    // stun balls (置き玉)
+    for(const b of stunBalls){ const x=cCX(b.c),y=cCY(b.r); const pu=1+Math.sin(clock*6+b.c)*0.12;
+      ctx.fillStyle='#2a7bff'; ctx.beginPath(); ctx.arc(x,y,11*pu,0,6.3); ctx.fill();
+      ctx.fillStyle='#bfefff'; ctx.beginPath(); ctx.arc(x-3,y-3,4,0,6.3); ctx.fill();
+      ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(x,y,11*pu,0,6.3); ctx.stroke(); }
+    // pops
+    for(const p of pops){ ctx.globalAlpha=Math.max(0,p.life*2); ctx.fillStyle=p.color;
+      ctx.beginPath(); ctx.arc(p.x,p.y,4,0,6.3); ctx.fill(); } ctx.globalAlpha=1;
+    // player (derpy blob)
+    drawPlayer(); drawOni();
+  }
+  function googly(x,y,rr,lookx,looky){
+    ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(x,y,rr,0,6.3); ctx.fill();
+    ctx.fillStyle='#111'; ctx.beginPath(); ctx.arc(x+lookx*rr*0.4,y+looky*rr*0.4,rr*0.5,0,6.3); ctx.fill();
+  }
+  function drawPlayer(){
+    const x=player.px,y=player.py, wob=Math.sin(clock*12)*2;
+    ctx.fillStyle='#ffe14d';
+    ctx.beginPath(); ctx.ellipse(x,y+wob*0.3, player.r+2, player.r-1+wob*0.2, 0,0,6.3); ctx.fill();
+    ctx.strokeStyle='#c99b12'; ctx.lineWidth=2; ctx.stroke();
+    const lx=player.dir.x, ly=player.dir.y;
+    googly(x-6,y-4+wob*0.4,6,lx,ly); googly(x+6,y-4-wob*0.4,6,lx,ly);
+    // dumb little mouth
+    ctx.strokeStyle='#a97e00'; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(x,y+6,4,0.1,Math.PI-0.1); ctx.stroke();
+  }
+  function drawOni(){
+    const x=oni.px,y=oni.py, stun=oni.stun>0;
+    // horns
+    ctx.fillStyle='#ffe6a0';
+    ctx.beginPath(); ctx.moveTo(x-10,y-12); ctx.lineTo(x-15,y-26); ctx.lineTo(x-3,y-14); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(x+10,y-12); ctx.lineTo(x+15,y-26); ctx.lineTo(x+3,y-14); ctx.fill();
+    // body
+    ctx.fillStyle= stun? '#c58aa0' : '#ff3b3b';
+    ctx.beginPath(); ctx.arc(x,y,oni.r+2,0,6.3); ctx.fill();
+    ctx.strokeStyle='#8a0f0f'; ctx.lineWidth=2; ctx.stroke();
+    if(stun){
+      // dizzy spiral eyes
+      ctx.strokeStyle='#fff'; ctx.lineWidth=2;
+      for(const ex of [-6,6]){ ctx.beginPath();
+        for(let a=0;a<10;a+=0.4){ const rr=a*0.5; const px=x+ex+Math.cos(a+clock*8)*rr, py=y-3+Math.sin(a+clock*8)*rr; a?ctx.lineTo(px,py):ctx.moveTo(px,py);} ctx.stroke(); }
+      ctx.fillStyle='#fff'; ctx.font='12px system-ui'; ctx.fillText('★', x-14, y-18); ctx.fillText('★', x+8, y-20);
+    } else {
+      const lx=oni.dir.x, ly=oni.dir.y;
+      googly(x-6,y-3,6,lx,ly); googly(x+6,y-3,6,lx,ly);
+      // angry brows
+      ctx.strokeStyle='#8a0f0f'; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.moveTo(x-11,y-9); ctx.lineTo(x-2,y-5); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(x+11,y-9); ctx.lineTo(x+2,y-5); ctx.stroke();
+      // jagged mouth
+      ctx.fillStyle='#620'; ctx.beginPath(); ctx.moveTo(x-8,y+7);
+      for(let i=0;i<=4;i++){ ctx.lineTo(x-8+i*4, y+7+(i%2?5:0)); } ctx.lineTo(x+8,y+7); ctx.fill();
+    }
+  }
+
+  function loop(now){
+    let dt=(now-last)/1000; last=now; if(dt>0.05) dt=0.05;
+    if(state==='playing'){ update(dt); if(state==='playing'){ draw(); requestAnimationFrame(loop);} else draw(); }
+    else draw();
+  }
+
+  // ---------- input ----------
+  const frame=$('frame');
+  let sw=null;
+  frame.addEventListener('pointerdown', e=>{ if(e.target===dropBtn) return; sw={x:e.clientX,y:e.clientY}; }, {passive:true});
+  frame.addEventListener('pointerup', e=>{
+    if(!sw) return; const dx=e.clientX-sw.x, dy=e.clientY-sw.y; sw=null;
+    if(Math.abs(dx)<18 && Math.abs(dy)<18) return;
+    if(Math.abs(dx)>Math.abs(dy)) setWant(dx>0?1:-1,0); else setWant(0,dy>0?1:-1);
+  }, {passive:true});
+  dropBtn.addEventListener('pointerdown', e=>{ e.preventDefault(); e.stopPropagation(); dropBall(); }, {passive:false});
+
+  window.addEventListener('keydown', e=>{
+    const k=e.key.toLowerCase();
+    if(['arrowup','arrowdown','arrowleft','arrowright',' '].includes(e.key.toLowerCase())||e.key===' ') e.preventDefault();
+    if(state!=='playing'){ if(e.key===' '||e.key==='Enter'){ state==='ready'?start(true):start(false);} return; }
+    if(e.key==='ArrowLeft'||k==='a') setWant(-1,0);
+    else if(e.key==='ArrowRight'||k==='d') setWant(1,0);
+    else if(e.key==='ArrowUp'||k==='w') setWant(0,-1);
+    else if(e.key==='ArrowDown'||k==='s') setWant(0,1);
+    else if(e.key===' ') dropBall();
+  });
+  $('startBtn').addEventListener('click', e=>{ e.stopPropagation(); start(true); });
+  $('retryBtn').addEventListener('click', e=>{ e.stopPropagation(); start(true); });
+
+  reset(true); state='ready'; draw();
+})();
+</script>
+</body>
+</html>

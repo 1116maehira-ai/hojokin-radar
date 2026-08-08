@@ -297,23 +297,16 @@ export default async function handler(req, res) {
     const { data: topic, error: topicError } = await supabase
       .from('magazine_topics')
       .insert({
-        youtube_url: youtubeUrl,
-        video_id: videoId,
-        transcript: transcript.slice(0, 8000),
-        status: 'processing',
+        title: `YouTube: ${videoId}`,
+        source_url: youtubeUrl,
+        source_text: transcript.slice(0, 8000),
+        status: 'draft',
       })
       .select('id')
       .single();
 
     if (topicError) {
-      // Table might not have all columns — try minimal insert
-      const { data: t2, error: e2 } = await supabase
-        .from('magazine_topics')
-        .insert({ youtube_url: youtubeUrl })
-        .select('id')
-        .single();
-      if (e2) throw new Error(`Supabase topic error: ${e2.message}`);
-      Object.assign(topic || {}, t2);
+      throw new Error(`Supabase topic error: ${topicError.message}`);
     }
     const topicId = topic?.id;
     step(`✅ トピック作成 (ID: ${topicId})`);
@@ -368,7 +361,7 @@ export default async function handler(req, res) {
     if (topicId) {
       await supabase
         .from('magazine_topics')
-        .update({ status: 'ready' })
+        .update({ status: 'expanded' })
         .eq('id', topicId);
     }
 

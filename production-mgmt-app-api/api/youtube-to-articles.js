@@ -1,11 +1,10 @@
 // POST /api/youtube-to-articles
 // Body: { youtubeUrl, recipientCategory? }
-// Returns: { articles, variationIds, message }
-//
-// Full pipeline:
-//   YouTube URL → transcript → 4 articles (Claude) → 3 images each (GPT)
-//   → Wix blog drafts (with images embedded) → Supabase newsletter variations
-//   → return for user confirmation before sending
+// Returns: { success, topicId, articles, log, message }
+// Phase 1: transcript → 4 articles → Supabase + Wix blog (text only, <60s)
+// Phase 2: image generation is a separate step per article
+
+export const config = { maxDuration: 60 };
 
 import { createClient } from '@supabase/supabase-js';
 
@@ -35,7 +34,6 @@ function extractVideoId(url) {
 }
 
 async function getYouTubeTranscript(videoId) {
-  // Try the existing fetch-youtube endpoint first
   try {
     const r = await fetch(`${BASE_URL}/api/fetch-youtube`, {
       method: 'POST',
@@ -48,12 +46,8 @@ async function getYouTubeTranscript(videoId) {
         return data.transcript || data.text || data.content;
       }
     }
-  } catch (_) {
-    // fall through to direct fetch below
-  }
+  } catch (_) {}
 
-  // Fallback: fetch YouTube auto-captions directly
-  // Try Japanese first, then English
   for (const lang of ['ja', 'en']) {
     const r = await fetch(
       `https://www.youtube.com/api/timedtext?v=${videoId}&lang=${lang}&fmt=json3`,
@@ -74,7 +68,7 @@ async function getYouTubeTranscript(videoId) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Step 2: Generate 4 articles with Claude (Anthropic)
+// Step 2: Generate 4 articles with Claude
 // ─────────────────────────────────────────────────────────────────────────────
 
 async function generateArticles(transcript) {
@@ -107,13 +101,13 @@ ${transcript.slice(0, 6000)}
 
 各記事の要件:
 - メルマガ件名(subject): 読者が開封したくなる30文字以内
-- メルマガ本文(body_mail): 800〜1200文字、脳手郎キャラの画像が3枚入ることを想定した流れ
+- メルマガ本文(body_mail): 800〜1200文字
 - ブログタイトル(blog_title): SEOを意識した魅力的なタイトル
-- ブログ本文(blog_body): 1000〜1500文字、段落間は空行区切り、## で小見出しOK
+- ブログ本文(blog_body): 1000〜1500文字、## で小見出しOK
 - 画像プロンプト(image_prompts): 3つのDALL-E用英語プロンプト
-  * image_prompts[0]: 脳手郎キャラクターが主役のシーン（記事テーマ関連）
-  * image_prompts[1]: 脳手郎キャラクターが主役の別シーン（記事テーマ関連）
-  * image_prompts[2]: キャラクターなし、記事テーマを表す抽象的・象徴的な画像
+  * image_prompts[0]: 脳手郎キャラクターが主役のシーン
+  * image_prompts[1]: 脳手郎キャラクターが主役の別シーン
+  * image_prompts[2]: キャラクターなし、記事テーマを表す画像
 
 以下のJSON形式で返してください:
 {
@@ -123,12 +117,8 @@ ${transcript.slice(0, 6000)}
       "subject": "件名テキスト",
       "body_mail": "メルマガ本文テキスト",
       "blog_title": "ブログタイトル",
-      "blog_body": "ブログ本文テキスト（## 見出し可）",
-      "image_prompts": [
-        "English prompt for image 1 (with character)",
-        "English prompt for image 2 (with character)",
-        "English prompt for image 3 (no character)"
-      ]
+      "blog_body": "ブログ本文テキスト",
+      "image_prompts": ["prompt1", "prompt2", "prompt3"]
     }
   ]
 }`,
@@ -144,66 +134,21 @@ ${transcript.slice(0, 6000)}
 
   const data = await response.json();
   const text = data.content?.[0]?.text || '';
-
-  // Extract JSON from response
   const jsonMatch = text.match(/\{[\s\S]*\}/);
   if (!jsonMatch) throw new Error('Claude did not return valid JSON');
-
-  const parsed = JSON.parse(jsonMatch[0]);
-  return parsed.articles;
+  return JSON.parse(jsonMatch[0]).articles;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Step 3: Generate images via /api/generate-image
+// Step 3 & 4: Image generation — deferred (Phase 2, separate endpoint)
+// Images take 3-5 min for 12 generations; Phase 1 is text-only to stay <60s
 // ─────────────────────────────────────────────────────────────────────────────
 
-async function generateImages(prompts) {
-  // prompts[0] and [1] = with character, prompts[2] = without character
-  const results = await Promise.all(
-    prompts.map((prompt, i) =>
-      fetch(`${BASE_URL}/api/generate-image`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt, withCharacter: i < 2 }),
-      })
-        .then(r => r.json())
-        .then(d => d.imageUrl)
-        .catch(err => {
-          console.error(`Image generation failed for prompt ${i}:`, err);
-          return null;
-        }),
-    ),
-  );
-  return results; // [url1, url2, url3] — may contain nulls on failure
-}
-
 // ─────────────────────────────────────────────────────────────────────────────
-// Step 4: Upload images to Wix Media Manager
-// ─────────────────────────────────────────────────────────────────────────────
-
-async function uploadImagesToWix(imageUrls) {
-  const results = await Promise.all(
-    imageUrls.map((url, i) => {
-      if (!url) return Promise.resolve(null);
-      return fetch(`${BASE_URL}/api/upload-wix-media`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ imageUrl: url, filename: `article-image-${i + 1}.png` }),
-      })
-        .then(r => r.json())
-        .then(d => d.wixImageUrl || url) // fall back to original URL if upload fails
-        .catch(() => url); // if Wix upload fails, use original URL directly
-    }),
-  );
-  return results;
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Step 5: Create Wix blog post with images embedded
+// Step 5: Post to Wix blog (via existing /api/post-blog)
 // ─────────────────────────────────────────────────────────────────────────────
 
 async function postToBlog(blogTitle, blogBody, imageUrls) {
-  // Weave images into blog body between sections
   const lines = blogBody.split('\n').filter(l => l.trim());
   const sectionSize = Math.max(1, Math.floor(lines.length / (imageUrls.length + 1)));
 
@@ -212,16 +157,12 @@ async function postToBlog(blogTitle, blogBody, imageUrls) {
 
   for (let i = 0; i < lines.length; i++) {
     bodyWithImages += lines[i] + '\n';
-    // Insert image after every sectionSize lines
     if ((i + 1) % sectionSize === 0 && imageIndex < imageUrls.length) {
       const imgUrl = imageUrls[imageIndex];
-      if (imgUrl) {
-        bodyWithImages += `📷 ${imgUrl}\n`;
-      }
+      if (imgUrl) bodyWithImages += `📷 ${imgUrl}\n`;
       imageIndex++;
     }
   }
-  // Append remaining images at the end
   while (imageIndex < imageUrls.length) {
     const imgUrl = imageUrls[imageIndex];
     if (imgUrl) bodyWithImages += `📷 ${imgUrl}\n`;
@@ -243,7 +184,7 @@ async function postToBlog(blogTitle, blogBody, imageUrls) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Step 6: Save to Supabase magazine_variations
+// Step 6: Save to Supabase
 // ─────────────────────────────────────────────────────────────────────────────
 
 async function saveToSupabase(article, topicId, variationNo, recipientCategory, wixPostId) {
@@ -257,7 +198,7 @@ async function saveToSupabase(article, topicId, variationNo, recipientCategory, 
       categories: [recipientCategory],
       selected: false,
       post_blog: wixPostId ? true : false,
-      scheduled_at: null, // user sets this after confirmation
+      scheduled_at: null,
     })
     .select('id')
     .single();
@@ -280,7 +221,6 @@ export default async function handler(req, res) {
   const videoId = extractVideoId(youtubeUrl);
   if (!videoId) return res.status(400).json({ error: 'Invalid YouTube URL' });
 
-  // Progress tracking (response is streamed at end, not SSE)
   const log = [];
   const step = (msg) => {
     log.push(msg);
@@ -288,12 +228,10 @@ export default async function handler(req, res) {
   };
 
   try {
-    // 1. Transcript
     step('📝 文字起こし取得中...');
     const transcript = await getYouTubeTranscript(videoId);
     step(`✅ 文字起こし完了 (${transcript.length}文字)`);
 
-    // 2. Create Supabase topic
     const { data: topic, error: topicError } = await supabase
       .from('magazine_topics')
       .insert({
@@ -305,13 +243,10 @@ export default async function handler(req, res) {
       .select('id')
       .single();
 
-    if (topicError) {
-      throw new Error(`Supabase topic error: ${topicError.message}`);
-    }
+    if (topicError) throw new Error(`Supabase topic error: ${topicError.message}`);
     const topicId = topic?.id;
     step(`✅ トピック作成 (ID: ${topicId})`);
 
-    // 3. Generate 4 articles
     step('✍️ Claude で記事生成中（4記事）...');
     const articles = await generateArticles(transcript);
     step(`✅ 記事生成完了 (${articles.length}記事)`);
@@ -320,30 +255,15 @@ export default async function handler(req, res) {
 
     for (let i = 0; i < articles.length; i++) {
       const article = articles[i];
-      step(`🖼️ [記事${i + 1}/${articles.length}: ${article.tone}] 画像生成中...`);
 
-      // 4. Generate images
-      const rawImageUrls = await generateImages(article.image_prompts);
-      step(`✅ 画像生成完了: ${rawImageUrls.filter(Boolean).length}/3枚`);
-
-      // 5. Upload to Wix Media Manager
-      step(`📤 Wix メディアへアップロード中...`);
-      const wixImageUrls = await uploadImagesToWix(rawImageUrls);
-      step(`✅ Wix アップロード完了`);
-
-      // 6. Post to Wix blog
-      step(`📰 Wix ブログ投稿中...`);
-      const wixPostId = await postToBlog(article.blog_title, article.blog_body, wixImageUrls);
+      // Post to Wix blog (text only — images generated separately in Phase 2)
+      step(`📰 [記事${i + 1}/${articles.length}: ${article.tone}] Wixブログ投稿中...`);
+      const wixPostId = await postToBlog(article.blog_title, article.blog_body, []);
       step(`✅ ブログ投稿${wixPostId ? '完了' : '失敗'}: ${wixPostId || 'error'}`);
 
-      // 7. Save to Supabase
       step(`💾 Supabase に保存中...`);
       const variationId = await saveToSupabase(
-        article,
-        topicId,
-        i + 1,
-        recipientCategory,
-        wixPostId,
+        article, topicId, i + 1, recipientCategory, wixPostId,
       );
       step(`✅ Supabase 保存完了 (variation_id: ${variationId})`);
 
@@ -353,16 +273,12 @@ export default async function handler(req, res) {
         blog_title: article.blog_title,
         wixPostId,
         variationId,
-        imageUrls: wixImageUrls,
+        imageUrls: [], // images generated in Phase 2
       });
     }
 
-    // 8. Update topic status
     if (topicId) {
-      await supabase
-        .from('magazine_topics')
-        .update({ status: 'expanded' })
-        .eq('id', topicId);
+      await supabase.from('magazine_topics').update({ status: 'expanded' }).eq('id', topicId);
     }
 
     return res.status(200).json({
@@ -371,7 +287,7 @@ export default async function handler(req, res) {
       recipientCategory,
       articles: results,
       log,
-      message: `✅ 完了！${articles.length}記事・各3枚の画像をWixブログに投稿し、Supabaseに保存しました。\n配信カテゴリ: ${recipientCategory}\n配信時間をセットして送信してください。`,
+      message: `✅ 完了！${articles.length}記事をWixブログに投稿し、Supabaseに保存しました。\n画像は別途生成します。配信カテゴリ: ${recipientCategory}`,
     });
   } catch (err) {
     console.error('[youtube-to-articles] error:', err);

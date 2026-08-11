@@ -29,81 +29,41 @@ const POSITION_SCENES = {
   bottom: 'triumphant celebration — 脳手郎 cheers success, encouraging the reader to take action',
 };
 
-let cachedCharacterDesc = null;
-
-// Step 1: GPT-4o Vision reads reference photos → precise character description
-async function getCharacterDescription() {
-  if (cachedCharacterDesc) return cachedCharacterDesc;
-
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: 'gpt-4o',
-      max_tokens: 1000,
-      messages: [{
-        role: 'user',
-        content: [
-          {
-            type: 'text',
-            text: `Analyze these reference photos of the mascot "脳手郎" (Noutero) and write an extremely detailed visual description in English for use in image generation prompts. Cover: exact body shape, proportions, material/texture (metallic gold), head details (exposed pink/red brain on top), face features (large blue beak/bill, round eyes with blue eyelashes), hands, feet, any accessories (silver ring/bracelet), overall art style (3D figurine/collectible toy aesthetic). Be very specific so the generated image matches these photos.`,
-          },
-          ...NOUTERO_REFS.map(ref => ({
-            type: 'image_url',
-            image_url: { url: `data:${ref.type};base64,${ref.data}`, detail: 'high' },
-          })),
-        ],
-      }],
-    }),
-  });
-
-  if (!response.ok) {
-    const err = await response.json();
-    throw new Error(`GPT-4o vision error: ${err.error?.message}`);
-  }
-
-  const d = await response.json();
-  cachedCharacterDesc = d.choices?.[0]?.message?.content || '';
-  console.log('[character-desc] length:', cachedCharacterDesc.length);
-  return cachedCharacterDesc;
-}
-
-// Step 2: gpt-image-1 generates the scene using the detailed character description
-async function generateArticleImage(variation, characterDesc, position = 'top') {
+// Use /v1/images/edits — the ONLY endpoint that accepts actual reference images as input.
+// gpt-image-1 sees the real 脳手郎 photos and places the character in the requested scene.
+async function generateArticleImage(variation, position = 'top') {
   const blogTitle = variation.blog_title || variation.summary || '';
   const body = (variation.blog_body || variation.body_mail || '').slice(0, 300);
   const scene = POSITION_SCENES[position];
 
-  const prompt = `Photorealistic cinematic 3D collectible figurine render for a Japanese business newsletter.
+  const prompt = `These are reference photos of our mascot character "脳手郎" (Noutero). Create a brand-new image showing this EXACT character (same gold metallic body, pink brain on head, blue beak, round eyes) in the following scene:
 
-Scene: ${scene}
-Article title: ${blogTitle}
-Article theme: ${body}
+${scene}
 
-Main character — 脳手郎 (Noutero): ${characterDesc}
+Article context: ${blogTitle} — ${body}
 
-Visual style: photorealistic, cinematic dramatic lighting, epic atmosphere, high-end collectible toy photography, Japanese business context (subsidies, grants, consulting). Absolutely NO text or lettering anywhere in the image.`;
+Style: photorealistic, cinematic dramatic lighting, epic atmosphere, high-end collectible figurine photography, professional Japanese business context (subsidies, consulting). No text anywhere.`;
 
-  const response = await fetch('https://api.openai.com/v1/images/generations', {
+  const formData = new FormData();
+  for (const ref of NOUTERO_REFS) {
+    const buf = Buffer.from(ref.data, 'base64');
+    const blob = new Blob([buf], { type: ref.type });
+    formData.append('image', blob, `ref.${ref.type.split('/')[1]}`);
+  }
+  formData.append('prompt', prompt);
+  formData.append('model', 'gpt-image-1');
+  formData.append('size', '1024x1024');
+  formData.append('quality', 'high');
+  formData.append('n', '1');
+
+  const response = await fetch('https://api.openai.com/v1/images/edits', {
     method: 'POST',
-    headers: {
-      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: 'gpt-image-1',
-      prompt,
-      n: 1,
-      size: '1024x1024',
-      quality: 'high',
-    }),
+    headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}` },
+    body: formData,
   });
 
   const data = await response.json();
-  if (!response.ok) throw new Error(`Image API error: ${data.error?.message}`);
+  if (!response.ok) throw new Error(`Edit API error: ${data.error?.message}`);
   return data.data?.[0]?.b64_json || null;
 }
 
@@ -169,10 +129,7 @@ export default async function handler(req, res) {
     }
     step(`✅ ${variations.length}記事取得`);
 
-    step('🔍 キャラクター解析中 (GPT-4o Vision)...');
-    const characterDesc = await getCharacterDescription();
-    step(`✅ 解析完了 (${characterDesc.length}文字)`);
-
+    step('🎨 参考画像を直接渡して生成開始 (/images/edits)...');
     const results = [];
     for (const v of variations) {
       step(`🖼️ 画像生成中 #${v.variation_no} (上・中・下 3枚)...`);
@@ -180,7 +137,7 @@ export default async function handler(req, res) {
         const imageUrls = [];
         for (const pos of ['top', 'middle', 'bottom']) {
           step(`  📸 #${v.variation_no} [${pos}] 生成中...`);
-          const b64 = await generateArticleImage(v, characterDesc, pos);
+          const b64 = await generateArticleImage(v, pos);
           if (b64) {
             const imageUrl = await uploadToStorage(b64, `${v.id}-${pos}`);
             imageUrls.push(imageUrl);

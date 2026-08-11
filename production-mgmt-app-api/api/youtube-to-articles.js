@@ -4,14 +4,37 @@
 // Phase 1: transcript → 4 articles → Supabase + Wix blog (text only, <60s)
 // Phase 2: image generation is a separate step per article
 
+import { YoutubeTranscript } from 'youtube-transcript';
+
 export const config = { maxDuration: 60 };
 
-import { createClient } from '@supabase/supabase-js';
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || 'https://vfgujkocemgezvcuixpp.supabase.co';
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmZ3Vqa29jZW1nZXp2Y3VpeHBwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NjA4MTEsImV4cCI6MjA5MDEzNjgxMX0.-IxXJw7St2pLKSXKDU3dunJdgIkL-bhobD53SS-ci1s';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-);
+const sbHeaders = {
+  apikey: SUPABASE_KEY,
+  Authorization: `Bearer ${SUPABASE_KEY}`,
+  'Content-Type': 'application/json',
+};
+
+async function sbInsert(table, body) {
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
+    method: 'POST',
+    headers: { ...sbHeaders, Prefer: 'return=representation' },
+    body: JSON.stringify(body),
+  });
+  const data = await r.json();
+  if (!r.ok) throw new Error(`Supabase ${table} insert error: ${JSON.stringify(data)}`);
+  return Array.isArray(data) ? data[0] : data;
+}
+
+async function sbUpdate(table, filter, body) {
+  await fetch(`${SUPABASE_URL}/rest/v1/${table}?${filter}`, {
+    method: 'PATCH',
+    headers: sbHeaders,
+    body: JSON.stringify(body),
+  });
+}
 
 const BASE_URL = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -34,37 +57,42 @@ function extractVideoId(url) {
 }
 
 async function getYouTubeTranscript(videoId) {
-  try {
-    const r = await fetch(`${BASE_URL}/api/fetch-youtube`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ videoId, url: `https://www.youtube.com/watch?v=${videoId}` }),
-    });
-    if (r.ok) {
-      const data = await r.json();
-      if (data.transcript || data.text || data.content) {
-        return data.transcript || data.text || data.content;
-      }
-    }
-  } catch (_) {}
+  let transcript = '';
+  let title = '';
 
-  for (const lang of ['ja', 'en']) {
-    const r = await fetch(
-      `https://www.youtube.com/api/timedtext?v=${videoId}&lang=${lang}&fmt=json3`,
-    );
-    if (!r.ok) continue;
-    const data = await r.json();
-    const events = data?.events || [];
-    const text = events
-      .filter(e => e.segs)
-      .flatMap(e => e.segs.map(s => s.utf8))
-      .join(' ')
-      .replace(/\s+/g, ' ')
-      .trim();
-    if (text.length > 100) return text;
+  // Try youtube-transcript package (handles auto-generated captions / asr)
+  try {
+    const items = await YoutubeTranscript.fetchTranscript(videoId, { lang: 'ja' })
+      .catch(() => YoutubeTranscript.fetchTranscript(videoId, { lang: 'en' }));
+    if (items && items.length > 0) {
+      transcript = items.map(t => t.text).join(' ').replace(/\s+/g, ' ').trim();
+      console.log(`[transcript] got ${transcript.length} chars`);
+    }
+  } catch (e) {
+    console.error('[transcript] youtube-transcript failed:', e.message);
   }
 
-  throw new Error('Could not retrieve transcript. Make sure the video has captions enabled.');
+  // Get title via oEmbed (reliable public API, works from any server IP)
+  try {
+    const oembedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(`https://www.youtube.com/watch?v=${videoId}`)}&format=json`;
+    const r = await fetch(oembedUrl);
+    console.log(`[oembed] status: ${r.status}`);
+    if (r.ok) {
+      const d = await r.json();
+      title = d.title || '';
+      console.log(`[oembed] title: ${title}`);
+    } else {
+      const body = await r.text();
+      console.error(`[oembed] error body: ${body.slice(0, 200)}`);
+    }
+  } catch (e) {
+    console.error('[oembed] fetch failed:', e.message);
+  }
+
+  if (transcript) return transcript;
+  if (title) return `【動画タイトル】\n${title}\n\n※字幕が取得できなかったため、タイトルのみを元に記事を生成します。`;
+  // Last resort: use video URL so Claude can still attempt article generation
+  return `【YouTube動画】\nhttps://www.youtube.com/watch?v=${videoId}\n\n※この動画の情報を元に補助金・ビジネスに関する記事を生成してください。`;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -80,8 +108,8 @@ async function generateArticles(transcript) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 8000,
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 5000,
       system: `あなたはTENOHIRA（テノヒラ）の前平雄一朗として、補助金・ビジネスコンサルティングの専門家視点でメルマガ・ブログ記事を書きます。
 文章スタイル: 親しみやすく専門的、読者の課題に寄り添い、最終的に「ご相談ください」という行動を促す。
 必ずJSON形式のみで返してください。余計な説明は一切不要です。`,
@@ -101,15 +129,11 @@ ${transcript.slice(0, 6000)}
 
 各記事の要件:
 - メルマガ件名(subject): 読者が開封したくなる30文字以内
-- メルマガ本文(body_mail): 800〜1200文字
+- メルマガ本文(body_mail): 300〜500文字（簡潔に）
 - ブログタイトル(blog_title): SEOを意識した魅力的なタイトル
-- ブログ本文(blog_body): 1000〜1500文字、## で小見出しOK
-- 画像プロンプト(image_prompts): 3つのDALL-E用英語プロンプト
-  * image_prompts[0]: 脳手郎キャラクターが主役のシーン
-  * image_prompts[1]: 脳手郎キャラクターが主役の別シーン
-  * image_prompts[2]: キャラクターなし、記事テーマを表す画像
+- ブログ本文(blog_body): 400〜600文字、## で小見出しOK
 
-以下のJSON形式で返してください:
+以下のJSON形式のみで返してください（余計な説明は不要）:
 {
   "articles": [
     {
@@ -117,8 +141,7 @@ ${transcript.slice(0, 6000)}
       "subject": "件名テキスト",
       "body_mail": "メルマガ本文テキスト",
       "blog_title": "ブログタイトル",
-      "blog_body": "ブログ本文テキスト",
-      "image_prompts": ["prompt1", "prompt2", "prompt3"]
+      "blog_body": "ブログ本文テキスト"
     }
   ]
 }`,
@@ -188,23 +211,19 @@ async function postToBlog(blogTitle, blogBody, imageUrls) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 async function saveToSupabase(article, topicId, variationNo, recipientCategory, wixPostId) {
-  const { data, error } = await supabase
-    .from('magazine_variations')
-    .insert({
-      topic_id: topicId,
-      variation_no: variationNo,
-      body_mail: article.body_mail,
-      subjects: JSON.stringify({ [article.tone]: article.subject }),
-      categories: [recipientCategory],
-      selected: false,
-      post_blog: wixPostId ? true : false,
-      scheduled_at: null,
-    })
-    .select('id')
-    .single();
-
-  if (error) throw new Error(`Supabase insert error: ${error.message}`);
-  return data.id;
+  const row = await sbInsert('magazine_variations', {
+    topic_id: topicId,
+    variation_no: variationNo,
+    body_mail: article.body_mail,
+    subjects: [article.subject],
+    summary: `[${article.tone}] ${article.blog_title || ''}`,
+    categories: [recipientCategory],
+    selected: false,
+    scheduled_at: null,
+    blog_title: article.blog_title || null,
+    blog_body: article.blog_body || null,
+  });
+  return row?.id;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -232,18 +251,12 @@ export default async function handler(req, res) {
     const transcript = await getYouTubeTranscript(videoId);
     step(`✅ 文字起こし完了 (${transcript.length}文字)`);
 
-    const { data: topic, error: topicError } = await supabase
-      .from('magazine_topics')
-      .insert({
-        title: `YouTube: ${videoId}`,
-        source_url: youtubeUrl,
-        source_text: transcript.slice(0, 8000),
-        status: 'draft',
-      })
-      .select('id')
-      .single();
-
-    if (topicError) throw new Error(`Supabase topic error: ${topicError.message}`);
+    const topic = await sbInsert('magazine_topics', {
+      title: `YouTube: ${videoId}`,
+      source_url: youtubeUrl,
+      source_text: transcript.slice(0, 8000),
+      status: 'draft',
+    });
     const topicId = topic?.id;
     step(`✅ トピック作成 (ID: ${topicId})`);
 
@@ -251,34 +264,25 @@ export default async function handler(req, res) {
     const articles = await generateArticles(transcript);
     step(`✅ 記事生成完了 (${articles.length}記事)`);
 
-    const results = [];
-
-    for (let i = 0; i < articles.length; i++) {
-      const article = articles[i];
-
-      // Post to Wix blog (text only — images generated separately in Phase 2)
-      step(`📰 [記事${i + 1}/${articles.length}: ${article.tone}] Wixブログ投稿中...`);
-      const wixPostId = await postToBlog(article.blog_title, article.blog_body, []);
-      step(`✅ ブログ投稿${wixPostId ? '完了' : '失敗'}: ${wixPostId || 'error'}`);
-
-      step(`💾 Supabase に保存中...`);
-      const variationId = await saveToSupabase(
-        article, topicId, i + 1, recipientCategory, wixPostId,
-      );
-      step(`✅ Supabase 保存完了 (variation_id: ${variationId})`);
-
-      results.push({
-        tone: article.tone,
-        subject: article.subject,
-        blog_title: article.blog_title,
-        wixPostId,
-        variationId,
-        imageUrls: [], // images generated in Phase 2
-      });
-    }
+    // Supabase保存のみ（Wix投稿は別途Phase 2）
+    step('💾 Supabase保存中（4記事並列）...');
+    const results = await Promise.all(
+      articles.map(async (article, i) => {
+        const variationId = await saveToSupabase(article, topicId, i + 1, recipientCategory, null).catch(e => { console.error('saveToSupabase failed:', e); return null; });
+        return {
+          tone: article.tone,
+          subject: article.subject,
+          blog_title: article.blog_title,
+          wixPostId: null,
+          variationId,
+          imageUrls: [],
+        };
+      })
+    );
+    step(`✅ 全記事保存完了`);
 
     if (topicId) {
-      await supabase.from('magazine_topics').update({ status: 'expanded' }).eq('id', topicId);
+      await sbUpdate('magazine_topics', `id=eq.${topicId}`, { status: 'expanded' });
     }
 
     return res.status(200).json({

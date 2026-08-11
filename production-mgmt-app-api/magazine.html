@@ -1,0 +1,2390 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TENOHIRA メルマガ配信システム</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✉️</text></svg>">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Noto Sans JP', sans-serif; background: #FFFFFF; font-size: 21px; color: #1A1A1A; }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #F4F4F5; }
+  ::-webkit-scrollbar-thumb { background: #D4D4D8; border-radius: 3px; }
+  textarea:focus, input:focus, select:focus { outline: none; border-color: #FF4500 !important; }
+  button { font-family: 'Noto Sans JP', sans-serif; }
+  select { font-family: 'Noto Sans JP', sans-serif; }
+  @media (max-width: 768px) {
+    body { font-size: 16px; }
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+
+const SUPABASE_URL = 'https://vfgujkocemgezvcuixpp.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmZ3Vqa29jZW1nZXp2Y3VpeHBwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NjA4MTEsImV4cCI6MjA5MDEzNjgxMX0.-IxXJw7St2pLKSXKDU3dunJdgIkL-bhobD53SS-ci1s';
+
+// ===== デザイントークン（白ベース／レッドオレンジ系アクセント） =====
+const COLOR = {
+  bg: '#FFFFFF',
+  surface: '#FAFAFA',
+  surfaceAlt: '#F4F4F5',     // ライトグレー
+  border: '#E4E4E7',
+  text: '#18181B',            // ほぼ黒、視認性重視
+  textSub: '#52525B',
+  textFaint: '#A1A1AA',
+  primary: '#FF4500',         // レッドオレンジ（メインCTA）
+  primaryDark: '#D63A00',
+  secondary: '#FF8C00',       // オレンジ
+  accent: '#FFC107',          // イエロー（ハイライト・バッジ）
+  success: '#16A34A',
+  danger: '#DC2626',
+  white: '#FFFFFF',
+};
+
+// レスポンシブ判定（768px以下はスマホ扱い）
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = React.useState(typeof window !== 'undefined' && window.innerWidth <= 768);
+  React.useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+  return isMobile;
+};
+
+const NOTERO_IMAGE_BASE64 = 'data:image/png;base64,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';
+
+// メルマガ本文に冠辞・脳手郎画像・結語を自動付与する
+function wrapWithNoteroTemplate(bodyText) {
+  // 既にテンプレート（冒頭挨拶か末尾署名）が含まれてたら二重にしない
+  const alreadyWrapped =
+    bodyText.includes('様子のおかしなウチの社長') ||
+    bodyText.includes('広報担当の脳手郎です') ||
+    (bodyText.includes('{{氏名}}様') && bodyText.includes('脳手郎/TENOHIRA広報'));
+  if (alreadyWrapped) return bodyText;
+  const header = '{{氏名}}様\n\n様子のおかしなウチの社長、前平をはじめ、TENOHIRAメンバーがお世話になります！\n広報担当の脳手郎です🧠\n※TENOHIRAのメンバーと名刺を交換された方のみに、元気いっぱいお送りします💪\n\n📷 ' + NOTERO_IMAGE_BASE64 + '\n\n';
+  const footer = '\n\n※私にメルマガ辞めなさい❗️などありましたらご連絡くださいませ、脳手郎は直ちに沈黙するようにと言いつけられております🥺\n\n脳手郎/TENOHIRA広報';
+  return header + bodyText + footer;
+}
+
+const CATEGORIES = [
+  { id: 'agency',   label: '代理店向け',       icon: '🤝', color: '#4F46E5' },
+  { id: 'direct',   label: '直クライアント向け', icon: '🏢', color: '#0891B2' },
+  { id: 'media',    label: 'メディア向け',       icon: '📺', color: '#7C3AED' },
+  { id: 'prospect', label: '見込み客向け',       icon: '🎯', color: '#D97706' },
+  { id: 'vendor',   label: '外注・業者向け',     icon: '🔧', color: '#059669' },
+  { id: 'subsidy',  label: '補助金候補向け',     icon: '💰', color: '#DC2626' },
+];
+
+const CAT_MAP = {
+  '代理店': 'agency', '直クライアント': 'direct', 'メディア': 'media',
+  '見込み客': 'prospect', '外注・業者': 'vendor', '補助金候補': 'subsidy',
+  '直クライ作': 'direct',
+};
+
+const CAT_OPTIONS = ['代理店','直クライアント','メディア','見込み客','外注・業者','補助金候補'];
+
+const SAMPLE_SUBJECTS = {
+  agency:   ['補助金、まだ間に合います！今こそ動くタイミングです🔥','沖縄の経営者へ。今だから話したいお金の話','無料診断やります！まずは話だけでもどうぞ'],
+  direct:   ['7月のご挨拶と、最近の現場から🌺','映像制作、こんな使い方もあるんです','TENOHIRAからの近況報告＋お得な情報'],
+  media:    ['新しい実績ができました。ぜひご覧ください','局の皆様へ、今月のTENOHIRA通信','コンペ参加のご案内と近況'],
+  prospect: ['一度お会いして以来、ずっと気になってました','もしよければ、15分だけ話しませんか？','沖縄の映像制作、こんな会社です'],
+  vendor:   ['いつもお世話になっております。近況共有です','今月の案件状況と今後のご相談','パートナーの皆様へのお知らせ'],
+  subsidy:  ['【締切注意】補助金申請、今月が最後のチャンスです','御社に使える補助金、見つかりました','無料で補助金診断します！お気軽にどうぞ'],
+};
+
+const SAMPLE_BODY = {
+  agency: `{{氏名}}さん、こんにちは！\n\n沖縄も夏本番ですね🌺 いかがお過ごしでしょうか？\n\n今日は、経営者の皆さんにぜひお伝えしたい「補助金」のお話です。\n\n実は今、ISCO補助金やものづくり補助金など、使える制度がいくつかあります。でも「難しそう」「うちには関係ない」と思って、チャンスを逃している会社さんが本当に多いんです。\n\nTENOHIRAでは、無料で「使える補助金の診断」をやっています。まずは話だけでも聞かせてください！\n\n一緒に、沖縄の企業をもっと元気にしていきましょう🔥\n\n前平 雄一朗 / TENOHIRA`,
+  direct: `{{氏名}}さん、こんにちは！\n\nいつもお世話になっております、TENOHIRAの前平です🌺\n\n先月もご一緒できて嬉しかったです。今月も新しい実績ができました！\n\n実は映像制作だけじゃなくて、補助金の申請代行もやっています。使える補助金が見つかれば、制作費の一部に充てることもできますよ！\n\n気になったらいつでも声かけてください。まずは話だけでも大丈夫です。\n\n前平 雄一朗 / TENOHIRA`,
+  media: `{{氏名}}さん、こんにちは！\n\nTENOHIRAの前平です。いつもお世話になっております🙏\n\n先月も新しい実績ができました。ぜひご覧いただければ嬉しいです。\n\n今後ともよろしくお願いいたします！\n\n前平 雄一朗 / TENOHIRA`,
+  prospect: `{{氏名}}さん、こんにちは！\n\n先日お会いしてから、ずっと気になっていました。TENOHIRAの前平です🌺\n\nあの時の話、もう少し詳しく聞かせていただけませんか？15分だけでも大丈夫です。\n\nお気軽に声かけてください！\n\n前平 雄一朗 / TENOHIRA`,
+  vendor: `{{氏名}}さん、こんにちは！\n\nいつもお世話になっております、TENOHIRAの前平です。\n\n今月の案件状況のご共有と、今後のご相談をさせてください。\n\nよろしくお願いいたします！\n\n前平 雄一朗 / TENOHIRA`,
+  subsidy: `{{氏名}}さん、こんにちは！\n\nTENOHIRAの前平です。補助金の件でご連絡しました🔥\n\n御社に使えそうな補助金が見つかりました。締切も近いので、早めにご確認ください。\n\n無料で診断しますので、まずはお気軽にご連絡ください！\n\n前平 雄一朗 / TENOHIRA`,
+};
+
+// subjects がどんな形式で保存されていても配列に正規化する
+function normalizeSubjects(subjects) {
+  if (Array.isArray(subjects)) return subjects;
+  if (!subjects) return [];
+  if (typeof subjects === 'string') {
+    try { const p = JSON.parse(subjects); return Array.isArray(p) ? p : Object.values(p); } catch(_) { return [subjects]; }
+  }
+  if (typeof subjects === 'object') return Object.values(subjects);
+  return [];
+}
+
+const NAV = [
+  { icon: '🏠', label: 'ダッシュボード' },
+  null, // 旧「メルマガ編集」は廃止（ネタ管理に統合）。インデックス整合のためnullで温存
+  { icon: '💡', label: 'ネタ管理' },
+  { icon: '👥', label: '配信先リスト' },
+  { icon: '📋', label: '配信履歴' },
+  { icon: '⚙️', label: '設定' },
+];
+
+// ===== ダッシュボードコンポーネント =====
+function Dashboard({ supabaseUrl, supabaseKey }) {
+  const [stats, setStats] = React.useState({ topicCount: 0, sentCount: 0, mailingCount: 0 });
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    const load = async () => {
+      setLoading(true);
+      try {
+        const headers = { apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}` };
+
+        const [topicsRes, sentRes, mailingRes] = await Promise.all([
+          fetch(`${supabaseUrl}/rest/v1/magazine_topics?select=id`, { headers }),
+          fetch(`${supabaseUrl}/rest/v1/magazine_variations?select=id&selected=eq.true`, { headers }),
+          fetch(`${supabaseUrl}/rest/v1/mailing_list?select=id&send_yn=eq.Y`, { headers }),
+        ]);
+        const topics = await topicsRes.json();
+        const sent = await sentRes.json();
+        const mailing = await mailingRes.json();
+
+        setStats({
+          topicCount: Array.isArray(topics) ? topics.length : 0,
+          sentCount: Array.isArray(sent) ? sent.length : 0,
+          mailingCount: Array.isArray(mailing) ? mailing.length : 0,
+        });
+      } catch (e) { console.error(e); }
+      setLoading(false);
+    };
+    load();
+  }, []);
+
+  const StatCard = ({ icon, label, value, unit, color, bg }) => (
+    <div style={{ background: COLOR.white, borderRadius: 18, border: `1px solid ${COLOR.border}`, padding: '24px 26px', flex: 1, minWidth: 190 }}>
+      <div style={{ width: 48, height: 48, borderRadius: 12, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, marginBottom: 14 }}>{icon}</div>
+      <div style={{ fontSize: 13, fontWeight: 700, color: COLOR.textSub, marginBottom: 8 }}>{label}</div>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
+        <span style={{ fontSize: 42, fontWeight: 900, color: color, fontFamily: "'Noto Sans JP', sans-serif" }}>
+          {loading ? '…' : value}
+        </span>
+        {unit && <span style={{ fontSize: 14, color: COLOR.textFaint, fontWeight: 700 }}>{unit}</span>}
+      </div>
+    </div>
+  );
+
+  return (
+    <div style={{ flex: 1, overflow: 'auto', padding: 24 }}>
+      <h1 style={{ fontSize: 22, fontWeight: 900, color: COLOR.text, marginBottom: 20 }}>🏠 ダッシュボード</h1>
+
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, marginBottom: 24 }}>
+        <StatCard icon="💡" label="ストック中のネタ" value={stats.topicCount} unit="件" color={COLOR.primary} bg="#FFE8DC" />
+        <StatCard icon="📨" label="これまで送信したネタ" value={stats.sentCount} unit="件" color={COLOR.secondary} bg="#FFEAD1" />
+        <StatCard icon="👥" label="現在の配信先" value={stats.mailingCount} unit="件" color="#B45309" bg="#FFF6CC" />
+      </div>
+
+      <div style={{ background: COLOR.surfaceAlt, borderRadius: 16, padding: '20px 24px', display: 'flex', alignItems: 'center', gap: 16, marginBottom: 16, borderLeft: `4px solid ${COLOR.accent}` }}>
+        <div style={{ fontSize: 28 }}>📊</div>
+        <div>
+          <div style={{ fontSize: 14, fontWeight: 800, color: COLOR.textSub }}>開封率トラッキング</div>
+          <div style={{ fontSize: 13, color: COLOR.textFaint, marginTop: 2 }}>準備中です。開封計測の仕組みが整い次第、ここに表示されます。</div>
+        </div>
+      </div>
+
+      <div style={{ background: COLOR.surfaceAlt, borderRadius: 16, padding: '20px 24px', display: 'flex', alignItems: 'center', gap: 16, borderLeft: `4px solid ${COLOR.accent}` }}>
+        <div style={{ fontSize: 28 }}>📸</div>
+        <div>
+          <div style={{ fontSize: 14, fontWeight: 800, color: COLOR.textSub }}>Instagram連携データ（いいね・コメント）</div>
+          <div style={{ fontSize: 13, color: COLOR.textFaint, marginTop: 2 }}>準備中です。Instagram連携が完了次第、ここに反映されます。</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ===== 配信履歴コンポーネント =====
+function HistoryView({ supabaseUrl, supabaseKey, isMobile, COLOR }) {
+  const [list, setList] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+  const [topics, setTopics] = React.useState({});
+
+  React.useEffect(() => {
+    const load = async () => {
+      setLoading(true);
+      try {
+        // 送信済みバリエーションを取得
+        const res = await fetch(
+          `${supabaseUrl}/rest/v1/magazine_variations?select=*&or=(scheduled_sent.eq.true,selected.eq.true)&order=sent_at.desc.nullslast,scheduled_at.desc.nullslast`,
+          { headers: { apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}` } }
+        );
+        const data = await res.json();
+        setList(data || []);
+
+        // ネタ名を取得
+        const topicIds = [...new Set((data || []).map(v => v.topic_id).filter(Boolean))];
+        if (topicIds.length > 0) {
+          const tRes = await fetch(
+            `${supabaseUrl}/rest/v1/magazine_topics?id=in.(${topicIds.join(',')})&select=id,title`,
+            { headers: { apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}` } }
+          );
+          const tData = await tRes.json();
+          const map = {};
+          (tData || []).forEach(t => { map[t.id] = t.title; });
+          setTopics(map);
+        }
+      } catch(e) { console.error(e); }
+      setLoading(false);
+    };
+    load();
+  }, []);
+
+  const formatDate = (str) => {
+    if (!str) return '-';
+    const d = new Date(str);
+    return d.toLocaleString('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+  };
+
+  return (
+    <div style={{ flex: 1, overflow: 'auto', padding: isMobile ? '12px' : '24px', background: '#F8FAFC' }}>
+      <h1 style={{ fontSize: 20, fontWeight: 900, color: COLOR.text, marginBottom: 18 }}>📋 配信履歴</h1>
+      {loading ? (
+        <div style={{ textAlign: 'center', padding: 40, color: COLOR.textFaint }}>読み込み中...</div>
+      ) : list.length === 0 ? (
+        <div style={{ textAlign: 'center', padding: 40, color: COLOR.textFaint }}>配信履歴がありません</div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {list.map(v => (
+            <div key={v.id} style={{ background: '#fff', borderRadius: 12, border: `1px solid ${COLOR.border}`, padding: '14px 18px' }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10, marginBottom: 6 }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: COLOR.text, marginBottom: 3 }}>
+                    {topics[v.topic_id] || 'ネタ名不明'} - バリエーション{v.variation_no}
+                  </div>
+                  <div style={{ fontSize: 12, color: COLOR.textSub }}>
+                    {v.edited_subjects && Object.keys(v.edited_subjects).length > 0
+                      ? Object.values(v.edited_subjects)[0]
+                      : normalizeSubjects(v.subjects)[0] || '件名なし'}
+                  </div>
+                </div>
+                <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                  {v.sent_at ? (
+                    <span style={{ fontSize: 11, background: '#DCFCE7', color: '#166534', borderRadius: 6, padding: '3px 8px', fontWeight: 700 }}>✅ 送信済み</span>
+                  ) : (
+                    <span style={{ fontSize: 11, background: '#FEF3C7', color: '#92400E', borderRadius: 6, padding: '3px 8px', fontWeight: 700 }}>📅 送信記録なし</span>
+                  )}
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+                <div style={{ fontSize: 11, color: COLOR.textFaint }}>
+                  📅 予約：{formatDate(v.scheduled_at)}
+                </div>
+                {v.sent_at && (
+                  <div style={{ fontSize: 11, color: COLOR.textFaint }}>
+                    ✉️ 送信：{formatDate(v.sent_at)}
+                  </div>
+                )}
+                {v.sent_count > 0 && (
+                  <div style={{ fontSize: 11, color: COLOR.textFaint }}>
+                    👥 {v.sent_count}件送信
+                  </div>
+                )}
+                {v.categories && v.categories.length > 0 && (
+                  <div style={{ fontSize: 11, color: COLOR.textFaint }}>
+                    🏷️ {v.categories.join('・')}
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ===== ネタ管理コンポーネント =====
+function TopicManager({ supabaseUrl, supabaseKey, showToast }) {
+  const isMobile = useIsMobile();
+  const [mobileView, setMobileView] = React.useState('list'); // 'list' | 'detail'
+  const [topics, setTopics] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+  const [showAdd, setShowAdd] = React.useState(false);
+  const [newTitle, setNewTitle] = React.useState('');
+  const [newUrl, setNewUrl] = React.useState('');
+  const [newText, setNewText] = React.useState('');
+  const [newDirect, setNewDirect] = React.useState(false); // そのまま使うモード
+  const [newDirectSubject, setNewDirectSubject] = React.useState(''); // そのまま使う時の件名
+  const [newDirectBody, setNewDirectBody] = React.useState(''); // 直接入力本文
+  const [expanding, setExpanding] = React.useState({});
+  const [selectedTopic, setSelectedTopic] = React.useState(null);
+  const [variations, setVariations] = React.useState([]);
+  const [loadingVars, setLoadingVars] = React.useState(false);
+
+  React.useEffect(() => { loadTopics(); }, []);
+
+  const loadTopics = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`${supabaseUrl}/rest/v1/magazine_topics?select=*&order=created_at.desc`, {
+        headers: { 'apikey': supabaseKey, 'Authorization': `Bearer ${supabaseKey}` }
+      });
+      const data = await res.json();
+      if (Array.isArray(data)) setTopics(data);
+    } catch(e) { console.error(e); }
+    setLoading(false);
+  };
+
+  const loadVariations = async (topicId) => {
+    setLoadingVars(true);
+    setVariations([]);
+    try {
+      const res = await fetch(`${supabaseUrl}/rest/v1/magazine_variations?topic_id=eq.${topicId}&order=variation_no`, {
+        headers: { 'apikey': supabaseKey, 'Authorization': `Bearer ${supabaseKey}` }
+      });
+      const data = await res.json();
+      if (Array.isArray(data)) setVariations(data);
+    } catch(e) { console.error(e); }
+    setLoadingVars(false);
+  };
+
+  const [fetchingUrl, setFetchingUrl] = React.useState(false);
+  const [autoflowing, setAutoflowing] = React.useState(false);
+  const [autoflowLog, setAutoflowLog] = React.useState([]);
+
+  const runYoutubeAutoflow = async () => {
+    if (!newUrl) { showToast('YouTubeのURLを入力してください', 'error'); return; }
+    if (!newUrl.includes('youtube.com') && !newUrl.includes('youtu.be')) {
+      showToast('YouTubeのURLを入力してください', 'error'); return;
+    }
+    setAutoflowing(true);
+    setAutoflowLog(['🚀 パイプライン開始...']);
+    try {
+      showToast('⏳ YouTube全自動パイプライン実行中...（2〜5分かかります）');
+      const res = await fetch('/api/youtube-to-articles', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ youtubeUrl: newUrl, recipientCategory: '直クライアント' }),
+      });
+      let data;
+      try { data = await res.json(); } catch(_) {
+        throw new Error(`サーバーエラー (HTTP ${res.status}) — Vercelのログを確認してください`);
+      }
+      if (!res.ok || data.error) {
+        const msg = data?.error || `HTTP ${res.status}`;
+        showToast('エラー: ' + msg, 'error');
+        const serverLog = Array.isArray(data?.log) ? data.log : [];
+        setAutoflowLog([...serverLog, '❌ ' + msg]);
+      } else {
+        const count = (data.articles || data.results || []).length;
+        showToast(`✅ 完了！${count}件の記事をWixブログ＆Supabaseに保存しました🎉`);
+        const serverLog = Array.isArray(data?.log) ? data.log : [];
+        setAutoflowLog([
+          ...serverLog,
+          `✅ 完了！ ${count}件の記事を生成`,
+          ...(data.articles || data.results || []).map((r, i) => `  ${i+1}. ${r.blog_title || r.blogTitle || r.subject || 'article'}`),
+        ]);
+        const topicRes = await fetch(`${supabaseUrl}/rest/v1/magazine_topics?order=created_at.desc&limit=5`, {
+          headers: { 'apikey': supabaseKey, 'Authorization': `Bearer ${supabaseKey}` }
+        });
+        const topicData = await topicRes.json();
+        if (Array.isArray(topicData)) setTopics(topicData);
+        setNewUrl(''); setNewTitle(''); setNewText('');
+        setShowAdd(false);
+      }
+    } catch(e) {
+      showToast('全自動パイプラインに失敗しました', 'error');
+      setAutoflowLog(prev => [...prev, '❌ 通信エラー: ' + e.message]);
+    }
+    setAutoflowing(false);
+  };
+
+  const fetchYouTube = async (url) => {
+    if (!url) return;
+    setFetchingUrl(true);
+
+    const isYoutube = url.includes('youtube.com') || url.includes('youtu.be');
+    const apiEndpoint = isYoutube ? '/api/fetch-youtube' : '/api/fetch-url';
+    showToast(isYoutube ? 'YouTube字幕を取得中...⏳' : 'ページを取得中...⏳');
+
+    try {
+      const res = await fetch(apiEndpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url }),
+      });
+      const data = await res.json();
+      if (data.error) {
+        showToast('取得に失敗しました: ' + data.error, 'error');
+      } else {
+        if (data.title && !newTitle) setNewTitle(data.title);
+        if (data.content) setNewText(data.content);
+        showToast(isYoutube
+          ? (data.hasTranscript ? '字幕取得成功！✅' : 'タイトル・説明文を取得しました')
+          : (data.hasContent ? '記事を取得しました！✅' : 'タイトルのみ取得しました')
+        );
+      }
+    } catch(e) {
+      showToast('URL取得に失敗しました', 'error');
+    }
+    setFetchingUrl(false);
+  };
+
+  const addTopic = async () => {
+    if (!newTitle.trim() && !newUrl.trim()) { showToast('URLかタイトルを入力してください', 'error'); return; }
+    if (!newTitle.trim() && newUrl.trim()) setNewTitle(newUrl);
+    try {
+      const res = await fetch(`${supabaseUrl}/rest/v1/magazine_topics`, {
+        method: 'POST',
+        headers: { 'apikey': supabaseKey, 'Authorization': `Bearer ${supabaseKey}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+        body: JSON.stringify({ title: newTitle, source_url: newUrl || null, source_text: newText || null, status: newDirect ? 'expanded' : 'draft' }),
+      });
+      const data = await res.json();
+      if (data && data[0]) {
+        setTopics(prev => [data[0], ...prev]);
+        // 直接使うモードの場合、バリエーション1件を即作成
+        if (newDirect && newDirectBody.trim()) {
+          await fetch(`${supabaseUrl}/rest/v1/magazine_variations`, {
+            method: 'POST',
+            headers: { 'apikey': supabaseKey, 'Authorization': `Bearer ${supabaseKey}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ topic_id: data[0].id, variation_no: 1, body_mail: newDirectBody, subjects: newDirectSubject.trim() ? [newDirectSubject.trim()] : [], summary: '直接入力', categories: [], selected: false }),
+          });
+          setSelectedTopic(data[0]);
+          loadVariations(data[0].id);
+          if (isMobile) setMobileView('detail');
+        }
+        setNewTitle(''); setNewUrl(''); setNewText(''); setNewDirect(false); setNewDirectBody(''); setNewDirectSubject('');
+        setShowAdd(false);
+        showToast(newDirect ? 'ネタを登録しました！（そのまま使う）' : 'ネタを登録しました！');
+      }
+    } catch(e) { showToast('登録失敗しました', 'error'); }
+  };
+
+  const expandTopic = async (topic) => {
+    setExpanding(prev => ({ ...prev, [topic.id]: true }));
+    try {
+      const res = await fetch('/api/expand-topic', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: topic.title, source_url: topic.source_url, source_text: topic.source_text }),
+      });
+      const data = await res.json();
+      if (!data.variations) { showToast('生成失敗しました', 'error'); return; }
+
+      for (const v of data.variations) {
+        await fetch(`${supabaseUrl}/rest/v1/magazine_variations`, {
+          method: 'POST',
+          headers: { 'apikey': supabaseKey, 'Authorization': `Bearer ${supabaseKey}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ topic_id: topic.id, variation_no: v.variation_no, body_mail: v.body_mail || '', body_insta: v.body_insta, subjects: v.subjects, summary: v.summary, categories: [], selected: false }),
+        });
+      }
+
+      await fetch(`${supabaseUrl}/rest/v1/magazine_topics?id=eq.${topic.id}`, {
+        method: 'PATCH',
+        headers: { 'apikey': supabaseKey, 'Authorization': `Bearer ${supabaseKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'expanded' }),
+      });
+
+      setTopics(prev => prev.map(t => t.id === topic.id ? { ...t, status: 'expanded' } : t));
+      showToast('4展開完了！バリエーションを確認してください🎉');
+      setSelectedTopic(topic);
+      await loadVariations(topic.id);
+    } catch(e) { showToast('展開失敗しました', 'error'); console.error(e); }
+    setExpanding(prev => ({ ...prev, [topic.id]: false }));
+  };
+
+  const [generatingImages, setGeneratingImages] = React.useState(false);
+  const [imageGenLog, setImageGenLog] = React.useState([]);
+
+  const generateImages = async (topicId) => {
+    setGeneratingImages(true);
+    setImageGenLog(['🎨 画像生成を開始します...']);
+    try {
+      const res = await fetch('/api/generate-images', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ topicId }),
+      });
+      const data = await res.json();
+      if (data.log) setImageGenLog(data.log);
+      if (!res.ok || !data.success) {
+        showToast(data.error || '画像生成失敗', 'error');
+        return;
+      }
+      // Update local state with generated image URLs
+      setVariations(prev => prev.map(v => {
+        const r = (data.results || []).find(x => x.variationId === v.id);
+        return r?.imageUrl ? { ...v, blog_image_url: r.imageUrl } : v;
+      }));
+      showToast('🎨 画像生成完了！');
+    } catch(e) {
+      showToast('画像生成エラー: ' + e.message, 'error');
+    } finally {
+      setGeneratingImages(false);
+    }
+  };
+
+  const [editingVar, setEditingVar] = React.useState({});
+  const [mediaUploadingVar, setMediaUploadingVar] = React.useState({}); // { varId: true/false }
+  const [showVideoLinkModal, setShowVideoLinkModal] = React.useState(null); // varId or null
+  const [videoLinkInput, setVideoLinkInput] = React.useState('');
+  const [bodyImageSizesVar, setBodyImageSizesVar] = React.useState({}); // { varId: totalBytes }
+  const MAX_BODY_IMAGE_BYTES = 10 * 1024 * 1024; // 10MB
+  const textareaRefs = React.useRef({}); // { varId: DOM要素 }
+  const cursorPosRefs = React.useRef({}); // { varId: position }
+
+  // ===== 配信許可→実送信 =====
+  const [sendingVar, setSendingVar] = React.useState({}); // { varId: true/false }
+  const [collapsedVars, setCollapsedVars] = React.useState({});
+  const [historyList, setHistoryList] = React.useState([]);
+  const [historyLoading, setHistoryLoading] = React.useState(false);
+  const [sendProgressVar, setSendProgressVar] = React.useState({}); // { varId: {done, total} }
+  const [sendResultVar, setSendResultVar] = React.useState(null); // { varId, success, failed }
+  const [showApproveConfirm, setShowApproveConfirm] = React.useState(null); // variation object or null
+  const CAT_LABEL_TO_VALUE = {
+    '代理店': '代理店', '直クライアント': '直クライアント', 'メディア': 'メディア',
+    '見込み客': '見込み客', '外注・業者': '外注・業者', '補助金候補': '補助金候補',
+  };
+
+  const fetchMembersForCategories = async (categories) => {
+    if (!categories || categories.length === 0) return [];
+    const orFilter = categories.map(c => `category.eq.${encodeURIComponent(c)}`).join(',');
+    const res = await fetch(`${supabaseUrl}/rest/v1/mailing_list?select=name,email,category&send_yn=eq.Y&or=(${orFilter})`, {
+      headers: { apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}` },
+    });
+    const data = await res.json();
+    return Array.isArray(data) ? data.filter(m => m.email) : [];
+  };
+
+  const handleSendVariation = async (v) => {
+    const members = await fetchMembersForCategories(v.categories || []);
+    if (members.length === 0) { showToast('送信対象がいません（カテゴリ未選択 or 送付先なし）', 'error'); return; }
+
+    const subjectIndices = (v.selected_subjects && v.selected_subjects.length > 0) ? v.selected_subjects : [0];
+    const baseSubject = v.edited_subjects?.[subjectIndices[0]] ?? normalizeSubjects(v.subjects)[subjectIndices[0]] ?? 'お知らせ';
+    const subject = baseSubject;
+
+    setSendingVar(prev => ({ ...prev, [v.id]: true }));
+    setSendProgressVar(prev => ({ ...prev, [v.id]: { done: 0, total: members.length } }));
+
+    let successCount = 0;
+    let failedList = [];
+
+    for (let i = 0; i < members.length; i++) {
+      const m = members[i];
+      const personalBody = wrapWithNoteroTemplate(v.body_mail || '').replace(/{{氏名}}/g, m.name || 'ご担当者');
+      setSendProgressVar(prev => ({ ...prev, [v.id]: { done: i, total: members.length } }));
+      try {
+        const res = await fetch('/api/send-mail', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ to: m.email, subject, body: personalBody }),
+        });
+        if (res.ok) successCount++;
+        else failedList.push(m.name || m.email);
+      } catch (e) {
+        failedList.push(m.name || m.email);
+      }
+      await new Promise(r => setTimeout(r, 300));
+    }
+
+    setSendingVar(prev => ({ ...prev, [v.id]: false }));
+    setSendProgressVar(prev => ({ ...prev, [v.id]: { done: members.length, total: members.length } }));
+    setSendResultVar({ varId: v.id, success: successCount, failed: failedList });
+
+    if (successCount > 0) {
+      await updateVariation(v.id, 'selected', true);
+      setVariations(prev => prev.map(va => va.id === v.id ? { ...va, selected: true } : va));
+
+      // ブログにも同時投稿
+      if (v.post_blog) {
+        try {
+          const subjectIndices2 = (v.selected_subjects && v.selected_subjects.length > 0) ? v.selected_subjects : [0];
+          const blogTitle = v.edited_subjects?.[subjectIndices2[0]] ?? normalizeSubjects(v.subjects)[subjectIndices2[0]] ?? 'お知らせ';
+          const blogBody = v.body_mail || '';
+          const blogRes = await fetch('/api/post-blog', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title: blogTitle, body: blogBody }),
+          });
+          if (blogRes.ok) {
+            showToast(`📝 ブログ投稿も完了！`);
+          } else {
+            showToast('ブログ投稿に失敗しました', 'error');
+          }
+        } catch (e) {
+          showToast('ブログ投稿エラー: ' + e.message, 'error');
+        }
+      }
+    }
+    showToast(`送信完了！${successCount}件成功 / ${failedList.length}件失敗`);
+  };
+
+  // テスト送信：1116maehira@gmail.com に1通だけ送る（件名に[テスト]付き・selectedは変えない）
+  const TEST_EMAIL = '1116maehira@gmail.com';
+  const handleTestSendVariation = async (v) => {
+    const subjectIndices = (v.selected_subjects && v.selected_subjects.length > 0) ? v.selected_subjects : [0];
+    const baseSubject = v.edited_subjects?.[subjectIndices[0]] ?? normalizeSubjects(v.subjects)[subjectIndices[0]] ?? 'お知らせ';
+    const subject = '[テスト] ' + baseSubject;
+    const personalBody = wrapWithNoteroTemplate(v.body_mail || '').replace(/{{氏名}}/g, '前平雄一朗');
+
+    setSendingVar(prev => ({ ...prev, [v.id]: true }));
+    setSendProgressVar(prev => ({ ...prev, [v.id]: { done: 0, total: 1 } }));
+
+    try {
+      const res = await fetch('/api/send-mail', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ to: TEST_EMAIL, subject, body: personalBody }),
+      });
+      setSendingVar(prev => ({ ...prev, [v.id]: false }));
+      setSendProgressVar(prev => ({ ...prev, [v.id]: { done: 1, total: 1 } }));
+      if (res.ok) {
+        showToast(`🧪 テスト送信完了！${TEST_EMAIL} に送りました`);
+      } else {
+        showToast('テスト送信に失敗しました', 'error');
+      }
+    } catch (e) {
+      setSendingVar(prev => ({ ...prev, [v.id]: false }));
+      showToast('テスト送信に失敗しました', 'error');
+    }
+  };
+
+  const toggleSelected = async (varId, current) => {
+    try {
+      await fetch(`${supabaseUrl}/rest/v1/magazine_variations?id=eq.${varId}`, {
+        method: 'PATCH',
+        headers: { 'apikey': supabaseKey, 'Authorization': `Bearer ${supabaseKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ selected: !current }),
+      });
+      setVariations(prev => prev.map(v => v.id === varId ? { ...v, selected: !current } : v));
+      showToast(!current ? '今月使うバリエーションに追加！' : '選択を解除しました');
+    } catch(e) { showToast('更新失敗', 'error'); }
+  };
+
+  const updateVariation = async (varId, field, value) => {
+    try {
+      await fetch(`${supabaseUrl}/rest/v1/magazine_variations?id=eq.${varId}`, {
+        method: 'PATCH',
+        headers: { 'apikey': supabaseKey, 'Authorization': `Bearer ${supabaseKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ [field]: value }),
+      });
+      setVariations(prev => prev.map(v => v.id === varId ? { ...v, [field]: value } : v));
+    } catch(e) { showToast('保存失敗', 'error'); }
+  };
+
+  const updateCategories = async (varId, cat, checked) => {
+    const v = variations.find(v => v.id === varId);
+    const cats = v.categories || [];
+    const newCats = checked ? [...cats, cat] : cats.filter(c => c !== cat);
+    await updateVariation(varId, 'categories', newCats);
+  };
+
+  // テキストをカーソル位置（なければ末尾）に挿入する共通ヘルパー
+  const insertAtCursorVar = (varId, insertText) => {
+    setVariations(prev => prev.map(va => {
+      if (va.id !== varId) return va;
+      const current = va.body_mail || '';
+      const pos = cursorPosRefs.current[varId];
+      const validPos = (typeof pos === 'number' && pos >= 0 && pos <= current.length) ? pos : current.length;
+      const before = current.slice(0, validPos);
+      const after = current.slice(validPos);
+      const needsLeadingBreak = before.length > 0 && !before.endsWith('\n\n');
+      const needsTrailingBreak = after.length > 0 && !after.startsWith('\n\n');
+      const newText = before + (needsLeadingBreak ? '\n\n' : '') + insertText + (needsTrailingBreak ? '\n\n' : '') + after;
+      cursorPosRefs.current[varId] = before.length + (needsLeadingBreak ? 2 : 0) + insertText.length + (needsTrailingBreak ? 2 : 0);
+      updateVariation(varId, 'body_mail', newText);
+      return { ...va, body_mail: newText };
+    }));
+  };
+
+  const handleImageUploadForVar = async (varId, file) => {
+    if (!file) return;
+
+    const currentTotal = bodyImageSizesVar[varId] || 0;
+    if (currentTotal + file.size > MAX_BODY_IMAGE_BYTES) {
+      const usedMB = (currentTotal / 1024 / 1024).toFixed(1);
+      const fileMB = (file.size / 1024 / 1024).toFixed(1);
+      showToast(`⚠️ 画像合計が10MBを超えます（現在${usedMB}MB＋この画像${fileMB}MB）。画像を圧縮するか他の画像を削除してください。`, 'error');
+      return;
+    }
+
+    setMediaUploadingVar(prev => ({ ...prev, [varId]: true }));
+    // 編集モードに切り替えて、挿入結果が見えるようにする
+    setEditingVar(prev => ({ ...prev, [varId + '_mail']: true }));
+
+    try {
+      const ext = file.name.split('.').pop();
+      const fileName = `topic_${varId}_${Date.now()}.${ext}`;
+      const res = await fetch(`${supabaseUrl}/storage/v1/object/magazine-media/${fileName}`, {
+        method: 'POST',
+        headers: {
+          apikey: supabaseKey,
+          Authorization: `Bearer ${supabaseKey}`,
+          'Content-Type': file.type,
+        },
+        body: file,
+      });
+      if (res.ok) {
+        const publicUrl = `${supabaseUrl}/storage/v1/object/public/magazine-media/${fileName}`;
+        insertAtCursorVar(varId, `📷 ${publicUrl}`);
+        setBodyImageSizesVar(prev => ({ ...prev, [varId]: (prev[varId] || 0) + file.size }));
+        showToast('画像を追加しました！カーソル位置に挿入されています');
+      } else {
+        showToast('画像のアップロードに失敗しました', 'error');
+      }
+    } catch (e) {
+      showToast('画像のアップロードに失敗しました', 'error');
+    }
+    setMediaUploadingVar(prev => ({ ...prev, [varId]: false }));
+  };
+
+  const handleAddVideoLinkVar = () => {
+    if (!videoLinkInput.trim() || !showVideoLinkModal) return;
+    setEditingVar(prev => ({ ...prev, [showVideoLinkModal + '_mail']: true }));
+    insertAtCursorVar(showVideoLinkModal, `🎬 ${videoLinkInput.trim()}`);
+    setVideoLinkInput('');
+    setShowVideoLinkModal(null);
+    showToast('動画リンクを追加しました！カーソル位置に挿入されています');
+  };
+
+  // おすすめ配信時刻：翌営業日の10:00（土日なら月曜10:00に繰り越し）
+  const getRecommendedDateTime = () => {
+    const now = new Date();
+    const d = new Date(now);
+    d.setDate(d.getDate() + 1);
+    while (d.getDay() === 0 || d.getDay() === 6) d.setDate(d.getDate() + 1);
+    d.setHours(10, 0, 0, 0);
+    const pad = n => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  };
+
+  const handleApprove = async (v) => {
+    let scheduled = v.scheduled_at;
+    if (!scheduled) {
+      // DBには保存せず、モーダル表示用に一時的にセットするだけ
+      scheduled = getRecommendedDateTime();
+    }
+    setShowApproveConfirm({ ...v, scheduled_at: scheduled });
+  };
+
+  // 送信前（未送信）の配信予定を取り消す。一度送信済み（selected=true）のものは取り消し不可。
+  const handleCancelApprove = async (v) => {
+    await updateVariation(v.id, 'scheduled_at', null);
+    setVariations(prev => prev.map(va => va.id === v.id ? { ...va, scheduled_at: null } : va));
+    showToast('配信予定を取り消しました。文章を見直してから再度許可してください');
+  };
+
+  const statusLabel = (s) => {
+    if (s === 'expanded') return { label: '展開済み', bg: '#D1FAE5', color: '#065F46' };
+    if (s === 'used') return { label: '使用済み', bg: '#E0E7FF', color: '#3730A3' };
+    return { label: '下書き', bg: '#F3F4F6', color: '#6B7280' };
+  };
+
+  return (
+    <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+      {/* ネタ一覧（PC：常時表示、スマホ：list表示時のみ） */}
+      {(!isMobile || mobileView === 'list') && (
+      <div style={{ width: isMobile ? '100%' : 300, background: '#fff', borderRight: isMobile ? 'none' : '1px solid #E2E8F0', display: 'flex', flexDirection: 'column', flexShrink: 0, flex: isMobile ? 1 : 'unset' }}>
+        <div style={{ padding: '14px 16px', borderBottom: '1px solid #E2E8F0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div>
+            <h2 style={{ fontSize: 15, fontWeight: 700, color: '#0F172A' }}>💡 ネタ管理</h2>
+            <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 2 }}>{topics.length}件登録済み</div>
+          </div>
+          <button onClick={() => setShowAdd(!showAdd)} style={{ padding: '6px 12px', border: 'none', borderRadius: 7, background: '#6366F1', color: '#fff', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>＋ 追加</button>
+        </div>
+
+        {showAdd && (
+          <div style={{ padding: 12, borderBottom: '1px solid #E2E8F0', background: '#F8FAFC' }}>
+            <input placeholder="ネタタイトル（URLから自動取得も可）" value={newTitle} onChange={e => setNewTitle(e.target.value)}
+              style={{ width: '100%', padding: '7px 10px', border: '1px solid #E2E8F0', borderRadius: 6, fontSize: 12, marginBottom: 6, boxSizing: 'border-box' }} />
+            <div style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
+              <input placeholder="元URL（YouTube/記事など、任意）" value={newUrl} onChange={e => setNewUrl(e.target.value)}
+                style={{ flex: 1, padding: '7px 10px', border: '1px solid #E2E8F0', borderRadius: 6, fontSize: 12, boxSizing: 'border-box' }} />
+              <button onClick={() => fetchYouTube(newUrl)} disabled={fetchingUrl || !newUrl}
+                style={{ padding: '7px 10px', border: 'none', borderRadius: 6, background: fetchingUrl ? '#E2E8F0' : '#6366F1', color: fetchingUrl ? '#94A3B8' : '#fff', fontSize: 11, fontWeight: 700, cursor: fetchingUrl ? 'wait' : 'pointer', whiteSpace: 'nowrap' }}>
+                {fetchingUrl ? '取得中...' : '▶ 取得'}
+              </button>
+            </div>
+            {(newUrl.includes('youtube.com') || newUrl.includes('youtu.be')) && (
+              <div style={{ marginBottom: 8 }}>
+                <button onClick={runYoutubeAutoflow} disabled={autoflowing || !newUrl}
+                  style={{ width: '100%', padding: '10px', border: 'none', borderRadius: 8, background: autoflowing ? '#E2E8F0' : 'linear-gradient(135deg, #FF4500, #FF6B35)', color: autoflowing ? '#94A3B8' : '#fff', fontSize: 13, fontWeight: 800, cursor: autoflowing ? 'wait' : 'pointer', letterSpacing: '0.02em' }}>
+                  {autoflowing ? '⏳ 全自動処理中...（2〜5分）' : '🎬 YouTube → 記事・画像・Wix・DB 全自動'}
+                </button>
+                {autoflowLog.length > 0 && (
+                  <div style={{ marginTop: 6, padding: '8px 10px', background: '#F1F5F9', borderRadius: 6, fontSize: 11, color: '#475569', lineHeight: 1.7 }}>
+                    {autoflowLog.map((line, i) => <div key={i}>{line}</div>)}
+                  </div>
+                )}
+              </div>
+            )}
+            {/* 4つ展開 or そのまま使う の切り替え */}
+            <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
+              <button onClick={() => setNewDirect(false)}
+                style={{ flex: 1, padding: '7px', border: `1.5px solid ${!newDirect ? '#6366F1' : '#E2E8F0'}`, borderRadius: 6, background: !newDirect ? '#EEF2FF' : '#fff', color: !newDirect ? '#6366F1' : '#94A3B8', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                🔀 4つに展開する
+              </button>
+              <button onClick={() => setNewDirect(true)}
+                style={{ flex: 1, padding: '7px', border: `1.5px solid ${newDirect ? COLOR.primary : '#E2E8F0'}`, borderRadius: 6, background: newDirect ? '#FFF4ED' : '#fff', color: newDirect ? COLOR.primary : '#94A3B8', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                📝 そのまま使う
+              </button>
+            </div>
+            {!newDirect ? (
+              <textarea placeholder="ネタ内容を手入力（任意）" value={newText} onChange={e => setNewText(e.target.value)}
+                style={{ width: '100%', padding: '7px 10px', border: '1px solid #E2E8F0', borderRadius: 6, fontSize: 12, minHeight: 70, resize: 'vertical', boxSizing: 'border-box', fontFamily: 'inherit' }} />
+            ) : (
+              <>
+                <input
+                  placeholder="📌 件名を入力してください"
+                  value={newDirectSubject}
+                  onChange={e => setNewDirectSubject(e.target.value)}
+                  style={{ width: '100%', padding: '7px 10px', border: `1.5px solid ${COLOR.primary}`, borderRadius: 6, fontSize: 12, marginBottom: 6, boxSizing: 'border-box', fontFamily: 'inherit' }}
+                />
+                <textarea placeholder="メール本文をそのまま貼り付けてください" value={newDirectBody} onChange={e => setNewDirectBody(e.target.value)}
+                  style={{ width: '100%', padding: '7px 10px', border: `1.5px solid ${COLOR.primary}`, borderRadius: 6, fontSize: 12, minHeight: 140, resize: 'vertical', boxSizing: 'border-box', fontFamily: 'inherit' }} />
+              </>
+            )}
+            <div style={{ display: 'flex', gap: 6, marginTop: 6 }}>
+              <button onClick={addTopic} style={{ flex: 1, padding: '7px', border: 'none', borderRadius: 6, background: '#6366F1', color: '#fff', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>登録</button>
+              <button onClick={() => setShowAdd(false)} style={{ flex: 1, padding: '7px', border: '1px solid #E2E8F0', borderRadius: 6, background: '#fff', fontSize: 12, cursor: 'pointer' }}>NG</button>
+            </div>
+          </div>
+        )}
+
+        <div style={{ flex: 1, overflow: 'auto', padding: '8px' }}>
+          {loading ? (
+            <div style={{ textAlign: 'center', padding: 30, color: '#94A3B8', fontSize: 13 }}>読み込み中...</div>
+          ) : topics.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: 30, color: '#94A3B8' }}>
+              <div style={{ fontSize: 28, marginBottom: 8 }}>💡</div>
+              <div style={{ fontSize: 13 }}>ネタを追加してください</div>
+            </div>
+          ) : topics.map(t => {
+            const st = statusLabel(t.status);
+            const isExpanding = expanding[t.id];
+            return (
+              <div key={t.id} style={{ padding: '11px 12px', borderRadius: 9, marginBottom: 5, background: selectedTopic && selectedTopic.id === t.id ? '#EEF2FF' : t.status === 'expanded' ? '#F1F5F9' : '#F8FAFC', border: selectedTopic && selectedTopic.id === t.id ? '1.5px solid #6366F1' : '1.5px solid transparent', opacity: t.status === 'expanded' ? 0.7 : 1 }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 6, marginBottom: 6 }}>
+                  <span onClick={() => { setSelectedTopic(t); loadVariations(t.id); if (isMobile) setMobileView('detail'); }} style={{ fontSize: 13, fontWeight: 600, color: '#1E293B', lineHeight: 1.4, flex: 1, cursor: 'pointer' }}>{t.title}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
+                    <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 6, background: st.bg, color: st.color, fontWeight: 600, whiteSpace: 'nowrap' }}>{st.label}</span>
+                    <button onClick={async e => { e.stopPropagation(); if (!window.confirm('このネタを削除しますか？')) return; await fetch(`${supabaseUrl}/rest/v1/magazine_topics?id=eq.${t.id}`, { method: 'DELETE', headers: { apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}` } }); setTopics(prev => prev.filter(x => x.id !== t.id)); if (selectedTopic && selectedTopic.id === t.id) setSelectedTopic(null); showToast('ネタを削除しました'); }}
+                      style={{ padding: '2px 6px', border: 'none', borderRadius: 5, background: 'transparent', color: '#94A3B8', fontSize: 14, cursor: 'pointer', fontWeight: 700 }}>🗑️</button>
+                  </div>
+                </div>
+                {t.source_url && <div style={{ fontSize: 10, color: '#6366F1', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 6 }}>🔗 {t.source_url}</div>}
+                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  {t.status === 'draft' ? (
+                    <button onClick={e => { e.stopPropagation(); expandTopic(t); }} disabled={isExpanding}
+                      style={{ padding: '4px 10px', border: 'none', borderRadius: 5, background: isExpanding ? '#E2E8F0' : '#6366F1', color: isExpanding ? '#94A3B8' : '#fff', fontSize: 11, fontWeight: 700, cursor: isExpanding ? 'wait' : 'pointer' }}>
+                      {isExpanding ? '⏳ 生成中...' : '✨ 4展開する'}
+                    </button>
+                  ) : (
+                    <span style={{ fontSize: 11, color: '#059669', fontWeight: 600 }}>✅ {variations.length > 0 && selectedTopic && selectedTopic.id === t.id ? variations.length : ''}件展開済み</span>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      )} {/* スマホ：list表示の閉じ */}
+
+      {/* 右側バリエーション詳細（PC：常時表示、スマホ：detail表示時のみ） */}
+      {(!isMobile || mobileView === 'detail') && (
+      <div style={{ flex: 1, overflow: 'auto', padding: isMobile ? '10px 12px' : '20px 24px', background: '#F8FAFC' }}>
+        {/* スマホ：戻るボタン */}
+        {isMobile && (
+          <button onClick={() => setMobileView('list')}
+            style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '10px 16px', border: `1.5px solid ${COLOR.primary}`, borderRadius: 10, background: '#FFF4ED', fontSize: 15, fontWeight: 800, color: COLOR.primary, cursor: 'pointer', marginBottom: 14, width: '100%', justifyContent: 'center' }}>
+            ← ネタ一覧に戻る
+          </button>
+        )}
+        {!selectedTopic ? (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', flexDirection: 'column', gap: 12, color: '#94A3B8' }}>
+            <div style={{ fontSize: 48 }}>💡</div>
+            <div style={{ fontSize: 15, fontWeight: 600, color: '#475569' }}>ネタを選択してください</div>
+          </div>
+        ) : (
+          <>
+            <div style={{ marginBottom: 18 }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10, flexWrap: 'wrap' }}>
+                <div style={{ flex: 1 }}>
+                  <h2 style={{ fontSize: 16, fontWeight: 700, color: '#0F172A' }}>{selectedTopic.title}</h2>
+                  {selectedTopic.source_url && <div style={{ fontSize: 12, color: '#6366F1', marginTop: 3 }}>🔗 {selectedTopic.source_url}</div>}
+                </div>
+                {variations.length > 0 && (
+                  <button onClick={() => generateImages(selectedTopic.id)} disabled={generatingImages}
+                    style={{ padding: '8px 14px', border: 'none', borderRadius: 9, background: generatingImages ? '#D4D4D8' : 'linear-gradient(135deg,#8B5CF6,#6366F1)', color: '#fff', fontSize: 13, fontWeight: 800, cursor: generatingImages ? 'wait' : 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                    {generatingImages ? '⏳ 生成中...' : '🎨 画像生成'}
+                  </button>
+                )}
+              </div>
+              {generatingImages && imageGenLog.length > 0 && (
+                <div style={{ marginTop: 8, background: '#F1F5F9', borderRadius: 8, padding: '8px 12px', fontSize: 12, color: '#475569' }}>
+                  {imageGenLog.map((l, i) => <div key={i}>{l}</div>)}
+                </div>
+              )}
+            </div>
+            {loadingVars ? (
+              <div style={{ textAlign: 'center', padding: 40, color: '#94A3B8' }}>バリエーション読み込み中...</div>
+            ) : variations.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: 60, color: '#94A3B8' }}>
+                <div style={{ fontSize: 36, marginBottom: 10 }}>✨</div>
+                <div style={{ fontSize: 14, fontWeight: 600, color: '#475569' }}>「4展開する」ボタンを押してください</div>
+                <div style={{ fontSize: 12, marginTop: 6 }}>4つのバリエーションが自動生成されます</div>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                {variations.map(v => (
+                  <div key={v.id} style={{ background: COLOR.white, borderRadius: 16, border: v.selected ? `3px solid ${COLOR.primary}` : `1px solid ${COLOR.border}`, overflow: 'hidden', boxShadow: v.selected ? '0 4px 16px rgba(255,69,0,0.12)' : 'none', opacity: v.archived ? 0.45 : 1 }}>
+                    <div onClick={() => setCollapsedVars(prev => ({ ...prev, [v.id]: !prev[v.id] }))} style={{ padding: isMobile ? '12px 14px' : '16px 20px', borderBottom: collapsedVars[v.id] ? 'none' : `1px solid ${COLOR.border}`, background: v.selected ? '#FFF8E1' : v.archived ? '#F1F5F9' : COLOR.surfaceAlt, cursor: 'pointer' }}>
+                      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10 }}>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                            <span style={{ fontSize: 12, color: COLOR.textFaint }}>{collapsedVars[v.id] ? '▶' : '▼'}</span>
+                            <span style={{ fontSize: 15, fontWeight: 900, color: v.archived ? COLOR.textFaint : COLOR.primary }}>バリエーション {v.variation_no}</span>
+                            {v.selected && <span style={{ fontSize: 11, fontWeight: 900, color: '#854D0E', background: COLOR.accent, padding: '3px 10px', borderRadius: 8 }}>今月使う</span>}
+                            {v.archived && <span style={{ fontSize: 11, fontWeight: 700, color: COLOR.textFaint, background: '#E2E8F0', padding: '3px 10px', borderRadius: 8 }}>使わない</span>}
+                          </div>
+                          {v.summary && <div style={{ fontSize: 12, color: COLOR.textSub, marginTop: 4, lineHeight: 1.5 }}>{v.summary}</div>}
+                        </div>
+                        <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+                          <button onClick={e => { e.stopPropagation(); const newVal = !v.archived; updateVariation(v.id, 'archived', newVal); setVariations(prev => prev.map(va => va.id === v.id ? { ...va, archived: newVal } : va)); }}
+                            style={{ padding: '8px 10px', border: `1px solid ${COLOR.border}`, borderRadius: 9, background: v.archived ? '#E2E8F0' : COLOR.white, color: COLOR.textSub, fontSize: 12, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                            {v.archived ? '↩ 戻す' : '🚫 使わない'}
+                          </button>
+                          {!v.archived && <button onClick={e => { e.stopPropagation(); toggleSelected(v.id, v.selected); }}
+                            style={{ padding: '8px 14px', border: 'none', borderRadius: 9, background: v.selected ? COLOR.success : COLOR.primary, color: '#fff', fontSize: 13, fontWeight: 800, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                            {v.selected ? '✅ 選択中' : '+ 今月使う'}
+                          </button>}
+                        </div>
+                      </div>
+                    </div>
+                    {!collapsedVars[v.id] && <div style={{ padding: '18px 20px' }}>
+                      {/* ブログ画像 */}
+                      {v.blog_image_url && (
+                        <div style={{ marginBottom: 16, textAlign: 'center' }}>
+                          <div style={{ fontSize: 12, fontWeight: 800, color: COLOR.textFaint, marginBottom: 6, letterSpacing: 0.5, textAlign: 'left' }}>🖼️ 生成画像</div>
+                          <img src={v.blog_image_url} alt="生成済み画像" style={{ maxWidth: '100%', maxHeight: 280, borderRadius: 10, border: `1px solid ${COLOR.border}`, objectFit: 'cover' }} />
+                          <div style={{ marginTop: 6, display: 'flex', justifyContent: 'center', gap: 10 }}>
+                            <a href={v.blog_image_url} target="_blank" rel="noopener" style={{ fontSize: 12, color: COLOR.primary, textDecoration: 'none', fontWeight: 600 }}>🔗 元URLを開く</a>
+                          </div>
+                        </div>
+                      )}
+                      {/* 件名案（チェックして選択→直接編集も可能） */}
+                      <div style={{ marginBottom: 16 }}>
+                        <div style={{ fontSize: 12, fontWeight: 800, color: COLOR.textFaint, marginBottom: 8, letterSpacing: 0.5 }}>📌 件名案（選んで編集もOK）</div>
+                        {normalizeSubjects(v.subjects).map((s, i) => {
+                          const checked = (v.selected_subjects || []).includes(i);
+                          const editKey = `${v.id}_subj_${i}`;
+                          const editedVal = v.edited_subjects?.[i] ?? s;
+                          return (
+                            <div key={i} style={{ marginBottom: 8 }}>
+                              <label style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 14, color: COLOR.text, padding: '8px 10px', background: checked ? '#FFF4ED' : COLOR.surfaceAlt, border: checked ? `1.5px solid ${COLOR.primary}` : '1.5px solid transparent', borderRadius: checked ? '8px 8px 0 0' : 8, cursor: 'pointer' }}>
+                                <input type="checkbox" checked={checked} style={{ marginTop: 3, width: 16, height: 16, accentColor: COLOR.primary }}
+                                  onChange={e => {
+                                    const cur = v.selected_subjects || [];
+                                    const next = e.target.checked ? [...cur, i] : cur.filter(x => x !== i);
+                                    setVariations(prev => prev.map(va => va.id === v.id ? { ...va, selected_subjects: next } : va));
+                                    updateVariation(v.id, 'selected_subjects', next);
+                                  }} />
+                                <span style={{ fontWeight: checked ? 700 : 400 }}>{editedVal}</span>
+                              </label>
+                              {checked && (
+                                <input
+                                  value={editedVal}
+                                  onChange={e => {
+                                    const edited = { ...(v.edited_subjects || {}) };
+                                    edited[i] = e.target.value;
+                                    setVariations(prev => prev.map(va => va.id === v.id ? { ...va, edited_subjects: edited } : va));
+                                  }}
+                                  onBlur={e => {
+                                    const edited = { ...(v.edited_subjects || {}) };
+                                    edited[i] = e.target.value;
+                                    updateVariation(v.id, 'edited_subjects', edited);
+                                  }}
+                                  placeholder="件名を直接編集できます"
+                                  style={{ width: '100%', padding: '8px 12px', border: `1.5px solid ${COLOR.primary}`, borderTop: 'none', borderRadius: '0 0 8px 8px', fontSize: 14, color: COLOR.text, background: '#FFF8F4', boxSizing: 'border-box', fontFamily: 'inherit' }}
+                                />
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                      {/* メルマガ本文（編集可能） */}
+                      <div style={{ marginBottom: 16 }}>
+                        <div style={{ marginBottom: 8 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                            <div style={{ fontSize: 12, fontWeight: 800, color: COLOR.textFaint, letterSpacing: 0.5 }}>📧 メルマガ本文</div>
+                            {(bodyImageSizesVar[v.id] || 0) > 0 && (
+                              <span style={{ fontSize: 11, color: (bodyImageSizesVar[v.id] || 0) > MAX_BODY_IMAGE_BYTES * 0.8 ? COLOR.danger : COLOR.textFaint, fontWeight: 700 }}>
+                                画像 {((bodyImageSizesVar[v.id] || 0) / 1024 / 1024).toFixed(1)}/10MB
+                              </span>
+                            )}
+                          </div>
+                          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                            <label style={{ flex: 1, minWidth: 80, padding: '8px 10px', border: `1px solid ${COLOR.border}`, borderRadius: 8, background: COLOR.white, color: COLOR.textSub, fontSize: 13, cursor: mediaUploadingVar[v.id] ? 'wait' : 'pointer', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+                              {mediaUploadingVar[v.id] ? '⏳' : '📷'} 画像
+                              <input type="file" accept="image/*" style={{ display: 'none' }} disabled={mediaUploadingVar[v.id]}
+                                onChange={e => { handleImageUploadForVar(v.id, e.target.files?.[0]); e.target.value = ''; }} />
+                            </label>
+                            <button onClick={() => setShowVideoLinkModal(v.id)} style={{ flex: 1, minWidth: 80, padding: '8px 10px', border: `1px solid ${COLOR.border}`, borderRadius: 8, background: COLOR.white, color: COLOR.textSub, fontSize: 13, cursor: 'pointer', fontWeight: 700 }}>🎬 動画</button>
+                            <button onClick={() => setEditingVar(prev => ({ ...prev, [v.id + '_mail']: !prev[v.id + '_mail'] }))}
+                              style={{ flex: 1, minWidth: 80, fontSize: 13, padding: '8px 10px', border: `1.5px solid ${editingVar[v.id + '_mail'] ? COLOR.success : COLOR.primary}`, borderRadius: 8, background: editingVar[v.id + '_mail'] ? '#DCFCE7' : '#FFF4ED', cursor: 'pointer', color: editingVar[v.id + '_mail'] ? COLOR.success : COLOR.primary, fontWeight: 800 }}>
+                              {editingVar[v.id + '_mail'] ? '✓ 保存' : '✏️ 編集'}
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* ===== 固定フォーマット（冒頭）===== */}
+                        <div style={{ background: '#FFF8F0', border: `1px solid ${COLOR.accent}`, borderBottom: 'none', borderRadius: '10px 10px 0 0', padding: '12px 14px', display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                          <img src={NOTERO_IMAGE_BASE64} alt="脳手郎" style={{ width: 44, height: 'auto', borderRadius: 6, flexShrink: 0 }} />
+                          <div style={{ fontSize: 13, color: COLOR.textSub, lineHeight: 1.7 }}>
+                            <span style={{ color: COLOR.primary, fontWeight: 800 }}>（受取人の名前）</span>様<br />
+                            様子のおかしなウチの社長、前平をはじめ、TENOHIRAメンバーがお世話になります！<br />
+                            広報担当の脳手郎です🧠<br />
+                            <span style={{ fontSize: 12, color: COLOR.textFaint }}>※TENOHIRAのメンバーと名刺を交換された方のみに、元気いっぱいお送りします💪</span>
+                          </div>
+                          <div style={{ fontSize: 10, color: COLOR.textFaint, marginLeft: 'auto', whiteSpace: 'nowrap' }}>固定</div>
+                        </div>
+
+                        {/* ===== 編集可能な本文エリア ===== */}
+                        {editingVar[v.id + '_mail'] ? (
+                          <textarea
+                            ref={el => { textareaRefs.current[v.id] = el; }}
+                            value={v.body_mail || ''}
+                            onChange={e => setVariations(prev => prev.map(va => va.id === v.id ? { ...va, body_mail: e.target.value } : va))}
+                            onBlur={e => updateVariation(v.id, 'body_mail', e.target.value)}
+                            onSelect={e => { cursorPosRefs.current[v.id] = e.target.selectionStart; }}
+                            onClick={e => { cursorPosRefs.current[v.id] = e.target.selectionStart; }}
+                            onKeyUp={e => { cursorPosRefs.current[v.id] = e.target.selectionStart; }}
+                            onFocus={e => { cursorPosRefs.current[v.id] = e.target.selectionStart; }}
+                            style={{ width: '100%', minHeight: isMobile ? 200 : 240, fontSize: isMobile ? 16 : 14, padding: '12px 14px', border: `1.5px solid ${COLOR.primary}`, borderTop: 'none', borderBottom: 'none', borderRadius: 0, lineHeight: 1.8, fontFamily: 'inherit', resize: 'vertical', boxSizing: 'border-box' }} />
+                        ) : (
+                          <div style={{ fontSize: 14, color: COLOR.text, lineHeight: 1.8, whiteSpace: 'pre-wrap', maxHeight: 220, overflow: 'auto', background: COLOR.surfaceAlt, border: `1px solid ${COLOR.border}`, borderTop: 'none', borderBottom: 'none', padding: '12px 14px', boxSizing: 'border-box' }}>{v.body_mail || '（本文未入力）'}</div>
+                        )}
+
+                        {/* ===== 固定フォーマット（末尾）===== */}
+                        <div style={{ background: '#FFF8F0', border: `1px solid ${COLOR.accent}`, borderTop: 'none', borderRadius: '0 0 10px 10px', padding: '10px 14px', fontSize: 13, color: COLOR.textSub, lineHeight: 1.7 }}>
+                          <div style={{ fontSize: 12, color: COLOR.textFaint, marginBottom: 4 }}>※私にメルマガ辞めなさい❗️などありましたらご連絡くださいませ、脳手郎は直ちに沈黙するようにと言いつけられております🥺</div>
+                          <span style={{ fontWeight: 700 }}>脳手郎/TENOHIRA広報</span>
+                          <span style={{ fontSize: 10, color: COLOR.textFaint, marginLeft: 8 }}>固定</span>
+                        </div>
+
+                        <div style={{ fontSize: 11, color: COLOR.textFaint, marginTop: 4, textAlign: 'right' }}>{(v.body_mail || '').length}文字（目安：1000〜1200文字）</div>
+                        {/* URL表示・非表示 */}
+                        {selectedTopic && selectedTopic.source_url && (
+                          <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <input type="checkbox" id={'url-' + v.id}
+                              checked={(v.body_mail || '').includes(selectedTopic.source_url)}
+                              style={{ width: 16, height: 16, accentColor: COLOR.primary }}
+                              onChange={e => {
+                                const body = v.body_mail || '';
+                                const urlText = `
+
+[参考：${selectedTopic.source_url}]`;
+                                const newBody = e.target.checked
+                                  ? body + urlText
+                                  : body.replace(urlText, '');
+                                setVariations(prev => prev.map(va => va.id === v.id ? { ...va, body_mail: newBody } : va));
+                                updateVariation(v.id, 'body_mail', newBody);
+                              }} />
+                            <label htmlFor={'url-' + v.id} style={{ fontSize: 13, color: COLOR.primary, cursor: 'pointer', fontWeight: 600 }}>元URLを本文に入れる</label>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Instagram用（編集可能） */}
+                      <div style={{ marginBottom: 16 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                          <div style={{ fontSize: 12, fontWeight: 800, color: COLOR.textFaint, letterSpacing: 0.5 }}>📸 Instagram用</div>
+                          <button onClick={() => setEditingVar(prev => ({ ...prev, [v.id + '_insta']: !prev[v.id + '_insta'] }))}
+                            style={{ fontSize: 12, padding: '5px 12px', border: `1px solid ${COLOR.border}`, borderRadius: 7, background: COLOR.white, cursor: 'pointer', color: COLOR.primary, fontWeight: 700 }}>
+                            {editingVar[v.id + '_insta'] ? '✓ 保存' : '✏️ 編集'}
+                          </button>
+                        </div>
+                        {editingVar[v.id + '_insta'] ? (
+                          <textarea value={v.body_insta || ''} onChange={e => setVariations(prev => prev.map(va => va.id === v.id ? { ...va, body_insta: e.target.value } : va))}
+                            onBlur={e => updateVariation(v.id, 'body_insta', e.target.value)}
+                            style={{ width: '100%', minHeight: 100, fontSize: 14, padding: '12px 14px', border: `1.5px solid ${COLOR.secondary}`, borderRadius: 9, lineHeight: 1.8, fontFamily: 'inherit', resize: 'vertical', boxSizing: 'border-box', background: '#FFF8F0' }} />
+                        ) : (
+                          <div style={{ fontSize: 14, color: COLOR.text, lineHeight: 1.8, whiteSpace: 'pre-wrap', background: '#FFF8F0', borderRadius: 9, padding: '12px 14px' }}>{v.body_insta}</div>
+                        )}
+                      </div>
+
+                      {/* カテゴリ選択 */}
+                      <div style={{ marginBottom: 16 }}>
+                        <div style={{ fontSize: 12, fontWeight: 800, color: COLOR.textFaint, marginBottom: 8, letterSpacing: 0.5 }}>📨 送信カテゴリ</div>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                          {['代理店', '直クライアント', 'メディア', '見込み客', '外注・業者', '補助金候補'].map(cat => {
+                            const checked = (v.categories || []).includes(cat);
+                            return (
+                              <label key={cat} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', borderRadius: 9, background: checked ? '#FFF4ED' : COLOR.surfaceAlt, border: checked ? `1.5px solid ${COLOR.primary}` : `1.5px solid ${COLOR.border}`, cursor: 'pointer', fontSize: 13, fontWeight: 600, color: checked ? COLOR.primary : COLOR.textSub }}>
+                                <input type="checkbox" checked={checked} onChange={e => updateCategories(v.id, cat, e.target.checked)} style={{ width: 16, height: 16, accentColor: COLOR.primary }} />
+                                {cat}
+                              </label>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* 配信予定日時 */}
+                      <div style={{ marginBottom: 16 }}>
+                        <div style={{ fontSize: 12, fontWeight: 800, color: COLOR.textFaint, marginBottom: 8, letterSpacing: 0.5 }}>🕐 配信予定日時（未指定ならおすすめ時刻で配信）</div>
+                        <input type="datetime-local"
+                          value={v.scheduled_at ? new Date(new Date(v.scheduled_at).getTime() + 9*60*60*1000).toISOString().slice(0, 16) : ''}
+                          onChange={e => {
+                            const val = e.target.value;
+                            if (!val) {
+                              setVariations(prev => prev.map(va => va.id === v.id ? { ...va, scheduled_at: null } : va));
+                              updateVariation(v.id, 'scheduled_at', null);
+                              return;
+                            }
+                            // JST→UTC変換して保存（通訳）
+                            const utc = new Date(val).toISOString();
+                            setVariations(prev => prev.map(va => va.id === v.id ? { ...va, scheduled_at: utc } : va));
+                            updateVariation(v.id, 'scheduled_at', utc);
+                          }}
+                          style={{ padding: '9px 12px', border: `1px solid ${COLOR.border}`, borderRadius: 8, fontSize: 14, color: COLOR.text, background: COLOR.white }} />
+                      </div>
+
+                      {/* SNS連携チェックボックス（ボタンのみ・連携処理は今後実装） */}
+                      <div style={{ marginBottom: 16, display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: 7, cursor: 'pointer', fontSize: 13, fontWeight: 600, color: COLOR.textSub }}>
+                          <input type="checkbox" checked={!!v.post_instagram} style={{ width: 16, height: 16, accentColor: COLOR.secondary }}
+                            onChange={e => { setVariations(prev => prev.map(va => va.id === v.id ? { ...va, post_instagram: e.target.checked } : va)); updateVariation(v.id, 'post_instagram', e.target.checked); }} />
+                          📸 Instagramにも同時投稿
+                        </label>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: 7, cursor: 'pointer', fontSize: 13, fontWeight: 600, color: COLOR.textSub }}>
+                          <input type="checkbox" checked={!!v.post_blog} style={{ width: 16, height: 16, accentColor: COLOR.secondary }}
+                            onChange={e => { setVariations(prev => prev.map(va => va.id === v.id ? { ...va, post_blog: e.target.checked } : va)); updateVariation(v.id, 'post_blog', e.target.checked); }} />
+                          📝 ブログにも同時投稿
+                        </label>
+                      </div>
+
+                      {/* 配信許可ボタン＋取り消しボタン */}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                        <button onClick={() => handleApprove(v)} disabled={sendingVar[v.id]}
+                          style={{ width: '100%', padding: isMobile ? '16px' : '14px', border: 'none', borderRadius: 12, background: sendingVar[v.id] ? '#D4D4D8' : `linear-gradient(135deg, ${COLOR.primary}, ${COLOR.secondary})`, color: '#fff', fontSize: isMobile ? 16 : 15, fontWeight: 900, cursor: sendingVar[v.id] ? 'wait' : 'pointer', letterSpacing: 0.5 }}>
+                          {sendingVar[v.id]
+                            ? `⏳ 送信中... ${sendProgressVar[v.id]?.done || 0}/${sendProgressVar[v.id]?.total || 0}`
+                            : v.selected
+                              ? '✅ 配信済み（再送信する）'
+                              : v.scheduled_at ? `🚀 配信を許可する（${new Date(v.scheduled_at).toLocaleString('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}）` : '🚀 配信を許可する'}
+                        </button>
+                        {v.scheduled_at && !v.selected && !sendingVar[v.id] && (
+                          <button onClick={() => handleCancelApprove(v)}
+                            style={{ width: '100%', padding: '12px', border: `1.5px solid ${COLOR.border}`, borderRadius: 12, background: COLOR.white, color: COLOR.textSub, fontSize: 14, fontWeight: 800, cursor: 'pointer' }}>
+                            ⏸ 配信予定を取り消し
+                          </button>
+                        )}
+                      </div>
+                    </div>}
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
+        )}
+      </div>
+      )} {/* スマホ：detail表示の閉じ */}
+
+      {/* ===== 動画リンク追加モーダル ===== */}
+      {showVideoLinkModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ background: COLOR.white, borderRadius: 16, padding: 28, width: 380, boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
+            <h2 style={{ fontSize: 16, fontWeight: 900, color: COLOR.text, marginBottom: 14 }}>🎬 動画リンクを追加</h2>
+            <input
+              value={videoLinkInput}
+              onChange={e => setVideoLinkInput(e.target.value)}
+              placeholder="https://youtube.com/... または instagram.com/..."
+              style={{ width: '100%', padding: '10px 12px', border: `1px solid ${COLOR.border}`, borderRadius: 8, fontSize: 14, color: COLOR.text, marginBottom: 16, boxSizing: 'border-box' }}
+              autoFocus
+            />
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button onClick={() => { setShowVideoLinkModal(null); setVideoLinkInput(''); }}
+                style={{ flex: 1, padding: '10px', border: `1px solid ${COLOR.border}`, borderRadius: 9, background: COLOR.white, fontSize: 13, cursor: 'pointer', fontWeight: 700, color: COLOR.textSub }}>キャンセル</button>
+              <button onClick={handleAddVideoLinkVar}
+                style={{ flex: 2, padding: '10px', border: 'none', borderRadius: 9, background: COLOR.primary, color: '#fff', fontSize: 13, cursor: 'pointer', fontWeight: 800 }}>本文に追加</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ===== 配信許可確認モーダル ===== */}
+      {showApproveConfirm && !sendingVar[showApproveConfirm.id] && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ background: COLOR.white, borderRadius: 16, padding: 28, width: 400, boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
+            <div style={{ fontSize: 32, textAlign: 'center', marginBottom: 12 }}>🚀</div>
+            <h2 style={{ fontSize: 18, fontWeight: 900, color: COLOR.text, textAlign: 'center', marginBottom: 8 }}>配信を許可しますか？</h2>
+            <p style={{ fontSize: 13, color: COLOR.textSub, textAlign: 'center', marginBottom: 20 }}>
+              配信予定：<strong style={{ color: COLOR.primary }}>{showApproveConfirm.scheduled_at ? new Date(showApproveConfirm.scheduled_at).toLocaleString('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '未定'}</strong>
+            </p>
+            <div style={{ background: COLOR.surfaceAlt, borderRadius: 10, padding: '12px 16px', marginBottom: 20, fontSize: 13, color: COLOR.textSub }}>
+              送信カテゴリ：{(showApproveConfirm.categories || []).length > 0 ? (showApproveConfirm.categories || []).join('、') : '（未選択）'}
+            </div>
+            {/* テスト送信ボタン */}
+            <button onClick={() => { const v = showApproveConfirm; setShowApproveConfirm(null); handleTestSendVariation(v); }}
+              style={{ width: '100%', padding: '11px', border: 'none', borderRadius: 9, background: '#0891B2', color: '#fff', fontSize: 14, cursor: 'pointer', fontWeight: 800, marginBottom: 10 }}>
+              🧪 テスト送信（自分だけ：{TEST_EMAIL}）
+            </button>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button onClick={async () => { const v = showApproveConfirm; setShowApproveConfirm(null); if (!v.selected) { await updateVariation(v.id, 'scheduled_at', null); setVariations(prev => prev.map(va => va.id === v.id ? { ...va, scheduled_at: null } : va)); } }} style={{ flex: 1, padding: '11px', border: `1px solid ${COLOR.border}`, borderRadius: 9, background: COLOR.white, fontSize: 14, cursor: 'pointer', fontWeight: 700, color: COLOR.textSub }}>キャンセル</button>
+              <button onClick={async () => { const v = showApproveConfirm; setShowApproveConfirm(null); await updateVariation(v.id, 'scheduled_at', v.scheduled_at); setVariations(prev => prev.map(va => va.id === v.id ? { ...va, scheduled_at: v.scheduled_at } : va)); showToast(`✅ 予約完了！${new Date(v.scheduled_at).toLocaleString('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}に自動送信されます`); }} style={{ flex: 2, padding: '11px', border: 'none', borderRadius: 9, background: COLOR.primary, color: '#fff', fontSize: 14, cursor: 'pointer', fontWeight: 800 }}>🚀 予約確定！</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ===== 送信結果モーダル ===== */}
+      {sendResultVar && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ background: COLOR.white, borderRadius: 16, padding: 32, width: 400, boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
+            <div style={{ fontSize: 40, textAlign: 'center', marginBottom: 12 }}>{sendResultVar.failed.length === 0 ? '🎉' : '⚠️'}</div>
+            <h2 style={{ fontSize: 18, fontWeight: 900, color: COLOR.text, textAlign: 'center', marginBottom: 16 }}>送信完了！</h2>
+            <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
+              <div style={{ flex: 1, background: '#DCFCE7', borderRadius: 10, padding: '14px', textAlign: 'center' }}>
+                <div style={{ fontSize: 28, fontWeight: 900, color: COLOR.success }}>{sendResultVar.success}</div>
+                <div style={{ fontSize: 12, color: COLOR.success, fontWeight: 700 }}>✅ 成功</div>
+              </div>
+              <div style={{ flex: 1, background: sendResultVar.failed.length > 0 ? '#FEE2E2' : COLOR.surfaceAlt, borderRadius: 10, padding: '14px', textAlign: 'center' }}>
+                <div style={{ fontSize: 28, fontWeight: 900, color: sendResultVar.failed.length > 0 ? COLOR.danger : COLOR.textFaint }}>{sendResultVar.failed.length}</div>
+                <div style={{ fontSize: 12, color: sendResultVar.failed.length > 0 ? COLOR.danger : COLOR.textFaint, fontWeight: 700 }}>❌ 失敗</div>
+              </div>
+            </div>
+            {sendResultVar.failed.length > 0 && (
+              <div style={{ background: '#FEF2F2', borderRadius: 8, padding: 12, marginBottom: 16, fontSize: 12, color: COLOR.danger }}>
+                <strong>失敗：</strong> {sendResultVar.failed.join('、')}
+              </div>
+            )}
+            <button onClick={() => setSendResultVar(null)} style={{ width: '100%', padding: '12px', border: 'none', borderRadius: 9, background: COLOR.primary, color: '#fff', fontSize: 14, cursor: 'pointer', fontWeight: 800 }}>閉じる</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+const { useState, useEffect } = React;
+
+function App() {
+  const isMobile = useIsMobile();
+  const [activeNav, setActiveNav] = useState(2);
+  const [selectedCat, setSelectedCat] = useState('agency');
+  const [statuses, setStatuses] = useState({});
+  const [selectedSubject, setSelectedSubject] = useState({});
+  const [bodies, setBodies] = useState({});
+  const [preview, setPreview] = useState('pc');
+  const [generating, setGenerating] = useState(false);
+  const [mailingList, setMailingList] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [toast, setToast] = useState(null);
+  const [listSearch, setListSearch] = useState('');
+  const [listCatFilter, setListCatFilter] = useState('all');
+  const [listYNFilter, setListYNFilter] = useState('all');
+  const [listGroupBy, setListGroupBy] = useState('company'); // 'company' | 'none'
+  const [listRoleFilter, setListRoleFilter] = useState('all'); // 'all' | 'exec'
+  const [collapsedGroups, setCollapsedGroups] = useState({});
+  const [deleting, setDeleting] = useState({});
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(null); // member object
+  const [saving, setSaving] = useState({});
+  const [sending, setSending] = useState(false);
+  const [sendProgress, setSendProgress] = useState({ done: 0, total: 0, current: '' });
+  const [sendResult, setSendResult] = useState(null); // { success, failed }
+  const [showSendModal, setShowSendModal] = useState(false);
+  const [testMode, setTestMode] = useState(false);
+  const TEST_EMAIL = '1116maehira@gmail.com';
+  const [showCardModal, setShowCardModal] = useState(false);
+  const [cardImage, setCardImage] = useState(null); // base64
+  const [cardImagePreview, setCardImagePreview] = useState(null);
+  const [cardOcrLoading, setCardOcrLoading] = useState(false);
+  const [cardResult, setCardResult] = useState(null); // {name, company, email, phone, role}
+  const [cardSaving, setCardSaving] = useState(false);
+  const [mediaUploading, setMediaUploading] = useState(false);
+  const [showVideoLinkModal, setShowVideoLinkModal] = useState(false);
+  const [videoLinkInput, setVideoLinkInput] = useState('');
+  const [bodyImageSizes, setBodyImageSizes] = useState({}); // { catId: totalBytes }
+  const MAX_BODY_IMAGE_BYTES = 10 * 1024 * 1024; // 10MB
+
+  const [storageFiles, setStorageFiles] = useState([]);
+  const [storageLoading, setStorageLoading] = useState(false);
+  const [storageDeleteMB, setStorageDeleteMB] = useState('');
+  const [storageDeleting, setStorageDeleting] = useState(false);
+  const bodyTextareaRef = React.useRef(null);
+  const lastCursorPos = React.useRef({}); // { [catId]: position }
+
+
+  useEffect(() => { loadMailingList(); }, []);
+  useEffect(() => { if (activeNav === 5) loadStorageFiles(); }, [activeNav]);
+
+  const loadMailingList = async () => {
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/mailing_list?select=*&order=no`, {
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+      });
+      const data = await res.json();
+      if (Array.isArray(data)) setMailingList(data);
+    } catch(e) { console.error(e); }
+    setLoading(false);
+  };
+
+  const updateField = async (id, field, value) => {
+    setSaving(prev => ({ ...prev, [id]: true }));
+    try {
+      await fetch(`${SUPABASE_URL}/rest/v1/mailing_list?id=eq.${id}`, {
+        method: 'PATCH',
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ [field]: value }),
+      });
+      setMailingList(prev => prev.map(m => m.id === id ? { ...m, [field]: value } : m));
+    } catch(e) { showToast('保存失敗しました', 'error'); }
+    setSaving(prev => ({ ...prev, [id]: false }));
+  };
+
+  const getCatMembers = (catId) => {
+    return mailingList.filter(m => {
+      const mapped = CAT_MAP[m.category] || '';
+      return mapped === catId && m.send_yn === 'Y' && m.email && !m.unsubscribed;
+    });
+  };
+
+  const deleteMember = async (id) => {
+    setDeleting(prev => ({ ...prev, [id]: true }));
+    try {
+      await fetch(`${SUPABASE_URL}/rest/v1/mailing_list?id=eq.${id}`, {
+        method: 'DELETE',
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
+      });
+      setMailingList(prev => prev.filter(m => m.id !== id));
+      showToast('削除しました');
+    } catch(e) { showToast('削除に失敗しました', 'error'); }
+    setDeleting(prev => ({ ...prev, [id]: false }));
+    setShowDeleteConfirm(null);
+  };
+
+  // 役員クラス判定（役職に社長・会長・取締役・専務・常務・理事長・CEOを含む）
+  const isExec = (role) => {
+    if (!role) return false;
+    return /社長|会長|取締役|専務|常務|理事長|CEO|代表|副社長|頭取/.test(role);
+  };
+
+  const filteredList = mailingList.filter(m => {
+    const matchSearch = !listSearch ||
+      (m.name || '').includes(listSearch) ||
+      (m.company || '').includes(listSearch) ||
+      (m.email || '').includes(listSearch) ||
+      (m.role || '').includes(listSearch);
+    const matchCat = listCatFilter === 'all' || m.category === listCatFilter;
+    const matchYN = listYNFilter === 'all' || m.send_yn === listYNFilter;
+    const matchRole = listRoleFilter === 'all' || (listRoleFilter === 'exec' && isExec(m.role));
+    return matchSearch && matchCat && matchYN && matchRole;
+  });
+
+  // 会社グルーピング
+  const groupedList = (() => {
+    if (listGroupBy === 'none') return [{ company: null, members: filteredList }];
+    const map = {};
+    filteredList.forEach(m => {
+      const key = m.company || '（会社名なし）';
+      if (!map[key]) map[key] = [];
+      map[key].push(m);
+    });
+    return Object.entries(map)
+      .sort(([a], [b]) => a.localeCompare(b, 'ja'))
+      .map(([company, members]) => ({ company, members }));
+  })();
+
+  const cat = CATEGORIES.find(c => c.id === selectedCat);
+  const subjects = SAMPLE_SUBJECTS[selectedCat];
+  const currentSubject = selectedSubject[selectedCat] ?? 0;
+  const currentBody = bodies[selectedCat] ?? SAMPLE_BODY[selectedCat];
+  const okCount = Object.values(statuses).filter(s => s === 'ok').length;
+  const members = getCatMembers(selectedCat);
+  const totalSend = CATEGORIES.reduce((acc, c) => acc + getCatMembers(c.id).length, 0);
+
+  const showToast = (msg, type = 'success') => {
+    setToast({ msg, type });
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  const handleOK = () => {
+    setStatuses(prev => ({ ...prev, [selectedCat]: 'ok' }));
+    const next = CATEGORIES.find(c => !statuses[c.id] && c.id !== selectedCat);
+    if (next) setSelectedCat(next.id);
+    showToast(`${cat.label}のメルマガをOKしました！`);
+  };
+
+  const handleCardFileSelect = (file) => {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result; // data:image/jpeg;base64,xxxx
+      const base64 = result.split(',')[1];
+      setCardImage(base64);
+      setCardImagePreview(result);
+      setCardResult(null);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleCardOcr = async () => {
+    if (!cardImage) return;
+    setCardOcrLoading(true);
+    try {
+      const mediaType = cardImagePreview.match(/data:(.*?);base64/)?.[1] || 'image/jpeg';
+      const res = await fetch('/api/ocr-card', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: cardImage, mediaType }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setCardResult(data.data);
+      } else {
+        showToast('読み取りに失敗しました：' + (data.error || '不明なエラー'), 'error');
+      }
+    } catch (e) {
+      showToast('読み取りに失敗しました', 'error');
+    }
+    setCardOcrLoading(false);
+  };
+
+  // テキストをカーソル位置（なければ末尾）に挿入する共通ヘルパー
+  const insertAtCursor = (catId, insertText) => {
+    setBodies(p => {
+      const current = p[catId] ?? SAMPLE_BODY[catId];
+      const pos = lastCursorPos.current[catId];
+      const validPos = (typeof pos === 'number' && pos >= 0 && pos <= current.length) ? pos : current.length;
+
+      // 挿入位置の前後に適切な改行を入れる（既存テキストの改行状況を見て調整）
+      const before = current.slice(0, validPos);
+      const after = current.slice(validPos);
+      const needsLeadingBreak = before.length > 0 && !before.endsWith('\n\n');
+      const needsTrailingBreak = after.length > 0 && !after.startsWith('\n\n');
+      const newText = before + (needsLeadingBreak ? '\n\n' : '') + insertText + (needsTrailingBreak ? '\n\n' : '') + after;
+
+      // 次回挿入はこの直後にできるよう、カーソル位置を更新
+      lastCursorPos.current[catId] = before.length + (needsLeadingBreak ? 2 : 0) + insertText.length + (needsTrailingBreak ? 2 : 0);
+
+      return { ...p, [catId]: newText };
+    });
+  };
+
+  const handleImageUploadForBody = async (file) => {
+    if (!file) return;
+
+    const currentTotal = bodyImageSizes[selectedCat] || 0;
+    if (currentTotal + file.size > MAX_BODY_IMAGE_BYTES) {
+      const usedMB = (currentTotal / 1024 / 1024).toFixed(1);
+      const fileMB = (file.size / 1024 / 1024).toFixed(1);
+      showToast(`⚠️ 画像合計が10MBを超えます（現在${usedMB}MB＋この画像${fileMB}MB）。画像を圧縮するか、他の画像を削除してください。`, 'error');
+      return;
+    }
+
+    setMediaUploading(true);
+    try {
+      const ext = file.name.split('.').pop();
+      const fileName = `${selectedCat}_${Date.now()}.${ext}`;
+      const res = await fetch(`${SUPABASE_URL}/storage/v1/object/magazine-media/${fileName}`, {
+        method: 'POST',
+        headers: {
+          apikey: SUPABASE_KEY,
+          Authorization: `Bearer ${SUPABASE_KEY}`,
+          'Content-Type': file.type,
+        },
+        body: file,
+      });
+      if (res.ok) {
+        const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/magazine-media/${fileName}`;
+        insertAtCursor(selectedCat, `📷 ${publicUrl}`);
+        setBodyImageSizes(p => ({ ...p, [selectedCat]: (p[selectedCat] || 0) + file.size }));
+        showToast('画像を追加しました！カーソル位置に挿入されています');
+      } else {
+        showToast('画像のアップロードに失敗しました', 'error');
+      }
+    } catch (e) {
+      showToast('画像のアップロードに失敗しました', 'error');
+    }
+    setMediaUploading(false);
+  };
+
+  const loadStorageFiles = async () => {
+    setStorageLoading(true);
+    try {
+      const res = await fetch(`${SUPABASE_URL}/storage/v1/object/list/magazine-media`, {
+        method: 'POST',
+        headers: {
+          apikey: SUPABASE_KEY,
+          Authorization: `Bearer ${SUPABASE_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ limit: 1000, sortBy: { column: 'created_at', order: 'asc' } }),
+      });
+      const data = await res.json();
+      if (res.ok) setStorageFiles(data || []);
+    } catch (e) {
+      showToast('ストレージ情報の取得に失敗しました', 'error');
+    }
+    setStorageLoading(false);
+  };
+
+  const totalStorageBytes = storageFiles.reduce((acc, f) => acc + (f.metadata?.size || 0), 0);
+
+  const handleDeleteOldestMB = async () => {
+    const targetMB = parseFloat(storageDeleteMB);
+    if (!targetMB || targetMB <= 0) { showToast('削除するMB数を入力してください', 'error'); return; }
+    const targetBytes = targetMB * 1024 * 1024;
+
+    setStorageDeleting(true);
+    try {
+      // 古い順（作成日時昇順）に並んでいる前提で、累積サイズが目標に達するまでファイルを選定
+      let accumulated = 0;
+      const toDelete = [];
+      for (const f of storageFiles) {
+        if (accumulated >= targetBytes) break;
+        toDelete.push(f.name);
+        accumulated += (f.metadata?.size || 0);
+      }
+
+      if (toDelete.length === 0) { showToast('削除対象がありません', 'error'); setStorageDeleting(false); return; }
+
+      const res = await fetch(`${SUPABASE_URL}/storage/v1/object/magazine-media`, {
+        method: 'DELETE',
+        headers: {
+          apikey: SUPABASE_KEY,
+          Authorization: `Bearer ${SUPABASE_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ prefixes: toDelete }),
+      });
+
+      if (res.ok) {
+        showToast(`✅ 古い画像${toDelete.length}件（約${(accumulated / 1024 / 1024).toFixed(1)}MB）を削除しました`);
+        setStorageDeleteMB('');
+        loadStorageFiles();
+      } else {
+        showToast('削除に失敗しました', 'error');
+      }
+    } catch (e) {
+      showToast('削除に失敗しました', 'error');
+    }
+    setStorageDeleting(false);
+  };
+
+  const handleAddVideoLink = () => {
+    if (!videoLinkInput.trim()) return;
+    insertAtCursor(selectedCat, `🎬 ${videoLinkInput.trim()}`);
+    setVideoLinkInput('');
+    setShowVideoLinkModal(false);
+    showToast('動画リンクを追加しました！カーソル位置に挿入されています');
+  };
+
+  const handleCardSave = async () => {
+    if (!cardResult) return;
+    setCardSaving(true);
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/mailing_list`, {
+        method: 'POST',
+        headers: {
+          apikey: SUPABASE_KEY,
+          Authorization: `Bearer ${SUPABASE_KEY}`,
+          'Content-Type': 'application/json',
+          Prefer: 'return=minimal',
+        },
+        body: JSON.stringify({
+          name: cardResult.name || '',
+          company: cardResult.company || '',
+          email: cardResult.email || '',
+          phone: cardResult.phone || '',
+          role: cardResult.role || '',
+          category: (cardResult.categories && cardResult.categories.length > 0) ? cardResult.categories[0] : '見込み客',
+          send_yn: cardResult.send_yn || (cardResult.email ? 'Y' : 'N'),
+        }),
+      });
+      if (res.ok) {
+        showToast('名刺を登録しました！🎉');
+        setShowCardModal(false);
+        setCardImage(null);
+        setCardImagePreview(null);
+        setCardResult(null);
+        loadMailingList();
+      } else {
+        const errData = await res.json().catch(() => null);
+        if (res.status === 409 || errData?.code === '23505') {
+          showToast('⚠️ このメールアドレスは既にリストに登録済みです', 'error');
+        } else {
+          showToast('登録に失敗しました：' + (errData?.message || '不明なエラー'), 'error');
+        }
+      }
+    } catch (e) {
+      showToast('登録に失敗しました', 'error');
+    }
+    setCardSaving(false);
+  };
+
+  const handleSendAll = async () => {
+    // 全カテゴリの送信対象を収集
+    const allTasks = [];
+    CATEGORIES.forEach(c => {
+      const members = testMode
+        ? [{ email: TEST_EMAIL, name: '前平雄一朗（テスト）' }]
+        : getCatMembers(c.id);
+      const subjectIdx = selectedSubject[c.id] ?? 0;
+      const subject = (testMode ? '[テスト] ' : '') + SAMPLE_SUBJECTS[c.id][subjectIdx];
+      const body = bodies[c.id] ?? SAMPLE_BODY[c.id];
+      members.forEach(m => {
+        allTasks.push({ member: m, subject, body, catLabel: c.label });
+      });
+    });
+
+    if (allTasks.length === 0) { showToast('送信対象がいません', 'error'); return; }
+
+    setSending(true);
+    setSendProgress({ done: 0, total: allTasks.length, current: '' });
+    setSendResult(null);
+
+    let successCount = 0;
+    let failedList = [];
+
+    for (let i = 0; i < allTasks.length; i++) {
+      const { member, subject, body } = allTasks[i];
+      const personalBody = body.replace(/{{氏名}}/g, member.name || 'ご担当者');
+      setSendProgress({ done: i, total: allTasks.length, current: member.name || member.email });
+
+      try {
+        const res = await fetch('/api/send-mail', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ to: member.email, subject, body: personalBody }),
+        });
+        if (res.ok) { successCount++; }
+        else { failedList.push(member.name || member.email); }
+      } catch(e) {
+        failedList.push(member.name || member.email);
+      }
+      // 連続送信の間隔（スパム対策）
+      await new Promise(r => setTimeout(r, 300));
+    }
+
+    setSending(false);
+    setSendProgress({ done: allTasks.length, total: allTasks.length, current: '' });
+    setSendResult({ success: successCount, failed: failedList });
+    showToast(`送信完了！ ${successCount}件成功 / ${failedList.length}件失敗`);
+  };
+
+  const handleRegenerate = async () => {
+    setGenerating(true);
+    try {
+      const res = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ category: cat.label, subject: subjects[currentSubject] }),
+      });
+      const data = await res.json();
+      const text = data.text || '';
+      if (text) {
+        setBodies(prev => ({ ...prev, [selectedCat]: text }));
+        showToast('AIで本文を再生成しました！');
+      }
+    } catch(e) { showToast('生成に失敗しました', 'error'); }
+    setGenerating(false);
+  };
+
+  const getStatus = (id) => {
+    if (statuses[id] === 'ok') return { label: 'OK ✓', bg: '#D1FAE5', color: '#065F46' };
+    if (id === selectedCat && activeNav === 1) return { label: '編集中', bg: '#FEF3C7', color: '#92400E' };
+    return { label: '未確認', bg: '#F3F4F6', color: '#6B7280' };
+  };
+
+  return (
+    <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', height: '100vh', overflow: 'hidden', background: COLOR.bg }}>
+      {/* Toast */}
+      {toast && (
+        <div style={{ position: 'fixed', top: 20, right: 20, left: isMobile ? 20 : 'auto', zIndex: 9999, background: toast.type === 'error' ? '#FEE2E2' : '#D1FAE5', color: toast.type === 'error' ? '#991B1B' : '#065F46', padding: '14px 20px', borderRadius: 12, fontWeight: 700, fontSize: 14, boxShadow: '0 4px 20px rgba(0,0,0,0.15)' }}>
+          {toast.type === 'error' ? '❌' : '✅'} {toast.msg}
+        </div>
+      )}
+
+      {/* Sidebar（PC：左カラム／モバイル：上部ヘッダーのみ、ナビは下部タブに） */}
+      {!isMobile && (
+        <div style={{ width: 220, background: COLOR.white, borderRight: `1px solid ${COLOR.border}`, display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
+          <div style={{ padding: '22px 18px', borderBottom: `2px solid ${COLOR.primary}` }}>
+            <div style={{ color: COLOR.primary, fontWeight: 900, fontSize: 18, letterSpacing: 2 }}>TENOHIRA</div>
+            <div style={{ color: COLOR.textFaint, fontSize: 12, marginTop: 3, fontWeight: 600 }}>メールマガジン配信</div>
+          </div>
+          <nav style={{ flex: 1, padding: '12px 10px' }}>
+            {NAV.map((item, i) => item && (
+              <div key={i} onClick={() => setActiveNav(i)} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', marginBottom: 4, borderRadius: 10, cursor: 'pointer', background: activeNav === i ? COLOR.primary : 'transparent', color: activeNav === i ? '#fff' : COLOR.textSub }}>
+                <span style={{ fontSize: 17 }}>{item.icon}</span>
+                <span style={{ fontSize: 14, fontWeight: 700 }}>{item.label}</span>
+              </div>
+            ))}
+          </nav>
+          <div style={{ padding: '14px 18px', borderTop: `1px solid ${COLOR.border}` }}>
+            <div style={{ color: COLOR.textFaint, fontSize: 11, fontWeight: 600 }}>ver 1.3.0</div>
+          </div>
+        </div>
+      )}
+
+      {/* モバイル用ヘッダー */}
+      {isMobile && (
+        <div style={{ background: COLOR.white, borderBottom: `2px solid ${COLOR.primary}`, padding: '14px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+          <div style={{ color: COLOR.primary, fontWeight: 900, fontSize: 16, letterSpacing: 1.5 }}>TENOHIRA</div>
+          <div style={{ color: COLOR.textSub, fontSize: 13, fontWeight: 700 }}>{NAV[activeNav]?.icon} {NAV[activeNav]?.label}</div>
+        </div>
+      )}
+
+      {/* Main */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+
+        {/* ===== ネタ管理 ===== */}
+        {activeNav === 2 && (
+          <TopicManager
+            supabaseUrl={SUPABASE_URL}
+            supabaseKey={SUPABASE_KEY}
+            showToast={showToast}
+          />
+        )}
+
+        {/* ===== 配信先リスト ===== */}
+        {activeNav === 3 && (
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+            {/* Header */}
+            <div style={{ background: COLOR.white, borderBottom: `1px solid ${COLOR.border}`, padding: isMobile ? '14px 16px' : '16px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0, flexWrap: 'wrap', gap: 10 }}>
+              <div>
+                <h1 style={{ fontSize: 20, fontWeight: 900, color: COLOR.text }}>👥 配信先リスト</h1>
+                <div style={{ fontSize: 13, color: COLOR.textSub, marginTop: 3, fontWeight: 600 }}>全{mailingList.length}件｜送信対象（Y・メールあり）：{totalSend}件｜表示中：{filteredList.length}件</div>
+              </div>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                <button onClick={() => setShowCardModal(true)} style={{ padding: '9px 16px', border: 'none', borderRadius: 9, background: COLOR.primary, fontSize: 13, cursor: 'pointer', color: '#fff', fontWeight: 800 }}>📇 名刺取込</button>
+                <button onClick={loadMailingList} style={{ padding: '9px 16px', border: `1px solid ${COLOR.border}`, borderRadius: 9, background: COLOR.white, fontSize: 13, cursor: 'pointer', color: COLOR.textSub, fontWeight: 700 }}>🔄 再読み込み</button>
+              </div>
+            </div>
+
+            {/* Filters */}
+            <div style={{ background: COLOR.white, borderBottom: `1px solid ${COLOR.border}`, padding: isMobile ? '10px 12px' : '12px 24px', display: 'flex', flexDirection: 'column', gap: 8, flexShrink: 0 }}>
+              {/* 1段目: 検索 */}
+              <input
+                placeholder="🔍 名前・会社・役職で検索"
+                value={listSearch}
+                onChange={e => setListSearch(e.target.value)}
+                style={{ width: '100%', padding: '9px 14px', border: `1px solid ${COLOR.border}`, borderRadius: 9, fontSize: 14, color: COLOR.text, boxSizing: 'border-box' }}
+              />
+              {/* 2段目: フィルターボタン群 */}
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                <select value={listCatFilter} onChange={e => setListCatFilter(e.target.value)}
+                  style={{ flex: 1, minWidth: 120, padding: '8px 10px', border: `1px solid ${COLOR.border}`, borderRadius: 9, fontSize: 13, color: COLOR.text, background: COLOR.white }}>
+                  <option value="all">全カテゴリ</option>
+                  {CAT_OPTIONS.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+                <select value={listYNFilter} onChange={e => setListYNFilter(e.target.value)}
+                  style={{ flex: 1, minWidth: 90, padding: '8px 10px', border: `1px solid ${COLOR.border}`, borderRadius: 9, fontSize: 13, color: COLOR.text, background: COLOR.white }}>
+                  <option value="all">Y/N全て</option>
+                  <option value="Y">送付Y</option>
+                  <option value="N">送付N</option>
+                </select>
+                {/* 役職フィルター */}
+                <button onClick={() => setListRoleFilter(r => r === 'exec' ? 'all' : 'exec')}
+                  style={{ padding: '8px 12px', border: `1.5px solid ${listRoleFilter === 'exec' ? COLOR.primary : COLOR.border}`, borderRadius: 9, background: listRoleFilter === 'exec' ? '#FFF4ED' : COLOR.white, color: listRoleFilter === 'exec' ? COLOR.primary : COLOR.textSub, fontSize: 13, fontWeight: 800, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                  👑 役員のみ{listRoleFilter === 'exec' ? ' ✓' : ''}
+                </button>
+                {/* グルーピング切替 */}
+                <button onClick={() => setListGroupBy(g => g === 'company' ? 'none' : 'company')}
+                  style={{ padding: '8px 12px', border: `1.5px solid ${listGroupBy === 'company' ? COLOR.secondary : COLOR.border}`, borderRadius: 9, background: listGroupBy === 'company' ? '#FFF8ED' : COLOR.white, color: listGroupBy === 'company' ? COLOR.secondary : COLOR.textSub, fontSize: 13, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                  🏢 会社別{listGroupBy === 'company' ? ' ON' : ' OFF'}
+                </button>
+              </div>
+            </div>
+
+            {/* Table / Card List */}
+            <div style={{ flex: 1, overflow: 'auto', padding: isMobile ? '0 0 16px' : '0 0 24px' }}>
+              {loading ? (
+                <div style={{ textAlign: 'center', padding: 40, color: COLOR.textFaint }}>読み込み中...</div>
+              ) : isMobile ? (
+                /* ===== スマホ: カード型レイアウト ===== */
+                <div style={{ padding: '8px 12px', display: 'flex', flexDirection: 'column', gap: 0 }}>
+                  {groupedList.map(({ company, members: groupMembers }) => (
+                    <React.Fragment key={company || 'ungrouped'}>
+                      {/* 会社グループヘッダー（スマホ） */}
+                      {listGroupBy === 'company' && (
+                        <div
+                          onClick={() => setCollapsedGroups(prev => ({ ...prev, [company]: !prev[company] }))}
+                          style={{ background: '#FFF4ED', border: `1px solid ${COLOR.accent}`, borderRadius: 10, padding: '10px 14px', marginBottom: 4, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
+                          <span style={{ fontSize: 14, fontWeight: 900, color: COLOR.primary, flex: 1 }}>
+                            {collapsedGroups[company] ? '▶' : '▼'} 🏢 {company || '（会社名なし）'}
+                          </span>
+                          <span style={{ fontSize: 12, color: COLOR.textFaint, fontWeight: 600 }}>{groupMembers.length}名</span>
+                          {groupMembers.some(m => isExec(m.role)) && (
+                            <span style={{ fontSize: 11, background: COLOR.accent, color: '#7C5A00', borderRadius: 6, padding: '2px 7px', fontWeight: 700 }}>👑</span>
+                          )}
+                          {/* 会社ごと一括Y/N */}
+                          <button onClick={e => { e.stopPropagation(); const allY = groupMembers.every(m => m.send_yn === 'Y'); groupMembers.forEach(m => updateField(m.id, 'send_yn', allY ? 'N' : 'Y')); }}
+                            style={{ padding: '4px 10px', border: 'none', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer', background: groupMembers.every(m => m.send_yn === 'Y') ? '#DCFCE7' : '#FEE2E2', color: groupMembers.every(m => m.send_yn === 'Y') ? COLOR.success : COLOR.danger }}>
+                            全員{groupMembers.every(m => m.send_yn === 'Y') ? 'N' : 'Y'}
+                          </button>
+                        </div>
+                      )}
+                      {/* メンバーカード（スマホ） */}
+                      {!collapsedGroups[company] && groupMembers.map((m, i) => (
+                        <div key={m.id} style={{ background: isExec(m.role) ? '#FFFBEB' : COLOR.white, border: `1px solid ${isExec(m.role) ? COLOR.accent : COLOR.border}`, borderRadius: 10, padding: '12px 14px', marginBottom: 6, marginLeft: listGroupBy === 'company' ? 8 : 0 }}>
+                          {/* 上段: 氏名 + Y/N + 削除 */}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                            <div style={{ flex: 1 }}>
+                              <span style={{ fontSize: 15, fontWeight: 800, color: COLOR.text }}>{m.name || '-'}</span>
+                              {isExec(m.role) && <span style={{ marginLeft: 6, fontSize: 12 }}>👑</span>}
+                            </div>
+                            <button onClick={() => updateField(m.id, 'send_yn', m.send_yn === 'Y' ? 'N' : 'Y')} disabled={saving[m.id]}
+                              style={{ padding: '6px 16px', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 900, cursor: 'pointer', background: m.send_yn === 'Y' ? '#DCFCE7' : '#FEE2E2', color: m.send_yn === 'Y' ? COLOR.success : COLOR.danger, opacity: saving[m.id] ? 0.5 : 1, minWidth: 54 }}>
+                              {saving[m.id] ? '...' : m.send_yn === 'Y' ? '✓ Y' : '✗ N'}
+                            </button>
+                            <button onClick={() => setShowDeleteConfirm(m)} disabled={deleting[m.id]}
+                              style={{ padding: '6px 10px', border: `1px solid ${COLOR.border}`, borderRadius: 8, fontSize: 16, cursor: 'pointer', background: COLOR.white, color: COLOR.danger, opacity: deleting[m.id] ? 0.5 : 1 }}>
+                              {deleting[m.id] ? '⏳' : '🗑️'}
+                            </button>
+                          </div>
+                          {/* 中段: 役職・会社 */}
+                          <div style={{ fontSize: 12, color: COLOR.textSub, marginBottom: 8, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                            {m.role && <span style={{ color: isExec(m.role) ? '#92400E' : COLOR.textSub }}>{m.role}</span>}
+                            {m.company && <span style={{ color: COLOR.textFaint }}>｜ {m.company}</span>}
+                            {m.email && <span style={{ color: COLOR.primary, fontWeight: 600, wordBreak: 'break-all' }}>{m.email}</span>}
+                          </div>
+                          {/* 下段: カテゴリ */}
+                          <select value={m.category || ''} onChange={e => updateField(m.id, 'category', e.target.value)}
+                            style={{ width: '100%', padding: '7px 10px', border: `1px solid ${COLOR.border}`, borderRadius: 8, fontSize: 13, color: COLOR.text, background: COLOR.surfaceAlt, cursor: 'pointer', boxSizing: 'border-box' }}>
+                            {CAT_OPTIONS.map(c => <option key={c} value={c}>{c}</option>)}
+                          </select>
+                        </div>
+                      ))}
+                    </React.Fragment>
+                  ))}
+                </div>
+              ) : (
+                /* ===== PC: テーブルレイアウト（従来通り） ===== */
+                <table style={{ width: '100%', minWidth: 750, borderCollapse: 'collapse' }}>
+                  <thead style={{ position: 'sticky', top: 0, zIndex: 10 }}>
+                    <tr style={{ background: COLOR.surfaceAlt, borderBottom: `2px solid ${COLOR.border}` }}>
+                      {['氏名', '役職', '会社名', 'メール', 'カテゴリ', '送付Y/N', ''].map(h => (
+                        <th key={h} style={{ padding: '11px 14px', textAlign: 'left', fontSize: 13, fontWeight: 800, color: COLOR.textSub, whiteSpace: 'nowrap' }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {groupedList.map(({ company, members: groupMembers }) => (
+                      <React.Fragment key={company || 'ungrouped'}>
+                        {/* 会社グループヘッダー */}
+                        {listGroupBy === 'company' && (
+                          <tr
+                            onClick={() => setCollapsedGroups(prev => ({ ...prev, [company]: !prev[company] }))}
+                            style={{ background: '#FFF4ED', cursor: 'pointer', borderBottom: `1px solid ${COLOR.accent}` }}>
+                            <td colSpan={7} style={{ padding: '8px 16px', fontSize: 13, fontWeight: 900, color: COLOR.primary }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                <span>{collapsedGroups[company] ? '▶' : '▼'} 🏢 {company}</span>
+                                <span style={{ fontSize: 12, color: COLOR.textFaint, fontWeight: 600 }}>{groupMembers.length}名</span>
+                                {groupMembers.some(m => isExec(m.role)) && <span style={{ fontSize: 11, background: COLOR.accent, color: '#7C5A00', borderRadius: 6, padding: '2px 7px', fontWeight: 700 }}>👑役員あり</span>}
+                                <button onClick={e => { e.stopPropagation(); const allY = groupMembers.every(m => m.send_yn === 'Y'); groupMembers.forEach(m => updateField(m.id, 'send_yn', allY ? 'N' : 'Y')); }}
+                                  style={{ marginLeft: 'auto', padding: '3px 12px', border: 'none', borderRadius: 7, fontSize: 12, fontWeight: 800, cursor: 'pointer', background: groupMembers.every(m => m.send_yn === 'Y') ? '#FEE2E2' : '#DCFCE7', color: groupMembers.every(m => m.send_yn === 'Y') ? COLOR.danger : COLOR.success }}>
+                                  全員{groupMembers.every(m => m.send_yn === 'Y') ? 'N' : 'Y'}
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                        {/* 会社グループ内のメンバー */}
+                        {!collapsedGroups[company] && groupMembers.map((m, i) => (
+                          <tr key={m.id} style={{ borderBottom: `1px solid ${COLOR.border}`, background: isExec(m.role) ? '#FFFBEB' : i % 2 === 0 ? COLOR.white : COLOR.surface }}>
+                            <td style={{ padding: '10px 14px', whiteSpace: 'nowrap' }}>
+                              <input defaultValue={m.name || ''} onBlur={e => { if (e.target.value !== m.name) updateField(m.id, 'name', e.target.value); }}
+                                style={{ width: '100%', padding: '4px 8px', border: `1px solid ${COLOR.border}`, borderRadius: 6, fontSize: 14, fontWeight: 700, color: COLOR.text, background: 'transparent', cursor: 'text' }} />
+                            </td>
+                            <td style={{ padding: '10px 14px', maxWidth: 160 }}>
+                              <input defaultValue={m.role || ''} onBlur={e => { if (e.target.value !== m.role) updateField(m.id, 'role', e.target.value); }}
+                                style={{ width: '100%', padding: '4px 8px', border: `1px solid ${COLOR.border}`, borderRadius: 6, fontSize: 12, color: isExec(m.role) ? '#92400E' : COLOR.textSub, background: 'transparent' }} />
+                            </td>
+                            <td style={{ padding: '10px 14px', fontSize: 13, color: COLOR.textSub, whiteSpace: 'nowrap' }}>
+                              <input defaultValue={m.company || ''} onBlur={e => { if (e.target.value !== m.company) updateField(m.id, 'company', e.target.value); }}
+                                style={{ width: '100%', padding: '4px 8px', border: `1px solid ${COLOR.border}`, borderRadius: 6, fontSize: 13, color: COLOR.textSub, background: 'transparent' }} />
+                            </td>
+                            <td style={{ padding: '10px 14px' }}>
+                              <input defaultValue={m.email || ''} onBlur={e => { if (e.target.value !== m.email) updateField(m.id, 'email', e.target.value); }}
+                                style={{ width: '100%', padding: '4px 8px', border: `1px solid ${COLOR.border}`, borderRadius: 6, fontSize: 13, color: m.email ? COLOR.primary : COLOR.textFaint, fontWeight: 600, background: 'transparent' }} />
+                            </td>
+                            <td style={{ padding: '10px 14px' }}>
+                              <select value={m.category || ''} onChange={e => updateField(m.id, 'category', e.target.value)}
+                                style={{ padding: '5px 10px', border: `1px solid ${COLOR.border}`, borderRadius: 7, fontSize: 13, color: COLOR.text, background: COLOR.white, cursor: 'pointer' }}>
+                                {CAT_OPTIONS.map(c => <option key={c} value={c}>{c}</option>)}
+                              </select>
+                            </td>
+                            <td style={{ padding: '10px 14px' }}>
+                              <button onClick={() => updateField(m.id, 'send_yn', m.send_yn === 'Y' ? 'N' : 'Y')} disabled={saving[m.id]}
+                                style={{ padding: '5px 16px', border: 'none', borderRadius: 7, fontSize: 13, fontWeight: 800, cursor: 'pointer', background: m.send_yn === 'Y' ? '#DCFCE7' : '#FEE2E2', color: m.send_yn === 'Y' ? COLOR.success : COLOR.danger, opacity: saving[m.id] ? 0.5 : 1 }}>
+                                {saving[m.id] ? '...' : m.send_yn === 'Y' ? '✓ Y' : '✗ N'}
+                              </button>
+                            </td>
+                            <td style={{ padding: '10px 14px' }}>
+                              <button onClick={() => setShowDeleteConfirm(m)} disabled={deleting[m.id]}
+                                style={{ padding: '5px 10px', border: `1px solid ${COLOR.border}`, borderRadius: 7, fontSize: 12, cursor: 'pointer', background: COLOR.white, color: COLOR.danger, fontWeight: 700, opacity: deleting[m.id] ? 0.5 : 1 }}>
+                                {deleting[m.id] ? '...' : '🗑️'}
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </React.Fragment>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ===== 削除確認モーダル ===== */}
+        {showDeleteConfirm && (
+          <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ background: COLOR.white, borderRadius: 16, padding: 28, width: 360, boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
+              <div style={{ fontSize: 28, textAlign: 'center', marginBottom: 12 }}>🗑️</div>
+              <h2 style={{ fontSize: 16, fontWeight: 900, color: COLOR.text, textAlign: 'center', marginBottom: 8 }}>削除しますか？</h2>
+              <p style={{ fontSize: 14, color: COLOR.textSub, textAlign: 'center', marginBottom: 20, lineHeight: 1.6 }}>
+                <strong style={{ color: COLOR.text }}>{showDeleteConfirm.name}</strong>（{showDeleteConfirm.company}）<br />
+                を削除します。この操作は取り消せません。
+              </p>
+              <div style={{ display: 'flex', gap: 10 }}>
+                <button onClick={() => setShowDeleteConfirm(null)} style={{ flex: 1, padding: '11px', border: `1px solid ${COLOR.border}`, borderRadius: 9, background: COLOR.white, fontSize: 14, cursor: 'pointer', fontWeight: 700, color: COLOR.textSub }}>キャンセル</button>
+                <button onClick={() => deleteMember(showDeleteConfirm.id)} style={{ flex: 1, padding: '11px', border: 'none', borderRadius: 9, background: COLOR.danger, color: '#fff', fontSize: 14, cursor: 'pointer', fontWeight: 800 }}>削除する</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ===== メルマガ編集 ===== */}
+        {activeNav === 1 && (
+          <>
+            {/* Header */}
+            <div style={{ background: COLOR.white, borderBottom: `1px solid ${COLOR.border}`, padding: isMobile ? '14px 16px' : '16px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0, flexWrap: 'wrap', gap: 10 }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: 14, color: COLOR.textSub, fontWeight: 700 }}>📅 2026年7月号｜配信予定：7月8日(火) 10:00</span>
+                  <span style={{ background: '#FFF4ED', color: COLOR.primary, fontSize: 12, padding: '3px 10px', borderRadius: 10, fontWeight: 800 }}>下書き</span>
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button
+                  style={{ padding: '10px 16px', border: 'none', borderRadius: 9, background: '#0891B2', color: '#fff', fontSize: 13, fontWeight: 800, cursor: sending ? 'default' : 'pointer', opacity: sending ? 0.7 : 1 }}
+                  onClick={() => { if (!sending) { setTestMode(true); setShowSendModal(true); } }}>
+                  🧪 テスト送信
+                </button>
+                <button
+                  style={{ padding: '10px 20px', border: 'none', borderRadius: 9, background: okCount === 6 ? COLOR.primary : '#D4D4D8', color: '#fff', fontSize: 14, fontWeight: 800, cursor: (okCount === 6 && !sending) ? 'pointer' : 'default', opacity: sending ? 0.7 : 1 }}
+                  onClick={() => okCount === 6 && !sending && (setTestMode(false), setShowSendModal(true))}>
+                  {sending ? `⏳ 送信中... ${sendProgress.done}/${sendProgress.total}` : okCount === 6 ? '📨 本番送信！' : `✅ 全カテゴリを確認 (${okCount}/6)`}
+                </button>
+              </div>
+            </div>
+
+            {/* Stats */}
+            <div style={{ display: 'flex', gap: 12, padding: isMobile ? '12px 16px' : '14px 24px', background: COLOR.white, borderBottom: `1px solid ${COLOR.border}`, flexShrink: 0, flexWrap: 'wrap' }}>
+              {[
+                { label: '配信カテゴリ数', value: '6', icon: '👥' },
+                { label: '配信対象件数', value: loading ? '...' : totalSend, icon: '📧' },
+                { label: '確認済み', value: `${okCount}/6`, icon: '✓' },
+              ].map((s, i) => (
+                <div key={i} style={{ flex: 1, minWidth: 140, background: COLOR.surfaceAlt, borderRadius: 12, padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div style={{ width: 42, height: 42, borderRadius: 10, background: '#FFF4ED', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 19 }}>{s.icon}</div>
+                  <div>
+                    <div style={{ fontSize: 24, fontWeight: 900, color: COLOR.text }}>{s.value}</div>
+                    <div style={{ fontSize: 12, color: COLOR.textSub, fontWeight: 600 }}>{s.label}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Body */}
+            <div style={{ flex: 1, display: 'flex', flexDirection: isMobile ? 'column' : 'row', overflow: 'hidden' }}>
+              {/* Cat List */}
+              <div style={{ width: isMobile ? '100%' : 220, background: COLOR.white, borderRight: isMobile ? 'none' : `1px solid ${COLOR.border}`, borderBottom: isMobile ? `1px solid ${COLOR.border}` : 'none', overflow: isMobile ? 'visible' : 'auto', padding: isMobile ? '10px 12px' : '14px 12px', flexShrink: 0 }}>
+                <div style={{ fontSize: 12, fontWeight: 800, color: COLOR.textFaint, marginBottom: 8, padding: '0 4px' }}>カテゴリ一覧</div>
+                <div style={{ display: isMobile ? 'flex' : 'block', gap: 8, overflowX: isMobile ? 'auto' : 'visible' }}>
+                {CATEGORIES.map(c => {
+                  const st = getStatus(c.id);
+                  const cnt = getCatMembers(c.id).length;
+                  return (
+                    <div key={c.id} onClick={() => setSelectedCat(c.id)} style={{ padding: '11px 14px', borderRadius: 10, marginBottom: isMobile ? 0 : 6, cursor: 'pointer', background: selectedCat === c.id ? '#FFF4ED' : COLOR.surfaceAlt, border: selectedCat === c.id ? `1.5px solid ${COLOR.primary}` : '1.5px solid transparent', minWidth: isMobile ? 160 : 'auto', flexShrink: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 5 }}>
+                        <span style={{ fontSize: 16 }}>{c.icon}</span>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: COLOR.text }}>{c.label}</span>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <span style={{ fontSize: 12, color: COLOR.textFaint, fontWeight: 600 }}>{loading ? '...' : cnt}件</span>
+                        <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 7, background: st.bg, color: st.color, fontWeight: 700 }}>{st.label}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+                </div>
+              </div>
+
+              {/* Editor */}
+              <div style={{ flex: 1, overflow: 'auto', padding: isMobile ? '16px' : '20px 22px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
+                  <div>
+                    <h2 style={{ fontSize: 18, fontWeight: 900, color: COLOR.text }}>{cat.icon} {cat.label}向けメルマガ</h2>
+                    <div style={{ fontSize: 13, color: COLOR.textSub, marginTop: 3, fontWeight: 600 }}>送信対象：{loading ? '...' : members.length}件</div>
+                  </div>
+                  <span style={{ background: statuses[selectedCat] === 'ok' ? '#DCFCE7' : '#FEF3C7', color: statuses[selectedCat] === 'ok' ? COLOR.success : '#92400E', fontSize: 13, padding: '5px 14px', borderRadius: 9, fontWeight: 800 }}>
+                    {statuses[selectedCat] === 'ok' ? '✅ 確認済み' : '✏️ 編集中'}
+                  </span>
+                </div>
+
+                {/* Subject */}
+                <div style={{ background: COLOR.white, borderRadius: 13, border: `1px solid ${COLOR.border}`, padding: '16px 18px', marginBottom: 16 }}>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: COLOR.textSub, marginBottom: 12 }}>件名を選んでください</div>
+                  {subjects.map((s, i) => (
+                    <label key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 10, cursor: 'pointer' }}>
+                      <input type="radio" name={'sub-' + selectedCat} checked={currentSubject === i} onChange={() => setSelectedSubject(p => ({ ...p, [selectedCat]: i }))} style={{ marginTop: 3, width: 16, height: 16, accentColor: COLOR.primary }} />
+                      <span style={{ fontSize: 14, color: COLOR.text, lineHeight: 1.6 }}>{s}</span>
+                    </label>
+                  ))}
+                </div>
+
+                {/* Body + Preview */}
+                <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: 16 }}>
+                  <div style={{ flex: 1, background: COLOR.white, borderRadius: 13, border: `1px solid ${COLOR.border}`, overflow: 'hidden' }}>
+                    <div style={{ padding: '13px 16px', borderBottom: `1px solid ${COLOR.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
+                      <span style={{ fontSize: 14, fontWeight: 800, color: COLOR.text }}>メール本文</span>
+                      <div style={{ display: 'flex', gap: 7, alignItems: 'center', flexWrap: 'wrap' }}>
+                        {(bodyImageSizes[selectedCat] || 0) > 0 && (
+                          <span style={{ fontSize: 12, color: (bodyImageSizes[selectedCat] || 0) > MAX_BODY_IMAGE_BYTES * 0.8 ? COLOR.danger : COLOR.textFaint, fontWeight: 700 }}>
+                            画像 {((bodyImageSizes[selectedCat] || 0) / 1024 / 1024).toFixed(1)}/10MB
+                          </span>
+                        )}
+                        <label style={{ padding: '6px 12px', border: `1px solid ${COLOR.border}`, borderRadius: 8, background: COLOR.white, color: COLOR.textSub, fontSize: 13, cursor: mediaUploading ? 'wait' : 'pointer', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 5 }}>
+                          {mediaUploading ? '⏳' : '📷'} 画像
+                          <input type="file" accept="image/*" style={{ display: 'none' }} disabled={mediaUploading}
+                            onChange={e => { handleImageUploadForBody(e.target.files?.[0]); e.target.value = ''; }} />
+                        </label>
+                        <button onClick={() => setShowVideoLinkModal(true)} style={{ padding: '6px 12px', border: `1px solid ${COLOR.border}`, borderRadius: 8, background: COLOR.white, color: COLOR.textSub, fontSize: 13, cursor: 'pointer', fontWeight: 700 }}>🎬 動画リンク</button>
+                        <button onClick={handleRegenerate} disabled={generating} style={{ padding: '6px 14px', border: 'none', borderRadius: 8, background: generating ? '#E4E4E7' : COLOR.primary, color: generating ? COLOR.textFaint : '#fff', fontSize: 13, cursor: generating ? 'wait' : 'pointer', fontWeight: 800 }}>
+                          {generating ? '⏳ 生成中...' : '✨ AIで再生成'}
+                        </button>
+                      </div>
+                    </div>
+                    <textarea ref={bodyTextareaRef} value={currentBody}
+                      onChange={e => setBodies(p => ({ ...p, [selectedCat]: e.target.value }))}
+                      onSelect={e => { lastCursorPos.current[selectedCat] = e.target.selectionStart; }}
+                      onClick={e => { lastCursorPos.current[selectedCat] = e.target.selectionStart; }}
+                      onKeyUp={e => { lastCursorPos.current[selectedCat] = e.target.selectionStart; }}
+                      onFocus={e => { lastCursorPos.current[selectedCat] = e.target.selectionStart; }}
+                      style={{ width: '100%', minHeight: isMobile ? 200 : 280, padding: 18, border: 'none', resize: 'vertical', fontSize: 15, lineHeight: 1.9, color: COLOR.text, fontFamily: 'Noto Sans JP, sans-serif', boxSizing: 'border-box', background: COLOR.white }} />
+                  </div>
+
+                  <div style={{ width: isMobile ? '100%' : 270, background: COLOR.white, borderRadius: 13, border: `1px solid ${COLOR.border}`, overflow: 'hidden', flexShrink: 0 }}>
+                    <div style={{ padding: '11px 14px', borderBottom: `1px solid ${COLOR.border}`, display: 'flex', gap: 7 }}>
+                      {['pc', 'sp'].map(m => (
+                        <button key={m} onClick={() => setPreview(m)} style={{ flex: 1, padding: '7px', border: 'none', borderRadius: 8, background: preview === m ? COLOR.primary : COLOR.surfaceAlt, color: preview === m ? '#fff' : COLOR.textSub, fontSize: 13, cursor: 'pointer', fontWeight: 700 }}>
+                          {m === 'pc' ? '💻 PC' : '📱 スマホ'}
+                        </button>
+                      ))}
+                    </div>
+                    <div style={{ padding: 16 }}>
+                      <div style={{ background: COLOR.surfaceAlt, borderRadius: 10, padding: 14, border: `1px solid ${COLOR.border}` }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
+                          <span style={{ fontSize: 13, fontWeight: 900, color: COLOR.text, letterSpacing: 1 }}>TENOHIRA</span>
+                          <span style={{ fontSize: 11, color: COLOR.textFaint, fontWeight: 600 }}>2026年7月号</span>
+                        </div>
+                        <div style={{ fontSize: 13, fontWeight: 800, color: COLOR.text, marginBottom: 10, lineHeight: 1.5, borderBottom: `1px solid ${COLOR.border}`, paddingBottom: 10 }}>
+                          {subjects[currentSubject]}
+                        </div>
+                        <div style={{ fontSize: 13, color: COLOR.textSub, lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>
+                          {currentBody.slice(0, 180)}...
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Footer */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 16, background: COLOR.white, borderRadius: 13, border: `1px solid ${COLOR.border}`, padding: '16px 20px', flexWrap: 'wrap', gap: 12 }}>
+                  <div style={{ fontSize: 14, color: COLOR.textSub, fontWeight: 600 }}>
+                    送信対象：<strong style={{ color: COLOR.text, fontSize: 16 }}>{loading ? '...' : members.length}件</strong>
+                  </div>
+                  <button onClick={handleOK} style={{ padding: '12px 26px', border: 'none', borderRadius: 10, background: statuses[selectedCat] === 'ok' ? COLOR.success : COLOR.primary, color: '#fff', fontSize: 14, fontWeight: 800, cursor: 'pointer' }}>
+                    {statuses[selectedCat] === 'ok' ? '✅ 確認済み！' : '✓ このカテゴリでOK！'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* ===== 送信確認モーダル ===== */}
+        {showSendModal && !sending && !sendResult && (
+          <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ background: '#fff', borderRadius: 16, padding: 32, width: 400, boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
+              <div style={{ fontSize: 32, textAlign: 'center', marginBottom: 12 }}>{testMode ? '🧪' : '📨'}</div>
+              <h2 style={{ fontSize: 18, fontWeight: 800, color: '#0F172A', textAlign: 'center', marginBottom: 8 }}>{testMode ? 'テスト送信しますか？' : 'メルマガを送信しますか？'}</h2>
+              <p style={{ fontSize: 13, color: '#64748B', textAlign: 'center', marginBottom: 20 }}>
+                {testMode
+                  ? <><strong style={{ color: '#0891B2' }}>{TEST_EMAIL}</strong> に6カテゴリ分を送信します（件名に[テスト]付き）</>
+                  : <>全6カテゴリ・合計 <strong style={{ color: '#6366F1' }}>{totalSend}件</strong> に送信します</>
+                }
+              </p>
+              <div style={{ background: '#F8FAFC', borderRadius: 10, padding: '12px 16px', marginBottom: 20 }}>
+                {CATEGORIES.map(c => (
+                  <div key={c.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#374151', padding: '4px 0', borderBottom: '1px solid #E2E8F0' }}>
+                    <span>{c.icon} {c.label}</span>
+                    <span style={{ fontWeight: 700 }}>{getCatMembers(c.id).length}件</span>
+                  </div>
+                ))}
+              </div>
+              <div style={{ display: 'flex', gap: 10 }}>
+                <button onClick={() => setShowSendModal(false)} style={{ flex: 1, padding: '11px', border: '1px solid #E2E8F0', borderRadius: 9, background: '#fff', fontSize: 14, cursor: 'pointer', fontWeight: 600, color: '#64748B' }}>キャンセル</button>
+                <button onClick={() => { setShowSendModal(false); handleSendAll(); }} style={{ flex: 2, padding: '11px', border: 'none', borderRadius: 9, background: testMode ? '#0891B2' : '#6366F1', color: '#fff', fontSize: 14, cursor: 'pointer', fontWeight: 700 }}>{testMode ? '🧪 テスト送信開始！' : '🚀 本番送信開始！'}</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ===== 送信中プログレス ===== */}
+        {sending && (
+          <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ background: '#fff', borderRadius: 16, padding: 32, width: 380, boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
+              <div style={{ fontSize: 32, textAlign: 'center', marginBottom: 12 }}>⏳</div>
+              <h2 style={{ fontSize: 17, fontWeight: 800, color: '#0F172A', textAlign: 'center', marginBottom: 16 }}>送信中...</h2>
+              <div style={{ background: '#F1F5F9', borderRadius: 8, height: 12, overflow: 'hidden', marginBottom: 12 }}>
+                <div style={{ height: '100%', background: '#6366F1', borderRadius: 8, width: `${sendProgress.total > 0 ? (sendProgress.done / sendProgress.total) * 100 : 0}%`, transition: 'width 0.3s' }} />
+              </div>
+              <p style={{ fontSize: 13, color: '#64748B', textAlign: 'center' }}>
+                {sendProgress.done} / {sendProgress.total} 件完了
+              </p>
+              {sendProgress.current && (
+                <p style={{ fontSize: 12, color: '#94A3B8', textAlign: 'center', marginTop: 4 }}>
+                  送信中：{sendProgress.current}
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ===== 送信結果モーダル ===== */}
+        {sendResult && (
+          <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ background: '#fff', borderRadius: 16, padding: 32, width: 400, boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
+              <div style={{ fontSize: 40, textAlign: 'center', marginBottom: 12 }}>{sendResult.failed.length === 0 ? '🎉' : '⚠️'}</div>
+              <h2 style={{ fontSize: 18, fontWeight: 800, color: '#0F172A', textAlign: 'center', marginBottom: 16 }}>送信完了！</h2>
+              <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
+                <div style={{ flex: 1, background: '#D1FAE5', borderRadius: 10, padding: '14px', textAlign: 'center' }}>
+                  <div style={{ fontSize: 28, fontWeight: 800, color: '#065F46' }}>{sendResult.success}</div>
+                  <div style={{ fontSize: 12, color: '#065F46' }}>✅ 成功</div>
+                </div>
+                <div style={{ flex: 1, background: sendResult.failed.length > 0 ? '#FEE2E2' : '#F1F5F9', borderRadius: 10, padding: '14px', textAlign: 'center' }}>
+                  <div style={{ fontSize: 28, fontWeight: 800, color: sendResult.failed.length > 0 ? '#991B1B' : '#94A3B8' }}>{sendResult.failed.length}</div>
+                  <div style={{ fontSize: 12, color: sendResult.failed.length > 0 ? '#991B1B' : '#94A3B8' }}>❌ 失敗</div>
+                </div>
+              </div>
+              {sendResult.failed.length > 0 && (
+                <div style={{ background: '#FEF2F2', borderRadius: 8, padding: 12, marginBottom: 16, fontSize: 12, color: '#991B1B' }}>
+                  <strong>失敗：</strong> {sendResult.failed.join('、')}
+                </div>
+              )}
+              <button onClick={() => setSendResult(null)} style={{ width: '100%', padding: '12px', border: 'none', borderRadius: 9, background: '#6366F1', color: '#fff', fontSize: 14, cursor: 'pointer', fontWeight: 700 }}>閉じる</button>
+            </div>
+          </div>
+        )}
+
+        {/* ===== 動画リンク追加モーダル ===== */}
+        {showVideoLinkModal && (
+          <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ background: '#fff', borderRadius: 16, padding: 28, width: 380, boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
+              <h2 style={{ fontSize: 16, fontWeight: 800, color: '#0F172A', marginBottom: 14 }}>🎬 動画リンクを追加</h2>
+              <input
+                value={videoLinkInput}
+                onChange={e => setVideoLinkInput(e.target.value)}
+                placeholder="https://youtube.com/... または instagram.com/..."
+                style={{ width: '100%', padding: '10px 12px', border: '1px solid #E2E8F0', borderRadius: 8, fontSize: 13, color: '#1E293B', marginBottom: 16, boxSizing: 'border-box' }}
+                autoFocus
+              />
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button onClick={() => { setShowVideoLinkModal(false); setVideoLinkInput(''); }}
+                  style={{ flex: 1, padding: '10px', border: '1px solid #E2E8F0', borderRadius: 9, background: '#fff', fontSize: 13, cursor: 'pointer', fontWeight: 600, color: '#64748B' }}>キャンセル</button>
+                <button onClick={handleAddVideoLink}
+                  style={{ flex: 2, padding: '10px', border: 'none', borderRadius: 9, background: '#6366F1', color: '#fff', fontSize: 13, cursor: 'pointer', fontWeight: 700 }}>本文に追加</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ===== 名刺OCR取込モーダル ===== */}
+        {showCardModal && (
+          <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ background: '#fff', borderRadius: 16, padding: 28, width: 420, maxHeight: '85vh', overflow: 'auto', boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                <h2 style={{ fontSize: 17, fontWeight: 800, color: '#0F172A' }}>📇 名刺取込</h2>
+                <button onClick={() => { setShowCardModal(false); setCardImage(null); setCardImagePreview(null); setCardResult(null); }} style={{ border: 'none', background: 'none', fontSize: 20, cursor: 'pointer', color: '#94A3B8' }}>✕</button>
+              </div>
+
+              {!cardImagePreview && (
+                <label style={{ display: 'block', border: '2px dashed #CBD5E1', borderRadius: 12, padding: '40px 20px', textAlign: 'center', cursor: 'pointer', background: '#F8FAFC' }}>
+                  <div style={{ fontSize: 32, marginBottom: 8 }}>📷</div>
+                  <div style={{ fontSize: 13, color: '#475569', fontWeight: 600 }}>名刺の写真を選択</div>
+                  <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 4 }}>名刺の四隅が見えるように、まっすぐ撮影してください</div>
+                  <input type="file" accept="image/*" capture="environment" style={{ display: 'none' }}
+                    onChange={e => handleCardFileSelect(e.target.files?.[0])} />
+                </label>
+              )}
+
+              {cardImagePreview && (
+                <>
+                  <img src={cardImagePreview} alt="名刺プレビュー" style={{ width: '100%', borderRadius: 10, marginBottom: 12, border: '1px solid #E2E8F0' }} />
+
+                  {!cardResult && (
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <button onClick={() => { setCardImage(null); setCardImagePreview(null); }}
+                        style={{ flex: 1, padding: '10px', border: '1px solid #E2E8F0', borderRadius: 9, background: '#fff', fontSize: 13, cursor: 'pointer', fontWeight: 600, color: '#64748B' }}>撮り直し</button>
+                      <button onClick={handleCardOcr} disabled={cardOcrLoading}
+                        style={{ flex: 2, padding: '10px', border: 'none', borderRadius: 9, background: '#6366F1', color: '#fff', fontSize: 13, cursor: 'pointer', fontWeight: 700, opacity: cardOcrLoading ? 0.6 : 1 }}>
+                        {cardOcrLoading ? '⏳ 読み取り中...' : '🔍 読み取る'}
+                      </button>
+                    </div>
+                  )}
+
+                  {cardResult && (
+                    <>
+                      <div style={{ background: '#F8FAFC', borderRadius: 10, padding: 16, marginBottom: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                        {[
+                          { key: 'name', label: '氏名' },
+                          { key: 'company', label: '会社名' },
+                          { key: 'role', label: '役職' },
+                          { key: 'email', label: 'メール' },
+                          { key: 'phone', label: '電話' },
+                        ].map(f => (
+                          <div key={f.key}>
+                            <div style={{ fontSize: 11, color: '#94A3B8', marginBottom: 3 }}>{f.label}</div>
+                            <input
+                              value={cardResult[f.key] || ''}
+                              onChange={e => setCardResult({ ...cardResult, [f.key]: e.target.value })}
+                              style={{ width: '100%', padding: '7px 10px', border: '1px solid #E2E8F0', borderRadius: 7, fontSize: 13, color: '#1E293B', background: '#fff' }}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                      {/* カテゴリ選択 */}
+                      <div style={{ marginBottom: 12 }}>
+                        <div style={{ fontSize: 11, color: '#94A3B8', marginBottom: 6 }}>カテゴリ（複数選択可）</div>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                          {['代理店','直クライアント','メディア','見込み客','外注・業者','補助金候補'].map(cat => {
+                            const checked = (cardResult.categories || []).includes(cat);
+                            return (
+                              <button key={cat} onClick={() => {
+                                const cats = cardResult.categories || [];
+                                setCardResult({ ...cardResult, categories: checked ? cats.filter(c => c !== cat) : [...cats, cat] });
+                              }} style={{ padding: '5px 10px', border: `1.5px solid ${checked ? COLOR.primary : COLOR.border}`, borderRadius: 8, background: checked ? '#FFF4ED' : COLOR.white, color: checked ? COLOR.primary : COLOR.textSub, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                                {checked ? '✓ ' : ''}{cat}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                      {/* メルマガ送付Y/N */}
+                      <div style={{ marginBottom: 12, display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <div style={{ fontSize: 11, color: '#94A3B8' }}>メルマガ送付</div>
+                        <button onClick={() => setCardResult({ ...cardResult, send_yn: (cardResult.send_yn || 'Y') === 'Y' ? 'N' : 'Y' })}
+                          style={{ padding: '6px 18px', border: 'none', borderRadius: 8, background: (cardResult.send_yn || 'Y') === 'Y' ? '#DCFCE7' : '#FEE2E2', color: (cardResult.send_yn || 'Y') === 'Y' ? '#166534' : '#991B1B', fontSize: 13, fontWeight: 900, cursor: 'pointer' }}>
+                          {(cardResult.send_yn || 'Y') === 'Y' ? '✓ 送る（Y）' : '✗ 送らない（N）'}
+                        </button>
+                      </div>
+                      {!cardResult.email && (
+                        <div style={{ fontSize: 11, color: '#92400E', background: '#FEF3C7', borderRadius: 8, padding: '8px 12px', marginBottom: 12 }}>
+                          ⚠️ メールが読み取れませんでした。手入力するか、送付Nのまま登録できます。
+                        </div>
+                      )}
+                      <div style={{ display: 'flex', gap: 8 }}>
+                        <button onClick={() => { setCardImage(null); setCardImagePreview(null); setCardResult(null); }}
+                          style={{ flex: 1, padding: '10px', border: '1px solid #E2E8F0', borderRadius: 9, background: '#fff', fontSize: 13, cursor: 'pointer', fontWeight: 600, color: '#64748B' }}>撮り直し</button>
+                        <button onClick={handleCardSave} disabled={cardSaving}
+                          style={{ flex: 2, padding: '10px', border: 'none', borderRadius: 9, background: '#10B981', color: '#fff', fontSize: 13, cursor: 'pointer', fontWeight: 700, opacity: cardSaving ? 0.6 : 1 }}>
+                          {cardSaving ? '⏳ 登録中...' : '✅ リストに登録'}
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ===== その他のページ（準備中） ===== */}
+        {/* ===== 設定（ストレージ管理） ===== */}
+        {activeNav === 5 && (
+          <div style={{ flex: 1, overflow: 'auto', padding: isMobile ? 16 : 24 }}>
+            <h1 style={{ fontSize: 20, fontWeight: 900, color: COLOR.text, marginBottom: 18 }}>⚙️ 設定</h1>
+
+            <div style={{ background: COLOR.white, borderRadius: 16, border: `1px solid ${COLOR.border}`, padding: 22, maxWidth: 480 }}>
+              <div style={{ fontSize: 15, fontWeight: 800, color: COLOR.text, marginBottom: 14 }}>📦 メルマガ画像ストレージ</div>
+
+              {storageLoading ? (
+                <div style={{ color: COLOR.textFaint, fontSize: 14, padding: 12 }}>読み込み中...</div>
+              ) : (
+                <>
+                  <div style={{ background: COLOR.surfaceAlt, borderRadius: 12, padding: 18, marginBottom: 18 }}>
+                    <div style={{ fontSize: 32, fontWeight: 900, color: COLOR.primary }}>{(totalStorageBytes / 1024 / 1024).toFixed(1)} MB</div>
+                    <div style={{ fontSize: 13, color: COLOR.textSub, marginTop: 4, fontWeight: 600 }}>使用中｜ファイル数：{storageFiles.length}件</div>
+                  </div>
+
+                  <div style={{ fontSize: 13, color: COLOR.textSub, marginBottom: 10, fontWeight: 600 }}>古い画像から指定MB分を削除します</div>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <input
+                      type="number"
+                      value={storageDeleteMB}
+                      onChange={e => setStorageDeleteMB(e.target.value)}
+                      placeholder="例：50"
+                      style={{ flex: 1, padding: '10px 14px', border: `1px solid ${COLOR.border}`, borderRadius: 9, fontSize: 14, color: COLOR.text }}
+                    />
+                    <span style={{ alignSelf: 'center', fontSize: 14, color: COLOR.textSub, fontWeight: 600 }}>MB分</span>
+                    <button onClick={handleDeleteOldestMB} disabled={storageDeleting}
+                      style={{ padding: '10px 18px', border: 'none', borderRadius: 9, background: COLOR.danger, color: '#fff', fontSize: 14, fontWeight: 800, cursor: storageDeleting ? 'wait' : 'pointer', opacity: storageDeleting ? 0.6 : 1, whiteSpace: 'nowrap' }}>
+                      {storageDeleting ? '⏳ 削除中...' : '🗑️ 削除'}
+                    </button>
+                  </div>
+                  <div style={{ fontSize: 12, color: COLOR.textFaint, marginTop: 10 }}>
+                    ⚠️ 削除した画像は過去のメルマガ本文からも見られなくなります
+                  </div>
+
+                  <button onClick={loadStorageFiles} style={{ marginTop: 18, padding: '8px 16px', border: `1px solid ${COLOR.border}`, borderRadius: 9, background: COLOR.white, fontSize: 13, cursor: 'pointer', color: COLOR.textSub, fontWeight: 700 }}>🔄 再読み込み</button>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ===== ダッシュボード ===== */}
+        {activeNav === 0 && <Dashboard supabaseUrl={SUPABASE_URL} supabaseKey={SUPABASE_KEY} />}
+
+        {/* ===== その他のページ（準備中） ===== */}
+        {activeNav === 4 && (
+          <HistoryView supabaseUrl={SUPABASE_URL} supabaseKey={SUPABASE_KEY} isMobile={isMobile} COLOR={COLOR} />
+        )}
+
+      </div>
+
+      {/* モバイル用 下部タブバー */}
+      {isMobile && (
+        <div style={{ display: 'flex', background: COLOR.white, borderTop: `1px solid ${COLOR.border}`, flexShrink: 0, paddingBottom: 'env(safe-area-inset-bottom, 0)' }}>
+          {NAV.map((item, i) => item && (
+            <div key={i} onClick={() => setActiveNav(i)}
+              style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, padding: '9px 2px', cursor: 'pointer', color: activeNav === i ? COLOR.primary : COLOR.textFaint, borderTop: activeNav === i ? `3px solid ${COLOR.primary}` : '3px solid transparent' }}>
+              <span style={{ fontSize: 19 }}>{item.icon}</span>
+              <span style={{ fontSize: 10, fontWeight: 700, whiteSpace: 'nowrap' }}>{item.label}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+ReactDOM.render(<App />, document.getElementById('root'));
+</script>
+</body>
+</html>

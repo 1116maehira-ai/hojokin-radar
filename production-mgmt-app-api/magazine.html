@@ -518,7 +518,8 @@ function TopicManager({ supabaseUrl, supabaseKey, showToast }) {
       }
       setVariations(prev => prev.map(v => {
         const r = (data.results || []).find(x => x.variationId === v.id);
-        return r?.imageUrl ? { ...v, blog_image_url: r.imageUrl } : v;
+        if (!r?.imageUrls?.length) return v;
+        return { ...v, blog_image_url: r.imageUrls[0], blog_image_urls: r.imageUrls };
       }));
       showToast('🎨 画像生成完了！');
     } catch(e) {
@@ -976,16 +977,28 @@ function TopicManager({ supabaseUrl, supabaseKey, showToast }) {
                       </div>
                     </div>
                     {!collapsedVars[v.id] && <div style={{ padding: '18px 20px' }}>
-                      {/* ブログ画像 */}
-                      {v.blog_image_url && (
-                        <div style={{ marginBottom: 16, textAlign: 'center' }}>
-                          <div style={{ fontSize: 12, fontWeight: 800, color: COLOR.textFaint, marginBottom: 6, letterSpacing: 0.5, textAlign: 'left' }}>🖼️ 生成画像</div>
-                          <img src={v.blog_image_url} alt="生成済み画像" style={{ maxWidth: '100%', maxHeight: 280, borderRadius: 10, border: `1px solid ${COLOR.border}`, objectFit: 'cover' }} />
-                          <div style={{ marginTop: 6, display: 'flex', justifyContent: 'center', gap: 10 }}>
-                            <a href={v.blog_image_url} target="_blank" rel="noopener" style={{ fontSize: 12, color: COLOR.primary, textDecoration: 'none', fontWeight: 600 }}>🔗 元URLを開く</a>
+                      {/* ブログ画像（上・中・下 3枚） */}
+                      {(() => {
+                        const imgs = v.blog_image_urls?.length ? v.blog_image_urls : v.blog_image_url ? [v.blog_image_url] : [];
+                        const labels = ['🔝 上（冒頭）', '📌 中（本文）', '🏁 下（CTA）'];
+                        if (!imgs.length) return null;
+                        return (
+                          <div style={{ marginBottom: 16 }}>
+                            <div style={{ fontSize: 12, fontWeight: 800, color: COLOR.textFaint, marginBottom: 8, letterSpacing: 0.5 }}>🖼️ 生成画像（{imgs.length}枚）</div>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                              {imgs.map((url, i) => (
+                                <div key={i} style={{ background: COLOR.surfaceAlt, borderRadius: 10, overflow: 'hidden', border: `1px solid ${COLOR.border}` }}>
+                                  <div style={{ fontSize: 11, fontWeight: 700, color: COLOR.textSub, padding: '6px 10px', borderBottom: `1px solid ${COLOR.border}` }}>{labels[i] || `画像${i+1}`}</div>
+                                  <img src={url} alt={`生成画像${i+1}`} style={{ width: '100%', maxHeight: 260, objectFit: 'cover', display: 'block' }} />
+                                  <div style={{ padding: '6px 10px' }}>
+                                    <a href={url} target="_blank" rel="noopener" style={{ fontSize: 11, color: COLOR.primary, textDecoration: 'none', fontWeight: 600 }}>🔗 URLを開く</a>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
                           </div>
-                        </div>
-                      )}
+                        );
+                      })()}
                       {/* 件名案（チェックして選択→直接編集も可能） */}
                       <div style={{ marginBottom: 16 }}>
                         <div style={{ fontSize: 12, fontWeight: 800, color: COLOR.textFaint, marginBottom: 8, letterSpacing: 0.5 }}>📌 件名案（選んで編集もOK）</div>

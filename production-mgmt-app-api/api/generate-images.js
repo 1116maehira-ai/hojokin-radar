@@ -64,24 +64,26 @@ async function getCharacterDescription() {
   return cachedCharacterDesc;
 }
 
-async function generateArticleImage(variation, characterDesc) {
-  const blogTitle = variation.blog_title || variation.summary || '';
-  const body = (variation.blog_body || variation.body_mail || '').slice(0, 400);
+const POSITION_SCENES = {
+  top: 'dramatic opening scene — 脳手郎 strikes a bold, attention-grabbing hero pose that hooks the reader',
+  middle: 'action scene — 脳手郎 is actively explaining or demonstrating the article\'s key insight to an audience',
+  bottom: 'triumphant closing scene — 脳手郎 celebrates success, encouraging the reader to take action',
+};
 
-  const prompt = `Create a clean, professional digital illustration for a Japanese business newsletter article.
+async function generateArticleImage(variation, characterDesc, position = 'top') {
+  const blogTitle = variation.blog_title || variation.summary || '';
+  const body = (variation.blog_body || variation.body_mail || '').slice(0, 300);
+  const scene = POSITION_SCENES[position];
+
+  const prompt = `Photorealistic cinematic 3D figurine render for a Japanese business newsletter.
 
 Article title: ${blogTitle}
-Article theme: ${body}
+Article summary: ${body}
+Scene: ${scene}
 
-The mascot character "脳手郎" (Noutero) must appear in the image. Character description: ${characterDesc}
+The mascot "脳手郎" (Noutero) must be the main subject. Character: ${characterDesc}
 
-Style requirements:
-- Clean flat design / digital illustration
-- Professional and friendly tone
-- Japanese business context (subsidies, consulting)
-- Warm, approachable colors
-- No text or lettering in the image
-- 1024x1024 square format`;
+Style: photorealistic, cinematic dramatic lighting, 3D collectible figurine render quality, epic atmosphere, professional Japanese business context (subsidies, consulting), NO text or lettering anywhere in the image, 1024x1024`;
 
   const response = await fetch('https://api.openai.com/v1/images/generations', {
     method: 'POST',
@@ -103,11 +105,12 @@ Style requirements:
   return data.data?.[0]?.b64_json || null;
 }
 
-async function updateVariation(id, imageUrl) {
+async function updateVariation(id, imageUrls) {
+  const urls = Array.isArray(imageUrls) ? imageUrls : [imageUrls];
   const r = await fetch(`${SUPABASE_URL}/rest/v1/magazine_variations?id=eq.${id}`, {
     method: 'PATCH',
     headers: sbHeaders,
-    body: JSON.stringify({ blog_image_url: imageUrl }),
+    body: JSON.stringify({ blog_image_url: urls[0] || null, blog_image_urls: urls }),
   });
   if (!r.ok) {
     const err = await r.text();
@@ -172,18 +175,26 @@ export default async function handler(req, res) {
     // Generate images sequentially to avoid rate limits
     const results = [];
     for (const v of variations) {
-      step(`🖼️ 画像生成中 #${v.variation_no}...`);
+      step(`🖼️ 画像生成中 #${v.variation_no} (上・中・下 3枚)...`);
       try {
-        const b64 = await generateArticleImage(v, characterDesc);
-        if (b64) {
-          step(`☁️ #${v.variation_no} Supabase Storageにアップロード中...`);
-          const imageUrl = await uploadToStorage(b64, v.id);
-          await updateVariation(v.id, imageUrl);
-          results.push({ variationId: v.id, variation_no: v.variation_no, imageUrl });
-          step(`✅ #${v.variation_no} 完了: ${imageUrl}`);
+        const imageUrls = [];
+        for (const pos of ['top', 'middle', 'bottom']) {
+          step(`  📸 #${v.variation_no} [${pos}] 生成中...`);
+          const b64 = await generateArticleImage(v, characterDesc, pos);
+          if (b64) {
+            const imageUrl = await uploadToStorage(b64, `${v.id}-${pos}`);
+            imageUrls.push(imageUrl);
+            step(`  ✅ #${v.variation_no} [${pos}] 完了`);
+          } else {
+            step(`  ⚠️ #${v.variation_no} [${pos}] データなし`);
+          }
+        }
+        if (imageUrls.length > 0) {
+          await updateVariation(v.id, imageUrls);
+          results.push({ variationId: v.id, variation_no: v.variation_no, imageUrls });
+          step(`✅ #${v.variation_no} 全${imageUrls.length}枚完了`);
         } else {
-          step(`⚠️ #${v.variation_no}: 画像データなし`);
-          results.push({ variationId: v.id, variation_no: v.variation_no, imageUrl: null });
+          results.push({ variationId: v.id, variation_no: v.variation_no, imageUrls: [] });
         }
       } catch (e) {
         step(`❌ #${v.variation_no} エラー: ${e.message}`);

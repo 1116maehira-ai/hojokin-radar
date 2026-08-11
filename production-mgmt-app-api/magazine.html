@@ -513,12 +513,13 @@ function TopicManager({ supabaseUrl, supabaseKey, showToast }) {
       const data = await res.json();
       if (data.log) setImageGenLog(data.log);
       if (!res.ok || !data.success) {
-        showToast(data.error || '画像生成失敗', 'error');
+        const errMsg = data.error || '画像生成失敗';
+        showToast(`❌ ${errMsg}`, 'error');
         return;
       }
       const totalImgs = (data.results || []).reduce((n, r) => n + (r.imageUrls?.length || 0), 0);
       if (totalImgs === 0) {
-        showToast('画像が生成できませんでした。ログを確認してください', 'error');
+        showToast('画像0枚 — 上のログを確認してください', 'error');
         return;
       }
       setVariations(prev => prev.map(v => {

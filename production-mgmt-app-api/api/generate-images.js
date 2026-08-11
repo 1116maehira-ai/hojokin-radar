@@ -29,8 +29,7 @@ const POSITION_SCENES = {
   bottom: 'triumphant celebration — 脳手郎 cheers success, encouraging the reader to take action',
 };
 
-// Use /v1/images/edits — the ONLY endpoint that accepts actual reference images as input.
-// gpt-image-1 sees the real 脳手郎 photos and places the character in the requested scene.
+// Use /v1/images/edits — passes an actual reference photo of 脳手郎 as FormData.
 async function generateArticleImage(variation, position = 'top') {
   const blogTitle = variation.blog_title || variation.summary || '';
   const body = (variation.blog_body || variation.body_mail || '').slice(0, 300);
@@ -42,19 +41,19 @@ ${scene}
 
 Article context: ${blogTitle} — ${body}
 
-Style: photorealistic, cinematic dramatic lighting, epic atmosphere, high-end collectible figurine photography, professional Japanese business context (subsidies, consulting). No text anywhere.`;
+Style: photorealistic, cinematic, 3D figurine render, dramatic lighting, epic atmosphere, high-end collectible figurine photography, professional Japanese business context (subsidies, consulting). No text anywhere.`;
+
+  // Use the first reference image — single image is most reliable with /images/edits
+  const ref = NOUTERO_REFS[0];
+  const buf = Buffer.from(ref.data, 'base64');
+  const blob = new Blob([buf], { type: ref.type });
 
   const formData = new FormData();
-  for (const ref of NOUTERO_REFS) {
-    const buf = Buffer.from(ref.data, 'base64');
-    const blob = new Blob([buf], { type: ref.type });
-    formData.append('image', blob, `ref.${ref.type.split('/')[1]}`);
-  }
+  formData.append('image', blob, 'noutero.jpg');
   formData.append('prompt', prompt);
   formData.append('model', 'gpt-image-1');
   formData.append('size', '1024x1024');
   formData.append('quality', 'high');
-  formData.append('n', '1');
 
   const response = await fetch('https://api.openai.com/v1/images/edits', {
     method: 'POST',
@@ -62,8 +61,17 @@ Style: photorealistic, cinematic dramatic lighting, epic atmosphere, high-end co
     body: formData,
   });
 
-  const data = await response.json();
-  if (!response.ok) throw new Error(`Edit API error: ${data.error?.message}`);
+  let data;
+  try {
+    data = await response.json();
+  } catch {
+    const text = await response.text().catch(() => '(empty)');
+    throw new Error(`Edit API HTTP ${response.status} — non-JSON: ${text.slice(0, 300)}`);
+  }
+
+  if (!response.ok) {
+    throw new Error(`Edit API error (${response.status}): ${data.error?.message || JSON.stringify(data).slice(0, 300)}`);
+  }
   return data.data?.[0]?.b64_json || null;
 }
 
@@ -114,6 +122,8 @@ export default async function handler(req, res) {
   const step = (msg) => { log.push(msg); console.log('[generate-images]', msg); };
 
   try {
+    step(`🔍 参考画像: ${NOUTERO_REFS.length}枚 / /images/edits 使用`);
+
     // Fetch all variations for this topic
     step('📋 バリエーション取得中...');
     const r = await fetch(`${SUPABASE_URL}/rest/v1/magazine_variations?topic_id=eq.${topicId}&select=id,variation_no,summary,body_mail,blog_title,blog_body`, {
@@ -161,7 +171,8 @@ export default async function handler(req, res) {
 
     const totalImages = results.reduce((n, r) => n + (r.imageUrls?.length || 0), 0);
     if (totalImages === 0) {
-      return res.status(500).json({ success: false, error: '画像が1枚も生成できませんでした', results, log });
+      const firstError = results.find(r => r.error)?.error || '画像が1枚も生成できませんでした';
+      return res.status(500).json({ success: false, error: firstError, results, log });
     }
     return res.status(200).json({ success: true, results, log });
   } catch (err) {

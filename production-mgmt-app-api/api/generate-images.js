@@ -95,27 +95,53 @@ Style requirements:
       n: 1,
       size: '1024x1024',
       quality: 'standard',
-      response_format: 'url',
+      response_format: 'b64_json',
     }),
   });
 
   const data = await response.json();
   if (!response.ok) throw new Error(`DALL-E error: ${data.error?.message}`);
-  return data.data?.[0]?.url || null;
+  return data.data?.[0]?.b64_json || null;
 }
 
 async function updateVariation(id, imageUrl) {
-  await fetch(`${SUPABASE_URL}/rest/v1/magazine_variations?id=eq.${id}`, {
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/magazine_variations?id=eq.${id}`, {
     method: 'PATCH',
     headers: sbHeaders,
     body: JSON.stringify({ blog_image_url: imageUrl }),
   });
+  if (!r.ok) {
+    const err = await r.text();
+    console.error(`[updateVariation] PATCH failed (${r.status}):`, err);
+    throw new Error(`Supabase PATCH failed: ${r.status}`);
+  }
+}
+
+async function uploadToStorage(b64Data, variationId) {
+  const buffer = Buffer.from(b64Data, 'base64');
+  const fileName = `article-images/v${variationId}-${Date.now()}.png`;
+  const uploadUrl = `${SUPABASE_URL}/storage/v1/object/magazine-media/${fileName}`;
+  const r = await fetch(uploadUrl, {
+    method: 'POST',
+    headers: {
+      apikey: SUPABASE_KEY,
+      Authorization: `Bearer ${SUPABASE_KEY}`,
+      'Content-Type': 'image/png',
+      'x-upsert': 'true',
+    },
+    body: buffer,
+  });
+  if (!r.ok) {
+    const err = await r.text();
+    throw new Error(`Storage upload failed (${r.status}): ${err}`);
+  }
+  return `${SUPABASE_URL}/storage/v1/object/public/magazine-media/${fileName}`;
 }
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
 
-  const { topicId } = req.body;
+  const { topicId, variationId } = req.body;
   if (!topicId) return res.status(400).json({ error: 'topicId is required' });
   if (!process.env.OPENAI_API_KEY) return res.status(500).json({ error: 'OPENAI_API_KEY not set' });
 
@@ -128,9 +154,13 @@ export default async function handler(req, res) {
     const r = await fetch(`${SUPABASE_URL}/rest/v1/magazine_variations?topic_id=eq.${topicId}&select=id,variation_no,summary,body_mail,blog_title,blog_body`, {
       headers: sbHeaders,
     });
-    const variations = await r.json();
+    let variations = await r.json();
     if (!Array.isArray(variations) || variations.length === 0) {
       return res.status(404).json({ error: 'No variations found for this topic' });
+    }
+    if (variationId) {
+      variations = variations.filter(v => v.id === variationId);
+      if (variations.length === 0) return res.status(404).json({ error: 'Variation not found' });
     }
     step(`✅ ${variations.length}記事取得`);
 
@@ -144,13 +174,15 @@ export default async function handler(req, res) {
     for (const v of variations) {
       step(`🖼️ 画像生成中 #${v.variation_no}...`);
       try {
-        const imageUrl = await generateArticleImage(v, characterDesc);
-        if (imageUrl) {
+        const b64 = await generateArticleImage(v, characterDesc);
+        if (b64) {
+          step(`☁️ #${v.variation_no} Supabase Storageにアップロード中...`);
+          const imageUrl = await uploadToStorage(b64, v.id);
           await updateVariation(v.id, imageUrl);
           results.push({ variationId: v.id, variation_no: v.variation_no, imageUrl });
-          step(`✅ #${v.variation_no} 完了`);
+          step(`✅ #${v.variation_no} 完了: ${imageUrl}`);
         } else {
-          step(`⚠️ #${v.variation_no}: 画像URLなし`);
+          step(`⚠️ #${v.variation_no}: 画像データなし`);
           results.push({ variationId: v.id, variation_no: v.variation_no, imageUrl: null });
         }
       } catch (e) {

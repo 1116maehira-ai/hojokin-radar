@@ -1,0 +1,10 @@
+{
+  "functions": {
+    "api/youtube-to-articles.js": {
+      "maxDuration": 60
+    },
+    "api/generate-images.js": {
+      "maxDuration": 300
+    }
+  }
+}

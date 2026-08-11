@@ -516,12 +516,17 @@ function TopicManager({ supabaseUrl, supabaseKey, showToast }) {
         showToast(data.error || '画像生成失敗', 'error');
         return;
       }
+      const totalImgs = (data.results || []).reduce((n, r) => n + (r.imageUrls?.length || 0), 0);
+      if (totalImgs === 0) {
+        showToast('画像が生成できませんでした。ログを確認してください', 'error');
+        return;
+      }
       setVariations(prev => prev.map(v => {
         const r = (data.results || []).find(x => x.variationId === v.id);
         if (!r?.imageUrls?.length) return v;
         return { ...v, blog_image_url: r.imageUrls[0], blog_image_urls: r.imageUrls };
       }));
-      showToast('🎨 画像生成完了！');
+      showToast(`🎨 画像生成完了！(${totalImgs}枚)`);
     } catch(e) {
       showToast('画像生成エラー: ' + e.message, 'error');
     } finally {

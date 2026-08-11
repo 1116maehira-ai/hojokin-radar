@@ -90,17 +90,17 @@ Style requirements:
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: 'dall-e-3',
+      model: 'gpt-image-1',
       prompt,
       n: 1,
       size: '1024x1024',
-      quality: 'standard',
+      quality: 'medium',
     }),
   });
 
   const data = await response.json();
-  if (!response.ok) throw new Error(`DALL-E error: ${data.error?.message}`);
-  return data.data?.[0]?.url || null;
+  if (!response.ok) throw new Error(`Image API error: ${data.error?.message}`);
+  return data.data?.[0]?.b64_json || null;
 }
 
 async function updateVariation(id, imageUrl) {
@@ -116,11 +116,8 @@ async function updateVariation(id, imageUrl) {
   }
 }
 
-async function uploadToStorage(dalleUrl, variationId) {
-  // Download from DALL-E temporary URL
-  const imgRes = await fetch(dalleUrl);
-  if (!imgRes.ok) throw new Error(`DALL-E URL fetch failed: ${imgRes.status}`);
-  const buffer = Buffer.from(await imgRes.arrayBuffer());
+async function uploadToStorage(b64Data, variationId) {
+  const buffer = Buffer.from(b64Data, 'base64');
 
   const fileName = `article-images/v${variationId}-${Date.now()}.png`;
   const uploadUrl = `${SUPABASE_URL}/storage/v1/object/magazine-media/${fileName}`;
@@ -177,15 +174,15 @@ export default async function handler(req, res) {
     for (const v of variations) {
       step(`🖼️ 画像生成中 #${v.variation_no}...`);
       try {
-        const dalleUrl = await generateArticleImage(v, characterDesc);
-        if (dalleUrl) {
+        const b64 = await generateArticleImage(v, characterDesc);
+        if (b64) {
           step(`☁️ #${v.variation_no} Supabase Storageにアップロード中...`);
-          const imageUrl = await uploadToStorage(dalleUrl, v.id);
+          const imageUrl = await uploadToStorage(b64, v.id);
           await updateVariation(v.id, imageUrl);
           results.push({ variationId: v.id, variation_no: v.variation_no, imageUrl });
           step(`✅ #${v.variation_no} 完了: ${imageUrl}`);
         } else {
-          step(`⚠️ #${v.variation_no}: 画像URL取得失敗`);
+          step(`⚠️ #${v.variation_no}: 画像データなし`);
           results.push({ variationId: v.id, variation_no: v.variation_no, imageUrl: null });
         }
       } catch (e) {

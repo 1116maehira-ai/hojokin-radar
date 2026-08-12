@@ -162,6 +162,41 @@ async function updateVariation(id, imageUrls) {
   }
 }
 
+function embedImagesInBody(blogBody, imageUrls) {
+  const [topUrl, midUrl, botUrl] = imageUrls;
+  const text = (blogBody || '').trim();
+  const paras = text.split(/\n\n+/);
+  const total = paras.length;
+  const midIdx = Math.floor(total / 2);
+
+  const top = paras.slice(0, midIdx).join('\n\n');
+  const bottom = paras.slice(midIdx).join('\n\n');
+
+  const parts = [];
+  if (topUrl) parts.push(`📷 ${topUrl}`);
+  if (top) parts.push(top);
+  if (midUrl) parts.push(`📷 ${midUrl}`);
+  if (bottom) parts.push(bottom);
+  if (botUrl) parts.push(`📷 ${botUrl}`);
+
+  return parts.join('\n\n');
+}
+
+async function updateVariationWithBody(id, imageUrls, blogBody) {
+  const urls = Array.isArray(imageUrls) ? imageUrls : [imageUrls];
+  const newBody = embedImagesInBody(blogBody, urls);
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/magazine_variations?id=eq.${id}`, {
+    method: 'PATCH',
+    headers: sbHeaders,
+    body: JSON.stringify({ blog_image_url: urls[0] || null, blog_image_urls: urls, blog_body: newBody }),
+  });
+  if (!r.ok) {
+    const err = await r.text();
+    throw new Error(`Supabase PATCH failed: ${r.status} ${err}`);
+  }
+  return newBody;
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
   const { topicId, variationId } = req.body;
@@ -229,9 +264,9 @@ export default async function handler(req, res) {
         }
 
         if (imageUrls.length > 0) {
-          await updateVariation(v.id, imageUrls);
-          results.push({ variationId: v.id, variation_no: v.variation_no, imageUrls, scenes });
-          step(`✅ #${v.variation_no} 完了 (${imageUrls.length}枚)`);
+          const newBody = await updateVariationWithBody(v.id, imageUrls, v.blog_body || '');
+          results.push({ variationId: v.id, variation_no: v.variation_no, imageUrls, scenes, blog_body: newBody });
+          step(`✅ #${v.variation_no} 完了 (${imageUrls.length}枚、ブログ本文に埋め込み済み)`);
         } else {
           results.push({ variationId: v.id, variation_no: v.variation_no, imageUrls: [] });
         }

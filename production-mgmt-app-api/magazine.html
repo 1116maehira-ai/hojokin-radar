@@ -522,11 +522,7 @@ function TopicManager({ supabaseUrl, supabaseKey, showToast }) {
         showToast('画像0枚 — 上のログを確認してください', 'error');
         return;
       }
-      setVariations(prev => prev.map(v => {
-        const r = (data.results || []).find(x => x.variationId === v.id);
-        if (!r?.imageUrls?.length) return v;
-        return { ...v, blog_image_url: r.imageUrls[0], blog_image_urls: r.imageUrls };
-      }));
+      await loadVariations(topicId);
       showToast(`🎨 画像生成完了！(${totalImgs}枚)`);
     } catch(e) {
       showToast('画像生成エラー: ' + e.message, 'error');

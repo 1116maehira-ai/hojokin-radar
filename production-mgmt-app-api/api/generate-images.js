@@ -1,9 +1,12 @@
 // POST /api/generate-images
-// New flow:
-//   1. Fetch 脳手郎 PNG reference photos directly from Google Drive
+// Flow:
+//   1. Read 脳手郎 PNG reference photos from public/noutero-refs/ (committed to repo)
 //   2. GPT-4o-mini reads the article and designs 3 unique scenes (top/middle/bottom)
 //   3. gpt-image-1 /images/edits receives the actual PNG + scene description
 //   4. Upload generated images to Supabase Storage
+
+import { readFileSync } from 'fs';
+import { join } from 'path';
 
 export const config = { maxDuration: 300 };
 
@@ -16,36 +19,22 @@ const sbHeaders = {
   'Content-Type': 'application/json',
 };
 
-// 脳手郎 reference PNG photos — Google Drive folder:
-// https://drive.google.com/drive/folders/1Cke0UMLU7ImPTlEj4sfnHwX81WlTJrnp
-const NOUTERO_GDRIVE_IDS = [
-  '1Z5997tvM0JkUrijKK8mU1sbyEwxlnIRw', // 1.png  559KB
-  '1O_PqQV7p79SW2B81ym_XEfFKjy3FpBZu', // 2.png  369KB
-  '1REOyHPCrHJbDQffXwR8ZwvsIq0a7Hn3A', // 3.png  367KB
-  '1jey4OlPxbR-Bn6JOksso8U3OP_-KlA1z', // 4.png  304KB
-];
+// 脳手郎 reference PNG photos — stored in public/noutero-refs/ (committed to repo)
+// Source: https://drive.google.com/drive/folders/1Cke0UMLU7ImPTlEj4sfnHwX81WlTJrnp
+const NOUTERO_REF_FILES = ['noutero-1.png', 'noutero-2.png', 'noutero-3.png', 'noutero-4.png'];
 
-// Fetch 脳手郎 PNG reference images from Google Drive at runtime.
-// The folder must be shared as "Anyone with the link can view".
-async function fetchNouteroRefs(step) {
+// Read 脳手郎 PNG reference images from the filesystem (public/noutero-refs/)
+function loadNouteroRefs(step) {
   const refs = [];
-  for (const id of NOUTERO_GDRIVE_IDS) {
+  const refsDir = join(process.cwd(), 'public', 'noutero-refs');
+  for (const filename of NOUTERO_REF_FILES) {
     try {
-      const r = await fetch(`https://drive.google.com/uc?export=download&id=${id}`, {
-        redirect: 'follow',
-        headers: { 'User-Agent': 'Mozilla/5.0' },
-      });
-      const ct = r.headers.get('content-type') || '';
-      if (r.ok && ct.startsWith('image/')) {
-        const buf = Buffer.from(await r.arrayBuffer());
-        refs.push(buf);
-        step(`  ✅ GDrive取得OK: ${(buf.length / 1024).toFixed(0)}KB (${ct})`);
-        if (refs.length >= 2) break; // 2枚あれば十分
-      } else {
-        step(`  ⚠️ GDrive ${id.slice(-8)}: HTTP ${r.status}, type=${ct}`);
-      }
+      const buf = readFileSync(join(refsDir, filename));
+      refs.push(buf);
+      step(`  ✅ 参考PNG読込: ${filename} (${(buf.length / 1024).toFixed(0)}KB)`);
+      if (refs.length >= 2) break; // 2枚あれば十分
     } catch (e) {
-      step(`  ⚠️ GDrive取得失敗 ${id.slice(-8)}: ${e.message}`);
+      step(`  ⚠️ ファイル読込失敗: ${filename} — ${e.message}`);
     }
   }
   return refs;
@@ -183,16 +172,16 @@ export default async function handler(req, res) {
   const step = (msg) => { log.push(msg); console.log('[generate-images]', msg); };
 
   try {
-    // Step 1: GoogleDriveから参考画像を取得
-    step('📥 GoogleDriveから脳手郎参考画像を取得中...');
-    const refs = await fetchNouteroRefs(step);
+    // Step 1: 参考画像をファイルシステムから読み込む
+    step('📥 脳手郎参考画像を読み込み中 (public/noutero-refs/)...');
+    const refs = loadNouteroRefs(step);
     if (refs.length === 0) {
       return res.status(500).json({
-        error: 'GoogleDriveから参考画像を取得できませんでした。フォルダを「リンクを知っている全員」で共有してください。',
+        error: '参考画像ファイルが見つかりません (public/noutero-refs/)',
         log,
       });
     }
-    step(`✅ 参考PNG ${refs.length}枚取得完了`);
+    step(`✅ 参考PNG ${refs.length}枚読込完了`);
 
     // Step 2: バリエーション取得
     step('📋 バリエーション取得中...');

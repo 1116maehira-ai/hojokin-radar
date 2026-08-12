@@ -5,8 +5,8 @@
 //   3. gpt-image-1 /images/edits receives the actual PNG + scene description
 //   4. Upload generated images to Supabase Storage
 
-import { readFileSync } from 'fs';
-import { join } from 'path';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 
 export const config = { maxDuration: 300 };
 

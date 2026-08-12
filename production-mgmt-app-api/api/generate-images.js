@@ -182,13 +182,13 @@ function embedImagesInBody(blogBody, imageUrls) {
   return parts.join('\n\n');
 }
 
-async function updateVariationWithBody(id, imageUrls, blogBody) {
+async function updateVariationWithBody(id, imageUrls, bodyMail) {
   const urls = Array.isArray(imageUrls) ? imageUrls : [imageUrls];
-  const newBody = embedImagesInBody(blogBody, urls);
+  const newBody = embedImagesInBody(bodyMail, urls);
   const r = await fetch(`${SUPABASE_URL}/rest/v1/magazine_variations?id=eq.${id}`, {
     method: 'PATCH',
     headers: sbHeaders,
-    body: JSON.stringify({ blog_image_url: urls[0] || null, blog_image_urls: urls, blog_body: newBody }),
+    body: JSON.stringify({ blog_image_url: urls[0] || null, blog_image_urls: urls, body_mail: newBody }),
   });
   if (!r.ok) {
     const err = await r.text();
@@ -264,7 +264,7 @@ export default async function handler(req, res) {
         }
 
         if (imageUrls.length > 0) {
-          const newBody = await updateVariationWithBody(v.id, imageUrls, v.blog_body || '');
+          const newBody = await updateVariationWithBody(v.id, imageUrls, v.body_mail || '');
           results.push({ variationId: v.id, variation_no: v.variation_no, imageUrls, scenes, blog_body: newBody });
           step(`✅ #${v.variation_no} 完了 (${imageUrls.length}枚、ブログ本文に埋め込み済み)`);
         } else {

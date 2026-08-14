@@ -1,5 +1,34 @@
 [
  {
+  "url": "https://www.pref.okinawa.lg.jp/shigoto/nyusatsukeiyaku/1015342/1025064/1037584/1040929.html",
+  "title": "令和8年度スタートアップイベントの企画・運営委託業務に係る企画提案の公募",
+  "deadline": null,
+  "id": "355e8419c5212273",
+  "source": "沖縄県庁 商工労働部 公募・募集",
+  "found_at": "2026-08-14",
+  "direction": "self",
+  "category": "委託・コンテンツ公募型",
+  "score": 85,
+  "reason": "沖縄県のスタートアップイベント企画運営委託で、TENOHIRAの映像制作・Webマーケ・イベント企画実績を活かせる元請案件として適合性が高い。",
+  "needs_sharoushi": false
+ },
+ {
+  "url": "https://www.jgrants-portal.go.jp/subsidy/a0WJ200000CDcQOMA1",
+  "title": "小規模事業者持続化補助金＜共同・協業型＞ 第３回公募",
+  "deadline": "2026-09-30",
+  "subsidy_max_limit": 30000000,
+  "target_area": "全国",
+  "target_employees": "従業員数の制約なし",
+  "id": "29b4fcd9000370e4",
+  "source": "jGrants（デジタル庁 補助金API）",
+  "found_at": "2026-08-14",
+  "direction": "both",
+  "category": "既存事業発展型",
+  "score": 75,
+  "reason": "複数事業者の共同・協業による販路開拓等を支援する制度で、TENOHIRAが他社と協業して映像・Web・マーケ等の新規販路開拓を行う自社申請と、顧客企業との共同申請で制作受託収入を得る両方の可能性がある。",
+  "needs_sharoushi": false
+ },
+ {
   "url": "https://www.pref.okinawa.lg.jp/shigoto/nyusatsukeiyaku/1015342/1025075/1041085.html",
   "title": "令和8年度準重点市場海外販路拡大事業委託業務 企画提案の募集",
   "deadline": null,

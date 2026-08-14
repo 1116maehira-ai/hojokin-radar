@@ -596,7 +596,7 @@ function TopicManager({ supabaseUrl, supabaseKey, showToast }) {
       } catch (e) {
         failedList.push(m.name || m.email);
       }
-      await new Promise(r => setTimeout(r, 300));
+      await new Promise(r => setTimeout(r, 1500));
     }
 
     setSendingVar(prev => ({ ...prev, [v.id]: false }));
@@ -1694,7 +1694,7 @@ function App() {
         failedList.push(member.name || member.email);
       }
       // 連続送信の間隔（スパム対策）
-      await new Promise(r => setTimeout(r, 300));
+      await new Promise(r => setTimeout(r, 1500));
     }
 
     setSending(false);

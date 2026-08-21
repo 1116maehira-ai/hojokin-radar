@@ -12,6 +12,7 @@ GitHub Pagesのダッシュボード表示＋LINE通知するツール。
 - `data/items.json` … 蓄積された新着＋分類結果
 - `docs/index.html` … ダッシュボード（GitHub Pages: docsフォルダ公開）
 - `.github/workflows/radar.yml` … 毎朝 JST 7:30 自動実行
+- `strategy/` … 事業戦略メモと面談記録（レーダーが何を拾うべきかの上位判断）
 
 ## セットアップ（10分）
 1. GitHubに新規リポジトリ（例: `1116maehira-ai/hojokin-radar`）を作り、この一式をpush
@@ -26,5 +27,6 @@ GitHub Pagesのダッシュボード表示＋LINE通知するツール。
 ## 運用メモ
 - 監視サイトの追加は `sites.yaml` に1ブロック追記するだけ。`include` の正規表現で絞る
 - 分類精度が悪いと感じたら `company_profile.md` を具体化する（採択実績・狙う公募の実例を足す）
+- 事業方針そのものが変わったときは `strategy/okinawa-dx-ai-strategy.md` → `company_profile.md` の順で更新する
 - ⚠ 厚労省系「助成金」の提出代行は社労士独占業務。`needs_sharoushi: true` の案件は提携社労士へ
 - 次フェーズ候補: 公募要領PDFの自動取得→申請書骨子の自動生成 / 締切カウントダウン / Supabase移行

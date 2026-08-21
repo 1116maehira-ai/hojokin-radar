@@ -1,0 +1,400 @@
+<title>手のひらAI 成長計画</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+:root{
+  --bg:#F4F6F8; --surface:#FFFFFF; --surface-2:#EDF0F4;
+  --ink:#151A21; --ink-2:#414B58; --ink-3:#6B7684;
+  --rule:#D7DDE4; --rule-soft:#E6EAEF;
+  --ai:#1E3A5F; --ai-ink:#1E3A5F; --ai-soft:#E5EBF3;
+  --gold:#8F6A1C; --gold-soft:#F2EBD9;
+  --alert:#9C4326; --alert-soft:#F6E7E1;
+  --shadow:0 1px 2px rgba(21,26,33,.05), 0 8px 24px -16px rgba(21,26,33,.22);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F1319; --surface:#171D25; --surface-2:#1E252F;
+    --ink:#E9EDF3; --ink-2:#AAB5C2; --ink-3:#7C8794;
+    --rule:#2A323D; --rule-soft:#222932;
+    --ai:#93B7DF; --ai-ink:#B9D0EB; --ai-soft:#1A2431;
+    --gold:#D3AB54; --gold-soft:#2A2416;
+    --alert:#DE9A7C; --alert-soft:#2E1E18;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F1319; --surface:#171D25; --surface-2:#1E252F;
+  --ink:#E9EDF3; --ink-2:#AAB5C2; --ink-3:#7C8794;
+  --rule:#2A323D; --rule-soft:#222932;
+  --ai:#93B7DF; --ai-ink:#B9D0EB; --ai-soft:#1A2431;
+  --gold:#D3AB54; --gold-soft:#2A2416;
+  --alert:#DE9A7C; --alert-soft:#2E1E18;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.6);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Zen Kaku Gothic New","Hiragino Kaku Gothic ProN",system-ui,sans-serif;
+  font-size:16px; line-height:1.85; letter-spacing:.01em;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{
+  max-width:1080px; margin:0 auto; padding:0 24px 96px;
+  display:grid; grid-template-columns:minmax(0,1fr); gap:0;
+}
+.col{max-width:60ch; margin:0 auto; width:100%}
+.wide{max-width:1000px; margin:0 auto; width:100%}
+
+h1,h2,h3,.num{font-family:"Zen Old Mincho","Hiragino Mincho ProN",serif}
+h1{font-size:clamp(30px,5.2vw,46px); line-height:1.32; font-weight:700; margin:0; text-wrap:balance; letter-spacing:.01em}
+h2{font-size:clamp(21px,3vw,27px); line-height:1.45; font-weight:700; margin:0; text-wrap:balance}
+h3{font-size:17px; line-height:1.6; font-weight:600; margin:0; text-wrap:balance}
+p{margin:0}
+strong{font-weight:700; color:var(--ink)}
+
+.eyebrow{
+  font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:11px; font-weight:500;
+  letter-spacing:.16em; text-transform:uppercase; color:var(--ink-3);
+}
+
+/* ---- header ---- */
+header{padding:72px 0 0}
+.meta{display:flex; flex-wrap:wrap; gap:8px 18px; margin-bottom:26px}
+.thesis{margin-top:26px; font-size:18px; line-height:1.9; color:var(--ink-2)}
+.thesis strong{color:var(--ink)}
+
+.pull{
+  margin-top:30px; padding:22px 26px; background:var(--surface); border-radius:3px;
+  border-left:3px solid var(--ai); box-shadow:var(--shadow);
+  font-size:17px; line-height:1.85;
+}
+.pull .lead{color:var(--ai-ink); font-weight:700}
+
+.stats{
+  margin-top:44px; display:grid; gap:1px; background:var(--rule);
+  grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+  border:1px solid var(--rule); border-radius:3px; overflow:hidden;
+}
+.stat{background:var(--surface); padding:20px 22px}
+.stat .v{
+  font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums;
+  font-size:27px; font-weight:500; color:var(--ai-ink); line-height:1.3; display:block;
+}
+.stat .v small{font-size:15px; font-weight:400; margin-left:2px; color:var(--ink-2)}
+.stat .k{font-size:12.5px; color:var(--ink-3); margin-top:4px; line-height:1.6}
+
+/* ---- sections ---- */
+section{padding-top:66px}
+.head{display:flex; flex-direction:column; gap:9px; margin-bottom:24px}
+.head::after{content:""; height:1px; background:var(--rule); margin-top:9px}
+.body{display:flex; flex-direction:column; gap:18px}
+.body p{color:var(--ink-2)}
+
+/* ---- tables ---- */
+.tscroll{overflow-x:auto; margin-top:26px; border:1px solid var(--rule); border-radius:3px; background:var(--surface)}
+table{border-collapse:collapse; width:100%; min-width:520px; font-size:14.5px}
+th,td{text-align:left; padding:13px 16px; border-bottom:1px solid var(--rule-soft); vertical-align:top; line-height:1.72}
+thead th{
+  font-family:"IBM Plex Mono",monospace; font-size:11px; font-weight:500;
+  letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3);
+  background:var(--surface-2); border-bottom:1px solid var(--rule); white-space:nowrap;
+}
+tbody tr:last-child td{border-bottom:none}
+td.n{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums; white-space:nowrap}
+tr.total td{background:var(--ai-soft); font-weight:700; color:var(--ink)}
+.new td{background:var(--gold-soft)}
+.tag{
+  display:inline-block; font-family:"IBM Plex Mono",monospace; font-size:10.5px;
+  letter-spacing:.08em; padding:2px 7px; border-radius:2px; margin-left:7px;
+  background:var(--gold); color:var(--bg); font-weight:500; vertical-align:1px;
+}
+
+/* ---- reason card ---- */
+.why{margin-top:26px; padding:24px 26px; background:var(--gold-soft); border-radius:3px}
+.why h3{color:var(--ink); margin-bottom:14px}
+.why ul{margin:0; padding-left:18px; display:flex; flex-direction:column; gap:9px}
+.why li{color:var(--ink-2); font-size:15px; line-height:1.8}
+
+/* ---- layers ---- */
+.layers{margin-top:26px; display:flex; flex-direction:column; gap:1px; background:var(--rule); border:1px solid var(--rule); border-radius:3px; overflow:hidden}
+.layer{background:var(--surface); padding:18px 22px; display:grid; grid-template-columns:96px minmax(0,1fr) auto; gap:18px; align-items:baseline}
+.layer .lbl{font-family:"IBM Plex Mono",monospace; font-size:11.5px; letter-spacing:.08em; color:var(--ai-ink); font-weight:500}
+.layer .desc{font-size:14.5px; color:var(--ink-2); line-height:1.75}
+.layer .desc b{color:var(--ink)}
+.layer .price{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums; font-size:14px; color:var(--ink); white-space:nowrap}
+@media(max-width:620px){.layer{grid-template-columns:1fr; gap:6px}}
+
+/* ---- timeline ---- */
+.tl{margin-top:30px; position:relative; padding-left:30px}
+.tl::before{content:""; position:absolute; left:5px; top:10px; bottom:10px; width:1px; background:var(--rule)}
+.ph{position:relative; padding-bottom:38px}
+.ph:last-child{padding-bottom:0}
+.ph::before{
+  content:""; position:absolute; left:-30px; top:9px; width:11px; height:11px;
+  border-radius:50%; background:var(--surface); border:2px solid var(--ai);
+}
+.ph.now::before{background:var(--ai)}
+.ph-top{display:flex; flex-wrap:wrap; align-items:baseline; gap:8px 14px}
+.ph-num{font-family:"IBM Plex Mono",monospace; font-size:11px; letter-spacing:.12em; color:var(--ai-ink); font-weight:500}
+.ph-name{font-family:"Zen Old Mincho",serif; font-size:19px; font-weight:700}
+.ph-date{font-family:"IBM Plex Mono",monospace; font-size:12px; color:var(--ink-3); font-variant-numeric:tabular-nums}
+.ph ul{margin:12px 0 0; padding-left:17px; display:flex; flex-direction:column; gap:8px}
+.ph li{font-size:14.5px; color:var(--ink-2); line-height:1.78}
+.ph li b{color:var(--ink)}
+.goal{
+  margin-top:13px; display:inline-block; font-size:13px; padding:5px 12px;
+  background:var(--ai-soft); color:var(--ai-ink); border-radius:2px; font-weight:500;
+}
+
+/* ---- seminar ---- */
+.parts{margin-top:26px; display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.part{background:var(--surface); border:1px solid var(--rule); border-radius:3px; padding:20px; display:flex; flex-direction:column; gap:10px}
+.part .pn{font-family:"IBM Plex Mono",monospace; font-size:11px; letter-spacing:.12em; color:var(--gold); font-weight:500}
+.part p{font-size:14px; color:var(--ink-2); line-height:1.78}
+
+/* ---- risk ---- */
+.risk td:first-child{font-weight:700; color:var(--ink); white-space:nowrap}
+.risk .un{color:var(--alert)}
+
+.note{margin-top:26px; padding:18px 22px; border:1px dashed var(--rule); border-radius:3px; font-size:14px; color:var(--ink-3); line-height:1.8}
+footer{margin-top:76px; padding-top:26px; border-top:1px solid var(--rule); font-size:13px; color:var(--ink-3); line-height:1.9}
+</style>
+
+<div class="wrap">
+
+<header class="col">
+  <div class="meta">
+    <span class="eyebrow">株式会社 TENOHIRA</span>
+    <span class="eyebrow">2026.08.21</span>
+    <span class="eyebrow">ISCO面談を受けて</span>
+  </div>
+  <h1>手のひらAI<br>成長計画</h1>
+  <p class="thesis">
+    AIリスキリングとIT連携で売上を作る道筋を、<strong>新規開発ゼロ</strong>で組み立てた。
+    新設する商品は1つだけ。月商150万円には2年目で到達する。
+  </p>
+
+  <div class="pull">
+    <span class="lead">検算で分かった一番大事なこと。</span><br>
+    代表の稼働は1年目で週8時間、2年目でも週12時間で足りる。
+    <strong>時間はボトルネックではない。詰まるのはリード数だ。</strong>
+    だからISCO・同友会ルートが効き、飛び込み営業は後回しでよい。
+  </div>
+
+  <div class="stats">
+    <div class="stat"><span class="v">1</span><span class="k">新設する商品の数</span></div>
+    <div class="stat"><span class="v">1,188<small>万</small></span><span class="k">1年目 売上（月平均99万）</span></div>
+    <div class="stat"><span class="v">2,100<small>万</small></span><span class="k">2年目 売上（月平均175万）</span></div>
+    <div class="stat"><span class="v">週8<small>h</small></span><span class="k">1年目 代表の稼働</span></div>
+  </div>
+</header>
+
+<section class="col">
+  <div class="head"><span class="eyebrow">前提</span><h2>面談で確定した3つの事実</h2></div>
+  <div class="body">
+    <p>この計画は思いつきではなく、ISCOとの面談で先方から出てきた事実に乗せている。3つとも、こちらの売り方を変える種類の事実だった。</p>
+  </div>
+  <div class="tscroll">
+    <table>
+      <thead><tr><th>面談で分かったこと</th><th>事業への含意</th></tr></thead>
+      <tbody>
+        <tr><td>中小企業の悩みはAI活用ではなく<strong>属人化</strong>。ダイナミックプライシング等を求める企業はごく少数</td><td>売り文句を「効率化」から<strong>「継承」</strong>に変える</td></tr>
+        <tr><td>ISCOは利益率10%上限・民業圧迫禁止。<strong>顧客ではなく増幅器</strong></td><td>ISCOから売上を取らない。取るのは露出と一次情報</td></tr>
+        <tr><td>「相談があるならこちらから行く」姿勢で全産業に横串</td><td><strong>1つのルートで全業種に届く</strong>。セミナー1本の価値が跳ね上がる</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="col">
+  <div class="head"><span class="eyebrow">土台</span><h2>既にある3つの資産</h2></div>
+  <div class="body">
+    <p>新しく作るものは、ほとんどない。手元にあるものが既に揃っている。</p>
+  </div>
+  <div class="layers">
+    <div class="layer"><span class="lbl">教材</span><span class="desc">自作の会計ツールを分解した<b>全10回カリキュラム</b>。複製可能で、講師を替えても回る</span><span class="price">複製可</span></div>
+    <div class="layer"><span class="lbl">型</span><span class="desc">ツールを入れ替えず間に置く<b>ハブ構築の設計</b>。移行は退職者を出す、という思想ごと売れる</span><span class="price">120万で実績</span></div>
+    <div class="layer"><span class="lbl">人</span><span class="desc">代表の<b>ヒアリング能力</b>。ISCO側が「人材派遣型コンサル」と評した部分</span><span class="price">非代替</span></div>
+  </div>
+</section>
+
+<section class="col">
+  <div class="head"><span class="eyebrow">構造</span><h2>収益の三層</h2></div>
+  <div class="body">
+    <p>入口・本命・土台を分けて、それぞれに別の役割を与える。入口で利益を取ろうとすると本命が死ぬ。</p>
+  </div>
+  <div class="layers">
+    <div class="layer"><span class="lbl">信用層</span><span class="desc"><b>セミナー登壇</b> — 名簿と信用を取る。ここで利益は取らない</span><span class="price">原価〜12万</span></div>
+    <div class="layer"><span class="lbl">フロー層</span><span class="desc"><b>診断 → 基礎研修 → ハブ構築</b> — 開発原資を作る本命</span><span class="price">15 / 45 / 120万</span></div>
+    <div class="layer"><span class="lbl">ストック層</span><span class="desc"><b>保守チケット</b> — 月商の下限を作る。内製化が進んでも接点が残る</span><span class="price">月3万</span></div>
+  </div>
+  <div class="note">
+    ISCO職員向けセミナーは<strong>原価ベースで提示する</strong>。ISCO自身が原価ベース文化なので通る。
+    ただし無償にはしない ── 「講師料ゼロの前例」を作ると、後から一般向けを値付けできなくなる。
+  </div>
+</section>
+
+<section class="col">
+  <div class="head"><span class="eyebrow">商品</span><h2>売るものは6つ、新設は1つ</h2></div>
+  <div class="tscroll">
+    <table>
+      <thead><tr><th>商品</th><th>価格</th><th>代表の稼働</th><th>状態</th></tr></thead>
+      <tbody>
+        <tr><td>体験セミナー（4時間ハンズオン）</td><td class="n">原価〜12万</td><td class="n">8h</td><td>既存</td></tr>
+        <tr class="new"><td>現状棚卸し＋AI診断（1日）<span class="tag">新設</span></td><td class="n">15万</td><td class="n">6h</td><td>これから作る</td></tr>
+        <tr><td>内製化 基礎3回パック</td><td class="n">45万</td><td class="n">12h</td><td>既存</td></tr>
+        <tr><td>ツール間ハブ構築</td><td class="n">100〜150万</td><td class="n">28h</td><td>実績あり</td></tr>
+        <tr><td>保守チケット（月3枠）</td><td class="n">月3万</td><td class="n">2h/月</td><td>設計済・未稼働</td></tr>
+        <tr><td>講師養成（師範代）</td><td class="n">年20万</td><td class="n">—</td><td>構想</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="why">
+    <h3>なぜ15万円の1日診断だけを新設するのか</h3>
+    <ul>
+      <li>セミナー（無料）と120万円の間の<strong>谷が深すぎる</strong>。社長決裁が止まるのはここ。</li>
+      <li><strong>15万なら即日決裁が下りる。</strong>3ヶ月の稟議にならない金額に置く。</li>
+      <li><strong>診断レポートがそのまま120万円の提案書になる。</strong>提案書を書く工数が消える。</li>
+      <li>原価は代表1日のみ。<strong>最強の資産をそのまま商品化</strong>したもの。</li>
+      <li>「決めてかからない・相手の土俵で聞く」という成井メソッドを、そのまま売り物にできる。</li>
+    </ul>
+  </div>
+</section>
+
+<section class="wide">
+  <div class="col head"><span class="eyebrow">数字</span><h2>2年で月商150万</h2></div>
+  <div class="col body">
+    <p>定常状態の内訳は単純だ。<strong>保守3万×20社で60万</strong>、<strong>導入120万×年9件で90万</strong>。合わせて150万になる。そこに至る2年間はこうなる。</p>
+  </div>
+  <div class="tscroll">
+    <table>
+      <thead><tr><th>項目</th><th>1年目（26/9〜27/8）</th><th>2年目（27/9〜28/8）</th></tr></thead>
+      <tbody>
+        <tr><td>セミナー</td><td class="n">12本 × 12万 = 144万</td><td class="n">18本 × 12万 = 216万</td></tr>
+        <tr><td>診断（1日）</td><td class="n">12件 × 15万 = 180万</td><td class="n">20件 × 15万 = 300万</td></tr>
+        <tr><td>導入（研修＋ハブ）</td><td class="n">6件 × 120万 = 720万</td><td class="n">9件 × 120万 = 1,080万</td></tr>
+        <tr><td>保守チケット</td><td class="n">平均4社 = 144万</td><td class="n">平均14社 = 504万</td></tr>
+        <tr class="total"><td>売上計</td><td class="n">1,188万（月平均 99万）</td><td class="n">2,100万（月平均 175万）</td></tr>
+        <tr><td>代表の稼働</td><td class="n">408h／年（週7.8h）</td><td class="n">624h／年（週12.0h）</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="col">
+    <div class="note">
+      <strong>この数字を支える転換率の前提</strong><br>
+      セミナー1本 ＝ 参加20社 → 診断1件 → 導入0.5件（診断から導入への転換 50%）。<br><br>
+      診断→導入50%は、飛び込み営業ではあり得ない数字だ。<strong>ISCO・同友会という信用が先に立つルートだからこそ成立する</strong>。この前提が崩れたら、数字ではなくルートを見直すこと。
+    </div>
+  </div>
+</section>
+
+<section class="col">
+  <div class="head"><span class="eyebrow">セミナー設計</span><h2>魂とフィットするAI</h2></div>
+  <div class="body">
+    <p>中小零細だから起こり得る使い方に振り切る。大企業向けAI活用の縮小版にはしない。核となる主張は一つ。</p>
+  </div>
+  <div class="pull">
+    <span class="lead">あなたの会社のAIは、"効率化"ではなく"継承"に使う。</span>
+  </div>
+  <div class="parts">
+    <div class="part">
+      <span class="pn">第1部</span>
+      <h3>大企業のAIは、あなたの会社に来ない</h3>
+      <p>中小の課題は人の問題である。土産卸の在庫差配、営業ごとにバラバラの見積書 ── ISCO面談で得た実例で話す。</p>
+    </div>
+    <div class="part">
+      <span class="pn">第2部</span>
+      <h3>ツールは入れ替えない</h3>
+      <p>間にハブを置く。移行は退職者を出すから、見慣れた画面のまま使わせる設計にする。</p>
+    </div>
+    <div class="part">
+      <span class="pn">第3部</span>
+      <h3>その場で作る</h3>
+      <p>Googleカレンダーから出退勤PDFへ。採用LPを作ってデプロイまで。手を動かして帰ってもらう。</p>
+    </div>
+  </div>
+  <div class="note">
+    <strong>落とし所</strong> ── 社長だけが触っても意味がない。管理職が社長と同じツール・同じ言語で話せる状態が納品物である。<br><br>
+    <strong>クロージング</strong> ── 終了時に「自社データで同じことをやる1日診断（15万円）」を提示。そのまま診断商品へ直結させる。
+  </div>
+</section>
+
+<section class="col">
+  <div class="head"><span class="eyebrow">進行</span><h2>今日からの手順</h2></div>
+  <div class="tl">
+    <div class="ph now">
+      <div class="ph-top"><span class="ph-num">PHASE 0</span><span class="ph-name">弾を作る</span><span class="ph-date">8/21 — 9/20・4週</span></div>
+      <ul>
+        <li><b>ISCO職員向けセミナーの日程を確定する。先方待ちにせず、こちらから3案出す</b> ── 全ルートの起点なので最優先</li>
+        <li>申請書チェックのモックを2日で作り、持ち込む（突合とKPI差分検出の2機能に絞る）</li>
+        <li>1日診断シートの型を作る ── ヒアリング項目の言語化がそのまま商品の実体になる</li>
+        <li>ハブ構築120万円案件の納品を進め、<b>事例として言語化</b>しておく</li>
+      </ul>
+    </div>
+    <div class="ph">
+      <div class="ph-top"><span class="ph-num">PHASE 1</span><span class="ph-name">信用を作る</span><span class="ph-date">9/21 — 11/30・10週</span></div>
+      <ul>
+        <li>ISCO職員セミナー実施 ── <b>全編録画する</b>。後の教材資産になる</li>
+        <li>PM会議へのゲスト出演</li>
+        <li>中小企業家同友会 専任幹事訪問・例会同行</li>
+        <li>一般向けセミナー第1回（ISCOまたは同友会の場を借りる）</li>
+        <li>提携社労士の確保 ── 助成金の提出代行は社労士の独占業務</li>
+      </ul>
+      <span class="goal">目標 ── 診断3件・導入受注2件</span>
+    </div>
+    <div class="ph">
+      <div class="ph-top"><span class="ph-num">PHASE 2</span><span class="ph-name">型を回す</span><span class="ph-date">12/1 — 2/28・13週</span></div>
+      <ul>
+        <li>セミナーを月1本のリズムにする</li>
+        <li><b>中継ぎ講師の1人目</b>を採用・育成（Phase 1の録画を教材化）</li>
+        <li>人材A（手紙・電話アポ）を採用</li>
+        <li>年度公募の準備を並行 ── 中心は4〜5月</li>
+      </ul>
+      <span class="goal">目標 ── 累計導入4件・保守3社</span>
+    </div>
+    <div class="ph">
+      <div class="ph-top"><span class="ph-num">PHASE 3</span><span class="ph-name">増幅</span><span class="ph-date">3/1 — 8/31</span></div>
+      <ul>
+        <li>講師養成 第1期</li>
+        <li>ISCOツール流通サイトへの出品（先方の構想が動いた場合）</li>
+      </ul>
+      <span class="goal">目標 ── 累計導入6件・保守6社・月商100万</span>
+    </div>
+  </div>
+</section>
+
+<section class="wide">
+  <div class="col head"><span class="eyebrow">前提の崩れ方</span><h2>リスク</h2></div>
+  <div class="tscroll">
+    <table class="risk">
+      <thead><tr><th>リスク</th><th>打ち手</th><th>未解決のまま残るもの</th></tr></thead>
+      <tbody>
+        <tr><td>ISCOの日程は<br>先方都合</td><td><strong>同友会ルートを必ず並走させる。</strong>単一ルートに依存しない</td><td>—</td></tr>
+        <tr><td>セキュリティが<br>売上の天井</td><td>「ツール3つまで／承認権限者は最小／デバイス限定」を標準ポリシー化し、診断項目と納品物に同梱する</td><td class="un">情報統制そのもの。大企業に売れない主因</td></tr>
+        <tr><td>代表への<br>属人化</td><td><strong>顧客に指摘している問題そのもの。</strong>Phase 2の中継ぎ講師が唯一の解。登壇と商談を全部録画して残す</td><td class="un">育成が間に合うか</td></tr>
+        <tr><td>内製化による<br>失注</td><td>チケット制保守。人はあなたから買いたいので接点は残る</td><td class="un">実運用が未検証</td></tr>
+        <tr><td>転換率50%の<br>前提崩れ</td><td>紹介ルート以外では成立しない数字。崩れたら診断単価を下げて件数で取る</td><td>—</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="col">
+  <div class="head"><span class="eyebrow">補足</span><h2>ISCO内部業務のAI化をどう扱うか</h2></div>
+  <div class="body">
+    <p><strong>収益目的ではない。実績と横展開への初期投資として扱う。</strong></p>
+    <p>規模は10〜30万円のPoCで受ける。ここで利益を取りにいかない。理由は、他の支援団体が同じ作業をしているからだ。ISCOで成立すれば、横展開の初期実績になる。</p>
+    <p>しかも先方は既に成果指標を持っている ──「10のうち3をAIに回せば、3人でやっていた仕事が2人になる」。<strong>効果測定を先方が代行してくれる</strong>案件は、そう多くない。</p>
+  </div>
+</section>
+
+<footer class="col">
+  株式会社TENOHIRA 社内資料 ── 2026年8月21日のISCO面談記録にもとづく。<br>
+  面談の書き起こしに由来する固有名詞・数値には未確認のものが含まれる。外部提示の前に確認すること。
+</footer>
+
+</div>

@@ -13,6 +13,7 @@ GitHub Pagesのダッシュボード表示＋LINE通知するツール。
 - `docs/index.html` … ダッシュボード（GitHub Pages: docsフォルダ公開）
 - `.github/workflows/radar.yml` … 毎朝 JST 7:30 自動実行
 - `strategy/` … 事業戦略メモと面談記録（レーダーが何を拾うべきかの上位判断）
+- `docs/growth-plan.html` … AI事業の成長計画（共有用ページ）
 
 ## セットアップ（10分）
 1. GitHubに新規リポジトリ（例: `1116maehira-ai/hojokin-radar`）を作り、この一式をpush

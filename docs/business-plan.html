@@ -1,0 +1,975 @@
+<title>共に立ち上がる事業計画</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
+<style>
+:root{
+  --ground:#ffffff;
+  --surface:#eef1f6;
+  --surface-2:#e3e8f0;
+  --line:#c9d2df;
+  --ink:#101a26;
+  --ink-soft:#4c5b6e;
+  --indigo:#22436e;
+  --brass:#96682a;
+  --brass-soft:#f0e3cd;
+  --sea:#1f6b64;
+  --warn:#9a4a1f;
+  --shadow:0 1px 2px rgba(16,26,38,.06),0 8px 24px rgba(16,26,38,.05);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#0d141c;
+    --surface:#16202b;
+    --surface-2:#1e2b38;
+    --line:#2d3f52;
+    --ink:#e4ebf3;
+    --ink-soft:#9aabbf;
+    --indigo:#8fb3dd;
+    --brass:#d9a45b;
+    --brass-soft:#2e2517;
+    --sea:#5cbdb1;
+    --warn:#e0925f;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.3);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0d141c;
+  --surface:#16202b;
+  --surface-2:#1e2b38;
+  --line:#2d3f52;
+  --ink:#e4ebf3;
+  --ink-soft:#9aabbf;
+  --indigo:#8fb3dd;
+  --brass:#d9a45b;
+  --brass-soft:#2e2517;
+  --sea:#5cbdb1;
+  --warn:#e0925f;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.3);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--ground);
+  color:var(--ink);
+  font-family:"Zen Kaku Gothic New",-apple-system,"Hiragino Kaku Gothic ProN",sans-serif;
+  font-size:16px;
+  line-height:1.85;
+  -webkit-font-smoothing:antialiased;
+}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+
+/* ---------- shell ---------- */
+.shell{max-width:1180px;margin:0 auto;padding:0 20px 96px;display:grid;grid-template-columns:1fr;gap:0}
+@media(min-width:1040px){
+  .shell{grid-template-columns:216px minmax(0,1fr);gap:56px;padding-right:40px}
+}
+
+/* ---------- hero ---------- */
+.hero{border-bottom:1px solid var(--line);margin-bottom:48px;padding:56px 0 40px}
+.hero-inner{max-width:1180px;margin:0 auto;padding:0 20px}
+.eyebrow{
+  font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--brass);margin:0 0 20px
+}
+h1{
+  font-family:"Shippori Mincho B1","Hiragino Mincho ProN",serif;
+  font-weight:700;font-size:clamp(30px,5vw,50px);line-height:1.35;
+  margin:0 0 24px;text-wrap:balance;letter-spacing:.01em
+}
+.hero-lede{max-width:62ch;color:var(--ink-soft);margin:0 0 32px;font-size:17px}
+.hero-stats{display:flex;flex-wrap:wrap;gap:12px}
+.stat{
+  background:var(--surface);border:1px solid var(--line);border-radius:3px;
+  padding:12px 18px;min-width:150px
+}
+.stat .k{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.14em;color:var(--ink-soft);text-transform:uppercase}
+.stat .v{font-family:"IBM Plex Mono",monospace;font-size:21px;font-weight:600;font-variant-numeric:tabular-nums;margin-top:4px}
+.stat .v small{font-size:13px;font-weight:400;color:var(--ink-soft)}
+
+/* ---------- toc rail ---------- */
+nav.rail{display:none}
+@media(min-width:1040px){
+  nav.rail{display:block;position:sticky;top:0;align-self:start;padding-top:8px;max-height:100vh;overflow-y:auto}
+  nav.rail ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+  nav.rail a{
+    display:flex;gap:10px;text-decoration:none;color:var(--ink-soft);
+    font-size:13px;line-height:1.5;padding:5px 8px;border-left:2px solid transparent;border-radius:0 3px 3px 0
+  }
+  nav.rail a:hover{color:var(--ink);background:var(--surface);border-left-color:var(--brass)}
+  nav.rail a:focus-visible{outline:2px solid var(--brass);outline-offset:1px}
+  nav.rail .n{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--brass);flex:none;padding-top:2px}
+}
+
+/* ---------- sections ---------- */
+main{min-width:0}
+section{margin-bottom:72px;scroll-margin-top:24px}
+h2{
+  font-family:"Shippori Mincho B1",serif;font-weight:600;
+  font-size:clamp(21px,3vw,27px);line-height:1.45;margin:0 0 8px;text-wrap:balance;
+  display:flex;gap:14px;align-items:baseline
+}
+h2 .num{
+  font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:600;color:var(--brass);
+  letter-spacing:.08em;flex:none;padding-top:2px
+}
+.sub{color:var(--ink-soft);font-size:14px;margin:0 0 28px;padding-left:0}
+@media(min-width:600px){.sub{padding-left:34px}}
+h3{font-size:15px;font-weight:700;margin:36px 0 12px;letter-spacing:.02em}
+h3::before{content:"";display:inline-block;width:14px;height:1px;background:var(--brass);vertical-align:middle;margin-right:9px}
+p{margin:0 0 16px;max-width:70ch}
+ul,ol.body{margin:0 0 16px;padding-left:1.3em;max-width:70ch}
+li{margin-bottom:7px}
+strong{font-weight:700}
+em{font-style:normal;color:var(--brass);font-weight:500}
+a{color:var(--indigo)}
+
+/* ---------- callouts ---------- */
+.creed{
+  border-left:3px solid var(--brass);background:var(--surface);
+  padding:24px 26px;margin:0 0 28px;border-radius:0 4px 4px 0
+}
+.creed p{
+  font-family:"Shippori Mincho B1",serif;font-size:clamp(16px,2.4vw,20px);
+  line-height:1.95;margin:0;max-width:34ch
+}
+.note{
+  border:1px solid var(--line);border-left:3px solid var(--sea);background:var(--surface);
+  padding:16px 20px;margin:0 0 22px;font-size:14px;border-radius:0 4px 4px 0
+}
+.note.warn{border-left-color:var(--warn)}
+.note p:last-child{margin-bottom:0}
+.note .tag{
+  font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--sea);display:block;margin-bottom:6px;font-weight:600
+}
+.note.warn .tag{color:var(--warn)}
+
+/* ---------- tables ---------- */
+.tw{overflow-x:auto;margin:0 0 8px;border:1px solid var(--line);border-radius:4px;background:var(--ground)}
+table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:540px}
+caption{
+  caption-side:bottom;text-align:left;font-size:12.5px;color:var(--ink-soft);
+  padding:10px 2px 0;line-height:1.6
+}
+th,td{padding:9px 13px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+thead th{
+  background:var(--surface-2);font-size:11px;letter-spacing:.09em;font-weight:700;
+  color:var(--ink-soft);text-transform:uppercase;white-space:nowrap;
+  font-family:"IBM Plex Mono",monospace
+}
+tbody tr:last-child td{border-bottom:none}
+tbody tr.total td{background:var(--surface);font-weight:700;border-top:2px solid var(--brass)}
+td.n,th.n{text-align:right;font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;white-space:nowrap}
+td.neg{color:var(--warn)}
+td.pos{color:var(--sea)}
+.qh{font-family:"IBM Plex Mono",monospace;font-weight:600;color:var(--brass)}
+.bar{display:block;height:5px;background:var(--brass);border-radius:2px;margin-top:5px;min-width:2px}
+.bar.g{background:var(--sea)}
+.chip{
+  display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;
+  padding:1px 7px;border-radius:2px;border:1px solid var(--line);
+  background:var(--surface);color:var(--ink-soft);letter-spacing:.04em;white-space:nowrap
+}
+.chip.a{border-color:var(--brass);color:var(--brass);background:var(--brass-soft)}
+
+/* ---------- figures ---------- */
+figure{margin:0 0 30px}
+figure svg{width:100%;height:auto;display:block;color:var(--ink)}
+.figwrap{border:1px solid var(--line);border-radius:4px;background:var(--surface);padding:22px 18px;overflow-x:auto}
+figcaption{font-size:12.5px;color:var(--ink-soft);padding-top:10px;line-height:1.6;max-width:70ch}
+svg text{font-family:"Zen Kaku Gothic New",sans-serif}
+svg .m{font-family:"IBM Plex Mono",monospace}
+
+/* ---------- footer ---------- */
+footer{
+  border-top:1px solid var(--line);margin-top:16px;padding:28px 20px 0;
+  max-width:1180px;margin-left:auto;margin-right:auto;
+  font-size:12.5px;color:var(--ink-soft)
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<header class="hero">
+  <div class="hero-inner">
+    <p class="eyebrow">事業計画 ／ 2026.08.21 → 2028.03.01</p>
+    <h1>あなたの勇気となって、<br>共に立ち上がる</h1>
+    <p class="hero-lede">
+      沖縄の経営者の「創業の魂」を映像に残し、AIをその会社の優秀な従業員として社員の隣に置く。
+      商品は2つだけ。理念に共感でき、愛せると思えた相手にだけ、その2つを届ける。
+      2028年3月に月額手取り100万円へ到達するまでの、6クォーターの実行計画。
+    </p>
+    <div class="hero-stats">
+      <div class="stat"><div class="k">到達目標</div><div class="v">100<small>万円／月 手取り</small></div></div>
+      <div class="stat"><div class="k">賞与</div><div class="v">100<small>万円／年 手取り</small></div></div>
+      <div class="stat"><div class="k">期限</div><div class="v">2028.03</div></div>
+      <div class="stat"><div class="k">残り</div><div class="v">6<small>クォーター</small></div></div>
+    </div>
+  </div>
+</header>
+
+<div class="shell">
+<nav class="rail" aria-label="目次">
+  <ol>
+    <li><a href="#s1"><span class="n">01</span><span>理念と、選ぶ基準</span></a></li>
+    <li><a href="#s2"><span class="n">02</span><span>事業の全体像</span></a></li>
+    <li><a href="#s3"><span class="n">03</span><span>商品は2つに絞る</span></a></li>
+    <li><a href="#s4"><span class="n">04</span><span>目標からの逆算</span></a></li>
+    <li><a href="#s5"><span class="n">05</span><span>6クォーター計画</span></a></li>
+    <li><a href="#s6"><span class="n">06</span><span>数値計画（P/L）</span></a></li>
+    <li><a href="#s7"><span class="n">07</span><span>営業の設計</span></a></li>
+    <li><a href="#s8"><span class="n">08</span><span>体制と役割分担</span></a></li>
+    <li><a href="#s9"><span class="n">09</span><span>データ資産</span></a></li>
+    <li><a href="#s10"><span class="n">10</span><span>社長の時間</span></a></li>
+    <li><a href="#s11"><span class="n">11</span><span>リスクと確認事項</span></a></li>
+  </ol>
+</nav>
+
+<main>
+
+<!-- ============ 01 ============ -->
+<section id="s1">
+  <h2><span class="num">01</span>理念と、選ぶ基準</h2>
+  <p class="sub">計画のすべては、ここから逆算される。ここがブレると、商品も価格も営業も全部ブレる。</p>
+
+  <div class="creed">
+    <p>私はあなたの声や腕や足になりたい。<br>
+    あなたの武器や盾を提供したい。<br>
+    あなたの勇気となって、共に立ち上がる。<br>
+    そのために、私は命を使いたい。</p>
+  </div>
+
+  <p>この3つの節が、そのまま<strong>商品の設計図</strong>になっている。声・腕・足になるとは「代わりにやっておく」こと。武器と盾を渡すとは「やり方を教える」こと。勇気となって共に立ち上がるとは「最初と最後に、私自身が立つ」こと。ここから2商品と、社長本人の稼働範囲が一意に決まる。</p>
+
+  <h3>誰と組むか — 対象者の選定基準</h3>
+  <p>売上の大小や業種ではなく、次の2問で判断する。どちらかがNOなら受けない。この基準を持つことが、結果として提案の熱量と成約率を上げる。</p>
+
+  <div class="tw">
+  <table>
+    <caption>選定基準。①②を満たした相手にだけ、③④の条件を確認して商談に進む。</caption>
+    <thead><tr><th style="width:34px">#</th><th>問い</th><th>判定</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">①</td><td>その人の理念・使命に、私が共感できるか</td><td><span class="chip a">必須</span></td></tr>
+      <tr><td class="mono">②</td><td>その人を、私が愛せると思えるか</td><td><span class="chip a">必須</span></td></tr>
+      <tr><td class="mono">③</td><td>いま解くべき課題が、映像またはAIの射程にあるか</td><td><span class="chip">商談で確認</span></td></tr>
+      <tr><td class="mono">④</td><td>予算と意思決定者にたどり着けるか</td><td><span class="chip">商談で確認</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>行動指針</h3>
+  <p>「どうする・こうする・そうする・発する」の4語。動く・考える・作る・発信する、の4つの動作。まとめて<em>ハッスル（＝元気いっぱい）</em>。</p>
+  <div class="note warn">
+    <span class="tag">要確認 01</span>
+    <p>4語と4動作の対応づけ（どうする＝考える、こうする＝作る…等）が口述からは確定できていません。ここは前平さん本人の言葉で確定させてください。ロゴ・LP・パンフレット・社内の合言葉すべてがこの4語に乗るため、表記ゆれを残せない箇所です。</p>
+  </div>
+</section>
+
+<!-- ============ 02 ============ -->
+<section id="s2">
+  <h2><span class="num">02</span>事業の全体像</h2>
+  <p class="sub">理念の3節が、提供の3形態を経て、2つの商品と社長の稼働範囲に落ちる構造。</p>
+
+  <figure>
+    <div class="figwrap">
+    <svg viewBox="0 0 880 288" role="img" aria-label="理念の3節が提供の3形態に変換され、映像制作・AI研修・社長本人の稼働という3つの提供物になる構造図">
+      <defs>
+        <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+        </marker>
+        <marker id="arb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--brass)"/>
+        </marker>
+      </defs>
+
+      <text x="10" y="22" class="m" font-size="11" letter-spacing="1.6" fill="var(--brass)">理念</text>
+      <text x="318" y="22" class="m" font-size="11" letter-spacing="1.6" fill="var(--brass)">提供の形</text>
+      <text x="622" y="22" class="m" font-size="11" letter-spacing="1.6" fill="var(--brass)">商品・稼働</text>
+
+      <!-- row 1 -->
+      <rect x="10" y="38" width="278" height="58" rx="3" fill="var(--ground)" stroke="currentColor" stroke-opacity=".35"/>
+      <text x="26" y="63" font-size="13">あなたの声や腕や足に</text>
+      <text x="26" y="82" font-size="13">なりたい</text>
+      <line x1="292" y1="67" x2="314" y2="67" stroke="currentColor" stroke-opacity=".5" marker-end="url(#ar)"/>
+      <rect x="318" y="38" width="230" height="58" rx="3" fill="var(--ground)" stroke="currentColor" stroke-opacity=".35"/>
+      <text x="334" y="73" font-size="14" font-weight="700">代わりに、やっておく</text>
+      <line x1="552" y1="67" x2="618" y2="67" stroke="var(--brass)" stroke-width="1.6" marker-end="url(#arb)"/>
+      <rect x="622" y="38" width="248" height="58" rx="3" fill="var(--brass-soft)" stroke="var(--brass)"/>
+      <text x="638" y="63" font-size="14" font-weight="700" fill="var(--brass)">映像制作</text>
+      <text x="638" y="82" font-size="11.5" fill="currentColor" fill-opacity=".75">理念・式典・採用・ブランディング</text>
+
+      <!-- row 2 -->
+      <rect x="10" y="108" width="278" height="58" rx="3" fill="var(--ground)" stroke="currentColor" stroke-opacity=".35"/>
+      <text x="26" y="133" font-size="13">あなたの武器や盾を</text>
+      <text x="26" y="152" font-size="13">提供したい</text>
+      <line x1="292" y1="137" x2="314" y2="137" stroke="currentColor" stroke-opacity=".5" marker-end="url(#ar)"/>
+      <rect x="318" y="108" width="230" height="58" rx="3" fill="var(--ground)" stroke="currentColor" stroke-opacity=".35"/>
+      <text x="334" y="143" font-size="14" font-weight="700">やり方を、教える</text>
+      <line x1="552" y1="137" x2="618" y2="137" stroke="var(--brass)" stroke-width="1.6" marker-end="url(#arb)"/>
+      <rect x="622" y="108" width="248" height="58" rx="3" fill="var(--brass-soft)" stroke="var(--brass)"/>
+      <text x="638" y="133" font-size="14" font-weight="700" fill="var(--brass)">AI研修</text>
+      <text x="638" y="152" font-size="11.5" fill="currentColor" fill-opacity=".75">全社員の隣にAIを置く／補助金活用</text>
+
+      <!-- row 3 -->
+      <rect x="10" y="178" width="278" height="58" rx="3" fill="var(--ground)" stroke="currentColor" stroke-opacity=".35"/>
+      <text x="26" y="203" font-size="13">あなたの勇気となって</text>
+      <text x="26" y="222" font-size="13">共に立ち上がる</text>
+      <line x1="292" y1="207" x2="314" y2="207" stroke="currentColor" stroke-opacity=".5" marker-end="url(#ar)"/>
+      <rect x="318" y="178" width="230" height="58" rx="3" fill="var(--ground)" stroke="currentColor" stroke-opacity=".35"/>
+      <text x="334" y="213" font-size="14" font-weight="700">最初と最後に、私が立つ</text>
+      <line x1="552" y1="207" x2="618" y2="207" stroke="var(--brass)" stroke-width="1.6" marker-end="url(#arb)"/>
+      <rect x="622" y="178" width="248" height="58" rx="3" fill="var(--ground)" stroke="var(--brass)" stroke-dasharray="3 3"/>
+      <text x="638" y="203" font-size="13" font-weight="700">社長本人の稼働範囲</text>
+      <text x="638" y="222" font-size="11.5" fill="currentColor" fill-opacity=".75">ヒアリング／立案／商談／初回・最終登壇</text>
+
+      <line x1="10" y1="256" x2="870" y2="256" stroke="currentColor" stroke-opacity=".2"/>
+      <text x="10" y="276" font-size="11.5" fill="currentColor" fill-opacity=".65">この3行の外側にある作業は、すべて「人・AI・外注」に渡す。渡せない作業は商品にしない。</text>
+    </svg>
+    </div>
+    <figcaption>図1 — 理念の各節が、提供の形を経て、商品と社長の稼働範囲に一対一で対応する。商品を2つに絞れる根拠はここにある。</figcaption>
+  </figure>
+</section>
+
+<!-- ============ 03 ============ -->
+<section id="s3">
+  <h2><span class="num">03</span>商品は2つに絞る</h2>
+  <p class="sub">できることは多い。しかし売るのは2つだけ。理由は理念との一致と、社長リソースの有限性。</p>
+
+  <div class="tw">
+  <table>
+    <caption>単価・原価率は<strong>仮置き</strong>。ここを実勢に合わせて直すと、以降の計画数値がすべて連動して動く（<code class="mono">plan/model.py</code>）。</caption>
+    <thead>
+      <tr><th>商品</th><th>買う理由（顧客の状況）</th><th class="n">単価</th><th class="n">原価率</th><th class="n">粗利</th><th>社長の関与</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>理念映像</strong><br><span class="chip">代行</span></td>
+        <td>周年・式典を迎える／採用で伝わらない／ブランディングが脆弱／2代目・3代目へ承継する</td>
+        <td class="n">150万</td><td class="n">50%</td><td class="n">75万</td>
+        <td>ヒアリング・立案・商談のみ</td>
+      </tr>
+      <tr>
+        <td><strong>AI研修</strong><br><span class="chip">教える</span></td>
+        <td>人手が足りない／AIを入れたいが誰も分からない／教育予算はあるが使えていない</td>
+        <td class="n">180万</td><td class="n">35%</td><td class="n">117万</td>
+        <td>初回・最終回の登壇</td>
+      </tr>
+      <tr>
+        <td><strong>AI伴走サポート</strong><br><span class="chip a">継続収益</span></td>
+        <td>研修後、現場で回り続けるか不安／新しい業務にも広げたい</td>
+        <td class="n">7万／月</td><td class="n">20%</td><td class="n">5.6万／月</td>
+        <td>四半期に一度の同席</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="note">
+    <span class="tag">私からの提案</span>
+    <p><strong>3つ目の「AI伴走サポート」を追加しました。</strong>お話には出ていませんでしたが、これが無いと計画が閉じません。映像も研修も売り切り型で、毎四半期ゼロから積み上げ直しになる。社長1人が全商談に出る構造では、いずれ時間が天井になります。研修導入企業の半数が月7万で継続すれば、2028年時点で<strong>年1,680万円・粗利率80%が自動で立ち上がる</strong>。これが月150万円の役員報酬を安定させる土台になります。研修の自然な延長なので、新しい商品を覚える必要もありません。</p>
+  </div>
+
+  <h3>AI研修に補助金を組み合わせる</h3>
+  <p>人材開発支援助成金（事業展開等リスキリング支援コース）等を使えば、中小企業は経費の最大75%＋賃金助成を受けられる。180万円の研修が実質40〜60万円になる。これが<em>「費用負担を極限に抑えながら成長速度を上げる」</em>の中身であり、テレアポの第一声に載せる言葉でもある。</p>
+  <div class="note warn">
+    <span class="tag">法令上の制約</span>
+    <p>厚労省系助成金の<strong>申請書作成・提出代行は社会保険労務士の独占業務</strong>です。TENOHIRAは「研修提供者」の立場に徹し、申請実務は提携社労士へ渡す設計にしてください（このリポジトリの補助金レーダーでも <code class="mono">needs_sharoushi</code> で分類済み）。提携社労士の確保は<strong>Q1の必達事項</strong>です。</p>
+  </div>
+</section>
+
+<!-- ============ 04 ============ -->
+<section id="s4">
+  <h2><span class="num">04</span>目標からの逆算</h2>
+  <p class="sub">手取り100万円という個人の目標を、明日かける電話の本数まで一本の線でつなぐ。</p>
+
+  <figure>
+    <div class="figwrap">
+    <svg viewBox="0 0 880 448" role="img" aria-label="手取り月100万円から、必要な役員報酬、粗利、売上、成約件数、商談件数、月間アプローチ数までを段階的に逆算した梯子図">
+      <line x1="42" y1="34" x2="42" y2="416" stroke="var(--brass)" stroke-opacity=".45" stroke-width="2"/>
+      <g font-size="13.5">
+        <circle cx="42" cy="34" r="7" fill="var(--brass)"/>
+        <text x="66" y="30" font-weight="700">手取り 月100万円 ＋ 賞与100万円</text>
+        <text x="66" y="49" font-size="11.5" fill="currentColor" fill-opacity=".65">2028年3月から、この水準で毎月支払われている状態</text>
+        <text x="864" y="34" text-anchor="end" class="m" font-size="15" font-weight="600" fill="var(--brass)">GOAL</text>
+
+        <circle cx="42" cy="98" r="5" fill="var(--ground)" stroke="var(--brass)" stroke-width="2"/>
+        <text x="66" y="94" font-weight="500">役員報酬（額面）月150万円＋賞与140万円</text>
+        <text x="66" y="113" font-size="11.5" fill="currentColor" fill-opacity=".65">社会保険・税を差し引いて手取り100万円になる水準</text>
+        <text x="864" y="102" text-anchor="end" class="m" font-size="14" font-weight="600">年 1,940万</text>
+
+        <circle cx="42" cy="162" r="5" fill="var(--ground)" stroke="var(--brass)" stroke-width="2"/>
+        <text x="66" y="158" font-weight="500">会社が稼ぐべき粗利</text>
+        <text x="66" y="177" font-size="11.5" fill="currentColor" fill-opacity=".65">＋ 社員3名 936万 ＋ 法定福利 431万 ＋ 販管費 792万 ＋ 利益</text>
+        <text x="864" y="166" text-anchor="end" class="m" font-size="14" font-weight="600">年 5,000万</text>
+
+        <circle cx="42" cy="226" r="5" fill="var(--ground)" stroke="var(--brass)" stroke-width="2"/>
+        <text x="66" y="222" font-weight="500">売上（平均粗利率 61%）</text>
+        <text x="66" y="241" font-size="11.5" fill="currentColor" fill-opacity=".65">映像3,600万／AI研修2,880万／伴走1,680万</text>
+        <text x="864" y="230" text-anchor="end" class="m" font-size="14" font-weight="600">年 8,160万</text>
+
+        <circle cx="42" cy="290" r="5" fill="var(--ground)" stroke="var(--brass)" stroke-width="2"/>
+        <text x="66" y="286" font-weight="500">成約件数</text>
+        <text x="66" y="305" font-size="11.5" fill="currentColor" fill-opacity=".65">映像24本＋研修16社／年 ＝ 月3.3件、伴走20社が継続</text>
+        <text x="864" y="294" text-anchor="end" class="m" font-size="14" font-weight="600">年 40件</text>
+
+        <circle cx="42" cy="354" r="5" fill="var(--ground)" stroke="var(--brass)" stroke-width="2"/>
+        <text x="66" y="350" font-weight="500">初回商談（成約率 40%）</text>
+        <text x="66" y="369" font-size="11.5" fill="currentColor" fill-opacity=".65">うち セミナー経由 36件／アウトバウンド 54件</text>
+        <text x="864" y="358" text-anchor="end" class="m" font-size="14" font-weight="600">年 90件</text>
+
+        <circle cx="42" cy="416" r="7" fill="var(--brass)"/>
+        <text x="66" y="412" font-weight="700">月間アプローチ 124社</text>
+        <text x="66" y="431" font-size="11.5" fill="currentColor" fill-opacity=".65">手紙＋訪問 34社／架電・DM 90社／セミナー 四半期2回</text>
+        <text x="864" y="416" text-anchor="end" class="m" font-size="15" font-weight="600" fill="var(--brass)">毎日の行動</text>
+      </g>
+    </svg>
+    </div>
+    <figcaption>図2 — 個人の手取り目標が、月124社へのアプローチという日々の行動量に変換される。途中のどれか1つの率が変われば、下の行動量が変わる。</figcaption>
+  </figure>
+
+  <div class="note">
+    <span class="tag">読み方</span>
+    <p>この梯子は<strong>上から下に読むと計画、下から上に読むと進捗管理</strong>になります。四半期ごとに実測値（成約率・アポ率）を入れ直せば、翌四半期の必要アプローチ数が自動で出ます。最初の2四半期は数字を「当てる」ためではなく「測る」ために回してください。</p>
+  </div>
+</section>
+
+<!-- ============ 05 ============ -->
+<section id="s5">
+  <h2><span class="num">05</span>6クォーター実行計画</h2>
+  <p class="sub">2026年8月21日から2028年3月1日まで。1年単位ではなく3ヶ月単位で、何を仕込み、誰を入れ、いくら稼ぐか。</p>
+
+  <figure>
+    <div class="figwrap">
+    <svg viewBox="0 0 900 330" role="img" aria-label="6つの四半期にわたり、仕組み構築・採用・集客投資・売上規模がどの順で立ち上がるかを示したロードマップ">
+      <g class="m" font-size="10.5" fill="currentColor" fill-opacity=".7">
+        <text x="152" y="16">Q1</text><text x="152" y="30" font-size="9.5">26/09-11</text>
+        <text x="272" y="16">Q2</text><text x="272" y="30" font-size="9.5">26/12-27/02</text>
+        <text x="392" y="16">Q3</text><text x="392" y="30" font-size="9.5">27/03-05</text>
+        <text x="512" y="16">Q4</text><text x="512" y="30" font-size="9.5">27/06-08</text>
+        <text x="632" y="16">Q5</text><text x="632" y="30" font-size="9.5">27/09-11</text>
+        <text x="752" y="16">Q6</text><text x="752" y="30" font-size="9.5">27/12-28/02</text>
+      </g>
+      <g stroke="currentColor" stroke-opacity=".14">
+        <line x1="146" y1="38" x2="146" y2="284"/><line x1="266" y1="38" x2="266" y2="284"/>
+        <line x1="386" y1="38" x2="386" y2="284"/><line x1="506" y1="38" x2="506" y2="284"/>
+        <line x1="626" y1="38" x2="626" y2="284"/><line x1="746" y1="38" x2="746" y2="284"/>
+        <line x1="866" y1="38" x2="866" y2="284"/>
+      </g>
+
+      <g font-size="11.5">
+        <text x="10" y="60" font-weight="700">仕組み</text>
+        <rect x="146" y="48" width="240" height="17" rx="2" fill="var(--indigo)" fill-opacity=".22" stroke="var(--indigo)" stroke-opacity=".5"/>
+        <text x="154" y="61" font-size="10.5">LP・名刺・パンフ・提携社労士・価格確定</text>
+        <rect x="386" y="48" width="480" height="17" rx="2" fill="var(--indigo)" fill-opacity=".12" stroke="var(--indigo)" stroke-opacity=".3"/>
+        <text x="394" y="61" font-size="10.5">実績の型化 → 事例集・提案テンプレ・伴走メニュー</text>
+
+        <text x="10" y="94" font-weight="700">採用</text>
+        <rect x="266" y="82" width="600" height="17" rx="2" fill="var(--sea)" fill-opacity=".2" stroke="var(--sea)" stroke-opacity=".5"/>
+        <text x="274" y="95" font-size="10.5">インサイドセールス 1名（架電・DM・SNS運用）</text>
+        <rect x="386" y="104" width="480" height="17" rx="2" fill="var(--sea)" fill-opacity=".2" stroke="var(--sea)" stroke-opacity=".5"/>
+        <text x="394" y="117" font-size="10.5">フロント営業 1名（手紙の訪問手渡し・追跡）</text>
+        <rect x="626" y="126" width="240" height="17" rx="2" fill="var(--sea)" fill-opacity=".2" stroke="var(--sea)" stroke-opacity=".5"/>
+        <text x="634" y="139" font-size="10.5">インサイドセールス 2名目</text>
+
+        <text x="10" y="172" font-weight="700">集客</text>
+        <rect x="146" y="160" width="720" height="17" rx="2" fill="var(--brass)" fill-opacity=".18" stroke="var(--brass)" stroke-opacity=".5"/>
+        <text x="154" y="173" font-size="10.5">手紙＋訪問手渡し＋追跡架電（主戦力・全期間）</text>
+        <rect x="266" y="182" width="600" height="17" rx="2" fill="var(--brass)" fill-opacity=".18" stroke="var(--brass)" stroke-opacity=".5"/>
+        <text x="274" y="195" font-size="10.5">セミナー 四半期2回（社長登壇・1回15社）</text>
+        <rect x="386" y="204" width="480" height="17" rx="2" fill="var(--brass)" fill-opacity=".18" stroke="var(--brass)" stroke-opacity=".5"/>
+        <text x="394" y="217" font-size="10.5">Google検索広告・SNS広告（月15万→28万）</text>
+      </g>
+
+      <text x="10" y="248" font-size="11.5" font-weight="700">売上</text>
+      <g>
+        <rect x="152" y="252" width="108" height="26" rx="2" fill="var(--brass)" fill-opacity=".13"/>
+        <rect x="152" y="252" width="15" height="26" rx="2" fill="var(--brass)"/>
+        <text x="176" y="269" class="m" font-size="11">330万</text>
+        <rect x="272" y="252" width="108" height="26" rx="2" fill="var(--brass)" fill-opacity=".13"/>
+        <rect x="272" y="252" width="31" height="26" rx="2" fill="var(--brass)"/>
+        <text x="310" y="269" class="m" font-size="11">670万</text>
+        <rect x="392" y="252" width="108" height="26" rx="2" fill="var(--brass)" fill-opacity=".13"/>
+        <rect x="392" y="252" width="43" height="26" rx="2" fill="var(--brass)"/>
+        <text x="442" y="269" class="m" font-size="11">942万</text>
+        <rect x="512" y="252" width="108" height="26" rx="2" fill="var(--brass)" fill-opacity=".13"/>
+        <rect x="512" y="252" width="57" height="26" rx="2" fill="var(--brass)"/>
+        <text x="576" y="269" class="m" font-size="11">1,234万</text>
+        <rect x="632" y="252" width="108" height="26" rx="2" fill="var(--brass)" fill-opacity=".13"/>
+        <rect x="632" y="252" width="76" height="26" rx="2" fill="var(--brass)"/>
+        <text x="700" y="269" class="m" font-size="10.5" fill="var(--ground)">1,648万</text>
+        <rect x="752" y="252" width="108" height="26" rx="2" fill="var(--brass)" fill-opacity=".13"/>
+        <rect x="752" y="252" width="82" height="26" rx="2" fill="var(--brass)"/>
+        <text x="820" y="269" class="m" font-size="10.5" fill="var(--ground)">1,774万</text>
+      </g>
+      <line x1="10" y1="296" x2="890" y2="296" stroke="var(--brass)" stroke-opacity=".4" stroke-dasharray="4 3"/>
+      <text x="10" y="316" font-size="11.5" fill="currentColor" fill-opacity=".7">2028年3月 ▸ 役員報酬 月150万円へ改定（＝Q6の売上水準が年間を通して維持できている状態）</text>
+    </svg>
+    </div>
+    <figcaption>図3 — 仕組み → 人 → 集客投資 の順に積み、売上はその2四半期後についてくる。先に人を入れるのではなく、先に受け皿と価格を確定させる。</figcaption>
+  </figure>
+
+  <div class="tw">
+  <table>
+    <caption>各四半期の主題と必達事項。「必達」が未達のまま次の四半期に進むと、以降の売上計画が2四半期ぶん後ろにずれる。</caption>
+    <thead>
+      <tr><th style="width:52px">Q</th><th style="width:104px">期間</th><th>主題</th><th>必達事項</th><th class="n">成約</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="qh">Q0</td><td class="mono">26/08/21-31</td>
+        <td><strong>助走</strong></td>
+        <td>価格3種の確定／既存名刺DBから「会ったことがある50社」を抽出／提携社労士に打診</td>
+        <td class="n">—</td>
+      </tr>
+      <tr>
+        <td class="qh">Q1</td><td class="mono">26/09-11</td>
+        <td><strong>受け皿をつくる</strong><br><span class="chip">社長1名</span></td>
+        <td>LP・名刺・チラシ・パンフをデザイナーへ一括発注（HTML／ai納品）／手紙の型を作り月12通の訪問手渡しを開始／<strong>1件目の映像と1社目の研修を必ず取る</strong>（事例が無いと次が売れない）</td>
+        <td class="n">2件</td>
+      </tr>
+      <tr>
+        <td class="qh">Q2</td><td class="mono">26/12-27/02</td>
+        <td><strong>人を1人入れる</strong><br><span class="chip">＋IS 1名</span></td>
+        <td>インサイドセールス採用・架電スクリプト化／セミナー初回開催／Q1の2件を事例コンテンツ化／伴走サポート1社目</td>
+        <td class="n">4件</td>
+      </tr>
+      <tr>
+        <td class="qh">Q3</td><td class="mono">27/03-05</td>
+        <td><strong>手紙を仕組みにする</strong><br><span class="chip">＋フロント営業</span></td>
+        <td>フロント営業採用（手紙の訪問手渡し専任）／広告開始 月15万／役員報酬 月80万へ改定／年度替わりの式典・周年需要を取り切る</td>
+        <td class="n">5〜6件</td>
+      </tr>
+      <tr>
+        <td class="qh">Q4</td><td class="mono">27/06-08</td>
+        <td><strong>再現性を確認する</strong></td>
+        <td>成約率・アポ率の実測値で図2を引き直す／映像外注チームを2系統に増やす（1系統だと納期が詰まる）／伴走6社</td>
+        <td class="n">7件</td>
+      </tr>
+      <tr>
+        <td class="qh">Q5</td><td class="mono">27/09-11</td>
+        <td><strong>量を倍にする</strong><br><span class="chip">＋IS 2名目</span></td>
+        <td>アプローチ量を月124社体制へ／AI中継講師を2名体制に／役員報酬 月110万へ改定／伴走11社</td>
+        <td class="n">9件</td>
+      </tr>
+      <tr>
+        <td class="qh">Q6</td><td class="mono">27/12-28/02</td>
+        <td><strong>水準を固定する</strong></td>
+        <td>3ヶ月連続で目標粗利を達成／伴走18社で月126万の固定収入／役員報酬 月130万→<strong>2028年3月に150万へ</strong></td>
+        <td class="n">9件</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- ============ 06 ============ -->
+<section id="s6">
+  <h2><span class="num">06</span>数値計画（四半期P/L）</h2>
+  <p class="sub">単位は万円。前提を変えて再計算できるように <code class="mono">plan/model.py</code> に式を置いてある。</p>
+
+  <div class="tw">
+  <table>
+    <caption>累積営業利益の最大赤字は Q1 の −56万円。運転資金として<strong>最低200万円の手元資金</strong>があれば、外部調達なしで走り切れる想定（入金サイトを考慮すると300万が安全圏）。</caption>
+    <thead>
+      <tr><th>Q</th><th class="n">映像</th><th class="n">研修</th><th class="n">伴走</th><th class="n">売上</th><th class="n">原価</th><th class="n">粗利</th><th class="n">率</th><th class="n">固定費</th><th class="n">営業利益</th><th class="n">累積</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="qh">Q1</td><td class="n">1本</td><td class="n">1社</td><td class="n">—</td><td class="n">330<span class="bar" style="width:19%"></span></td><td class="n">138</td><td class="n">192</td><td class="n">58%</td><td class="n">248</td><td class="n neg">−56</td><td class="n neg">−56</td></tr>
+      <tr><td class="qh">Q2</td><td class="n">2本</td><td class="n">2社</td><td class="n">1社</td><td class="n">670<span class="bar" style="width:38%"></span></td><td class="n">278</td><td class="n">392</td><td class="n">59%</td><td class="n">347</td><td class="n pos">+45</td><td class="n neg">−10</td></tr>
+      <tr><td class="qh">Q3</td><td class="n">3本</td><td class="n">2.5社</td><td class="n">3社</td><td class="n">942<span class="bar" style="width:53%"></span></td><td class="n">391</td><td class="n">551</td><td class="n">59%</td><td class="n">584</td><td class="n neg">−32</td><td class="n neg">−43</td></tr>
+      <tr><td class="qh">Q4</td><td class="n">4本</td><td class="n">3社</td><td class="n">6社</td><td class="n">1,234<span class="bar" style="width:70%"></span></td><td class="n">508</td><td class="n">727</td><td class="n">59%</td><td class="n">604</td><td class="n pos">+122</td><td class="n pos">+79</td></tr>
+      <tr><td class="qh">Q5</td><td class="n">5本</td><td class="n">4社</td><td class="n">11社</td><td class="n">1,648<span class="bar" style="width:93%"></span></td><td class="n">663</td><td class="n">986</td><td class="n">60%</td><td class="n">829</td><td class="n pos">+157</td><td class="n pos">+236</td></tr>
+      <tr><td class="qh">Q6</td><td class="n">5本</td><td class="n">4社</td><td class="n">18社</td><td class="n">1,774<span class="bar" style="width:100%"></span></td><td class="n">688</td><td class="n">1,087</td><td class="n">61%</td><td class="n">916</td><td class="n pos">+171</td><td class="n pos">+407</td></tr>
+      <tr class="total"><td colspan="4">19ヶ月 合計</td><td class="n">6,600</td><td class="n">2,666</td><td class="n">3,935</td><td class="n">60%</td><td class="n">3,528</td><td class="n pos">+407</td><td class="n"></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>2028年3月以降の定常状態</h3>
+  <div class="tw">
+  <table>
+    <caption>目標水準に到達した後の年間モデル。役員報酬を満額計上したうえで営業利益917万円が残り、賞与と納税と次の投資を賄える。</caption>
+    <thead><tr><th>項目</th><th class="n">年額</th><th>内訳</th></tr></thead>
+    <tbody>
+      <tr><td>売上</td><td class="n">8,160</td><td>映像24本 3,600／研修16社 2,880／伴走20社 1,680</td></tr>
+      <tr><td>原価（外注）</td><td class="n">3,144</td><td>映像チーム・AI中継講師・教材</td></tr>
+      <tr class="total"><td>粗利</td><td class="n">5,016</td><td>粗利率 61%</td></tr>
+      <tr><td>役員報酬＋賞与</td><td class="n">1,940</td><td>月150万×12ヶ月 ＋ 賞与140万（額面）</td></tr>
+      <tr><td>社員人件費</td><td class="n">936</td><td>インサイドセールス2名・フロント営業1名</td></tr>
+      <tr><td>法定福利費</td><td class="n">431</td><td>会社負担分 概算15%</td></tr>
+      <tr><td>販管費</td><td class="n">792</td><td>広告336／家賃光熱96／ツール84／会費・会食・ガソリン156／印刷郵送120</td></tr>
+      <tr class="total"><td>営業利益</td><td class="n">917</td><td>売上高営業利益率 11%</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="note warn">
+    <span class="tag">要確認 02 — 税務上の重要論点</span>
+    <p><strong>役員報酬は事業年度の途中で自由に増額できません。</strong>期首から3ヶ月以内の改定でなければ損金算入できず（定期同額給与）、また<strong>役員賞与100万円は「事前確定届出給与」の届出を期限内に出していないと全額が損金不算入</strong>になります。計画では Q3・Q5・2028年3月に改定を置いていますが、<strong>これは決算期に合わせて置き直す必要があります</strong>。決算期を教えてください。ここだけは顧問税理士と先に握ってください。</p>
+  </div>
+</section>
+
+<!-- ============ 07 ============ -->
+<section id="s7">
+  <h2><span class="num">07</span>営業の設計</h2>
+  <p class="sub">7つの接触手段と4つの受け皿。どれをいくつ回せば、月7.5件の商談になるか。</p>
+
+  <figure>
+    <div class="figwrap">
+    <svg viewBox="0 0 880 400" role="img" aria-label="7つの接触手段が4つの情報受け皿を経て、問い合わせ・初回商談・提案商談・成約へと絞り込まれていくファネル図">
+      <defs>
+        <marker id="ar4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+        </marker>
+      </defs>
+      <text x="10" y="18" class="m" font-size="11" letter-spacing="1.6" fill="var(--brass)">接触する</text>
+      <g font-size="11.5">
+        <rect x="10" y="30" width="196" height="26" rx="2" fill="var(--brass-soft)" stroke="var(--brass)"/>
+        <text x="22" y="47" font-weight="700" fill="var(--brass)">手紙 ＋ 訪問手渡し ＋ 追跡架電</text>
+        <text x="212" y="47" class="m" font-size="10.5" fill="currentColor" fill-opacity=".7">月34社・商談化 8%</text>
+
+        <rect x="10" y="62" width="196" height="24" rx="2" fill="var(--ground)" stroke="currentColor" stroke-opacity=".3"/>
+        <text x="22" y="78">電話営業</text>
+        <rect x="10" y="90" width="196" height="24" rx="2" fill="var(--ground)" stroke="currentColor" stroke-opacity=".3"/>
+        <text x="22" y="106">メールDM</text>
+        <rect x="10" y="118" width="196" height="24" rx="2" fill="var(--ground)" stroke="currentColor" stroke-opacity=".3"/>
+        <text x="22" y="134">紙媒体の送付</text>
+        <text x="212" y="106" class="m" font-size="10.5" fill="currentColor" fill-opacity=".7">月90社・商談化 2%</text>
+
+        <rect x="10" y="150" width="196" height="24" rx="2" fill="var(--ground)" stroke="currentColor" stroke-opacity=".3"/>
+        <text x="22" y="166">折込チラシ</text>
+        <rect x="10" y="178" width="196" height="24" rx="2" fill="var(--ground)" stroke="currentColor" stroke-opacity=".3"/>
+        <text x="22" y="194">SNS広告（FB・IG）</text>
+        <rect x="10" y="206" width="196" height="24" rx="2" fill="var(--ground)" stroke="currentColor" stroke-opacity=".3"/>
+        <text x="22" y="222">Google検索広告</text>
+        <rect x="10" y="234" width="196" height="24" rx="2" fill="var(--ground)" stroke="currentColor" stroke-opacity=".3"/>
+        <text x="22" y="250">SNSの高頻度発信</text>
+        <text x="212" y="222" class="m" font-size="10.5" fill="currentColor" fill-opacity=".7">面で認知を取る</text>
+
+        <rect x="10" y="270" width="196" height="26" rx="2" fill="var(--brass-soft)" stroke="var(--brass)"/>
+        <text x="22" y="287" font-weight="700" fill="var(--brass)">セミナー登壇（社長）</text>
+        <text x="212" y="287" class="m" font-size="10.5" fill="currentColor" fill-opacity=".7">四半期2回×15社・商談化 30%</text>
+      </g>
+
+      <path d="M330 150 L358 150" stroke="currentColor" stroke-opacity=".5" marker-end="url(#ar4)"/>
+
+      <text x="366" y="18" class="m" font-size="11" letter-spacing="1.6" fill="var(--brass)">受け止める</text>
+      <g font-size="11.5">
+        <rect x="366" y="30" width="150" height="24" rx="2" fill="var(--ground)" stroke="currentColor" stroke-opacity=".3"/><text x="378" y="46">ランディングページ</text>
+        <rect x="366" y="58" width="150" height="24" rx="2" fill="var(--ground)" stroke="currentColor" stroke-opacity=".3"/><text x="378" y="74">名刺</text>
+        <rect x="366" y="86" width="150" height="24" rx="2" fill="var(--ground)" stroke="currentColor" stroke-opacity=".3"/><text x="378" y="102">チラシ</text>
+        <rect x="366" y="114" width="150" height="24" rx="2" fill="var(--ground)" stroke="currentColor" stroke-opacity=".3"/><text x="378" y="130">パンフレット</text>
+      </g>
+      <text x="366" y="162" font-size="10.5" fill="currentColor" fill-opacity=".65">デザイナーに一括発注（Q1）</text>
+      <text x="366" y="178" font-size="10.5" fill="currentColor" fill-opacity=".65">HTML・ai データで納品を受け、</text>
+      <text x="366" y="194" font-size="10.5" fill="currentColor" fill-opacity=".65">以降の差し替えは内製</text>
+
+      <path d="M524 100 L552 100" stroke="currentColor" stroke-opacity=".5" marker-end="url(#ar4)"/>
+
+      <text x="560" y="18" class="m" font-size="11" letter-spacing="1.6" fill="var(--brass)">絞り込む（月次）</text>
+      <g>
+        <polygon points="560,30 870,30 838,74 592,74" fill="var(--indigo)" fill-opacity=".14" stroke="var(--indigo)" stroke-opacity=".4"/>
+        <text x="576" y="50" font-size="12">問い合わせ・アポ獲得</text>
+        <text x="854" y="58" text-anchor="end" class="m" font-size="15" font-weight="600">7.5</text>
+
+        <polygon points="592,82 838,82 812,126 618,126" fill="var(--indigo)" fill-opacity=".22" stroke="var(--indigo)" stroke-opacity=".5"/>
+        <text x="608" y="102" font-size="12">初回ヒアリング商談</text>
+        <text x="796" y="110" text-anchor="end" class="m" font-size="15" font-weight="600">7.5</text>
+        <text x="608" y="118" font-size="10" fill="currentColor" fill-opacity=".65">社長本人が出る</text>
+
+        <polygon points="618,134 812,134 790,178 640,178" fill="var(--indigo)" fill-opacity=".3" stroke="var(--indigo)" stroke-opacity=".6"/>
+        <text x="634" y="154" font-size="12">立案・提案商談</text>
+        <text x="774" y="162" text-anchor="end" class="m" font-size="15" font-weight="600">5.2</text>
+        <text x="634" y="170" font-size="10" fill="currentColor" fill-opacity=".65">社長本人が出る</text>
+
+        <polygon points="640,186 790,186 764,230 666,230" fill="var(--brass)" fill-opacity=".85"/>
+        <text x="658" y="206" font-size="12" font-weight="700" fill="var(--ground)">成約</text>
+        <text x="748" y="214" text-anchor="end" class="m" font-size="16" font-weight="700" fill="var(--ground)">3.0</text>
+
+        <path d="M715 238 L715 262" stroke="var(--sea)" stroke-width="1.6" marker-end="url(#ar4)" stroke-opacity=".8"/>
+        <rect x="596" y="268" width="238" height="42" rx="3" fill="var(--sea)" fill-opacity=".14" stroke="var(--sea)" stroke-opacity=".6"/>
+        <text x="612" y="286" font-size="12" font-weight="700" fill="var(--sea)">納品後 → 伴走サポートへ</text>
+        <text x="612" y="303" font-size="10.5" fill="currentColor" fill-opacity=".7">研修導入企業の約50%が月7万で継続</text>
+      </g>
+
+      <line x1="10" y1="332" x2="870" y2="332" stroke="currentColor" stroke-opacity=".2"/>
+      <text x="10" y="352" font-size="11.5" fill="currentColor" fill-opacity=".7">主戦力は「手紙＋訪問手渡し＋追跡架電」と「セミナー」。この2つで商談の8割をつくる。</text>
+      <text x="10" y="372" font-size="11.5" fill="currentColor" fill-opacity=".7">広告とSNS発信は商談を直接生むためではなく、手紙が届いた企業が検索したときに「実在して信用できる」と示すために回す。</text>
+      <text x="10" y="392" font-size="11.5" fill="currentColor" fill-opacity=".7">初回・提案の2商談は社長本人。それ以外の全接触は人とAIに渡す。</text>
+    </svg>
+    </div>
+    <figcaption>図4 — 接触手段は7つあるが、商談を生むのは実質2つ。残りは「信用の裏取り」として機能させる、という役割分担で設計している。</figcaption>
+  </figure>
+
+  <div class="tw">
+  <table>
+    <caption>四半期ごとの必要活動量。手紙とセミナーが立ち上がるQ3以降、架電はいったん減らせる（受注処理に人手が要るため）。Q5で量を倍にする。</caption>
+    <thead>
+      <tr><th>Q</th><th class="n">成約</th><th class="n">必要商談</th><th class="n">ｾﾐﾅｰ経由</th><th class="n">ｱｳﾄﾊﾞｳﾝﾄﾞ</th><th class="n">手紙／月</th><th class="n">架電／月</th><th class="n">商談／月</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="qh">Q1</td><td class="n">2.0</td><td class="n">5.0</td><td class="n">—</td><td class="n">5.0</td><td class="n">12</td><td class="n">33</td><td class="n">1.7</td></tr>
+      <tr><td class="qh">Q2</td><td class="n">4.0</td><td class="n">10.0</td><td class="n">4.5</td><td class="n">5.5</td><td class="n">14</td><td class="n">37</td><td class="n">3.3</td></tr>
+      <tr><td class="qh">Q3</td><td class="n">5.5</td><td class="n">13.8</td><td class="n">9.0</td><td class="n">4.8</td><td class="n">12</td><td class="n">32</td><td class="n">4.6</td></tr>
+      <tr><td class="qh">Q4</td><td class="n">7.0</td><td class="n">17.5</td><td class="n">9.0</td><td class="n">8.5</td><td class="n">21</td><td class="n">57</td><td class="n">5.8</td></tr>
+      <tr><td class="qh">Q5</td><td class="n">9.0</td><td class="n">22.5</td><td class="n">9.0</td><td class="n">13.5</td><td class="n">34</td><td class="n">90</td><td class="n">7.5</td></tr>
+      <tr><td class="qh">Q6</td><td class="n">9.0</td><td class="n">22.5</td><td class="n">9.0</td><td class="n">13.5</td><td class="n">34</td><td class="n">90</td><td class="n">7.5</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="note warn">
+    <span class="tag">要確認 03 — 法令</span>
+    <p>メールDMは<strong>特定電子メール法</strong>により原則オプトイン（事前同意）が必要です。名刺交換済みの相手は例外として送付できますが、リストから抽出した未接触企業への一斉メールは違法になり得ます。<strong>名刺DB＝メール可、抽出リスト＝手紙・電話のみ</strong>と、送信経路をシステム上で分けてください。名刺DBの構築・利用も個人情報保護法の利用目的の範囲内で。</p>
+  </div>
+</section>
+
+<!-- ============ 08 ============ -->
+<section id="s8">
+  <h2><span class="num">08</span>体制と役割分担</h2>
+  <p class="sub">社長がやることを守るために、それ以外の全部を誰かに渡す。渡し先は4種類。</p>
+
+  <figure>
+    <div class="figwrap">
+    <svg viewBox="0 0 880 330" role="img" aria-label="社長が担う4つの業務を中心に、人・AI・外注・提携の4系統がそれぞれ何を引き受けるかを示した体制図">
+      <defs>
+        <marker id="ar5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+        </marker>
+      </defs>
+      <rect x="316" y="112" width="248" height="106" rx="4" fill="var(--brass)" fill-opacity=".9"/>
+      <text x="440" y="140" text-anchor="middle" font-size="14" font-weight="700" fill="var(--ground)">社長がやること</text>
+      <text x="440" y="162" text-anchor="middle" font-size="11.5" fill="var(--ground)" fill-opacity=".92">① 使命と課題のヒアリング</text>
+      <text x="440" y="180" text-anchor="middle" font-size="11.5" fill="var(--ground)" fill-opacity=".92">② 立案・プランニング</text>
+      <text x="440" y="198" text-anchor="middle" font-size="11.5" fill="var(--ground)" fill-opacity=".92">③ 商談と成約　④ 初回・最終登壇</text>
+
+      <g font-size="11">
+        <rect x="16" y="26" width="264" height="72" rx="3" fill="var(--ground)" stroke="var(--sea)" stroke-opacity=".6"/>
+        <text x="30" y="46" font-size="12.5" font-weight="700" fill="var(--sea)">人 ／ 社内 3名</text>
+        <text x="30" y="65">インサイドセールス2名：架電・DM手配・折込手配・SNS運用</text>
+        <text x="30" y="83">フロント営業1名：手紙の訪問手渡し・追跡・関係維持</text>
+        <path d="M282 70 L322 118" stroke="var(--sea)" stroke-opacity=".6" marker-end="url(#ar5)"/>
+        <text x="292" y="104" font-size="10" fill="currentColor" fill-opacity=".65">商談機会</text>
+
+        <rect x="600" y="26" width="264" height="72" rx="3" fill="var(--ground)" stroke="var(--indigo)" stroke-opacity=".6"/>
+        <text x="614" y="46" font-size="12.5" font-weight="700" fill="var(--indigo)">AI ／ 自社ツール</text>
+        <text x="614" y="65">アタックリスト生成・企業情報の深掘り・補助金レーダー</text>
+        <text x="614" y="83">手紙原稿・提案書ドラフト・議事録・数値ダッシュボード</text>
+        <path d="M598 70 L558 118" stroke="var(--indigo)" stroke-opacity=".6" marker-end="url(#ar5)"/>
+        <text x="530" y="104" font-size="10" fill="currentColor" fill-opacity=".65" text-anchor="end">準備と下書き</text>
+
+        <rect x="16" y="232" width="264" height="82" rx="3" fill="var(--ground)" stroke="currentColor" stroke-opacity=".35"/>
+        <text x="30" y="252" font-size="12.5" font-weight="700">外注 ／ 案件ごと</text>
+        <text x="30" y="271">映像：コンテ・品質管理・進行・撮影・編集</text>
+        <text x="30" y="289">AI中継講師：第2回〜最終回前までの登壇</text>
+        <text x="30" y="307">デザイナー：LP・名刺・チラシ・パンフ（Q1に一括）</text>
+        <path d="M282 262 L322 214" stroke="currentColor" stroke-opacity=".5" marker-end="url(#ar5)"/>
+        <text x="292" y="238" font-size="10" fill="currentColor" fill-opacity=".65">納品物</text>
+
+        <rect x="600" y="232" width="264" height="82" rx="3" fill="var(--ground)" stroke="currentColor" stroke-opacity=".35"/>
+        <text x="614" y="252" font-size="12.5" font-weight="700">提携 ／ 専門家</text>
+        <text x="614" y="271">社労士：助成金の申請実務（独占業務・必須）</text>
+        <text x="614" y="289">税理士：役員報酬の改定時期・事前確定届出給与</text>
+        <text x="614" y="307">経済団体：倫理法人会・同友会・商工会・品質研究会</text>
+        <path d="M598 262 L558 214" stroke="currentColor" stroke-opacity=".5" marker-end="url(#ar5)"/>
+        <text x="530" y="238" font-size="10" fill="currentColor" fill-opacity=".65" text-anchor="end">信用と紹介</text>
+      </g>
+    </svg>
+    </div>
+    <figcaption>図5 — 中央の4業務だけが社長の稼働。外周のどれかが埋まっていない期間は、その仕事が中央に流れ込み、商談数が落ちる。</figcaption>
+  </figure>
+
+  <div class="tw">
+  <table>
+    <caption>採用と外注の投入時期・月額。社員は業務委託または短時間正社員を想定（法定福利費は別途15%）。</caption>
+    <thead><tr><th>役割</th><th>投入</th><th class="n">月額</th><th>渡す仕事</th></tr></thead>
+    <tbody>
+      <tr><td><strong>インサイドセールス①</strong></td><td class="mono">Q2</td><td class="n">22万</td><td>架電・メールDM手配・折込手配・SNS運用・リスト整備</td></tr>
+      <tr><td><strong>フロント営業</strong></td><td class="mono">Q3</td><td class="n">28万</td><td>手紙の訪問手渡し・追跡架電・関係維持。月34社を回る</td></tr>
+      <tr><td><strong>インサイドセールス②</strong></td><td class="mono">Q5</td><td class="n">28万</td><td>量を倍にするための増員。セミナー集客も担当</td></tr>
+      <tr><td>映像チーム</td><td class="mono">案件ごと</td><td class="n">売上の50%</td><td>実績・品質でランクを分け、単価を3段階で持つ</td></tr>
+      <tr><td>AI中継講師</td><td class="mono">案件ごと</td><td class="n">売上の35%</td><td>1名で3〜4社を並行。Q5で2名体制へ</td></tr>
+      <tr><td>デザイナー</td><td class="mono">Q1 一括</td><td class="n">60万（一括）</td><td>LP・名刺・チラシ・パンフ。HTML／aiデータで納品を受ける</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- ============ 09 ============ -->
+<section id="s9">
+  <h2><span class="num">09</span>すでに持っている資産</h2>
+  <p class="sub">アタックリスト生成の仕組みと名刺データバンクは構築済み。この2つが繋がると、営業の質が変わる。</p>
+
+  <figure>
+    <div class="figwrap">
+    <svg viewBox="0 0 880 300" role="img" aria-label="法人番号データとGoogle Maps APIを母体に、外部検索APIで企業情報を深掘りし、名刺データベースと突合して3種類のセグメントを抽出する構造図">
+      <defs>
+        <marker id="ar6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+        </marker>
+        <marker id="arb6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--brass)"/>
+        </marker>
+      </defs>
+      <g font-size="11.5">
+        <rect x="10" y="34" width="176" height="46" rx="3" fill="var(--ground)" stroke="currentColor" stroke-opacity=".35"/>
+        <text x="24" y="54" font-size="12" font-weight="700">法人番号データ</text>
+        <text x="24" y="71" font-size="10.5" fill="currentColor" fill-opacity=".7">全法人の母集団</text>
+
+        <rect x="10" y="90" width="176" height="46" rx="3" fill="var(--ground)" stroke="currentColor" stroke-opacity=".35"/>
+        <text x="24" y="110" font-size="12" font-weight="700">Google Maps API</text>
+        <text x="24" y="127" font-size="10.5" fill="currentColor" fill-opacity=".7">実在確認・業種・エリア</text>
+
+        <path d="M190 57 L226 84" stroke="currentColor" stroke-opacity=".5" marker-end="url(#ar6)"/>
+        <path d="M190 113 L226 100" stroke="currentColor" stroke-opacity=".5" marker-end="url(#ar6)"/>
+
+        <rect x="232" y="66" width="150" height="46" rx="3" fill="var(--indigo)" fill-opacity=".16" stroke="var(--indigo)" stroke-opacity=".55"/>
+        <text x="246" y="86" font-size="12" font-weight="700" fill="var(--indigo)">業種 × エリアで抽出</text>
+        <text x="246" y="103" font-size="10.5" fill="currentColor" fill-opacity=".7">沖縄県内・対象業種</text>
+
+        <path d="M386 89 L422 89" stroke="currentColor" stroke-opacity=".5" marker-end="url(#ar6)"/>
+
+        <rect x="428" y="40" width="196" height="98" rx="3" fill="var(--ground)" stroke="currentColor" stroke-opacity=".35"/>
+        <text x="442" y="60" font-size="12" font-weight="700">外部検索APIで深掘り</text>
+        <text x="442" y="79" font-size="10.5" fill="currentColor" fill-opacity=".75">創業／設立年月日・代表者名</text>
+        <text x="442" y="96" font-size="10.5" fill="currentColor" fill-opacity=".75">電話・メール・SNSの有無</text>
+        <text x="442" y="113" font-size="10.5" fill="currentColor" fill-opacity=".75">広告展開の有無・求人の有無</text>
+        <text x="442" y="130" font-size="10" fill="var(--sea)">ハルシネーション防止のため一次情報で裏取り</text>
+
+        <rect x="232" y="168" width="150" height="46" rx="3" fill="var(--brass-soft)" stroke="var(--brass)"/>
+        <text x="246" y="188" font-size="12" font-weight="700" fill="var(--brass)">名刺データバンク</text>
+        <text x="246" y="205" font-size="10.5" fill="currentColor" fill-opacity=".75">過去・直近の名刺を撮影→DB化</text>
+        <path d="M386 186 L520 148" stroke="var(--brass)" stroke-opacity=".7" stroke-dasharray="4 3" marker-end="url(#arb6)"/>
+        <text x="400" y="176" font-size="10" fill="var(--brass)">突合して「既接触」フラグ</text>
+
+        <path d="M628 89 L664 89" stroke="currentColor" stroke-opacity=".5" marker-end="url(#ar6)"/>
+
+        <rect x="670" y="34" width="200" height="30" rx="3" fill="var(--ground)" stroke="var(--brass)"/>
+        <text x="684" y="54" font-size="11.5"><tspan font-weight="700">A.</tspan> 会ったことがある企業</text>
+        <rect x="670" y="70" width="200" height="30" rx="3" fill="var(--ground)" stroke="var(--brass)"/>
+        <text x="684" y="90" font-size="11.5"><tspan font-weight="700">B.</tspan> 承継期（設立30〜50年）</text>
+        <rect x="670" y="106" width="200" height="30" rx="3" fill="var(--ground)" stroke="var(--brass)"/>
+        <text x="684" y="126" font-size="11.5"><tspan font-weight="700">C.</tspan> 周年期・求人出稿中</text>
+
+        <path d="M770 142 L770 172" stroke="var(--brass)" stroke-width="1.6" marker-end="url(#arb6)"/>
+        <rect x="646" y="178" width="224" height="52" rx="3" fill="var(--brass)" fill-opacity=".12" stroke="var(--brass)"/>
+        <text x="660" y="198" font-size="11.5" font-weight="700">送る文面と手段を、群ごとに変える</text>
+        <text x="660" y="216" font-size="10.5" fill="currentColor" fill-opacity=".75">A＝メール可／B・C＝手紙と電話のみ</text>
+      </g>
+      <line x1="10" y1="252" x2="870" y2="252" stroke="currentColor" stroke-opacity=".2"/>
+      <text x="10" y="272" font-size="11.5" fill="currentColor" fill-opacity=".7">この仕組みの価値は「リストが多いこと」ではなく、<tspan font-weight="700">設立年月日で承継期の企業を狙い撃ちできること</tspan>にある。</text>
+      <text x="10" y="290" font-size="11.5" fill="currentColor" fill-opacity=".7">創業50年・55年・60年の企業は、周年映像と事業承継の話が同時に刺さる。ここが最も成約率の高い群になる。</text>
+    </svg>
+    </div>
+    <figcaption>図6 — リスト生成と名刺DBを突合すると、単なる企業一覧ではなく「いま話が刺さる状態にある企業」の抽出装置になる。</figcaption>
+  </figure>
+
+  <div class="note">
+    <span class="tag">Q0でやること</span>
+    <p>まず<strong>沖縄県内の対象業種法人が実際に何社あるか</strong>を法人番号データで数えてください。母数が3,000社なら月124社アプローチで年1,500社、2年で全部回り切ります。母数が判明して初めて「県内だけで足りるのか、いつ県外に出るのか」が判断できます。この1本のクエリが、計画の耐用年数を決めます。</p>
+  </div>
+</section>
+
+<!-- ============ 10 ============ -->
+<section id="s10">
+  <h2><span class="num">10</span>社長の時間は足りるのか</h2>
+  <p class="sub">目標水準（Q6）に達したとき、やりたい仕事だけで週何時間になるかを実測する。</p>
+
+  <div class="tw">
+  <table>
+    <caption>合計 週22時間。残りは発信・撮影立会・学習・家族に使える。<strong>この計画の制約は社長の時間ではなく、商談の入り口の数</strong>だと分かる。</caption>
+    <thead><tr><th>やること</th><th class="n">件数／月</th><th class="n">単位時間</th><th class="n">月合計</th></tr></thead>
+    <tbody>
+      <tr><td>初回ヒアリング商談</td><td class="n">7.5</td><td class="n">2.5h</td><td class="n">18.8h</td></tr>
+      <tr><td>立案・提案商談</td><td class="n">5.2</td><td class="n">2.5h</td><td class="n">13.1h</td></tr>
+      <tr><td>プランニング・提案書作成</td><td class="n">5.2</td><td class="n">3.0h</td><td class="n">15.8h</td></tr>
+      <tr><td>AI研修 初回・最終登壇</td><td class="n">2.7</td><td class="n">3.0h</td><td class="n">8.1h</td></tr>
+      <tr><td>セミナー登壇＋準備</td><td class="n">0.7</td><td class="n">6.0h</td><td class="n">4.2h</td></tr>
+      <tr><td>経営・採用・数値管理</td><td class="n">—</td><td class="n">—</td><td class="n">20.0h</td></tr>
+      <tr><td>団体活動・会食（関係構築）</td><td class="n">6.0</td><td class="n">2.5h</td><td class="n">15.0h</td></tr>
+      <tr class="total"><td>合計</td><td class="n"></td><td class="n"></td><td class="n">94.9h／月</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="note">
+    <span class="tag">この表が意味すること</span>
+    <p>社長の時間は<strong>まだ4割空いています</strong>。つまり、いま伸ばすべきは社長の稼働率ではなく、<em>月124社に届く仕組み</em>のほうです。人を増やす判断も、社長が忙しいからではなく「アプローチ量が目標に届かないから」で下してください。この順序を間違えると、人件費だけが先に増えます。</p>
+  </div>
+</section>
+
+<!-- ============ 11 ============ -->
+<section id="s11">
+  <h2><span class="num">11</span>リスクと、決めるべきこと</h2>
+  <p class="sub">この計画で最も危ういのは数字ではなく、まだ決まっていない前提のほう。</p>
+
+  <h3>リスクと打ち手</h3>
+  <div class="tw">
+  <table>
+    <caption>上から順に、計画が壊れる確率が高いもの。</caption>
+    <thead><tr><th>リスク</th><th>何が起きるか</th><th>打ち手</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>社長への依存</strong></td>
+        <td>全商談に本人が出るため、体調・繁忙で売上が直接止まる</td>
+        <td>伴走サポートで固定収入を積む。Q5以降、2人目の商談者の育成を検討</td>
+      </tr>
+      <tr>
+        <td><strong>補助金前提の価格</strong></td>
+        <td>不採択・制度改定で「実質40万」が崩れ、失注または値引き</td>
+        <td>助成金なしでも成立する価格帯（ライト版90万）を第2案として常備</td>
+      </tr>
+      <tr>
+        <td><strong>映像の繁閑差</strong></td>
+        <td>式典・周年は年度末と創業月に集中。Q3に山、Q1に谷</td>
+        <td>研修と伴走で平準化。谷の四半期は研修の比率を上げる</td>
+      </tr>
+      <tr>
+        <td><strong>県内市場の有限性</strong></td>
+        <td>2年で対象企業を一巡し、3年目に新規が枯れる</td>
+        <td>Q0で母数を実測。既存顧客の2本目（採用映像→周年映像）と紹介を設計に入れる</td>
+      </tr>
+      <tr>
+        <td><strong>外注品質のばらつき</strong></td>
+        <td>1系統に依存すると納期遅延が直撃し、理念映像の品質が崩れる</td>
+        <td>Q4までに映像チームを2系統。AI中継講師もQ5で2名体制</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>私が答えを持っていない、10の問い</h3>
+  <div class="tw">
+  <table>
+    <caption>①〜④は計画の土台が変わる問いです。ここが決まるまで、上の数字はすべて仮置きとして扱ってください。</caption>
+    <thead><tr><th style="width:34px">#</th><th>問い</th><th>なぜ効くか</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">①</td><td><strong>この事業はTENOHIRA本体か、切り出した新事業か</strong></td><td>既存8名の人件費を背負うかどうかで固定費が年1,000万以上変わる。<strong>最重要</strong></td></tr>
+      <tr><td class="mono">②</td><td>決算期はいつか</td><td>役員報酬の改定可能時期と、事前確定届出給与の届出期限が決まる</td></tr>
+      <tr><td class="mono">③</td><td>現在の売上・現預金・借入はいくらか</td><td>スタート地点。運転資金200万を自己資金で賄えるか、創業融資が要るか</td></tr>
+      <tr><td class="mono">④</td><td>生活に必要な最低月額はいくらか</td><td>Q1〜Q2の役員報酬を月50万に置いたが、足りなければ計画全体を後ろ倒す必要がある</td></tr>
+      <tr><td class="mono">⑤</td><td>映像とAI研修の実勢価格はいくらか</td><td>150万／180万は仮置き。過去実績の平均単価を入れれば全数値が確定する</td></tr>
+      <tr><td class="mono">⑥</td><td>映像外注チームの単価と、月何本まで回せるか</td><td>原価率50%とQ6の月2本が成立するかの検証</td></tr>
+      <tr><td class="mono">⑦</td><td>AI中継講師をどう確保・育成するか</td><td>この1点だけが未定。社内育成か外部登用かで原価率が変わる</td></tr>
+      <tr><td class="mono">⑧</td><td>提携社労士のあてはあるか</td><td>助成金活用が商品の核。ここが無いとAI研修の価格説得力が消える</td></tr>
+      <tr><td class="mono">⑨</td><td>行動指針の4語の正確な定義</td><td>LP・パンフ・採用の全文言がこの4語に乗る</td></tr>
+      <tr><td class="mono">⑩</td><td>沖縄県内の対象業種法人は何社あるか</td><td>計画の耐用年数。法人番号データで今日測れる</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="note">
+    <span class="tag">次にやること</span>
+    <p>①〜⑤を教えていただければ、<code class="mono">plan/model.py</code> の前提を差し替えて全数値を引き直します。あわせて、Q1に必要な<strong>LPの構成案</strong>と<strong>手紙の文面テンプレート（承継期・周年期の2パターン）</strong>、<strong>テレアポの第一声スクリプト</strong>まで作れます。どれから着手しますか。</p>
+  </div>
+</section>
+
+</main>
+</div>
+
+<footer>
+  <p>株式会社TENOHIRA 事業計画 ／ 作成 2026年8月21日 ／ 計画期間 2026年8月21日 – 2028年3月1日<br>
+  数値の前提と計算式は <code class="mono">plan/model.py</code>・<code class="mono">plan/funnel.py</code> に格納。前提を書き換えて再実行すれば全表が更新されます。</p>
+</footer>

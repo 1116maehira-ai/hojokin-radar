@@ -1,0 +1,1155 @@
+<title>TENOHIRAのぜんぶ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+
+<style>
+:root{
+  --bg:#ffffff; --panel:#f2f5f8; --panel2:#e7edf3; --line:#dbe3ec;
+  --ink:#16202b; --ink2:#5a6b7c;
+  --fire:#d94a1f; --fire-bg:#fdece6;
+  --sea:#0d7c72;  --sea-bg:#e2f2f0;
+  --sun:#b57708;  --sun-bg:#fdf1da;
+  --sky:#2560a8;  --sky-bg:#e6eefa;
+  --shadow:0 1px 2px rgba(22,32,43,.05), 0 10px 28px rgba(22,32,43,.06);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#10151b; --panel:#1a222c; --panel2:#232d39; --line:#2e3a48;
+    --ink:#e8eef4; --ink2:#95a6b8;
+    --fire:#ff8158; --fire-bg:#2c1a14;
+    --sea:#43c3b6;  --sea-bg:#0f2724;
+    --sun:#f5bb4a;  --sun-bg:#2a2113;
+    --sky:#74aae8;  --sky-bg:#141f2e;
+    --shadow:0 1px 2px rgba(0,0,0,.5), 0 10px 28px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#10151b; --panel:#1a222c; --panel2:#232d39; --line:#2e3a48;
+  --ink:#e8eef4; --ink2:#95a6b8;
+  --fire:#ff8158; --fire-bg:#2c1a14;
+  --sea:#43c3b6;  --sea-bg:#0f2724;
+  --sun:#f5bb4a;  --sun-bg:#2a2113;
+  --sky:#74aae8;  --sky-bg:#141f2e;
+  --shadow:0 1px 2px rgba(0,0,0,.5), 0 10px 28px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto} *{animation:none!important;transition:none!important}}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Zen Kaku Gothic New",-apple-system,"Hiragino Kaku Gothic ProN",sans-serif;
+  font-size:16.5px;line-height:1.9;-webkit-font-smoothing:antialiased}
+.maru{font-family:"Zen Maru Gothic","Zen Kaku Gothic New",sans-serif}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+.wrap{max-width:920px;margin:0 auto;padding:0 20px}
+
+/* ── hero ── */
+header.hero{padding:64px 0 40px;background:
+  radial-gradient(120% 90% at 18% 0%, var(--fire-bg) 0%, transparent 62%),
+  radial-gradient(110% 85% at 92% 12%, var(--sea-bg) 0%, transparent 58%)}
+.kicker{font-size:12px;letter-spacing:.2em;color:var(--fire);font-weight:700;margin:0 0 16px;
+  font-family:"IBM Plex Mono",monospace}
+h1{font-family:"Zen Maru Gothic",sans-serif;font-weight:900;font-size:clamp(30px,7vw,54px);
+  line-height:1.3;margin:0 0 20px;letter-spacing:-.01em;text-wrap:balance}
+.lede{font-size:clamp(16px,2.4vw,19px);color:var(--ink2);max-width:34em;margin:0 0 28px}
+.lede b{color:var(--ink)}
+
+/* ── nav ── */
+nav.pills{position:sticky;top:0;z-index:30;background:color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:10px 0;margin-bottom:8px}
+.pills-in{max-width:920px;margin:0 auto;padding:0 20px;display:flex;gap:8px;overflow-x:auto;
+  scrollbar-width:none}
+.pills-in::-webkit-scrollbar{display:none}
+.pills a{flex:none;text-decoration:none;font-size:13.5px;font-weight:700;padding:7px 15px;
+  border-radius:999px;background:var(--panel);color:var(--ink2);border:1px solid transparent;white-space:nowrap}
+.pills a:hover{background:var(--fire-bg);color:var(--fire)}
+.pills a:focus-visible{outline:2px solid var(--fire);outline-offset:2px}
+
+/* ── section ── */
+section{padding:56px 0 8px;scroll-margin-top:64px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;
+  letter-spacing:.12em;padding:4px 12px;border-radius:999px;margin:0 0 14px;
+  font-family:"IBM Plex Mono",monospace}
+.e-fire{background:var(--fire-bg);color:var(--fire)}
+.e-sea{background:var(--sea-bg);color:var(--sea)}
+.e-sun{background:var(--sun-bg);color:var(--sun)}
+.e-sky{background:var(--sky-bg);color:var(--sky)}
+h2{font-family:"Zen Maru Gothic",sans-serif;font-weight:900;font-size:clamp(23px,4.2vw,34px);
+  line-height:1.35;margin:0 0 12px;text-wrap:balance}
+.tldr{font-size:16px;background:var(--panel);border-radius:14px;padding:16px 20px;margin:0 0 28px;
+  border-left:5px solid var(--fire)}
+.tldr b{font-family:"Zen Maru Gothic",sans-serif}
+h3{font-family:"Zen Maru Gothic",sans-serif;font-size:18px;font-weight:700;margin:36px 0 12px}
+p{margin:0 0 16px;max-width:40em}
+ul{margin:0 0 16px;padding-left:1.4em;max-width:40em}
+li{margin-bottom:6px}
+a{color:var(--sky)}
+.small{font-size:14px;color:var(--ink2)}
+
+/* ── cards ── */
+.grid{display:grid;gap:14px;grid-template-columns:1fr;margin-bottom:22px}
+@media(min-width:640px){.grid.g2{grid-template-columns:1fr 1fr}}
+@media(min-width:640px){.grid.g3{grid-template-columns:1fr 1fr}}
+@media(min-width:860px){.grid.g3{grid-template-columns:repeat(3,1fr)}}
+.card{background:var(--panel);border-radius:16px;padding:20px 22px;border:1px solid transparent}
+.card.out{background:var(--bg);border-color:var(--line)}
+.card h4{font-family:"Zen Maru Gothic",sans-serif;font-size:17px;font-weight:700;margin:0 0 8px}
+.card p{margin:0;font-size:14.5px;line-height:1.8;color:var(--ink2)}
+.card p+p{margin-top:8px}
+.card .big{font-family:"IBM Plex Mono",monospace;font-size:26px;font-weight:600;color:var(--ink);display:block;margin:4px 0}
+.card .big small{font-size:14px;color:var(--ink2);font-family:"Zen Kaku Gothic New",sans-serif}
+.c-fire{background:var(--fire-bg)} .c-sea{background:var(--sea-bg)}
+.c-sun{background:var(--sun-bg)}  .c-sky{background:var(--sky-bg)}
+
+/* ── money chain ── */
+.chain{display:flex;flex-direction:column;gap:0;margin:0 0 24px}
+.chain .step{display:flex;gap:16px;align-items:flex-start;padding:16px 0;border-bottom:1px dashed var(--line)}
+.chain .step:last-child{border-bottom:none}
+.chain .num{flex:none;width:30px;height:30px;border-radius:50%;background:var(--fire);color:#fff;
+  display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-size:13px;font-weight:600;margin-top:3px}
+.chain .step.win .num{background:var(--sea)}
+.chain .body{flex:1;min-width:0}
+.chain .t{font-family:"Zen Maru Gothic",sans-serif;font-weight:700;font-size:16.5px;margin-bottom:2px}
+.chain .d{font-size:14px;color:var(--ink2);line-height:1.75}
+.chain .v{flex:none;font-family:"IBM Plex Mono",monospace;font-size:19px;font-weight:600;text-align:right;
+  min-width:110px;margin-top:2px}
+.chain .step.win .v{color:var(--sea)}
+@media(max-width:560px){
+  .chain .step{flex-wrap:wrap}
+  .chain .v{width:100%;text-align:left;min-width:0;padding-left:46px;margin-top:6px}
+}
+
+/* ── person ── */
+.person{background:var(--bg);border:1px solid var(--line);border-radius:16px;padding:20px 22px;box-shadow:var(--shadow)}
+.person .who{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.person .name{font-family:"Zen Maru Gothic",sans-serif;font-size:19px;font-weight:900}
+.person .mission{font-family:"Zen Maru Gothic",sans-serif;font-size:15.5px;font-weight:700;
+  background:var(--fire-bg);color:var(--fire);border-radius:10px;padding:10px 14px;margin-bottom:12px;line-height:1.7}
+.kpi{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:6px}
+.kpi li{display:flex;justify-content:space-between;gap:12px;font-size:14px;padding:5px 0;
+  border-bottom:1px dotted var(--line);margin:0}
+.kpi li:last-child{border-bottom:none}
+.kpi .k{color:var(--ink2)}
+.kpi .v{font-family:"IBM Plex Mono",monospace;font-weight:600;white-space:nowrap}
+
+/* ── tag ── */
+.tag{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 10px;border-radius:999px;
+  font-family:"IBM Plex Mono",monospace;white-space:nowrap}
+.t-done{background:var(--sea-bg);color:var(--sea)}
+.t-todo{background:var(--fire-bg);color:var(--fire)}
+.t-wait{background:var(--sun-bg);color:var(--sun)}
+.t-plain{background:var(--panel2);color:var(--ink2)}
+
+/* ── details ── */
+details.item{background:var(--bg);border:1px solid var(--line);border-radius:16px;margin-bottom:12px;
+  overflow:hidden;box-shadow:var(--shadow)}
+details.item[open]{border-color:var(--fire)}
+details.item>summary{list-style:none;cursor:pointer;padding:18px 20px;display:flex;gap:14px;
+  align-items:center;font-family:"Zen Maru Gothic",sans-serif;font-weight:700;font-size:17px}
+details.item>summary::-webkit-details-marker{display:none}
+details.item>summary:focus-visible{outline:2px solid var(--fire);outline-offset:-2px}
+details.item>summary .sum-t{flex:1;min-width:0}
+details.item>summary .sum-t small{display:block;font-family:"Zen Kaku Gothic New",sans-serif;
+  font-weight:400;font-size:13.5px;color:var(--ink2);margin-top:2px}
+details.item>summary .caret{flex:none;width:26px;height:26px;border-radius:50%;background:var(--panel);
+  display:grid;place-items:center;color:var(--ink2);font-size:15px;font-weight:700}
+details.item[open]>summary .caret{background:var(--fire);color:#fff}
+details.item[open]>summary .caret::after{content:"−"}
+details.item:not([open])>summary .caret::after{content:"＋"}
+.inner{padding:2px 20px 22px;border-top:1px solid var(--line)}
+.inner h5{font-family:"Zen Maru Gothic",sans-serif;font-size:14px;font-weight:700;margin:18px 0 8px;
+  color:var(--fire);letter-spacing:.02em}
+.inner p{font-size:14.5px;margin:0 0 12px;max-width:none}
+.inner ul{font-size:14.5px;margin:0 0 12px;max-width:none}
+.inner li{margin-bottom:5px}
+.spec{list-style:none;padding:0;margin:0 0 14px;display:grid;gap:0}
+.spec li{display:flex;gap:12px;font-size:14px;padding:7px 0;border-bottom:1px dotted var(--line);margin:0}
+.spec li:last-child{border-bottom:none}
+.spec .k{flex:none;width:88px;color:var(--ink2);font-size:13px}
+.spec .v{flex:1;min-width:0}
+.quote{background:var(--panel);border-radius:12px;padding:16px 18px;margin:0 0 14px;
+  font-family:"Zen Maru Gothic",sans-serif;font-size:15px;line-height:1.9;white-space:pre-wrap}
+
+/* ── table ── */
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:14px;margin-bottom:20px}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:520px}
+th,td{padding:11px 14px;text-align:left;border-bottom:1px solid var(--line)}
+thead th{background:var(--panel2);font-size:11.5px;letter-spacing:.08em;color:var(--ink2);
+  font-family:"IBM Plex Mono",monospace;font-weight:700;white-space:nowrap}
+tbody tr:last-child td{border-bottom:none}
+tr.hi td{background:var(--fire-bg)}
+td.n,th.n{text-align:right;font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;white-space:nowrap}
+
+/* ── figure ── */
+figure{margin:0 0 24px}
+figure svg{width:100%;height:auto;display:block}
+.figbox{background:var(--panel);border-radius:18px;padding:20px 12px;overflow-x:auto}
+figcaption{font-size:13.5px;color:var(--ink2);padding-top:12px;line-height:1.7;max-width:40em}
+svg text{font-family:"Zen Kaku Gothic New",sans-serif}
+svg .mr{font-family:"Zen Maru Gothic",sans-serif}
+svg a{cursor:pointer}
+svg a .hit{fill:transparent}
+svg a:hover .node{stroke-width:3}
+svg a:focus-visible{outline:none}
+svg a:focus-visible .node{stroke-width:3;stroke-dasharray:4 3}
+
+/* ── timeline ── */
+.tl{position:relative;padding-left:34px;margin-bottom:22px}
+.tl::before{content:"";position:absolute;left:11px;top:8px;bottom:8px;width:3px;background:var(--line);border-radius:2px}
+.tl .ev{position:relative;padding:0 0 24px}
+.tl .ev::before{content:"";position:absolute;left:-28px;top:7px;width:13px;height:13px;border-radius:50%;
+  background:var(--bg);border:3px solid var(--fire)}
+.tl .ev.done::before{background:var(--sea);border-color:var(--sea)}
+.tl .when{font-family:"IBM Plex Mono",monospace;font-size:12.5px;font-weight:600;color:var(--fire)}
+.tl .ev.done .when{color:var(--sea)}
+.tl .what{font-family:"Zen Maru Gothic",sans-serif;font-weight:700;font-size:16.5px;margin:2px 0 4px}
+.tl .desc{font-size:14px;color:var(--ink2);line-height:1.75}
+
+footer{border-top:1px solid var(--line);margin-top:56px;padding:28px 0 60px;font-size:13.5px;color:var(--ink2)}
+</style>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="kicker">株式会社TENOHIRA ／ 2026.08 → 2028.02</p>
+    <h1>TENOHIRAは、<br>こういう会社になる。</h1>
+    <p class="lede">
+      使命も、お金の話も、誰が何をするかも、いつまでにやるかも、<b>ぜんぶこの1枚に入っています。</b>
+      上から順に読んでもいいし、気になったところだけタップしてもいい。<br>
+      むずかしい言葉は使いません。
+    </p>
+  </div>
+</header>
+
+<nav class="pills" aria-label="ページ内メニュー">
+  <div class="pills-in">
+    <a href="#cycle">ぐるぐる回る全体像</a>
+    <a href="#mission">① 使命</a>
+    <a href="#money">② お金</a>
+    <a href="#product">③ 商品</a>
+    <a href="#people">④ 人とKPI</a>
+    <a href="#media">⑤ 用意するもの</a>
+    <a href="#when">⑥ いつまでに</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<!-- ══════ CYCLE ══════ -->
+<section id="cycle">
+  <span class="eyebrow e-fire">まずはこれだけ</span>
+  <h2>この会社は、ひとつの生き物です。</h2>
+  <div class="tldr">
+    <b>心臓が「使命」。</b>そこから血が出て、目で見つけて、口で声をかけて、耳で聴いて、手でつくって渡す。
+    お金が戻ってきて、分け合って、また心臓に返る。<b>どこか一箇所が止まると、全部止まります。</b>
+  </div>
+
+  <figure>
+    <div class="figbox">
+    <svg viewBox="0 0 720 548" role="img" aria-label="使命を中心に、見つける・声をかける・聴く・つくって渡す・お金が戻る・分け合う の6つが時計回りに循環する図。各要素はタップで詳細へ移動できる">
+      <defs>
+        <marker id="cy" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--fire)"/>
+        </marker>
+      </defs>
+
+      <g stroke="var(--fire)" stroke-width="2.4" fill="none" marker-end="url(#cy)" opacity=".62">
+        <path d="M401.6 74.4 A200 200 0 0 1 508.6 136.2"/>
+        <path d="M550.2 208.2 A200 200 0 0 1 550.2 331.8"/>
+        <path d="M508.6 403.8 A200 200 0 0 1 401.6 465.6"/>
+        <path d="M318.4 465.6 A200 200 0 0 1 211.4 403.8"/>
+        <path d="M169.8 331.8 A200 200 0 0 1 169.8 208.2"/>
+        <path d="M211.4 136.2 A200 200 0 0 1 318.4 74.4"/>
+      </g>
+
+      <circle cx="360" cy="270" r="78" fill="var(--fire)"/>
+      <text x="360" y="252" text-anchor="middle" class="mr" font-size="15" font-weight="700" fill="#fff">❤️</text>
+      <text x="360" y="282" text-anchor="middle" class="mr" font-size="21" font-weight="900" fill="#fff">使命</text>
+      <text x="360" y="304" text-anchor="middle" font-size="11" fill="#fff" fill-opacity=".9">ぜんぶの出発点</text>
+
+      <a href="#media" aria-label="見つける の詳細へ">
+        <rect class="node" x="282" y="38" width="156" height="64" rx="16" fill="var(--sky-bg)" stroke="var(--sky)" stroke-width="1.6"/>
+        <text x="360" y="64" text-anchor="middle" font-size="15">👀</text>
+        <text x="360" y="84" text-anchor="middle" class="mr" font-size="15" font-weight="700" fill="var(--ink)">見つける</text>
+        <rect class="hit" x="282" y="38" width="156" height="64"/>
+      </a>
+      <text x="360" y="24" text-anchor="middle" font-size="11.5" fill="var(--ink2)">誰に会うかを決める（リスト）</text>
+
+      <a href="#media" aria-label="声をかける の詳細へ">
+        <rect class="node" x="455" y="138" width="156" height="64" rx="16" fill="var(--sky-bg)" stroke="var(--sky)" stroke-width="1.6"/>
+        <text x="533" y="164" text-anchor="middle" font-size="15">🗣️</text>
+        <text x="533" y="184" text-anchor="middle" class="mr" font-size="15" font-weight="700" fill="var(--ink)">声をかける</text>
+        <rect class="hit" x="455" y="138" width="156" height="64"/>
+      </a>
+      <text x="533" y="218" text-anchor="middle" font-size="11.5" fill="var(--ink2)">手紙・電話・動画・広告</text>
+
+      <a href="#people" aria-label="聴く の詳細へ">
+        <rect class="node" x="455" y="338" width="156" height="64" rx="16" fill="var(--fire-bg)" stroke="var(--fire)" stroke-width="1.6"/>
+        <text x="533" y="364" text-anchor="middle" font-size="15">👂</text>
+        <text x="533" y="384" text-anchor="middle" class="mr" font-size="15" font-weight="700" fill="var(--ink)">聴く</text>
+        <rect class="hit" x="455" y="338" width="156" height="64"/>
+      </a>
+      <text x="533" y="418" text-anchor="middle" font-size="11.5" fill="var(--ink2)">ヒアリングと商談（前平）</text>
+
+      <a href="#product" aria-label="つくって渡す の詳細へ">
+        <rect class="node" x="282" y="438" width="156" height="64" rx="16" fill="var(--sea-bg)" stroke="var(--sea)" stroke-width="1.6"/>
+        <text x="360" y="464" text-anchor="middle" font-size="15">🤲</text>
+        <text x="360" y="484" text-anchor="middle" class="mr" font-size="15" font-weight="700" fill="var(--ink)">つくって渡す</text>
+        <rect class="hit" x="282" y="438" width="156" height="64"/>
+      </a>
+      <text x="360" y="518" text-anchor="middle" font-size="11.5" fill="var(--ink2)">理念映像・式典・AI研修</text>
+
+      <a href="#money" aria-label="お金が戻る の詳細へ">
+        <rect class="node" x="109" y="338" width="156" height="64" rx="16" fill="var(--sun-bg)" stroke="var(--sun)" stroke-width="1.6"/>
+        <text x="187" y="364" text-anchor="middle" font-size="15">💰</text>
+        <text x="187" y="384" text-anchor="middle" class="mr" font-size="15" font-weight="700" fill="var(--ink)">お金が戻る</text>
+        <rect class="hit" x="109" y="338" width="156" height="64"/>
+      </a>
+      <text x="187" y="418" text-anchor="middle" font-size="11.5" fill="var(--ink2)">売上と粗利</text>
+
+      <a href="#money" aria-label="分け合う の詳細へ">
+        <rect class="node" x="109" y="138" width="156" height="64" rx="16" fill="var(--sun-bg)" stroke="var(--sun)" stroke-width="1.6"/>
+        <text x="187" y="164" text-anchor="middle" font-size="15">🎁</text>
+        <text x="187" y="184" text-anchor="middle" class="mr" font-size="15" font-weight="700" fill="var(--ink)">分け合う</text>
+        <rect class="hit" x="109" y="138" width="156" height="64"/>
+      </a>
+      <text x="187" y="218" text-anchor="middle" font-size="11.5" fill="var(--ink2)">給料・次の準備・守りのお金</text>
+    </svg>
+    </div>
+    <figcaption>タップすると、その部分の詳しい話に飛びます。矢印の向きに、ぐるぐる回り続けるのが健康な状態です。</figcaption>
+  </figure>
+
+  <div class="grid g3">
+    <div class="card c-fire">
+      <h4>止まりやすいのはココ①</h4>
+      <p><b>声をかける</b>が止まると、1〜2ヶ月後に売上が消えます。手紙も電話も、成果が出るのは先。だから<b>忙しい月ほど止めてはいけない</b>。</p>
+    </div>
+    <div class="card c-fire">
+      <h4>止まりやすいのはココ②</h4>
+      <p><b>聴く</b>は前平さんしかできません。ここが詰まると全部詰まる。だから<b>前平さんの時間には、わざと18時間の余白</b>を作ってあります。</p>
+    </div>
+    <div class="card c-sea">
+      <h4>強いのはココ</h4>
+      <p><b>つくって渡す</b>は、社内の映像制作事業部がやります。外に払うお金が少ないので、<b>売った額の85%が手元に残ります</b>。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ MISSION ══════ -->
+<section id="mission">
+  <span class="eyebrow e-fire">① 心臓</span>
+  <h2>なんのために、やるのか。</h2>
+  <div class="tldr">
+    <b>「あなたの声・腕・足になる。武器と盾を渡す。勇気になって、一緒に立ち上がる」</b><br>
+    これが使命です。そして<b>この3つが、そのまま商品になっています。</b>あとで見ると分かります。
+  </div>
+
+  <div class="card c-fire" style="padding:26px 28px;margin-bottom:22px">
+    <p class="maru" style="font-size:clamp(17px,3vw,22px);font-weight:700;line-height:2;color:var(--ink);max-width:24em">
+      命の使い方が使命。<br>
+      あなたの声になり、腕に、足に、武器に、盾に、勇気になる。<br>
+      ともに立ち上がり挑む。<br>
+      君を抱きしめる、君もいつか誰かのヒーロー。
+    </p>
+  </div>
+
+  <h3>使命が、そのまま商品になっている</h3>
+  <div class="tw">
+  <table>
+    <caption class="small" style="padding:12px 14px;color:var(--ink2)">使命の1行ごとに、売るものが決まっている。だから商品を増やさなくていい。</caption>
+    <thead><tr><th>使命の言葉</th><th>やり方</th><th>売るもの</th></tr></thead>
+    <tbody>
+      <tr><td>声になり、腕に、足になる</td><td><b>代わりにやっておく</b></td><td>理念映像・式典の記録</td></tr>
+      <tr><td>武器に、盾になる</td><td><b>やり方を教える</b></td><td>AIリスキリング研修</td></tr>
+      <tr><td>勇気になって、ともに立ち上がる</td><td><b>最初と最後は自分が立つ</b></td><td>前平さんが直接やる部分</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="grid g2">
+    <div class="card">
+      <h4>誰と組む？（2問だけ）</h4>
+      <p>① その人の使命に<b>共鳴できるか</b><br>② その人を<b>愛せると思えるか</b><br><br>
+      どちらかがNOなら、金額がいくらでも受けません。これは気分の話ではなく、<b>共鳴できない相手の仕事は、品質が出ないから</b>です。</p>
+    </div>
+    <div class="card">
+      <h4>やったらダメなこと（3つ）</h4>
+      <p>・人のせいにする（全部自分のせい）<br>・嘘つく・誤魔化す・隠す<br>・人を落とす・足を引っ張る・邪魔する<br><br>
+      この3つは、誰であっても一発アウトです。</p>
+    </div>
+  </div>
+
+  <div class="card c-sea">
+    <h4>10年後にこうなってたい</h4>
+    <p style="color:var(--ink);font-size:15.5px">世界中の中小企業の経営者が「俺には最高の仲間もいる、TENOHIRAもいる。いける」と言っている。<br>
+    関わったあなたが最強になっている。<b>あなたも我々も、お金の心配から解放されている。</b></p>
+  </div>
+</section>
+
+<!-- ══════ MONEY ══════ -->
+<section id="money">
+  <span class="eyebrow e-sun">② お金</span>
+  <h2>いくら稼いで、どこに行くのか。</h2>
+  <div class="tldr">
+    <b>前平さんの部署で年1.58億円 売る。</b>会社全体だと2.58億円。
+    そこから全部払って、<b>手元に2,973万円残る</b>。それで3人が手取り100万円/月、他のみんなが手取り2倍になります。
+  </div>
+
+  <h3>言葉の意味（ここだけ覚えれば読めます）</h3>
+  <div class="grid g3">
+    <div class="card out"><h4>売上（うりあげ）</h4><p>お客さんから入ってくるお金の<b>総額</b>。まだ自分たちのものじゃない。</p></div>
+    <div class="card out"><h4>粗利（あらり）</h4><p>売上から、<b>外に払うお金</b>（機材とか外注とか）を引いた残り。ここが自分たちの取り分。</p></div>
+    <div class="card out"><h4>固定費（こていひ）</h4><p>売れても売れなくても、<b>毎月必ず出ていくお金</b>。給料・家賃・ガソリンなど。</p></div>
+  </div>
+
+  <h3>お金の流れ（上から下へ）</h3>
+  <div class="chain">
+    <div class="step">
+      <div class="num">1</div>
+      <div class="body">
+        <div class="t">前平さんの部署が売る</div>
+        <div class="d">年96社に売る。1社あたり平均149万円。＋ 毎月払ってもらう「AI補佐サポート」</div>
+      </div>
+      <div class="v">1.58億</div>
+    </div>
+    <div class="step">
+      <div class="num">2</div>
+      <div class="body">
+        <div class="t">映像制作事業部（役員2名）が売る</div>
+        <div class="d">広告代理店から受けるTVCM・ブランドムービー。金額は今のまま据え置き</div>
+      </div>
+      <div class="v">1.00億</div>
+    </div>
+    <div class="step">
+      <div class="num">3</div>
+      <div class="body">
+        <div class="t">会社全体の売上</div>
+        <div class="d">1.58億 ＋ 1.00億</div>
+      </div>
+      <div class="v">2.58億</div>
+    </div>
+    <div class="step">
+      <div class="num">4</div>
+      <div class="body">
+        <div class="t">外に払うお金を引く</div>
+        <div class="d">制作の実費・機材・一部外注。<b>ここが少ないのがTENOHIRAの強み</b>（制作を社内でやるから）</div>
+      </div>
+      <div class="v">−7,545万</div>
+    </div>
+    <div class="step win">
+      <div class="num">5</div>
+      <div class="body">
+        <div class="t">粗利 ＝ 自分たちの取り分</div>
+        <div class="d">売上の <b>71%</b> が残る。普通の制作会社は40〜50%なので、かなり良い</div>
+      </div>
+      <div class="v">1.83億</div>
+    </div>
+    <div class="step">
+      <div class="num">6</div>
+      <div class="body">
+        <div class="t">毎月かかるお金を払う</div>
+        <div class="d">給料（役員3名＋社員5名）・社宅・事務所・ガソリン・ソフト代・積立など</div>
+      </div>
+      <div class="v">−1.32億</div>
+    </div>
+    <div class="step win">
+      <div class="num">7</div>
+      <div class="body">
+        <div class="t">残った利益</div>
+        <div class="d">ここから税金を払う</div>
+      </div>
+      <div class="v">5,042万</div>
+    </div>
+    <div class="step">
+      <div class="num">8</div>
+      <div class="body">
+        <div class="t">税金（34%）と借金の返済</div>
+        <div class="d">法人税など −1,714万／借入の返済 −354万（返済は税金を払ったあとのお金から出す）</div>
+      </div>
+      <div class="v">−2,068万</div>
+    </div>
+    <div class="step win">
+      <div class="num">✓</div>
+      <div class="body">
+        <div class="t">最終的に会社に残るお金</div>
+        <div class="d">目標は2,000万円だったので、<b>973万円のおつり</b>が出ます</div>
+      </div>
+      <div class="v">2,973万</div>
+    </div>
+  </div>
+
+  <h3>で、給料はどうなる？</h3>
+  <div class="grid g2">
+    <div class="card c-sun">
+      <h4>役員3名（前平・KOSUKE・GAFU）</h4>
+      <span class="big">100<small>万円 / 月 手取り</small></span>
+      <p>額面150万円。＋ 年1回のボーナス 手取り100万円。<br>
+      いまは3人で月170万円なので、<b>ここまで上げるのがこの計画の目的</b>です。いきなりは上げず、3ヶ月ごとに段階的に。</p>
+    </div>
+    <div class="card c-sun">
+      <h4>社員5名</h4>
+      <span class="big">×2<small>いまの手取りの2倍</small></span>
+      <p>いまの平均は手取り22.6万円。それを<b>約47万円</b>（額面60万円）に。<br>
+      2028年3月から。これは憲法に書いてある約束です。</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h4>「4億」じゃなくていいの？</h4>
+    <p>憲法には「売上4億」と書いてあります。でも<b>あれは粗利率50%で計算した数字</b>でした。<br>
+    実際は<b>85%</b>残ります。だから同じ金額を手にするのに、4億も売る必要がない。<b>2.58億で足ります。</b><br><br>
+    4億は、その次の目標（「最低5億稼いでいる」）に向かう段として残しておきます。</p>
+  </div>
+</section>
+
+<!-- ══════ PRODUCT ══════ -->
+<section id="product">
+  <span class="eyebrow e-sea">③ 商品</span>
+  <h2>何を、いくらで売るのか。</h2>
+  <div class="tldr">
+    商品は大きく<b>3種類だけ</b>。理念映像・式典の記録・AIリスキリング研修。
+    そして<b>1社に「映像」と「AI研修」を両方売る</b>のが、この計画のいちばん大事なコツです。
+  </div>
+
+  <div class="tw">
+  <table>
+    <caption class="small" style="padding:12px 14px;color:var(--ink2)">「粗利」は、売った金額のうち手元に残る分。外注が少ないので80〜90%残ります。</caption>
+    <thead><tr><th>商品</th><th class="n">値段</th><th class="n">手元に残る</th><th>どんなとき売れる？</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td><b>理念映像 2本セット</b></td><td class="n">150万</td><td class="n">120万<br><span class="small">80%</span></td><td>周年・世代交代・採用で困っている会社</td></tr>
+      <tr><td>理念映像 1本</td><td class="n">100万</td><td class="n">80万</td><td>まず1本だけ、という会社</td></tr>
+      <tr><td>式典の撮影（編集なし）</td><td class="n">15万</td><td class="n">13.5万<br><span class="small">90%</span></td><td>周年式典・記念パーティーがある会社</td></tr>
+      <tr><td>式典のダイジェスト版</td><td class="n">20万</td><td class="n">18万</td><td>式典に来られなかった人にも見せたい会社</td></tr>
+      <tr class="hi"><td><b>AIリスキリング L</b></td><td class="n">120万</td><td class="n">108万<br><span class="small">90%</span></td><td>全社員にAIを使えるようになってほしい会社</td></tr>
+      <tr><td>AIリスキリング M</td><td class="n">80万</td><td class="n">72万</td><td>まず一部門から試したい会社</td></tr>
+      <tr><td>AIリスキリング S</td><td class="n">30万</td><td class="n">27万</td><td>お試し。ここからLやMに上がってもらう入口</td></tr>
+      <tr><td><b>AI補佐サポート</b><br><span class="small">毎月お金が入る</span></td><td class="n">10万<br><span class="small">/月</span></td><td class="n">8.5万<br><span class="small">/月</span></td><td>映像を作った会社だけ。AIの相談＋<b>毎月1人ずつ社員のインタビュー動画（縦型1分）を撮って納品</b></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>いちばん大事なコツ：セットで売る</h3>
+  <div class="grid g2">
+    <div class="card c-fire">
+      <h4>バラで売ると…</h4>
+      <p>1社あたり100万円くらい。1.58億にするには<b>158社</b>必要。<br>
+      前平さんが全部の商談に出るので、<b>時間が足りなくなって破綻します。</b></p>
+    </div>
+    <div class="card c-sea">
+      <h4>セットで売ると</h4>
+      <p>理念映像2本＋式典＋AI研修L＝<b>305万円</b>。<br>
+      1社あたりの平均が149万になり、<b>96社で足ります。</b>しかも<b>ヒアリングは1回で済む</b>。</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h4>なぜセットで売れるのか</h4>
+    <p>創業の魂を聞き出したその同じ場で、こう言えるからです。<br><br>
+    <b class="maru" style="color:var(--fire);font-size:16px">「その魂を、社員全員がAIを使いこなす形でも守りませんか」</b><br><br>
+    別々の商談にすると、商談数が2倍になります。同じ場で両方聞くから、時間が半分で済む。<b>これが計画の背骨です。</b></p>
+  </div>
+
+  <h3>1年で売る内訳（96社）</h3>
+  <div class="tw">
+  <table>
+    <thead><tr><th>セット</th><th>中身</th><th class="n">値段</th><th class="n">社数</th><th class="n">売上</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td><b>① フル</b></td><td>理念映像2本＋式典撮影＋ダイジェスト＋AI研修L</td><td class="n">305万</td><td class="n">12</td><td class="n">3,660万</td></tr>
+      <tr class="hi"><td><b>② 映像＋研修</b></td><td>理念映像2本＋AI研修L</td><td class="n">270万</td><td class="n">14</td><td class="n">3,780万</td></tr>
+      <tr><td>③ 映像＋式典</td><td>理念映像2本＋式典一式</td><td class="n">185万</td><td class="n">12</td><td class="n">2,220万</td></tr>
+      <tr><td>④ 研修だけ</td><td>AI研修L</td><td class="n">120万</td><td class="n">14</td><td class="n">1,680万</td></tr>
+      <tr><td>⑤ 映像1本</td><td>理念映像1本</td><td class="n">100万</td><td class="n">12</td><td class="n">1,200万</td></tr>
+      <tr><td>⑥ 研修M</td><td>AI研修M</td><td class="n">80万</td><td class="n">16</td><td class="n">1,280万</td></tr>
+      <tr><td>⑦ お試し</td><td>AI研修S</td><td class="n">30万</td><td class="n">16</td><td class="n">480万</td></tr>
+      <tr><td colspan="3"><b>合計</b></td><td class="n"><b>96社</b></td><td class="n"><b>1.43億</b></td></tr>
+      <tr><td colspan="3">＋ AI補佐サポート（毎月）</td><td class="n">25社</td><td class="n">1,500万</td></tr>
+      <tr class="hi"><td colspan="3"><b>事業部の売上</b></td><td class="n"></td><td class="n"><b>1.58億</b></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="card c-sun">
+    <h4>助成金のこと</h4>
+    <p>AIリスキリング研修は、<b>国（厚生労働省）の助成金</b>が使えます。うまくいけば会社の負担が3割くらいまで下がる。これが「120万円でも高くない」と言える理由です。<br><br>
+    <b>ただし注意。</b>助成金の申請書を代わりに書いて出すのは<b>社会保険労務士さんしかできません</b>（法律で決まっています）。TENOHIRAは研修をやる側に徹して、申請は提携する社労士さんにお願いします。ここを間違えると違法になります。</p>
+  </div>
+</section>
+
+<!-- ══════ PEOPLE ══════ -->
+<section id="people">
+  <span class="eyebrow e-fire">④ 人</span>
+  <h2>誰が、何を持っているのか。</h2>
+  <div class="tldr">
+    <b>全員が「使命」を持っています。</b>作業のリストではなく、その人が守るものです。<br>
+    そして<b>毎月かぞえる数字（KPI）</b>を1人3つまで。増やすと、どれも達成できなくなります。
+  </div>
+
+  <div class="grid" style="gap:16px">
+
+    <div class="person">
+      <div class="who"><span class="name">前平</span><span class="tag t-plain">販売営業部</span><span class="tag t-done">いる</span></div>
+      <div class="mission">共鳴できる相手を見つけ、深く聴き、その人だけの答えを立案して、自分の口で決めてくる。</div>
+      <ul class="kpi">
+        <li><span class="k">初回ヒアリング商談</span><span class="v">20件 / 月</span></li>
+        <li><span class="k">成約</span><span class="v">8件 / 月</span></li>
+        <li><span class="k">YouTube用ヒアリング撮影</span><span class="v">4本 / 月</span></li>
+      </ul>
+      <p class="small" style="margin-top:12px">稼働 週37.7時間。<b>わざと18時間の余白</b>を空けている（想定より商談が増えたときに受け止めるため）。</p>
+    </div>
+
+    <div class="person">
+      <div class="who"><span class="name">フロント営業</span><span class="tag t-plain">1.0人</span><span class="tag t-todo">これから決める</span></div>
+      <div class="mission">会いたい会社の門を、自分の足で叩く。断られても、また次の門へ行く。</div>
+      <ul class="kpi">
+        <li><span class="k">手紙を届ける</span><span class="v">30件 / 月</span></li>
+        <li><span class="k">追跡の電話からアポ</span><span class="v">4.5件 / 月</span></li>
+        <li><span class="k">YouTubeの撮影同行と投稿</span><span class="v">4本 / 月</span></li>
+      </ul>
+      <p class="small" style="margin-top:12px">月20日のうち<b>14.5日</b>で回る計算。5.5日の余力がある。ここが埋まってきたら、手紙を月60件に増やす。</p>
+    </div>
+
+    <div class="person">
+      <div class="who"><span class="name">企画・進行</span><span class="tag t-plain">0.5人</span><span class="tag t-todo">これから決める</span></div>
+      <div class="mission">決まった約束を、ひとつも落とさず、遅らせず、形にする。</div>
+      <ul class="kpi">
+        <li><span class="k">提案書の仕上げ</span><span class="v">8件 / 月</span></li>
+        <li><span class="k">進行中の案件を管理</span><span class="v">30件</span></li>
+        <li><span class="k">納期を守った割合</span><span class="v">100%</span></li>
+      </ul>
+      <p class="small" style="margin-top:12px">月10日のうち<b>6日</b>で回る。HIBIKI（制作進行）の適性に近い役割。</p>
+    </div>
+
+    <div class="person">
+      <div class="who"><span class="name">架電チーム</span><span class="tag t-plain">外注</span><span class="tag t-todo">これから探す</span></div>
+      <div class="mission">まだTENOHIRAを知らない会社に、最初の30秒で「会ってみようかな」と思ってもらう。</div>
+      <ul class="kpi">
+        <li><span class="k">架電</span><span class="v">720件 / 月</span></li>
+        <li><span class="k">アポ獲得</span><span class="v">10.8件 / 月</span></li>
+        <li><span class="k">アポ率</span><span class="v">1.5%</span></li>
+      </ul>
+      <p class="small" style="margin-top:12px">1日1万円 × 60件 × 週3回 ＝ <b>月20万円</b>。<b>必要な商談の半分がここから来ます。</b>話す内容はAI研修＋助成金の一本に絞る。</p>
+    </div>
+
+    <div class="person">
+      <div class="who"><span class="name">映像制作事業部</span><span class="tag t-plain">役員2名＋制作チーム</span><span class="tag t-done">いる</span></div>
+      <div class="mission">TVCMと同じ品質で、創業の魂を撮る。「あの品質の会社が作った」を、売る側の武器にする。</div>
+      <ul class="kpi">
+        <li><span class="k">代理店案件の売上</span><span class="v">1.00億 / 年</span></li>
+        <li><span class="k">販売営業部からの制作を受ける</span><span class="v">月8社ぶん</span></li>
+        <li><span class="k">納期を守った割合</span><span class="v">100%</span></li>
+      </ul>
+      <p class="small" style="margin-top:12px">TVCMを撮っているチームが理念映像も撮る。<b>これが「理念映像2本で150万」の値段の根拠</b>になっている。</p>
+    </div>
+
+    <div class="person">
+      <div class="who"><span class="name">AI</span><span class="tag t-plain">道具</span><span class="tag t-done">動いてる</span></div>
+      <div class="mission">考えなくてもできる作業を、人間から全部引き取る。人には考える仕事だけを残す。</div>
+      <ul class="kpi">
+        <li><span class="k">手紙の原稿を下書き</span><span class="v">30〜60件 / 月</span></li>
+        <li><span class="k">アタックリストの生成と企業調査</span><span class="v">随時</span></li>
+        <li><span class="k">提案書の清書・議事録・数値集計</span><span class="v">随時</span></li>
+      </ul>
+      <p class="small" style="margin-top:12px">「考えない作業みたいな仕事は誰もやってない」——これはスローガンではなく、<b>この人数で1.58億を回すための必須条件</b>です。</p>
+    </div>
+
+    <div class="person">
+      <div class="who"><span class="name">提携社労士</span><span class="tag t-plain">外部</span><span class="tag t-todo">これから探す</span></div>
+      <div class="mission">お客さんが助成金を確実に受け取れるようにする。TENOHIRAが法律の線を越えないように守る。</div>
+      <ul class="kpi">
+        <li><span class="k">助成金の申請サポート</span><span class="v">研修受注のたび</span></li>
+        <li><span class="k">確保の期限</span><span class="v">Q1まで</span></li>
+      </ul>
+      <p class="small" style="margin-top:12px">申請代行は社労士の<b>独占業務</b>。ここが決まらないとAI研修L・Mの説得力が消えます。</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════ MEDIA ══════ -->
+<section id="media">
+  <span class="eyebrow e-sky">⑤ 用意するもの</span>
+  <h2>何を作れば、動き出すのか。</h2>
+  <div class="tldr">
+    <b>タップすると、それぞれ「何が書いてあるべきか」まで開きます。</b><br>
+    緑は<b>もうある</b>もの、オレンジは<b>これから作る</b>もの、黄色は<b>確認待ち</b>です。
+  </div>
+
+  <!-- LP -->
+  <details class="item" id="m-lp">
+    <summary>
+      <span class="sum-t">ランディングページ（LP）<small>手紙や広告を見た人が検索したとき、最初に着く場所</small></span>
+      <span class="tag t-wait">確認待ち</span>
+      <span class="caret" aria-hidden="true"></span>
+    </summary>
+    <div class="inner">
+      <ul class="spec">
+        <li><span class="k">目的</span><span class="v">「実在して、信用できる会社だ」と示す。問い合わせを受ける</span></li>
+        <li><span class="k">形式</span><span class="v">HTML 1ページ（スマホ縦読み前提）</span></li>
+        <li><span class="k">誰が作る</span><span class="v"><b>前平さんが昨日すでに構築済み</b></span></li>
+        <li><span class="k">いつまで</span><span class="v">Q1（2026年9〜11月）に公開</span></li>
+      </ul>
+      <h5>いま必要なこと</h5>
+      <p><b>前平さんが作ったHTMLを共有してください。</b>下のチェックリストと突き合わせて、足りない要素があれば指摘します。ここに実際の構成を書き込みます。</p>
+      <h5>載っているべき要素（チェックリスト）</h5>
+      <ul>
+        <li><b>ファーストビュー</b>：使命の一文 ＋「創業の魂を、永遠に、万人に」</li>
+        <li><b>誰のためのページか</b>：周年を迎える／世代交代する／採用で困っている／AIを入れたい会社</li>
+        <li><b>商品3つ</b>：理念映像／式典の記録／AIリスキリング。値段の目安も出す</li>
+        <li><b>実績</b>：<b>YouTubeのヒアリング動画を埋め込む。これが最強の実績になる</b></li>
+        <li><b>助成金の説明</b>：「申請は提携社労士がサポート」と明記（法律上ここは必須）</li>
+        <li><b>前平さんの顔と言葉</b>：誰がやっているのかが分かること</li>
+        <li><b>問い合わせ</b>：電話・LINE・フォーム。<b>スマホで押しやすい位置に固定</b></li>
+      </ul>
+      <h5>よくある落とし穴</h5>
+      <p>会社概要から始まるLPは読まれません。<b>1画面目で「誰の何を解決するのか」</b>が分かるかどうかが全部です。</p>
+    </div>
+  </details>
+
+  <!-- 名刺 -->
+  <details class="item" id="m-card">
+    <summary>
+      <span class="sum-t">名刺<small>会った人の手元に、いちばん長く残るもの</small></span>
+      <span class="tag t-todo">これから</span>
+      <span class="caret" aria-hidden="true"></span>
+    </summary>
+    <div class="inner">
+      <ul class="spec">
+        <li><span class="k">サイズ</span><span class="v">91 × 55 mm（標準）／ 両面カラー</span></li>
+        <li><span class="k">枚数</span><span class="v">まず500枚。月に50〜80枚は配る想定</span></li>
+        <li><span class="k">誰が作る</span><span class="v">デザイナーに一括発注（LP・チラシ・パンフとまとめて）</span></li>
+        <li><span class="k">いつまで</span><span class="v">Q1の最初の1ヶ月</span></li>
+      </ul>
+      <h5>表に書くこと</h5>
+      <ul>
+        <li>株式会社TENOHIRA／前平 ◯◯／肩書</li>
+        <li>住所（宜野湾市）・携帯・メール</li>
+        <li><b>QRコード（LPへ）</b></li>
+      </ul>
+      <h5>裏に書くこと ─ ここが本体です</h5>
+      <div class="quote">あなたの声になり、腕に、足に、
+武器に、盾に、勇気になる。
+ともに立ち上がり、挑む。
+
+── 創業の魂を、永遠に、万人に。
+
+　理念映像 ／ 式典の記録 ／ AIリスキリング
+
+　▶ 経営者インタビュー、公開中（QR → YouTube）</div>
+      <h5>考え方</h5>
+      <p>名刺の裏を白紙にしないでください。<b>渡した瞬間、相手は必ず裏を見ます。</b>そこに使命が書いてあれば、その場で「これ、どういう意味ですか」と聞かれる。<b>会話が生まれる名刺</b>にしてください。</p>
+      <p>QRの飛び先を<b>YouTubeにする</b>のがポイントです。会社案内より、経営者インタビューを見せたほうが刺さります。</p>
+    </div>
+  </details>
+
+  <!-- チラシ -->
+  <details class="item" id="m-flyer">
+    <summary>
+      <span class="sum-t">チラシ（2種類）<small>ポスティングと、訪問時の置き土産</small></span>
+      <span class="tag t-todo">これから</span>
+      <span class="caret" aria-hidden="true"></span>
+    </summary>
+    <div class="inner">
+      <ul class="spec">
+        <li><span class="k">サイズ</span><span class="v">A4 片面 カラー（両面にしない。読まれないので）</span></li>
+        <li><span class="k">種類</span><span class="v">① 周年・式典向け ／ ② AI研修向け</span></li>
+        <li><span class="k">配り方</span><span class="v">ポスティング（月5万円ぶん）＋ 訪問時に手渡し</span></li>
+        <li><span class="k">いつまで</span><span class="v">Q1（LP・名刺・パンフと同時発注）</span></li>
+      </ul>
+
+      <h5>① 周年・式典向け</h5>
+      <div class="quote">【見出し】
+その一日を、50年先まで残す。
+
+【リード】
+周年式典は、たいてい一日で終わります。
+写真が少し残って、あとは記憶になっていく。
+もったいない、と私たちは思っています。
+
+【中身】
+・式典の撮影　15万円（編集なし・当日データお渡し）
+・ダイジェスト版　20万円
+・理念映像 2本セット　150万円
+　── 社長の言葉を、入社初日に観るものに。
+
+【最後】
+まずは、御社の歩みを聞かせてください。
+提案は、そのあとで。
+
+株式会社TENOHIRA　前平 ◯◯　090-◯◯◯◯-◯◯◯◯</div>
+
+      <h5>② AI研修向け</h5>
+      <div class="quote">【見出し】
+AIを、社員全員のとなりに。
+国の助成金が使えます。
+
+【リード】
+「AIを入れたいが、誰も分からない」
+その状態からで大丈夫です。
+カリキュラムは御社の業務に合わせて作ります。
+
+【中身】
+・お試し（S）　30万円
+・部門ごと（M）　80万円
+・全社まるごと（L）　120万円
+　── 助成金が適用されれば、負担は3割前後まで下がります。
+　　（審査があります。申請は提携社労士がサポートします）
+
+【最後】
+まず御社の状況を伺ってから、
+使える制度をお調べしてご説明にあがります。</div>
+      <h5>やってはいけないこと</h5>
+      <p><b>2種類を1枚にまとめないでください。</b>「映像もAIもやってます」は、どちらも刺さりません。相手の状況に合わせて、どちらか1枚だけを渡します。</p>
+    </div>
+  </details>
+
+  <!-- パンフレット -->
+  <details class="item" id="m-pamph">
+    <summary>
+      <span class="sum-t">パンフレット<small>商談のあと、置いてくるもの。決裁者に回る</small></span>
+      <span class="tag t-todo">これから</span>
+      <span class="caret" aria-hidden="true"></span>
+    </summary>
+    <div class="inner">
+      <ul class="spec">
+        <li><span class="k">形式</span><span class="v">A4 三つ折り（6面）カラー</span></li>
+        <li><span class="k">使う場面</span><span class="v">商談の最後に置いてくる。<b>その場にいない決裁者が読む前提</b></span></li>
+        <li><span class="k">いつまで</span><span class="v">Q1</span></li>
+      </ul>
+      <h5>6面の構成</h5>
+      <div class="tw"><table>
+        <thead><tr><th class="n">面</th><th>内容</th><th>ここで伝えること（1つだけ）</th></tr></thead>
+        <tbody>
+          <tr><td class="n">1</td><td>表紙</td><td>「創業の魂を、永遠に、万人に」＋ 印象的な1枚</td></tr>
+          <tr><td class="n">2</td><td>使命</td><td>なぜこの仕事をしているのか。前平さんの言葉で</td></tr>
+          <tr><td class="n">3</td><td>理念映像</td><td>何を撮り、誰がいつ観るのか。<b>尺や本数ではなく「使われる場面」で説明</b></td></tr>
+          <tr><td class="n">4</td><td>式典の記録</td><td>その一日が、資産に変わる</td></tr>
+          <tr><td class="n">5</td><td>AIリスキリング</td><td>3プランと助成金。「あなたしかできない事に集中する」ため</td></tr>
+          <tr><td class="n">6</td><td>会社概要・連絡先</td><td>所在地・実績・QR（LPとYouTube）</td></tr>
+        </tbody>
+      </table></div>
+      <h5>チラシとの違い</h5>
+      <p>チラシは<b>まだ会っていない人</b>に渡すもの。パンフレットは<b>会ったあと、社内で回覧される</b>もの。だからパンフには<b>値段と実績</b>を必ず入れます。社長が経理や役員に見せたとき、それが無いと話が進みません。</p>
+    </div>
+  </details>
+
+  <!-- 手紙 -->
+  <details class="item" id="m-letter">
+    <summary>
+      <span class="sum-t">手紙 ＋ 訪問手渡し<small>いちばん転換率が高い（15%）。月30件</small></span>
+      <span class="tag t-done">できてる</span>
+      <span class="caret" aria-hidden="true"></span>
+    </summary>
+    <div class="inner">
+      <ul class="spec">
+        <li><span class="k">形式</span><span class="v">A4 1枚。機械が直筆風に書く。封筒に入れて人が届ける</span></li>
+        <li><span class="k">量</span><span class="v">月30件（7営業日で1サイクル）。AI下書きを入れれば月60件へ</span></li>
+        <li><span class="k">誰が</span><span class="v">原稿＝AI下書き＋フロント営業が仕上げ／届ける＝フロント営業</span></li>
+        <li><span class="k">状態</span><span class="v"><b>文面2パターン作成済み</b>（承継期・周年期）</span></li>
+      </ul>
+      <h5>3つのルール</h5>
+      <ul>
+        <li><b>価格と商品説明を書かない。</b>書いた瞬間にDMになって捨てられます</li>
+        <li><b>1行目から相手のことを書く。</b>設立年も求人の有無もデータベースにあります</li>
+        <li><b>次の行動を1つだけ書く。</b>「数日中に電話します」。それ以外の選択肢を出さない</li>
+      </ul>
+      <h5>いちばん大事なこと</h5>
+      <p>転換率15%は、<b>手紙 → 訪問 → 3〜5日後の追跡電話</b>の3点セットで初めて出る数字です。<b>届けて終わりにすると2〜3%まで落ちます。</b>電話の予定を、手紙を出す前にカレンダーに入れてください。</p>
+      <p><a href="./sales-toolkit.html#s1">→ 文面の全文と、月次サイクルの詳細を見る</a></p>
+    </div>
+  </details>
+
+  <!-- 架電 -->
+  <details class="item" id="m-call">
+    <summary>
+      <span class="sum-t">架電スクリプト<small>外注チームに渡すもの。月720件</small></span>
+      <span class="tag t-done">できてる</span>
+      <span class="caret" aria-hidden="true"></span>
+    </summary>
+    <div class="inner">
+      <ul class="spec">
+        <li><span class="k">量</span><span class="v">1日60件 × 週3回 ＝ 月720件</span></li>
+        <li><span class="k">費用</span><span class="v">1日1万円 ＝ <b>月20万円</b></span></li>
+        <li><span class="k">成果</span><span class="v">アポ 10.8件/月（<b>必要な商談の半分</b>）</span></li>
+        <li><span class="k">状態</span><span class="v"><b>スクリプト・切り返し・リスト仕様まで作成済み</b></span></li>
+      </ul>
+      <h5>いちばん大事な判断</h5>
+      <p><b>電話で理念映像を売らないこと。</b>「創業の魂を映像に」は電話口の30秒では絶対に伝わりません。外注のオペレーターならなおさらです。</p>
+      <p>だから電話の入口は<b>「助成金を使った社内のAI研修」の一本だけ</b>にします。制度の名前という具体物があるので、外注の人でも語れる。アポが取れて前平さんが会いに行けば、そこで映像の話は自然に出せます。</p>
+      <p class="maru" style="background:var(--fire-bg);color:var(--fire);padding:12px 16px;border-radius:10px;font-weight:700">手紙 ＝ 理念映像　／　電話 ＝ AI研修。この分担を崩さないこと。</p>
+      <h5>絶対に言わせてはいけないこと</h5>
+      <ul>
+        <li>「助成金は必ず通ります」（審査があります）</li>
+        <li>「無料です」</li>
+        <li>「国から言われて電話しています」</li>
+      </ul>
+      <p>ここを曖昧にすると、後で信用を全部失います。「嘘つく・誤魔化す・隠す」に真正面から反します。</p>
+      <p><a href="./sales-toolkit.html#s2">→ スクリプト全文とリスト仕様（13列）を見る</a></p>
+    </div>
+  </details>
+
+  <!-- 提案書 -->
+  <details class="item" id="m-proposal">
+    <summary>
+      <span class="sum-t">提案書<small>305万円を決めるための11ページ</small></span>
+      <span class="tag t-done">できてる</span>
+      <span class="caret" aria-hidden="true"></span>
+    </summary>
+    <div class="inner">
+      <ul class="spec">
+        <li><span class="k">形式</span><span class="v">A4 11ページ（PDF＋印刷）</span></li>
+        <li><span class="k">誰が</span><span class="v">前平さんが立案 → AIが下書き → 0.5人が仕上げ</span></li>
+        <li><span class="k">状態</span><span class="v"><b>構成とテンプレート作成済み</b></span></li>
+      </ul>
+      <h5>勝負は2ページ目</h5>
+      <p>2ページ目に<b>「聞かせていただいたこと」</b>を置きます。ヒアリングで社長が話した言葉を、<b>きれいにせず、そのまま</b>書く。「大変でしたけどね、まあ」みたいな言い淀みも入れる。</p>
+      <p>ここで「この人は本当に聞いていた」と伝われば、<b>残りのページは値段の確認作業になります。</b>1ページ目より2ページ目に時間をかけてください。</p>
+      <h5>やってはいけないこと</h5>
+      <p><b>聞いていないことを書かない。</b>推測で「さぞご苦労されたことと存じます」と書いた瞬間、2ページ目の効果が全部消えます。3つしか聞けなかったなら、3つでいい。</p>
+      <p><a href="./sales-toolkit.html#s3">→ 11ページの構成と見積の見せ方を見る</a></p>
+    </div>
+  </details>
+
+  <!-- YouTube -->
+  <details class="item" id="m-youtube">
+    <summary>
+      <span class="sum-t">YouTube ／ ショート動画<small>いちばん強い武器になる可能性がある</small></span>
+      <span class="tag t-done">設計できてる</span>
+      <span class="caret" aria-hidden="true"></span>
+    </summary>
+    <div class="inner">
+      <ul class="spec">
+        <li><span class="k">中身</span><span class="v">経営者団体4つ（倫理法人会・同友会・経営実践研究会・経営品質研究会）の経営者にヒアリングし、その様子をそのまま公開</span></li>
+        <li><span class="k">量</span><span class="v">本編 月4本（15〜25分）／ ショート 1本につき3〜5本</span></li>
+        <li><span class="k">費用</span><span class="v"><b>0円</b>（撮影は前平さんの訪問に同行、編集はフロント営業）</span></li>
+        <li><span class="k">狙い</span><span class="v">再生数ではない。<b>「深い話を引き出している様子」そのもの</b>を見せる</span></li>
+      </ul>
+      <h5>これ、1回で4つ取れます</h5>
+      <ul>
+        <li><b>営業</b>：使命に共鳴できるか確かめる ＝ 初回ヒアリング商談と同じ行為</li>
+        <li><b>コンテンツ</b>：YouTube本編とショート</li>
+        <li><b>商品のデモ</b>：見込み客が「この人に聞かれたら何が出てくるか」を完成品で体験できる</li>
+        <li><b>理念映像の素材</b>：受注できたら、この録画がそのまま構成の元になる</li>
+      </ul>
+      <h5>タイトルの型</h5>
+      <div class="quote">【創業52年】◯◯社長に、やめようと思った日のことを聞いた
+
+サムネイル：社長の顔 ＋ 引用を一言
+　例）「3回、やめようと思いました」</div>
+      <h5>ショートの切り出し方</h5>
+      <p>質問と答えを<b>セットで</b>切ります。答えだけだと意味が分かりません。切り出すのはこの3問がおすすめです。</p>
+      <ul>
+        <li>「やめなかったのは、なぜですか」</li>
+        <li>「支えてくれた方に、いま言えるとしたら何と言いますか」</li>
+        <li>「次に継ぐ方には、何を渡したいですか」</li>
+      </ul>
+      <h5>撮影許可のとり方</h5>
+      <div class="quote">「今日のお話、私のYouTubeで公開させていただくことは可能でしょうか。
+
+　目的は再生数ではなくて、
+　沖縄の経営者の方が何を考えてやってこられたのかを、
+　そのまま残していきたいというものです。
+
+　編集したものは公開前に必ずお見せします。
+　一言でもNGがあれば、その部分は出しません。
+
+　データは御社にもお渡しします。
+　採用でも社内でも、自由にお使いください」</div>
+      <h5>なぜ広がるのか</h5>
+      <p><b>出演した社長が、自分で配ってくれるからです。</b>自分が良く映った動画は、自分のFacebookやLINEで共有します。広告費ゼロでリーチが伸びる。<br>
+      そして次の人が「自分もヒアリングされたい」と手を挙げる。<b>ぐるぐる回り始めます。</b></p>
+      <p><a href="./sales-toolkit.html#s4">→ ヒアリング15問と、撮影の実務を見る</a></p>
+    </div>
+  </details>
+
+  <!-- SNS広告 -->
+  <details class="item" id="m-ads">
+    <summary>
+      <span class="sum-t">SNS広告（Facebook・Instagram）<small>月3万円。新しく作らない</small></span>
+      <span class="tag t-todo">これから</span>
+      <span class="caret" aria-hidden="true"></span>
+    </summary>
+    <div class="inner">
+      <ul class="spec">
+        <li><span class="k">予算</span><span class="v">月30,000円</span></li>
+        <li><span class="k">ターゲット</span><span class="v">沖縄県内／35〜65歳／経営者・自営業・管理職の興味関心</span></li>
+        <li><span class="k">素材</span><span class="v"><b>YouTubeショートをそのまま使う。広告用に新規制作しない</b></span></li>
+        <li><span class="k">飛び先</span><span class="v">LP</span></li>
+      </ul>
+      <h5>広告文の案</h5>
+      <div class="quote">社長のその話、社員は聞いたことありますか？
+
+沖縄の経営者に、創業のことを聞いて回っています。
+「やめようと思った日」の話が、いちばん多く再生されています。
+
+▶ インタビューを見る</div>
+      <h5>この広告の役割</h5>
+      <p><b>ここから直接お客さんは来ません。</b>月3万円ではそこまで届かない。<br>
+      役割は<b>「手紙が届いた会社が検索したとき、ちゃんと出てくる」</b>ことです。信用の裏取り。<b>そう割り切って、成果を問い合わせ数で測らないでください。</b></p>
+    </div>
+  </details>
+
+  <!-- リスト -->
+  <details class="item" id="m-list">
+    <summary>
+      <span class="sum-t">アタックリスト ＋ 名刺データベース<small>誰に会うかを決める、いちばん上流</small></span>
+      <span class="tag t-done">できてる</span>
+      <span class="caret" aria-hidden="true"></span>
+    </summary>
+    <div class="inner">
+      <ul class="spec">
+        <li><span class="k">元データ</span><span class="v">法人番号データ（全法人）＋ Google Maps API（実在確認・業種・エリア）</span></li>
+        <li><span class="k">深掘り</span><span class="v">外部検索APIで、設立年月日・代表者名・電話・メール・求人の有無・SNSの有無・広告の有無</span></li>
+        <li><span class="k">名刺DB</span><span class="v">過去と直近の名刺を全部撮影してデータ化。突合して「既に会った」フラグを付ける</span></li>
+        <li><span class="k">状態</span><span class="v"><b>構築済み</b></span></li>
+      </ul>
+      <h5>この仕組みの本当の価値</h5>
+      <p>「リストがたくさんある」ことではありません。<b>設立年月日で、承継期の会社を狙い撃ちできること</b>です。</p>
+      <p>創業50年・55年・60年の会社には、<b>周年の話と世代交代の話が同時に刺さります。</b>ここが最も成約率の高いグループになります。</p>
+      <h5>3つのグループに分ける</h5>
+      <ul>
+        <li><b>A. 会ったことがある会社</b>（名刺DBと一致）── メールを送ってよい</li>
+        <li><b>B. 承継期</b>（設立30〜50年）── 手紙と電話のみ</li>
+        <li><b>C. 周年期・求人を出している会社</b> ── 手紙と電話のみ</li>
+      </ul>
+      <h5>法律の注意</h5>
+      <p>メールDMは<b>特定電子メール法</b>で、原則として事前の同意が必要です。名刺交換した相手は例外ですが、<b>リストから抽出しただけの会社に一斉メールを送ると違法になり得ます。</b>システム上で経路を分けてください。</p>
+    </div>
+  </details>
+
+  <!-- 事業計画 -->
+  <details class="item" id="m-plan">
+    <summary>
+      <span class="sum-t">事業計画書 ＆ 営業ツール集<small>この2つが、すべての数字と文面の元</small></span>
+      <span class="tag t-done">できてる</span>
+      <span class="caret" aria-hidden="true"></span>
+    </summary>
+    <div class="inner">
+      <h5>事業計画書（本体）</h5>
+      <p>使命から数値計画、6クォーターの実行計画まで。図8点・表20点。<br>
+      <a href="./business-plan.html">→ 事業計画書を開く</a></p>
+      <h5>営業の四つ道具</h5>
+      <p>手紙の文面・架電スクリプト・提案書・ヒアリング設計。そのまま使える形。<br>
+      <a href="./sales-toolkit.html">→ ツール集を開く</a></p>
+      <h5>数字を計算しているファイル</h5>
+      <ul>
+        <li><code>plan/division_a.py</code> ── 商品・件数・チャネル・P/Lの計算式</li>
+        <li><code>plan/fixed_costs.sql</code> ── 固定費のDB実測（重複を除いた本当の額）</li>
+      </ul>
+      <p class="small">値段や件数を変えたら、この2つを書き換えて実行すれば、全部の表が更新されます。</p>
+    </div>
+  </details>
+
+</section>
+
+<!-- ══════ WHEN ══════ -->
+<section id="when">
+  <span class="eyebrow e-sea">⑥ いつまでに</span>
+  <h2>いつ、誰が、何をやるのか。</h2>
+  <div class="tldr">
+    <b>目標の年は2027年3月〜2028年2月。</b>でも準備できるのは<b>6ヶ月だけ</b>です。<br>
+    しかも<b>受注は売上より3ヶ月早い</b>。だから2026年12月に取った仕事が、2027年3月の売上になります。<b>準備期はもう本番。</b>
+  </div>
+
+  <div class="tl">
+    <div class="ev">
+      <div class="when">今週 ─ 2026年8月22日〜31日</div>
+      <div class="what">土台を決める</div>
+      <div class="desc">
+        <b>①決算期を確認して税理士に聞く</b>（ボーナス420万を経費にできるかがかかっている）／
+        <b>②1.5人を誰にするか決める</b>／<b>③架電外注先を選ぶ</b>／④提携社労士に打診／
+        ⑤県内に対象の会社が何社あるか数える／⑥名刺DBから「会ったことがある会社」を抽出／
+        <b>⑦手紙を1通出す</b>／<b>⑧YouTubeの1本目を依頼する</b>
+      </div>
+    </div>
+    <div class="ev">
+      <div class="when">Q1 ─ 2026年9〜11月　売上 1,200万</div>
+      <div class="what">回し始める</div>
+      <div class="desc">
+        架電外注を週3回で開始／手紙を月30件走らせる／<b>YouTubeのヒアリング撮影を月4本</b>／
+        LP・名刺・チラシ・パンフをデザイナーに一括発注／
+        <b>フルセット（305万）を1件は必ず取る</b>── 実績がないと305万は売れない
+      </div>
+    </div>
+    <div class="ev">
+      <div class="when">Q2 ─ 2026年12月〜2027年2月　売上 2,000万</div>
+      <div class="what">本番の受注を積む</div>
+      <div class="desc">
+        <b>ここで取った仕事が、本番期の初月の売上になる</b>／
+        AI補佐サポートの1〜4社目で提供の型をつくる／
+        手紙の原稿をAI下書きにして月60件へ／SNS広告を開始
+      </div>
+    </div>
+    <div class="ev">
+      <div class="when">Q3 ─ 2027年3〜5月　売上 3,000万</div>
+      <div class="what">本番スタート・年度替わりを取り切る</div>
+      <div class="desc">式典・周年・研修予算が動く四半期／縦型インタビューの撮影日を制作事業部と固定化／役員報酬を月110万へ</div>
+    </div>
+    <div class="ev">
+      <div class="when">Q4 ─ 2027年6〜8月　売上 3,800万</div>
+      <div class="what">本当にこの通りか、確かめる</div>
+      <div class="desc">
+        成約率・アポ率の<b>実測値</b>で計算をやり直す／
+        <b>YouTube経由の商談が何件あったか測る</b>── 伸びていれば最大のチャネルになる／
+        AI補佐サポートの解約率を測る
+      </div>
+    </div>
+    <div class="ev">
+      <div class="when">Q5 ─ 2027年9〜11月　売上 4,300万</div>
+      <div class="what">型を固める</div>
+      <div class="desc">AI補佐の中身を標準化して0.5人で回るようにする／フルセットの比率を上げて客単価を押し上げる／役員報酬を月135万へ</div>
+    </div>
+    <div class="ev">
+      <div class="when">Q6 ─ 2027年12月〜2028年2月　売上 4,700万</div>
+      <div class="what">着地させる</div>
+      <div class="desc">
+        <b>役員報酬を額面150万へ（3名同時）＋ ボーナスの届出</b>／
+        AI補佐サポート25社＝月250万を達成／
+        <b>2028年3月からの「全員手取り2倍」を確定して、全社に発表する</b>
+      </div>
+    </div>
+    <div class="ev done">
+      <div class="when">2028年3月 ─ ゴール</div>
+      <div class="what">約束を果たす</div>
+      <div class="desc">役員3名が手取り100万円/月。社員5名の手取りが2倍。会社に2,973万円が残っている。<b>そして次は5億へ。</b></div>
+    </div>
+  </div>
+
+  <div class="card c-fire">
+    <h4>この計画で、いちばん壊れやすいところ</h4>
+    <p><b>役員3名の給料（年6,331万円）は、売上が悪くても減りません。</b>だから最初から満額にはしません。Q1は3人×80万から始めて、3ヶ月ごとに上げていく。<br><br>
+    そして<b>「売上が計画を下回った四半期は、次の引き上げを見送る」</b>というルールを、<b>いま、3人で合意しておいてください。</b>あとから言い出すと、必ずもめます。</p>
+  </div>
+</section>
+
+<!-- ══════ CLOSE ══════ -->
+<section id="close">
+  <span class="eyebrow e-fire">最後に</span>
+  <h2>ぜんぶ、つながっています。</h2>
+  <p>
+    使命に共鳴できる会社を<b>見つけて</b>、手紙と電話とYouTubeで<b>声をかけて</b>、
+    前平さんが<b>聴いて</b>、制作事業部が<b>つくって渡して</b>、<b>お金が戻ってきて</b>、
+    給料と次の準備に<b>分け合って</b>、また使命に返る。
+  </p>
+  <p>
+    どこか一箇所が止まると、2〜3ヶ月後に必ず全部が止まります。
+    逆に言えば、<b>ぐるぐる回っている限り、この会社は生きています。</b>
+  </p>
+  <div class="card c-fire" style="padding:26px 28px">
+    <p class="maru" style="font-size:clamp(19px,3.6vw,26px);font-weight:900;color:var(--ink);line-height:1.7;margin:0">
+      ドースル コースル ソースル ハッスル
+    </p>
+    <p style="margin-top:12px;color:var(--ink2)">
+      全部そろってから始めるものではありません。<b>手紙を1通出せば、3日後に電話する理由ができる。
+      ヒアリングを1本撮れば、2本目の紹介が生まれる。</b>動いた分だけ、次が決まります。
+    </p>
+  </div>
+</section>
+
+</div>
+
+<footer>
+  <div class="wrap">
+    株式会社TENOHIRA ／ 2026年8月22日 作成<br>
+    もっと詳しく：<a href="./business-plan.html">事業計画書</a>　／　<a href="./sales-toolkit.html">営業の四つ道具</a><br>
+    数字の計算式：<code>plan/division_a.py</code>・<code>plan/fixed_costs.sql</code>
+  </div>
+</footer>

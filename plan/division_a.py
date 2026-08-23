@@ -36,14 +36,21 @@ print("─"*94)
 print(f"  {'フロー計':12}{flow_rev/cnt:>7.0f}{flow_gp/cnt:>8.1f}{cnt:>6}{flow_rev:>9,}{flow_gp:>9,.0f}"
       f"  粗利率{flow_gp/flow_rev*100:.0f}% / ストック対象 {stock_pool}社")
 
-# ══ 2. ストック（AI補佐サポート＋月1本の縦型インタビュー動画）═══
-STOCK_PRICE, STOCK_GPR, STOCK_KEEP = 10, 0.85, 0.50
-end_n   = round(stock_pool*STOCK_KEEP)
-avg_n   = end_n/2                       # 初年度は期中に積み上がるので平均は期末の半分
-stock_rev = avg_n*STOCK_PRICE*12
-print(f"\n【2. ストック】月{STOCK_PRICE}万 ×（映像/式典 受注 {stock_pool}社 × 継続{STOCK_KEEP:.0%}）")
-print(f"  期末 {end_n}社＝月{end_n*STOCK_PRICE}万／初年度は平均{avg_n:.0f}社で 売上 {stock_rev:,.0f}万")
-print(f"  ※ 月500万に届くのは2年目（{500//STOCK_PRICE}社必要）。初年度末は月{end_n*STOCK_PRICE}万が着地")
+# ══ 2. ストック（実勢：研修LPの follow-plan ＋ 映像顧客向けの新プラン）═══
+# ① AI伴走：研修LPに掲載済み Light 4万 / Standard 6万 / Premium 12万
+AI_MIX      = [(4, 0.30), (6, 0.50), (12, 0.20)]   # (月額, 構成比)
+AI_PRICE    = sum(p*w for p, w in AI_MIX)          # 加重平均 5.6万
+AI_END      = 19                                   # 期末の契約社数（研修導入38社 × 継続50%）
+# ② 魂の記録プラン：Premium ＋ 毎月1本の縦型インタビュー動画（映像受注顧客のみ）
+VD_PRICE, VD_END = 15, 10
+STOCK_GPR   = 0.85
+stock_rev = (AI_END/2)*AI_PRICE*12 + (VD_END/2)*VD_PRICE*12
+stock_m   = AI_END*AI_PRICE + VD_END*VD_PRICE
+print(f"\n【2. ストック】2本立て")
+print(f"  ① AI伴走（研修LP掲載済み）平均{AI_PRICE:.1f}万 × 期末{AI_END}社 = 月{AI_END*AI_PRICE:.0f}万")
+print(f"  ② 魂の記録プラン（映像顧客のみ）{VD_PRICE}万 × 期末{VD_END}社 = 月{VD_END*VD_PRICE}万")
+print(f"  初年度末 月{stock_m:.0f}万 ／ 初年度売上 {stock_rev:,.0f}万")
+print(f"  ※ 月500万に届くのは2〜3年目（AI伴走をあと{(500-VD_END*VD_PRICE)/AI_PRICE:.0f}社）")
 
 REV = flow_rev + stock_rev
 GP  = flow_gp + stock_rev*STOCK_GPR

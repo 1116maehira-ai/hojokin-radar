@@ -126,3 +126,41 @@ for a in (12000, 14000, REV, 16000, 17900):
 need_a = ((2000+LOAN)/(1-TAX) + FIXED - B_REV*B_GPR)/(GP/REV)
 print(f"\n  税引後2,000万＋借入返済354万 を満たす A売上 = {need_a:,.0f}万（{need_a/10000:.2f}億）"
       f"／全社 {(need_a+B_REV)/10000:.2f}億")
+
+# ══ 7. 役員報酬カレンダー（定期同額給与・事前確定届出給与に準拠）═══
+# 決算期 2月末／新事業年度 3/1開始（仮確定）。期の途中では増額できないため、
+# 改定できるのは事業年度の頭（3月支給分）だけ。
+print("\n"+"═"*94); print("【7. 役員報酬カレンダー（3人合計・仮確定）】"); print("═"*94)
+INS_RATIO = 170/1940      # 満額水準（150万×12+140）での法定福利/額面比を流用
+CUR_TOT   = 170           # 現状 3人合計/月（MAGE60+KOSUKE60+GAFU50）
+X_PP      = 120           # FY2027（Q3-Q6）の暫定フラット額・1人あたり/月　※仮
+X_TOT     = X_PP*3
+FULL_PP, FULL_BONUS_PP = 150, 140
+
+def annual_cash(monthly_total, months, bonus_total=0):
+    return monthly_total*months + bonus_total + (monthly_total*months + bonus_total)*INS_RATIO
+
+q1q2  = annual_cash(CUR_TOT, 6)
+fy27x = annual_cash(X_TOT, 12)
+fy28  = annual_cash(FULL_PP*3, 12, FULL_BONUS_PP*3)
+print(f"  Q1・Q2（〜27/2・6ヶ月）  現状 {CUR_TOT}万/月 据え置き（期中は改定不可）      {q1q2:>7,.0f}万")
+print(f"  FY2027 Q3〜Q6（12ヶ月）  {X_TOT}万/月（1人{X_PP}万）フラット・26年12月決議  {fy27x:>7,.0f}万")
+print(f"  FY2028〜（達成後）      {FULL_PP*3}万/月＋賞与{FULL_BONUS_PP*3}万・27年12月決議        {fy28:>7,.0f}万/年")
+print(f"  賞与の事前確定届出給与：決議（27年12月想定）から1ヶ月以内＝28年1月末までに提出")
+
+print(f"\n  FY2027 実際のロールアップ（役員費 {fy27x:,.0f}万 で再計算）")
+# ⚠ REV/GP は【2】でのストック改訂（AI伴走＋魂の記録）を反映済みで 15,952万。
+#   一方 business-plan.html の販売パッケージ系の表はまだ旧ストック単価（15,800万）の
+#   ままで更新されていない（次回の見直し対象）。この節は現行HTMLとの整合を優先し、
+#   HTML側の基準値（15,800万）を明示的に使う。
+A_REV_HTML, A_GP_HTML = 15800, 18255   # business-plan.html が現在採用している基準値
+FIXED_FY27 = fy27x + STAFF5 + DIRECT + COMMON + RESERVE
+op = A_GP_HTML - FIXED_FY27; at = op*(1-TAX)
+print(f"    固定費 {FIXED_FY27:,.0f}万 → 営業利益 {op:,.0f}万 → 税引後 {at:,.0f}万 → 返済後 {at-LOAN:,.0f}万")
+print(f"    （満額を通年計上した旧モデルは 税引後3,328万・返済後2,973万。"
+      f"移行期のぶん実際は上振れる）")
+g_new = GP + B_REV*B_GPR
+op_new = g_new - FIXED_FY27
+print(f"    ※ 参考：REV/GPの最新値（{REV:,.0f}万・粗利{GP:,.0f}万）で全社ロールアップすると、"
+      f"営業利益は約{op_new:,.0f}万・税引後約{op_new*(1-TAX):,.0f}万になる。"
+      f"business-plan.htmlの商品構成表を更新する回で反映する")

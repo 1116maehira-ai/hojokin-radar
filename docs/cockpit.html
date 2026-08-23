@@ -1,0 +1,582 @@
+<title>販売営業部コックピット</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+:root{--bg:#fff;--panel:#f2f5f8;--panel2:#e7edf3;--line:#dbe3ec;--ink:#16202b;--ink2:#5a6b7c;
+ --fire:#d94a1f;--fire-bg:#fdece6;--sea:#0d7c72;--sea-bg:#e2f2f0;--sun:#b57708;--sun-bg:#fdf1da;
+ --sky:#2560a8;--sky-bg:#e6eefa;--done:#0d7c72}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+ --bg:#10151b;--panel:#1a222c;--panel2:#232d39;--line:#2e3a48;--ink:#e8eef4;--ink2:#95a6b8;
+ --fire:#ff8158;--fire-bg:#2c1a14;--sea:#43c3b6;--sea-bg:#0f2724;--sun:#f5bb4a;--sun-bg:#2a2113;
+ --sky:#74aae8;--sky-bg:#141f2e;--done:#43c3b6}}
+:root[data-theme="dark"]{--bg:#10151b;--panel:#1a222c;--panel2:#232d39;--line:#2e3a48;--ink:#e8eef4;--ink2:#95a6b8;
+ --fire:#ff8158;--fire-bg:#2c1a14;--sea:#43c3b6;--sea-bg:#0f2724;--sun:#f5bb4a;--sun-bg:#2a2113;
+ --sky:#74aae8;--sky-bg:#141f2e;--done:#43c3b6}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font-family:"Zen Kaku Gothic New",-apple-system,"Hiragino Kaku Gothic ProN",sans-serif;
+ font-size:16px;line-height:1.8;-webkit-font-smoothing:antialiased}
+.wrap{max-width:940px;margin:0 auto;padding:0 18px}
+.maru{font-family:"Zen Maru Gothic",sans-serif}
+.mono{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
+code{font-family:"IBM Plex Mono",monospace;font-size:.88em;background:var(--panel);padding:1px 5px;border-radius:3px}
+a{color:var(--sky)}
+
+header{padding:52px 0 30px;background:radial-gradient(120% 80% at 15% 0%,var(--fire-bg) 0%,transparent 60%)}
+.kick{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.2em;color:var(--fire);font-weight:600;margin:0 0 14px}
+h1{font-family:"Zen Maru Gothic",sans-serif;font-weight:900;font-size:clamp(27px,5.4vw,44px);line-height:1.3;margin:0 0 16px;text-wrap:balance}
+.lede{color:var(--ink2);max-width:38em;margin:0 0 24px}
+.lede b{color:var(--ink)}
+
+nav.pills{position:sticky;top:0;z-index:30;background:color-mix(in srgb,var(--bg) 93%,transparent);
+ backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:9px 0;margin-bottom:10px}
+.pills-in{max-width:940px;margin:0 auto;padding:0 18px;display:flex;gap:7px;overflow-x:auto;scrollbar-width:none}
+.pills-in::-webkit-scrollbar{display:none}
+.pills a{flex:none;text-decoration:none;font-size:13px;font-weight:700;padding:6px 14px;border-radius:999px;
+ background:var(--panel);color:var(--ink2);white-space:nowrap}
+.pills a:hover{background:var(--fire-bg);color:var(--fire)}
+.pills a:focus-visible{outline:2px solid var(--fire);outline-offset:2px}
+
+section{padding:44px 0 4px;scroll-margin-top:60px}
+h2{font-family:"Zen Maru Gothic",sans-serif;font-weight:900;font-size:clamp(21px,3.6vw,30px);line-height:1.35;margin:0 0 8px;text-wrap:balance}
+.sub{color:var(--ink2);font-size:14.5px;margin:0 0 22px}
+h3{font-family:"Zen Maru Gothic",sans-serif;font-size:17px;font-weight:700;margin:32px 0 10px}
+p{margin:0 0 14px;max-width:42em}
+ul.b{margin:0 0 14px;padding-left:1.35em;max-width:42em}ul.b li{margin-bottom:5px}
+
+/* ── ステップ ── */
+.step{border:1px solid var(--line);border-radius:18px;margin-bottom:16px;overflow:hidden}
+.step>.hd{display:flex;gap:14px;align-items:center;padding:16px 20px;background:var(--panel);flex-wrap:wrap}
+.step>.hd .when{font-family:"IBM Plex Mono",monospace;font-size:11.5px;font-weight:700;color:#fff;
+ background:var(--fire);border-radius:999px;padding:3px 13px;white-space:nowrap}
+.step.later>.hd .when{background:var(--ink2)}
+.step>.hd .ttl{font-family:"Zen Maru Gothic",sans-serif;font-weight:900;font-size:18px;flex:1;min-width:180px}
+.step>.hd .tm{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--ink2);white-space:nowrap}
+.step>.bd{padding:6px 20px 18px}
+
+ul.tasks{list-style:none;margin:0;padding:0}
+ul.tasks>li{display:flex;gap:13px;padding:15px 0;border-bottom:1px dashed var(--line);align-items:flex-start}
+ul.tasks>li:last-child{border-bottom:none}
+ul.tasks input[type=checkbox]{flex:none;width:23px;height:23px;margin:3px 0 0;accent-color:var(--done);cursor:pointer}
+ul.tasks input[type=checkbox]:focus-visible{outline:2px solid var(--fire);outline-offset:2px}
+.tk{flex:1;min-width:0}
+.tk .t{font-family:"Zen Maru Gothic",sans-serif;font-weight:700;font-size:16px;line-height:1.6;display:block}
+.tk .mt{display:flex;gap:7px;flex-wrap:wrap;margin:5px 0 6px}
+.tag{font-family:"IBM Plex Mono",monospace;font-size:10.5px;font-weight:700;padding:1px 9px;border-radius:999px;white-space:nowrap}
+.who{background:var(--sky-bg);color:var(--sky)}
+.min{background:var(--panel2);color:var(--ink2)}
+.cost{background:var(--sun-bg);color:var(--sun)}
+.blk{background:var(--fire-bg);color:var(--fire)}
+.tk .d{font-size:14.5px;color:var(--ink2);line-height:1.8;display:block}
+.tk .d b{color:var(--ink)}
+.tk .out{display:block;margin-top:6px;font-size:13.5px;color:var(--sea);font-weight:700}
+ul.tasks input[type=checkbox]:checked ~ .tk .t{text-decoration:line-through;opacity:.5}
+ul.tasks input[type=checkbox]:checked ~ .tk .d,
+ul.tasks input[type=checkbox]:checked ~ .tk .out{opacity:.45}
+
+/* ── 進捗 ── */
+.prog{background:var(--panel);border-radius:16px;padding:16px 20px;margin-bottom:18px}
+.prog .row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px;flex-wrap:wrap;gap:8px}
+.prog .lab{font-family:"Zen Maru Gothic",sans-serif;font-weight:700;font-size:15px}
+.prog .num{font-family:"IBM Plex Mono",monospace;font-size:15px;color:var(--ink2)}
+.track{height:11px;background:var(--panel2);border-radius:99px;overflow:hidden}
+.fill{height:100%;background:var(--done);border-radius:99px;width:0;transition:width .25s ease}
+
+/* ── カード ── */
+.cards{display:grid;gap:12px;grid-template-columns:1fr;margin-bottom:20px}
+@media(min-width:700px){.cards.c3{grid-template-columns:repeat(3,1fr)}.cards.c2{grid-template-columns:1fr 1fr}}
+.card{background:var(--panel);border-radius:15px;padding:17px 19px}
+.card.hot{background:var(--fire-bg)}.card.ok{background:var(--sea-bg)}
+.card h4{font-family:"Zen Maru Gothic",sans-serif;font-size:15.5px;font-weight:700;margin:0 0 6px}
+.card p{margin:0;font-size:14px;color:var(--ink2);line-height:1.75}
+.card p+p{margin-top:7px}
+.card .big{font-family:"IBM Plex Mono",monospace;font-size:25px;font-weight:600;color:var(--ink);display:block;margin:2px 0 3px}
+
+/* ── リンク集 ── */
+.links{display:grid;gap:10px;grid-template-columns:1fr;margin-bottom:18px}
+@media(min-width:620px){.links{grid-template-columns:1fr 1fr}}
+.lk{display:flex;gap:13px;align-items:flex-start;background:var(--panel);border-radius:14px;padding:14px 17px;
+ text-decoration:none;color:var(--ink);border:1px solid transparent}
+.lk:hover{border-color:var(--fire);background:var(--fire-bg)}
+.lk .ic{flex:none;font-size:20px;line-height:1.3}
+.lk .n{font-family:"Zen Maru Gothic",sans-serif;font-weight:700;font-size:15px;display:block}
+.lk .s{font-size:13px;color:var(--ink2);line-height:1.65;display:block;margin-top:1px}
+
+/* ── 表 ── */
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:14px;margin-bottom:18px}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:560px}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+thead th{background:var(--panel2);font-size:11.5px;letter-spacing:.07em;color:var(--ink2);
+ font-family:"IBM Plex Mono",monospace;font-weight:700;white-space:nowrap}
+tbody tr:last-child td{border-bottom:none}
+td.n,th.n{text-align:right;font-family:"IBM Plex Mono",monospace;white-space:nowrap}
+tr.hi td{background:var(--fire-bg)}
+input.cell{width:100%;min-width:58px;border:1px solid var(--line);border-radius:7px;padding:5px 8px;
+ font-family:"IBM Plex Mono",monospace;font-size:14px;background:var(--bg);color:var(--ink);text-align:right}
+input.cell:focus{outline:2px solid var(--fire);outline-offset:-1px;border-color:var(--fire)}
+
+.note{border:1px solid var(--line);border-left:4px solid var(--sun);background:var(--panel);
+ border-radius:0 13px 13px 0;padding:16px 20px;margin:0 0 20px;font-size:14.5px}
+.note.warn{border-left-color:var(--fire)}.note.ok{border-left-color:var(--sea)}
+.note p{max-width:none;margin:0 0 10px}.note p:last-child{margin:0}
+.note .tag2{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.14em;font-weight:700;
+ color:var(--sun);display:block;margin-bottom:6px}
+.note.warn .tag2{color:var(--fire)}.note.ok .tag2{color:var(--sea)}
+.quote{background:var(--panel);border-radius:12px;padding:15px 18px;margin:0 0 14px;
+ font-family:"Zen Maru Gothic",sans-serif;font-size:14.5px;line-height:1.9;white-space:pre-wrap}
+footer{border-top:1px solid var(--line);margin-top:48px;padding:26px 0 60px;font-size:13px;color:var(--ink2)}
+</style>
+
+<header><div class="wrap">
+  <p class="kick">株式会社TENOHIRA 販売営業部 ／ 2026.08.23 –</p>
+  <h1>明日から、これをやる。</h1>
+  <p class="lede">
+    考えることは全部終わりました。<b>あとは、小さな1歩の連続だけです。</b><br>
+    チェックを入れると<b>全員に共有されて保存されます</b>。誰がどこまで進んだかが、このページ1枚で分かります。
+  </p>
+  <artifact-local>
+  <div class="prog">
+    <div class="row"><span class="lab">ぜんぶの進み具合</span><span class="num" id="pAll">0 / 0</span></div>
+    <div class="track"><div class="fill" id="fAll"></div></div>
+  </div>
+  </artifact-local>
+</div></header>
+
+<nav class="pills" aria-label="メニュー"><div class="pills-in">
+  <a href="#now">いま何をやるか</a>
+  <a href="#s0">今夜</a>
+  <a href="#s1">明日</a>
+  <a href="#s2">今週</a>
+  <a href="#s3">来週</a>
+  <a href="#s4">1ヶ月目</a>
+  <a href="#orient">1.5人オリエン</a>
+  <a href="#watch">毎週の数字</a>
+  <a href="#all">全部のリンク</a>
+</div></nav>
+
+<div class="wrap">
+
+<!-- ══════ NOW ══════ -->
+<section id="now">
+  <h2>いま止まっているのは、この3つだけ</h2>
+  <p class="sub">これが動けば、あとは全部つながっています。</p>
+  <div class="cards c3">
+    <div class="card hot"><h4>① 1.5人を誰にするか</h4>
+      <p>これが決まらないと、手紙も架電もYouTubeも回りません。<b>いちばん上流の決定です。</b></p></div>
+    <div class="card hot"><h4>② 架電の外注先</h4>
+      <p>1日1万円×60件×週3回。<b>必要な商談の半分がここから来ます。</b>3社に相見積を。</p></div>
+    <div class="card hot"><h4>③ 決算期の確認</h4>
+      <p>賞与420万を経費にできるかがかかっています。<b>税理士にLINE1本。</b></p></div>
+  </div>
+  <div class="note ok">
+    <span class="tag2">もう終わっていること</span>
+    <p><b>AI研修LPは修正して公開済み。</b>アタックリスト211社も出ています。手紙の文面も架電スクリプトも提案書もヒアリング設計も、全部できています。<b>作るフェーズは終わりました。</b></p>
+  </div>
+</section>
+
+<!-- ══════ STEP 0 ══════ -->
+<section id="s0">
+  <h2>今夜やること</h2>
+  <p class="sub">30分。明日を止めないための、事前の3つ。</p>
+  <div class="step"><div class="hd">
+    <span class="when">今夜</span><span class="ttl">明日の準備</span><span class="tm">30分</span>
+  </div><div class="bd">
+    <ul class="tasks">
+      <li><input type="checkbox" id="t01"><div class="tk">
+        <span class="t">修正版のAI研修LPを、スマホで開いて確認する</span>
+        <span class="mt"><span class="tag who">前平</span><span class="tag min">5分</span></span>
+        <span class="d">公開済みです。<b>「書き方は、TENOHIRAがお伝えします」</b>に変わっているか、フッターが出ているかを見てください。<a href="https://1116maehira-ai.github.io/reskilling-lp/" target="_blank" rel="noopener">研修LPを開く</a></span>
+        <span class="out">→ 明日の架電で、この URL を案内できる</span>
+      </div></li>
+      <li><input type="checkbox" id="t02"><div class="tk">
+        <span class="t">税理士さんにLINEを1本</span>
+        <span class="mt"><span class="tag who">前平</span><span class="tag min">3分</span><span class="tag blk">これが最優先</span></span>
+        <span class="d">聞くのは2つだけ。<b>「決算期はいつでしたっけ」「役員報酬の改定と、事前確定届出給与の届出期限を教えてください」</b>。3人分あるので、間違えると税額で140万の差が出ます。</span>
+        <span class="out">→ 報酬引き上げカレンダーが確定する</span>
+      </div></li>
+      <li><input type="checkbox" id="t03"><div class="tk">
+        <span class="t">式典映像LPの修正版HTMLを手元に出しておく</span>
+        <span class="mt"><span class="tag who">前平</span><span class="tag min">5分</span></span>
+        <span class="d">別のチャットで直してもらった最新版のファイル。<b>明日これをもらえれば、その日のうちにデプロイできます。</b></span>
+        <span class="out">→ 明日、映像LPも公開状態になる</span>
+      </div></li>
+      <li><input type="checkbox" id="t04"><div class="tk">
+        <span class="t">明日の3時間をカレンダーで押さえる</span>
+        <span class="mt"><span class="tag who">前平</span><span class="tag min">2分</span></span>
+        <span class="d">午前でも午後でもいい。<b>連続した3時間。</b>明日のリストは、細切れだと終わりません。</span>
+        <span class="out">→ 明日が「やる日」になる</span>
+      </div></li>
+    </ul>
+  </div></div>
+</section>
+
+<!-- ══════ STEP 1 ══════ -->
+<section id="s1">
+  <h2>明日やること</h2>
+  <p class="sub">3時間。ここで6つ動かせば、来週から仕組みが回り始めます。</p>
+  <div class="step"><div class="hd">
+    <span class="when">Day 1</span><span class="ttl">回し始める</span><span class="tm">3時間</span>
+  </div><div class="bd">
+    <ul class="tasks">
+      <li><input type="checkbox" id="t11"><div class="tk">
+        <span class="t">1.5人を誰にするか、役員2名と決める</span>
+        <span class="mt"><span class="tag who">前平＋役員2名</span><span class="tag min">40分</span><span class="tag blk">全部これ待ち</span></span>
+        <span class="d">決めるのは2つ。<b>1.0人＝門を叩く人</b>（手紙を届け、断られてもまた次へ行ける人）と、<b>0.5人＝段取りの人</b>（提案書の仕上げと30案件の進行管理。HIBIKIの制作進行の適性に近い）。<br>
+        既存5名から回すなら制作の手が減ります。新規なら採用に1ヶ月かかります。<b>どちらでもいいので、明日決めてください。</b></span>
+        <span class="out">→ 手紙・架電・YouTubeの担当が決まる</span>
+      </div></li>
+      <li><input type="checkbox" id="t12"><div class="tk">
+        <span class="t">架電の外注先3社に、条件を聞く</span>
+        <span class="mt"><span class="tag who">前平</span><span class="tag min">30分</span><span class="tag cost">月20万の枠</span></span>
+        <span class="d">聞く条件はこれだけ。<b>「1日1万円で60件、週3回、月720件。沖縄県内の建設・不動産向け。スクリプトはこちらで用意します」</b>。<br>
+        テレアポ代行で検索して3社、または同友会・倫理法人会のつながりから。<b>相見積を取ってください。</b></span>
+        <span class="out">→ 月10.8アポ（必要な商談の半分）の見通しが立つ</span>
+      </div></li>
+      <li><input type="checkbox" id="t13"><div class="tk">
+        <span class="t">直筆風の手紙マシンを調べて、見積を取る</span>
+        <span class="mt"><span class="tag who">前平</span><span class="tag min">30分</span><span class="tag cost">初期費用</span></span>
+        <span class="d">検索ワードは<b>「手書き風 DM 代行」「筆跡 ロボット 手紙」</b>。買う（10〜30万）か、1通いくらの代行に出す（1通150〜300円）かの2択。<br>
+        <b>月30通なら代行のほうが安い。月60通を超えるなら買ったほうが得です。</b>まず両方の見積を。</span>
+        <span class="out">→ 手紙が「量産できるもの」になる</span>
+      </div></li>
+      <li><input type="checkbox" id="t14"><div class="tk">
+        <span class="t">アタックリストのCSVをスプレッドシートに入れる</span>
+        <span class="mt"><span class="tag who">前平 or 1.0人</span><span class="tag min">15分</span></span>
+        <span class="d">211社のCSVをGoogleスプレッドシートにアップして、共有リンクを1.5人に渡せる状態にする。<b>「ステータス」列を1つ足してください</b>（未着手／裏取り済／手紙済／架電済／アポ／NG）。<a href="./attack-list.html" target="_blank" rel="noopener">リストを見る</a></span>
+        <span class="out">→ 全員が同じリストを見て動ける</span>
+      </div></li>
+      <li><input type="checkbox" id="t15"><div class="tk">
+        <span class="t">手紙の1通目を、書いて、出す</span>
+        <span class="mt"><span class="tag who">前平</span><span class="tag min">30分</span></span>
+        <span class="d">Sランクの一番上の会社に。<a href="./sales-toolkit.html#s1" target="_blank" rel="noopener">文面テンプレ</a>をコピーして、<b>書き出しの3行だけ</b>書き換える。設立年と代表者名は<b>必ず先に確認</b>してください（法人番号公表サイトとHPで3分）。<br>
+        機械が来るまでは手書きでいい。<b>1通目は完璧を待たないこと。</b></span>
+        <span class="out">→ 3日後に電話をかける理由ができる</span>
+      </div></li>
+      <li><input type="checkbox" id="t16"><div class="tk">
+        <span class="t">YouTubeの1本目を、誰に頼むか決めて連絡する</span>
+        <span class="mt"><span class="tag who">前平</span><span class="tag min">15分</span></span>
+        <span class="d">4団体（倫理法人会・同友会・経営実践研究会・経営品質研究会）の中で、<b>いちばん話しやすい人</b>から。1本目は必ず硬くなるので、失敗しても撮り直せる相手を選んでください。<br>
+        言い方は<a href="./sales-toolkit.html#s4" target="_blank" rel="noopener">ヒアリング設計</a>の「撮影許可のとり方」をそのまま。</span>
+        <span class="out">→ 半年後にいちばん効くチャネルが動き出す</span>
+      </div></li>
+    </ul>
+  </div></div>
+</section>
+
+<!-- ══════ STEP 2 ══════ -->
+<section id="s2">
+  <h2>今週やること</h2>
+  <p class="sub">Day 2〜7。作るものを全部発注して、リストを使える状態にする。</p>
+  <div class="step"><div class="hd">
+    <span class="when">今週</span><span class="ttl">仕込みを終わらせる</span><span class="tm">合計 8時間くらい</span>
+  </div><div class="bd">
+    <ul class="tasks">
+      <li><input type="checkbox" id="t21"><div class="tk">
+        <span class="t">「全部そろい」62社の裏取りを終わらせる</span>
+        <span class="mt"><span class="tag who">1.0人</span><span class="tag min">3時間</span></span>
+        <span class="d"><b>1.5人が入ったら、最初に渡す仕事はこれです。</b>法人番号・代表者名・設立年が全部埋まっている62社を、国税庁の法人番号公表サイトとHPの会社概要で突き合わせる。1社3分。<br>
+        <b>データベースの値は全件が未検証（仮）です。</b>ここを間違えた手紙は、届いた瞬間に信用を失います。</span>
+        <span class="out">→ 最初の2ヶ月分の手紙が、安心して書ける</span>
+      </div></li>
+      <li><input type="checkbox" id="t22"><div class="tk">
+        <span class="t">チラシ2種・名刺・パンフレットをデザイナーに一括発注する</span>
+        <span class="mt"><span class="tag who">前平</span><span class="tag min">1時間</span><span class="tag cost">60万くらい</span></span>
+        <span class="d"><b>LPが2枚できたので、そこから流用できます。</b>ゼロから作らせないでください。<br>
+        中身は全部書いてあります：<a href="./index-map.html#m-flyer" target="_blank" rel="noopener">チラシ2種の全文</a>／<a href="./index-map.html#m-card" target="_blank" rel="noopener">名刺の裏面</a>／<a href="./index-map.html#m-pamph" target="_blank" rel="noopener">パンフ6面の構成</a>。<b>納品はHTMLとaiデータで</b>（あとで自分たちで差し替えられるように）。</span>
+        <span class="out">→ 郵送と手渡しの弾ができる</span>
+      </div></li>
+      <li><input type="checkbox" id="t23"><div class="tk">
+        <span class="t">提携社労士に打診する</span>
+        <span class="mt"><span class="tag who">前平</span><span class="tag min">30分</span></span>
+        <span class="d">AI研修の助成金で組む相手。<b>「申請書類は御社（顧客）が書く。うちは書き方を教える。分からない部分が出たときに相談させてほしい」</b>という関係でいい。丸ごと任せると粗利が落ちます。<br>
+        同友会・倫理法人会に必ず何人かいます。<b>2人確保できるとなお良い。</b></span>
+        <span class="out">→ AI研修120万の価格説得力が固まる</span>
+      </div></li>
+      <li><input type="checkbox" id="t24"><div class="tk">
+        <span class="t">メタ広告のABテスト文面を3本つくる</span>
+        <span class="mt"><span class="tag who">前平＋1.0人</span><span class="tag min">40分</span><span class="tag cost">月3万</span></span>
+        <span class="d">下の「広告のABテスト」に3本用意してあります。<b>そのまま入稿できます。</b>ターゲットは沖縄県／35〜65歳／経営者・自営業・管理職。<br>
+        <b>クリエイティブは新しく作らないこと。</b>YouTubeのショートをそのまま使います。</span>
+        <span class="out">→ 手紙が届いた会社が検索したとき、ちゃんと出てくる</span>
+      </div></li>
+      <li><input type="checkbox" id="t25"><div class="tk">
+        <span class="t">リスティング広告のキーワードを設計する</span>
+        <span class="mt"><span class="tag who">前平</span><span class="tag min">30分</span><span class="tag cost">月3万</span></span>
+        <span class="d">下の「広告のABテスト」にキーワード案があります。<b>「沖縄 周年 映像」「沖縄 AI研修 助成金」など、悩んでいる人が打つ言葉だけ</b>に絞る。<br>
+        「映像制作 沖縄」のような大きい語は単価が高くて溶けます。<b>入れないでください。</b></span>
+        <span class="out">→ 探している人が、確実に着地する</span>
+      </div></li>
+      <li><input type="checkbox" id="t26"><div class="tk">
+        <span class="t">手紙の原稿をAIに下書きさせる仕組みをつくる</span>
+        <span class="mt"><span class="tag who">前平</span><span class="tag min">40分</span></span>
+        <span class="d"><a href="./sales-toolkit.html#s1" target="_blank" rel="noopener">AIへの指示文</a>がそのまま使えます。スプレッドシートの1行を貼れば、書き出し3〜4行が出てくる状態に。<br>
+        <b>これができると、原稿制作が3日→1.5日になり、手紙が月30通→60通に増えます。</b>商談数が倍になる、いちばん費用対効果の高い1時間です。</span>
+        <span class="out">→ 手紙が倍出せるようになる</span>
+      </div></li>
+      <li><input type="checkbox" id="t27"><div class="tk">
+        <span class="t">県内の製造業リストを追加でつくる</span>
+        <span class="mt"><span class="tag who">前平＋AI</span><span class="tag min">40分</span></span>
+        <span class="d">研修LPは「建設・不動産・<b>製造業</b>」を謳っているのに、<b>データベースに製造業が0件</b>でした。ここが穴です。<br>
+        法人番号データ＋Google Maps APIで、既存と同じ条件（沖縄県／設立30〜55年／求人出稿）で抽出すれば、母数が増えます。</span>
+        <span class="out">→ アタックできる母数が増える</span>
+      </div></li>
+    </ul>
+  </div></div>
+</section>
+
+<!-- ══════ STEP 3 ══════ -->
+<section id="s3">
+  <h2>来週やること</h2>
+  <p class="sub">Day 8〜14。ここから「毎月まわる仕組み」に入ります。</p>
+  <div class="step"><div class="hd">
+    <span class="when">来週</span><span class="ttl">仕組みを起動する</span><span class="tm">毎日1〜2時間</span>
+  </div><div class="bd">
+    <ul class="tasks">
+      <li><input type="checkbox" id="t31"><div class="tk">
+        <span class="t">1.5人のオリエンテーションをやる</span>
+        <span class="mt"><span class="tag who">前平</span><span class="tag min">90分</span><span class="tag blk">これが分岐点</span></span>
+        <span class="d">下の<a href="#orient">「1.5人オリエン」</a>に、見せる順番と話すことが全部書いてあります。<b>資料は作らなくていい。このページと全体図を一緒に見るだけです。</b></span>
+        <span class="out">→ 2人が「自分の使命」を持って動き出す</span>
+      </div></li>
+      <li><input type="checkbox" id="t32"><div class="tk">
+        <span class="t">手紙30通の1サイクル目を完走する</span>
+        <span class="mt"><span class="tag who">1.0人</span><span class="tag min">7営業日</span></span>
+        <span class="d">原稿3日 → 機械で清書1日 → 訪問お届け3日。<b>そして3〜5日後の追跡架電を、出す前にカレンダーへ入れてください。</b><br>
+        転換率15%は、手紙＋訪問＋追跡電話の3点セットで初めて出る数字です。<b>届けて終わりにすると2〜3%に落ちます。</b></span>
+        <span class="out">→ 4〜5件の商談が生まれる</span>
+      </div></li>
+      <li><input type="checkbox" id="t33"><div class="tk">
+        <span class="t">架電外注をスタートする（週3回×60件）</span>
+        <span class="mt"><span class="tag who">1.0人が管理</span><span class="tag min">週2時間</span><span class="tag cost">月20万</span></span>
+        <span class="d"><a href="./sales-toolkit.html#s2" target="_blank" rel="noopener">スクリプトとリスト仕様13列</a>をそのまま渡す。<b>入口はAI研修＋助成金の一本だけ。理念映像の話はさせないこと。</b><br>
+        毎週見るのは3つだけ：<b>接続率・アポ率・資料送付数</b>。</span>
+        <span class="out">→ 月10件のアポが立ち上がる</span>
+      </div></li>
+      <li><input type="checkbox" id="t34"><div class="tk">
+        <span class="t">チラシを郵送 → 3日後に架電、の流れを組む</span>
+        <span class="mt"><span class="tag who">1.0人</span><span class="tag min">週1時間</span></span>
+        <span class="d"><b>手紙（月30通・手渡し）とは別枠</b>で、チラシを郵送で数百通。<b>そして郵送リストを、そのまま架電外注のリストに回します。</b><br>
+        第一声が「<b>先日チラシをお送りした</b>TENOHIRAです」になるだけで、接続率も転換率も上がります。スプレッドシートに「チラシ送付日」の列を足してください。</span>
+        <span class="out">→ 架電のアポ率が1.5%→2%台に上がる</span>
+      </div></li>
+      <li><input type="checkbox" id="t35"><div class="tk">
+        <span class="t">メタ広告とリスティングを、両方まわし始める</span>
+        <span class="mt"><span class="tag who">1.0人</span><span class="tag min">初期2時間</span><span class="tag cost">月3万＋3万</span></span>
+        <span class="d">3本のABテストを同時に走らせて、<b>2週間後にクリック単価と滞在時間で1本に絞る</b>。<br>
+        <b>この広告から直接お客さんは来ません。</b>役割は「手紙が届いた会社が検索したとき、ちゃんと出てくる」こと。問い合わせ数で評価しないでください。</span>
+        <span class="out">→ 信用の裏取りができる</span>
+      </div></li>
+      <li><input type="checkbox" id="t36"><div class="tk">
+        <span class="t">YouTubeの1本目を撮る</span>
+        <span class="mt"><span class="tag who">前平＋1.0人</span><span class="tag min">半日</span></span>
+        <span class="d">カメラ2台＋ピンマイク2本、三脚固定で回しっぱなし。<b>凝らないこと。</b>質問は<a href="./sales-toolkit.html#s4" target="_blank" rel="noopener">15問</a>を上から順に。<br>
+        <b>7番「やめなかったのは、なぜですか」のあとの沈黙を、埋めないでください。</b>あそこで待てるかどうかが全部です。</span>
+        <span class="out">→ 営業・コンテンツ・商品デモ・理念映像の素材が、1回で4つ手に入る</span>
+      </div></li>
+    </ul>
+  </div></div>
+</section>
+
+<!-- ══════ STEP 4 ══════ -->
+<section id="s4">
+  <h2>1ヶ月目の残り</h2>
+  <p class="sub">Day 15〜30。2サイクル目を回して、数字を測る。</p>
+  <div class="step later"><div class="hd">
+    <span class="when">Day 15-30</span><span class="ttl">回して、測る</span><span class="tm">—</span>
+  </div><div class="bd">
+    <ul class="tasks">
+      <li><input type="checkbox" id="t41"><div class="tk">
+        <span class="t">手紙の2サイクル目（AI下書きで月60通に増やす）</span>
+        <span class="mt"><span class="tag who">1.0人</span></span>
+        <span class="d">1サイクル目で型ができているはず。<b>2サイクル目からAI下書きを入れて倍にします。</b></span>
+        <span class="out">→ 商談が4.5件/月 → 9件/月へ</span>
+      </div></li>
+      <li><input type="checkbox" id="t42"><div class="tk">
+        <span class="t">初回ヒアリング商談を回す（目標 月4〜6件）</span>
+        <span class="mt"><span class="tag who">前平</span></span>
+        <span class="d">1ヶ月目はまだ立ち上がりです。<b>4〜6件出れば十分。</b>1件あたり2.5時間（移動込み）。<br>
+        <b>必ず録画してください。</b>提案書の2ページ目「聞かせていただいたこと」がそのまま作れます。</span>
+        <span class="out">→ 提案書が書ける状態になる</span>
+      </div></li>
+      <li><input type="checkbox" id="t43"><div class="tk">
+        <span class="t">1件目の提案書を出す（できればフルパッケージ305万）</span>
+        <span class="mt"><span class="tag who">前平＋0.5人</span></span>
+        <span class="d"><a href="./sales-toolkit.html#s3" target="_blank" rel="noopener">11ページの構成</a>。<b>2ページ目にいちばん時間をかけてください。</b>社長の言葉を、きれいにせずそのまま。<br>
+        <b>1件目の実績が、次の10件を連れてきます。</b></span>
+        <span class="out">→ 「305万が売れる」ことが証明される</span>
+      </div></li>
+      <li><input type="checkbox" id="t44"><div class="tk">
+        <span class="t">セミナー1回目の日程と会場を決める</span>
+        <span class="mt"><span class="tag who">前平</span></span>
+        <span class="d">1回20社×転換率30%＝6商談。<b>四半期に1〜2回から始めて、Q5で4回へ。</b>会場は商工会議所か、団体の会合に相乗り。</span>
+        <span class="out">→ 1対多のチャネルが増える</span>
+      </div></li>
+      <li><input type="checkbox" id="t45"><div class="tk">
+        <span class="t">1ヶ月目の数字を測って、逆算を引き直す</span>
+        <span class="mt"><span class="tag who">前平</span><span class="tag min">1時間</span></span>
+        <span class="d">下の<a href="#watch">「毎週の数字」</a>に入れた実測値で、計画の率を差し替えます。<b>手紙の転換率15%、架電1.5%、成約率40%が本当かを確かめる。</b><br>
+        <b>ここがこの計画のいちばん大事な瞬間です。</b>予想が外れていたら、外れたほうが正しい。</span>
+        <span class="out">→ 2ヶ月目からの計画が、実測に基づいたものになる</span>
+      </div></li>
+    </ul>
+  </div></div>
+</section>
+
+<!-- ══════ 広告 ══════ -->
+<section id="ads">
+  <h2>広告のABテスト（そのまま入稿できます）</h2>
+  <p class="sub">メタ広告 月3万／リスティング 月3万。2週間で1本に絞ります。</p>
+
+  <h3>メタ広告（Facebook・Instagram）3パターン</h3>
+  <div class="cards c3">
+    <div class="card"><h4>A ── 問いかけ型</h4>
+      <p class="mono" style="font-size:12px;color:var(--fire)">→ 映像LPへ</p>
+      <p><b>社長のその話、社員は聞いたことありますか？</b><br><br>
+      沖縄の経営者に、創業のことを聞いて回っています。<br>「やめようと思った日」の話が、いちばん多く再生されています。<br><br>▶ インタビューを見る</p></div>
+    <div class="card"><h4>B ── 数字型</h4>
+      <p class="mono" style="font-size:12px;color:var(--sky)">→ 研修LPへ</p>
+      <p><b>AI研修に、国の助成金が使えます。</b><br><br>
+      研修費120万円 → 会社の負担 約30万円。<br>社員がHP・動画・SNSを自分たちで作れるようになります。<br><br>▶ カリキュラムを見る</p></div>
+    <div class="card"><h4>C ── 期限型</h4>
+      <p class="mono" style="font-size:12px;color:var(--fire)">→ 映像LPへ</p>
+      <p><b>周年式典、一日で終わらせますか。</b><br><br>
+      写真が少し残って、あとは記憶になっていく。<br>その一日を、50年先まで残る形にできます。最短3週間。<br><br>▶ 実績を見る</p></div>
+  </div>
+  <div class="note">
+    <span class="tag2">2週間後に見る数字</span>
+    <p><b>クリック単価</b>と<b>LPの滞在時間</b>の2つだけ。問い合わせ数では判断しないでください（月3万では母数が足りません）。<br>
+    <b>滞在時間がいちばん長かった1本に、翌月から全額を寄せます。</b></p>
+  </div>
+
+  <h3>リスティング広告（Google）</h3>
+  <div class="tw"><table>
+    <thead><tr><th>キーワード群</th><th>例</th><th>飛び先</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td><b>周年・式典</b></td><td>沖縄 周年 映像／沖縄 創立記念 動画／周年式典 映像 制作 沖縄／社史 映像 沖縄</td><td>映像LP</td></tr>
+      <tr class="hi"><td><b>AI研修＋助成金</b></td><td>沖縄 AI研修 助成金／人材開発支援助成金 AI／ChatGPT 研修 沖縄／社員 AI 教育 助成金</td><td>研修LP</td></tr>
+      <tr><td>採用</td><td>沖縄 採用動画 制作／会社紹介 動画 沖縄／求人 動画 沖縄</td><td>映像LP</td></tr>
+      <tr><td>事業承継</td><td>事業承継 映像／先代 想い 記録／二代目 社長 ブランディング</td><td>映像LP</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note warn">
+    <span class="tag2">入れてはいけないキーワード</span>
+    <p><b>「映像制作 沖縄」「動画制作」「PR動画」</b>のような大きい語。単価が高いうえに、価格だけを比べる人しか来ません。月3万が1週間で溶けます。<br>
+    <b>「悩んでいる人が打つ言葉」だけに絞ってください。</b>周年・助成金・事業承継は、そういう言葉です。</p>
+  </div>
+</section>
+
+<!-- ══════ オリエン ══════ -->
+<section id="orient">
+  <h2>1.5人のオリエンテーション</h2>
+  <p class="sub">90分。資料は作らなくていい。このページと全体図を、一緒に見るだけです。</p>
+
+  <div class="tw"><table>
+    <thead><tr><th class="n">順</th><th>見せるもの</th><th class="n">時間</th><th>話すこと</th></tr></thead>
+    <tbody>
+      <tr><td class="n">1</td><td><b>使命</b>（全体図の①）</td><td class="n">15分</td><td>数字の話より先に、これ。<b>「あなたの声・腕・足になる。武器と盾を渡す。勇気になって、一緒に立ち上がる」</b>──なぜこの仕事をするのか。<b>ここで共鳴しない人とは、組まないほうがいい。</b></td></tr>
+      <tr><td class="n">2</td><td><b>生き物の図</b>（全体図の最初）</td><td class="n">10分</td><td>会社が1つの循環であること。<b>「あなたが止まると、2ヶ月後に全部止まる」</b>を、図で見せる。自分の位置が分かります。</td></tr>
+      <tr class="hi"><td class="n">3</td><td><b>その人の使命とKPI</b>（全体図の④）</td><td class="n">20分</td><td><b>ここが本番。</b>「作業のリスト」ではなく「あなたが守るもの」として渡す。<br>1.0人＝<b>会いたい会社の門を、自分の足で叩く。断られても、また次の門へ行く。</b><br>0.5人＝<b>決まった約束を、ひとつも落とさず、遅らせず、形にする。</b><br>KPIは3つだけ。増やさない。</td></tr>
+      <tr><td class="n">4</td><td><b>お金の話</b>（全体図の②）</td><td class="n">15分</td><td>売上・粗利・固定費の意味から。<b>そして「2028年3月に、手取りが2倍になる」を数字の根拠つきで見せる。</b>これを最初から言い切れる会社は沖縄にほとんどありません。</td></tr>
+      <tr><td class="n">5</td><td><b>LP 2枚</b></td><td class="n">10分</td><td>自分が売るものを、お客さんが見る形で見せる。<b>スマホで見せてください。</b></td></tr>
+      <tr class="hi"><td class="n">6</td><td><b>このページ</b></td><td class="n">20分</td><td>明日から何をするかを一緒に見る。<b>その場で、最初のチェックを1つ入れてもらう。</b>チェックは全員に共有されるので、その瞬間からチームになります。</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="note ok">
+    <span class="tag2">この順番の理由</span>
+    <p><b>数字を先に見せると、people は「ノルマ」だと思います。使命を先に見せると、「自分の仕事」だと思います。</b>同じ内容でも、順番で受け取り方が変わります。<br>
+    そして<b>③でその人だけの使命を言葉にして渡す</b>のが山場です。ここを飛ばして「手紙を届けてください」と言うと、ただの雑用になります。</p>
+  </div>
+
+  <div class="note warn">
+    <span class="tag2">最初に伝えておくこと</span>
+    <p><b>やったらダメな3つ</b>を、初日に言ってください。人のせいにする／嘘つく・誤魔化す・隠す／人を落とす・足を引っ張る・邪魔する。<b>誰であっても一発アウト。</b><br>
+    そして<b>「使命に賛同できないまま居座る状態は、こちらから対話を持ちかける」</b>ことも、先に伝えておく。あとから言うと、裏切りに聞こえます。</p>
+  </div>
+</section>
+
+<!-- ══════ 観測 ══════ -->
+<section id="watch">
+  <h2>毎週の数字</h2>
+  <p class="sub">金曜の夕方に5分。入れた数字は全員に共有されて保存されます。</p>
+  <div class="note">
+    <span class="tag2">見るのはこの5つだけ</span>
+    <p>増やすと、続きません。<b>週の目標は 手紙8通／架電180件／アポ3件／商談3件／成約1件</b>（Q1の水準）。<br>
+    <b>2週続けて目標の半分を切ったら、そこがボトルネックです。</b>人を責めずに、やり方を変えてください。</p>
+  </div>
+  <div class="tw"><table>
+    <thead><tr><th>週</th><th class="n">手紙<br>（届けた数）</th><th class="n">架電<br>（件数）</th><th class="n">アポ<br>（獲得）</th><th class="n">商談<br>（実施）</th><th class="n">成約</th><th class="n">YouTube<br>（撮影）</th></tr></thead>
+    <tbody>
+      <tr><td>第1週</td><td><input class="cell" id="w1a" type="text" inputmode="numeric"></td><td><input class="cell" id="w1b" type="text" inputmode="numeric"></td><td><input class="cell" id="w1c" type="text" inputmode="numeric"></td><td><input class="cell" id="w1d" type="text" inputmode="numeric"></td><td><input class="cell" id="w1e" type="text" inputmode="numeric"></td><td><input class="cell" id="w1f" type="text" inputmode="numeric"></td></tr>
+      <tr><td>第2週</td><td><input class="cell" id="w2a" type="text" inputmode="numeric"></td><td><input class="cell" id="w2b" type="text" inputmode="numeric"></td><td><input class="cell" id="w2c" type="text" inputmode="numeric"></td><td><input class="cell" id="w2d" type="text" inputmode="numeric"></td><td><input class="cell" id="w2e" type="text" inputmode="numeric"></td><td><input class="cell" id="w2f" type="text" inputmode="numeric"></td></tr>
+      <tr><td>第3週</td><td><input class="cell" id="w3a" type="text" inputmode="numeric"></td><td><input class="cell" id="w3b" type="text" inputmode="numeric"></td><td><input class="cell" id="w3c" type="text" inputmode="numeric"></td><td><input class="cell" id="w3d" type="text" inputmode="numeric"></td><td><input class="cell" id="w3e" type="text" inputmode="numeric"></td><td><input class="cell" id="w3f" type="text" inputmode="numeric"></td></tr>
+      <tr><td>第4週</td><td><input class="cell" id="w4a" type="text" inputmode="numeric"></td><td><input class="cell" id="w4b" type="text" inputmode="numeric"></td><td><input class="cell" id="w4c" type="text" inputmode="numeric"></td><td><input class="cell" id="w4d" type="text" inputmode="numeric"></td><td><input class="cell" id="w4e" type="text" inputmode="numeric"></td><td><input class="cell" id="w4f" type="text" inputmode="numeric"></td></tr>
+      <tr><td>第5週</td><td><input class="cell" id="w5a" type="text" inputmode="numeric"></td><td><input class="cell" id="w5b" type="text" inputmode="numeric"></td><td><input class="cell" id="w5c" type="text" inputmode="numeric"></td><td><input class="cell" id="w5d" type="text" inputmode="numeric"></td><td><input class="cell" id="w5e" type="text" inputmode="numeric"></td><td><input class="cell" id="w5f" type="text" inputmode="numeric"></td></tr>
+      <tr><td>第6週</td><td><input class="cell" id="w6a" type="text" inputmode="numeric"></td><td><input class="cell" id="w6b" type="text" inputmode="numeric"></td><td><input class="cell" id="w6c" type="text" inputmode="numeric"></td><td><input class="cell" id="w6d" type="text" inputmode="numeric"></td><td><input class="cell" id="w6e" type="text" inputmode="numeric"></td><td><input class="cell" id="w6f" type="text" inputmode="numeric"></td></tr>
+      <tr><td>第7週</td><td><input class="cell" id="w7a" type="text" inputmode="numeric"></td><td><input class="cell" id="w7b" type="text" inputmode="numeric"></td><td><input class="cell" id="w7c" type="text" inputmode="numeric"></td><td><input class="cell" id="w7d" type="text" inputmode="numeric"></td><td><input class="cell" id="w7e" type="text" inputmode="numeric"></td><td><input class="cell" id="w7f" type="text" inputmode="numeric"></td></tr>
+      <tr><td>第8週</td><td><input class="cell" id="w8a" type="text" inputmode="numeric"></td><td><input class="cell" id="w8b" type="text" inputmode="numeric"></td><td><input class="cell" id="w8c" type="text" inputmode="numeric"></td><td><input class="cell" id="w8d" type="text" inputmode="numeric"></td><td><input class="cell" id="w8e" type="text" inputmode="numeric"></td><td><input class="cell" id="w8f" type="text" inputmode="numeric"></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ══════ 全リンク ══════ -->
+<section id="all">
+  <h2>全部のリンク</h2>
+  <p class="sub">ここから全部に行けます。</p>
+
+  <h3>考えるための資料</h3>
+  <div class="links">
+    <a class="lk" href="./index-map.html"><span class="ic">🫀</span><span><span class="n">全体図</span><span class="s">使命・お金・商品・人とKPI・媒体・期限を1枚に。<b>オリエンで使うのはこれ</b></span></span></a>
+    <a class="lk" href="./business-plan.html"><span class="ic">🔥</span><span><span class="n">事業計画書</span><span class="s">6クォーターの数値計画。1.58億の内訳と根拠</span></span></a>
+  </div>
+
+  <h3>売るための道具</h3>
+  <div class="links">
+    <a class="lk" href="./sales-toolkit.html"><span class="ic">🗡️</span><span><span class="n">営業の四つ道具</span><span class="s">手紙の文面・架電スクリプト・提案書・ヒアリング15問</span></span></a>
+    <a class="lk" href="./attack-list.html"><span class="ic">🎯</span><span><span class="n">アタックリスト 211社</span><span class="s">S 91社・A 120社。承継期62・周年間近75</span></span></a>
+  </div>
+
+  <h3>お客さんが見るもの</h3>
+  <div class="links">
+    <a class="lk" href="https://1116maehira-ai.github.io/reskilling-lp/" target="_blank" rel="noopener"><span class="ic">🤖</span><span><span class="n">AI研修LP（公開中・修正済み）</span><span class="s">1116maehira-ai.github.io/reskilling-lp</span></span></a>
+    <a class="lk" href="./lp-fix-order.html"><span class="ic">📋</span><span><span class="n">映像LP 修正指示書</span><span class="s">元のチャットにそのまま渡せる形。デプロイ待ち</span></span></a>
+  </div>
+
+  <h3>データ</h3>
+  <div class="tw"><table>
+    <thead><tr><th>もの</th><th>場所</th><th>中身</th></tr></thead>
+    <tbody>
+      <tr><td>アタックリスト CSV</td><td><code>plan/attacklist/attack_list_SA.csv</code></td><td>211社。Excelでそのまま開けます</td></tr>
+      <tr><td>数値モデル</td><td><code>plan/division_a.py</code></td><td>商品・件数・チャネル・P/L。前提を書き換えて再実行すれば全部更新</td></tr>
+      <tr><td>固定費の実測</td><td><code>plan/fixed_costs.sql</code></td><td>重複を除いた本当の額。月545.8万＋返済29.5万</td></tr>
+      <tr><td>アタックリストの元DB</td><td>Supabase <code>fieldwork</code></td><td>ceremony / indeedhack / centercall / posmane_client</td></tr>
+      <tr><td>固定費・顧客の元DB</td><td>Supabase <code>production-mgmt</code></td><td>fixed_costs / staff / customers / mailing_list</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+</div>
+
+<footer><div class="wrap">
+  株式会社TENOHIRA 販売営業部 コックピット ／ 2026年8月23日<br>
+  チェックと数字は、開いている全員に共有されて保存されます。
+</div></footer>
+
+<script>
+(function(){
+  function upd(){
+    var b=document.querySelectorAll('ul.tasks input[type=checkbox]');
+    var d=0; for(var i=0;i<b.length;i++){ if(b[i].checked) d++; }
+    var p=document.getElementById('pAll'), f=document.getElementById('fAll');
+    if(p) p.textContent = d + ' / ' + b.length;
+    if(f) f.style.width = (b.length? (d/b.length*100):0) + '%';
+  }
+  document.addEventListener('change', function(e){
+    if(e.target && e.target.type==='checkbox') upd();
+  });
+  upd();
+})();
+</script>

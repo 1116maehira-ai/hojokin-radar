@@ -1,0 +1,718 @@
+<title>営業の四つ道具</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
+<style>
+:root{
+  --ground:#ffffff; --surface:#eef1f6; --surface-2:#e3e8f0; --line:#c9d2df;
+  --ink:#101a26; --ink-soft:#4c5b6e;
+  --indigo:#22436e; --brass:#96682a; --brass-soft:#f2e6d1;
+  --sea:#1f6b64; --warn:#9a4a1f; --flame:#b03a1a;
+  --paper:#fbfaf7; --paper-line:#ddd6c6;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#0d141c; --surface:#16202b; --surface-2:#1e2b38; --line:#2d3f52;
+    --ink:#e4ebf3; --ink-soft:#9aabbf;
+    --indigo:#8fb3dd; --brass:#d9a45b; --brass-soft:#2e2517;
+    --sea:#5cbdb1; --warn:#e0925f; --flame:#e8734f;
+    --paper:#141c25; --paper-line:#33404e;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0d141c; --surface:#16202b; --surface-2:#1e2b38; --line:#2d3f52;
+  --ink:#e4ebf3; --ink-soft:#9aabbf;
+  --indigo:#8fb3dd; --brass:#d9a45b; --brass-soft:#2e2517;
+  --sea:#5cbdb1; --warn:#e0925f; --flame:#e8734f;
+  --paper:#141c25; --paper-line:#33404e;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);
+  font-family:"Zen Kaku Gothic New",-apple-system,"Hiragino Kaku Gothic ProN",sans-serif;
+  font-size:16px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+code{font-family:"IBM Plex Mono",monospace;font-size:.9em;background:var(--surface);padding:1px 5px;border-radius:2px}
+
+.shell{max-width:1180px;margin:0 auto;padding:0 20px 96px;display:grid;grid-template-columns:1fr;gap:0}
+@media(min-width:1040px){.shell{grid-template-columns:196px minmax(0,1fr);gap:52px;padding-right:36px}}
+
+.hero{border-bottom:1px solid var(--line);margin-bottom:44px;padding:52px 0 36px}
+.hero-inner{max-width:1180px;margin:0 auto;padding:0 20px}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--brass);margin:0 0 18px}
+h1{font-family:"Shippori Mincho B1","Hiragino Mincho ProN",serif;font-weight:700;
+   font-size:clamp(26px,4.4vw,42px);line-height:1.4;margin:0 0 20px;text-wrap:balance}
+.hero-lede{max-width:62ch;color:var(--ink-soft);margin:0 0 28px;font-size:16.5px}
+.tools{display:flex;flex-wrap:wrap;gap:10px}
+.tools a{display:flex;gap:10px;align-items:baseline;text-decoration:none;background:var(--surface);
+  border:1px solid var(--line);border-radius:3px;padding:10px 16px;color:var(--ink);font-size:13.5px;font-weight:500}
+.tools a:hover{border-color:var(--brass);background:var(--brass-soft)}
+.tools a:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+.tools .n{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--brass);font-weight:600}
+
+nav.rail{display:none}
+@media(min-width:1040px){
+  nav.rail{display:block;position:sticky;top:0;align-self:start;padding-top:8px;max-height:100vh;overflow-y:auto}
+  nav.rail ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:1px}
+  nav.rail a{display:flex;gap:9px;text-decoration:none;color:var(--ink-soft);font-size:12.5px;
+    line-height:1.5;padding:5px 8px;border-left:2px solid transparent;border-radius:0 3px 3px 0}
+  nav.rail a:hover{color:var(--ink);background:var(--surface);border-left-color:var(--brass)}
+  nav.rail a:focus-visible{outline:2px solid var(--brass);outline-offset:1px}
+  nav.rail .n{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--brass);flex:none;padding-top:2px}
+}
+main{min-width:0}
+section{margin-bottom:72px;scroll-margin-top:24px}
+h2{font-family:"Shippori Mincho B1",serif;font-weight:600;font-size:clamp(20px,3vw,27px);
+   line-height:1.45;margin:0 0 8px;text-wrap:balance;display:flex;gap:14px;align-items:baseline}
+h2 .num{font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:600;color:var(--brass);letter-spacing:.08em;flex:none;padding-top:2px}
+.sub{color:var(--ink-soft);font-size:14px;margin:0 0 26px}
+@media(min-width:600px){.sub{padding-left:34px}}
+h3{font-size:15px;font-weight:700;margin:36px 0 12px;letter-spacing:.02em}
+h3::before{content:"";display:inline-block;width:14px;height:1px;background:var(--brass);vertical-align:middle;margin-right:9px}
+h4{font-size:13.5px;font-weight:700;margin:24px 0 8px;color:var(--ink-soft)}
+p{margin:0 0 16px;max-width:70ch}
+ul,ol{margin:0 0 16px;padding-left:1.35em;max-width:70ch}
+li{margin-bottom:6px}
+em{font-style:normal;color:var(--brass);font-weight:500}
+a{color:var(--indigo)}
+
+/* 手紙用の便箋ブロック */
+.letter{background:var(--paper);border:1px solid var(--paper-line);border-radius:3px;
+  padding:30px 34px;margin:0 0 12px;position:relative;overflow-x:auto}
+.letter pre{font-family:"Shippori Mincho B1","Hiragino Mincho ProN",serif;font-size:14.5px;
+  line-height:2.15;margin:0;white-space:pre-wrap;word-break:break-word}
+.letter .stamp{position:absolute;top:12px;right:16px;font-family:"IBM Plex Mono",monospace;
+  font-size:10px;letter-spacing:.14em;color:var(--brass);text-transform:uppercase}
+
+/* スクリプト用 */
+.script{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--indigo);
+  border-radius:0 3px 3px 0;padding:18px 22px;margin:0 0 14px;overflow-x:auto}
+.script .who{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--indigo);font-weight:600;display:block;margin-bottom:8px}
+.script pre{font-family:"Zen Kaku Gothic New",sans-serif;font-size:14.5px;line-height:1.95;
+  margin:0;white-space:pre-wrap;word-break:break-word}
+.script.them{border-left-color:var(--warn)}
+.script.them .who{color:var(--warn)}
+
+.note{border:1px solid var(--line);border-left:3px solid var(--sea);background:var(--surface);
+  padding:16px 20px;margin:0 0 22px;font-size:14px;border-radius:0 4px 4px 0}
+.note.warn{border-left-color:var(--warn)}
+.note.hot{border-left-color:var(--flame)}
+.note p{max-width:none} .note p:last-child{margin-bottom:0}
+.note .tag{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--sea);display:block;margin-bottom:6px;font-weight:600}
+.note.warn .tag{color:var(--warn)} .note.hot .tag{color:var(--flame)}
+
+.tw{overflow-x:auto;margin:0 0 8px;border:1px solid var(--line);border-radius:4px;background:var(--ground)}
+table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:540px}
+caption{caption-side:bottom;text-align:left;font-size:12.5px;color:var(--ink-soft);padding:10px 2px 0;line-height:1.6}
+th,td{padding:9px 13px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+thead th{background:var(--surface-2);font-size:11px;letter-spacing:.09em;font-weight:700;color:var(--ink-soft);
+  text-transform:uppercase;white-space:nowrap;font-family:"IBM Plex Mono",monospace}
+tbody tr:last-child td{border-bottom:none}
+tbody tr.total td{background:var(--surface);font-weight:700;border-top:2px solid var(--brass)}
+tbody tr.goal td{background:var(--brass-soft)}
+td.n,th.n{text-align:right;font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;white-space:nowrap}
+.qh{font-family:"IBM Plex Mono",monospace;font-weight:600;color:var(--brass)}
+.chip{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;padding:1px 7px;border-radius:2px;
+  border:1px solid var(--line);background:var(--surface);color:var(--ink-soft);letter-spacing:.04em;white-space:nowrap}
+.chip.a{border-color:var(--brass);color:var(--brass);background:var(--brass-soft)}
+.chip.s{border-color:var(--sea);color:var(--sea)}
+.chip.w{border-color:var(--warn);color:var(--warn)}
+
+.slot{background:var(--brass-soft);color:var(--brass);padding:0 3px;border-radius:2px;font-weight:600}
+
+figure{margin:0 0 28px}
+figure svg{width:100%;height:auto;display:block;color:var(--ink)}
+.figwrap{border:1px solid var(--line);border-radius:4px;background:var(--surface);padding:22px 18px;overflow-x:auto}
+figcaption{font-size:12.5px;color:var(--ink-soft);padding-top:10px;line-height:1.6;max-width:70ch}
+svg text{font-family:"Zen Kaku Gothic New",sans-serif}
+svg .m{font-family:"IBM Plex Mono",monospace}
+
+footer{border-top:1px solid var(--line);margin:16px auto 0;padding:26px 20px 0;max-width:1180px;font-size:12.5px;color:var(--ink-soft)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<header class="hero">
+  <div class="hero-inner">
+    <p class="eyebrow">株式会社TENOHIRA 販売営業部 ／ Q1 実務ツール</p>
+    <h1>あなたの武器や盾を、<br>提供したい。</h1>
+    <p class="hero-lede">
+      計画を動かすために、Q1で実際に手を動かすもの。手紙・架電・提案書・ヒアリング。
+      この四つが回れば、月20商談が立ち上がる。すべてそのまま使える形にしてあります。
+      <span class="slot">◯◯</span> の箇所だけ埋めてください。
+    </p>
+    <div class="tools">
+      <a href="#s1"><span class="n">01</span><span>手紙の文面 ─ 承継期・周年期</span></a>
+      <a href="#s2"><span class="n">02</span><span>架電スクリプトとリスト仕様</span></a>
+      <a href="#s3"><span class="n">03</span><span>305万の提案書</span></a>
+      <a href="#s4"><span class="n">04</span><span>ヒアリング設計</span></a>
+    </div>
+  </div>
+</header>
+
+<div class="shell">
+<nav class="rail" aria-label="目次">
+  <ol>
+    <li><a href="#s0"><span class="n">00</span><span>四つの役割分担</span></a></li>
+    <li><a href="#s1"><span class="n">01</span><span>手紙の文面</span></a></li>
+    <li><a href="#s2"><span class="n">02</span><span>架電スクリプト</span></a></li>
+    <li><a href="#s3"><span class="n">03</span><span>305万の提案書</span></a></li>
+    <li><a href="#s4"><span class="n">04</span><span>ヒアリング設計</span></a></li>
+    <li><a href="#s5"><span class="n">05</span><span>今週やること</span></a></li>
+  </ol>
+</nav>
+
+<main>
+
+<!-- ══════════ 00 ══════════ -->
+<section id="s0">
+  <h2><span class="num">00</span>四つの役割分担</h2>
+  <p class="sub">同じ「営業」でも、四つは狙いが違う。混ぜると全部が中途半端になる。</p>
+
+  <figure>
+    <div class="figwrap">
+    <svg viewBox="0 0 880 268" role="img" aria-label="手紙・架電・ヒアリング動画の3つが商談を生み、提案書が成約に変える役割分担図">
+      <defs><marker id="tk1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="var(--brass)"/></marker></defs>
+
+      <text x="10" y="20" class="m" font-size="11" letter-spacing="1.6" fill="var(--brass)">商談をつくる（月20件）</text>
+      <text x="612" y="20" class="m" font-size="11" letter-spacing="1.6" fill="var(--brass)">成約に変える（月8件）</text>
+
+      <rect x="10" y="32" width="250" height="56" rx="3" fill="var(--brass-soft)" stroke="var(--brass)"/>
+      <text x="26" y="54" font-size="12.5" font-weight="700" fill="var(--brass)">01 手紙 ＋ 訪問手渡し</text>
+      <text x="26" y="74" font-size="11">月30件 → 商談4.5　転換率15%（最高）</text>
+      <text x="272" y="66" font-size="10.5" fill="currentColor" fill-opacity=".6">狙い：会いたい会社に、深く刺す</text>
+
+      <rect x="10" y="96" width="250" height="56" rx="3" fill="var(--brass-soft)" stroke="var(--brass)"/>
+      <text x="26" y="118" font-size="12.5" font-weight="700" fill="var(--brass)">02 架電（外注）</text>
+      <text x="26" y="138" font-size="11">月720件 → 商談10.8　転換率1.5%</text>
+      <text x="272" y="130" font-size="10.5" fill="currentColor" fill-opacity=".6">狙い：数で面を取る。入口は助成金</text>
+
+      <rect x="10" y="160" width="250" height="56" rx="3" fill="var(--brass-soft)" stroke="var(--brass)"/>
+      <text x="26" y="182" font-size="12.5" font-weight="700" fill="var(--brass)">04 ヒアリング動画</text>
+      <text x="26" y="202" font-size="11">月4本 → 商談2.0（半年後から伸びる）</text>
+      <text x="272" y="194" font-size="10.5" fill="currentColor" fill-opacity=".6">狙い：信用を先に置く。呼ばれる側になる</text>
+
+      <path d="M540 124 L596 124" stroke="var(--brass)" stroke-width="2" marker-end="url(#tk1)"/>
+      <text x="568" y="116" text-anchor="middle" font-size="10.5" fill="var(--brass)">初回ヒアリング</text>
+
+      <rect x="612" y="96" width="258" height="56" rx="3" fill="var(--brass)" fill-opacity=".9"/>
+      <text x="628" y="118" font-size="12.5" font-weight="700" fill="var(--ground)">03 提案書（305万）</text>
+      <text x="628" y="138" font-size="11" fill="var(--ground)" fill-opacity=".9">成約率40%　平均客単価149万をつくる</text>
+
+      <line x1="10" y1="236" x2="870" y2="236" stroke="currentColor" stroke-opacity=".2"/>
+      <text x="10" y="258" font-size="11.5" fill="currentColor" fill-opacity=".78">01・02・04 は「会う」ためのもの。売り込まない。03 だけが「決める」ためのもの。ここを混ぜないこと。</text>
+    </svg>
+    </div>
+    <figcaption>図 — 三つで会い、一つで決める。手紙と架電で売り込むと、どちらも死ぬ。</figcaption>
+  </figure>
+
+  <div class="tw">
+  <table>
+    <caption>四つの道具の使い分け。担当が違うことにも注意。</caption>
+    <thead><tr><th>道具</th><th>誰が</th><th>目的</th><th>やってはいけないこと</th></tr></thead>
+    <tbody>
+      <tr><td><strong>01 手紙</strong></td><td>1.0人（原稿はAI下書き）</td><td>会う約束を取る</td><td>価格を書く。商品を説明する。長く書く</td></tr>
+      <tr><td><strong>02 架電</strong></td><td>外注（1日1万円・60件）</td><td>アポを取る</td><td>商品を売る。理念映像の話をする</td></tr>
+      <tr><td><strong>03 提案書</strong></td><td>前平＋0.5人（清書）</td><td>成約する</td><td>ヒアリングで聞いていない話を書く</td></tr>
+      <tr><td><strong>04 ヒアリング動画</strong></td><td>前平（撮影同行は1.0人）</td><td>信用を先に置く</td><td>自社の宣伝を混ぜる。編集で盛る</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- ══════════ 01 ══════════ -->
+<section id="s1">
+  <h2><span class="num">01</span>手紙の文面</h2>
+  <p class="sub">機械が直筆風に書き、人が持って行く。A4一枚。売り込まない。目的は「数日後の電話に出てもらうこと」だけ。</p>
+
+  <div class="note">
+    <span class="tag">この手紙が守る三つのルール</span>
+    <p><strong>① 価格と商品説明を書かない。</strong>手紙で売ろうとした瞬間にDMになります。<br>
+    <strong>② 相手のことを一行目から書く。</strong>設立年・業種・求人の有無はアタックリストDBにあります。「あなたに書いた」と伝わる一文が最初にあるかどうかが、読まれるかどうかを決めます。<br>
+    <strong>③ 次の行動を一つだけ書く。</strong>「数日中に電話します」。それ以外の選択肢を出さない。</p>
+  </div>
+
+  <h3>パターンA ─ 承継期（設立30〜50年・2代目3代目へ）</h3>
+  <div class="letter">
+    <span class="stamp">Pattern A ／ 承継期</span>
+<pre>株式会社<span class="slot">◯◯◯◯</span>
+代表取締役　<span class="slot">◯◯ ◯◯</span> 様
+
+
+突然のお手紙を、お許しください。
+
+宜野湾で映像とAIの仕事をしております
+株式会社TENOHIRA の 前平 と申します。
+
+御社が <span class="slot">昭和◯◯</span> 年の創業と拝見しました。
+<span class="slot">◯◯</span> 年、この沖縄で続けてこられたということです。
+それだけで、私は一度お話を伺いたいと思いました。
+
+なぜ始めたのか。
+何度やめようと思ったのか。
+誰に支えられて、ここまで来たのか。
+
+その話を、今いる社員の方も、次を継がれる方も、
+たぶん全部は聞いたことがないはずです。
+
+聞ける人がいるうちにしか、聞けません。
+私はそれを、いちばん惜しいことだと思っています。
+
+私がしたいのは、売り込みではありません。
+まず一度、御社の歩みを聞かせていただきたい。
+そのうえで、残す価値があると私自身が思えたときにだけ、
+ご提案をさせてください。
+
+数日中に、お電話を差し上げます。
+「手紙の前平です」とだけ申し上げますので、
+その時に、ご都合を教えていただけたら幸いです。
+
+長々と失礼いたしました。
+御社のこれからが、良いものでありますように。
+
+
+　　　　　　　　　　株式会社TENOHIRA
+　　　　　　　　　　前平 <span class="slot">◯◯</span>
+　　　　　　　　　　沖縄県宜野湾市 <span class="slot">◯◯◯◯</span>
+　　　　　　　　　　<span class="slot">090-◯◯◯◯-◯◯◯◯</span></pre>
+  </div>
+
+  <h3>パターンB ─ 周年期・式典を控える会社</h3>
+  <div class="letter">
+    <span class="stamp">Pattern B ／ 周年期</span>
+<pre>株式会社<span class="slot">◯◯◯◯</span>
+代表取締役　<span class="slot">◯◯ ◯◯</span> 様
+
+
+突然のお手紙を、お許しください。
+
+宜野湾で映像とAIの仕事をしております
+株式会社TENOHIRA の 前平 と申します。
+
+御社が来年、創業 <span class="slot">◯◯</span> 周年を迎えられると知りました。
+おめでとうございます。
+
+周年の式典は、たいてい一日で終わります。
+写真が少し残って、あとは記憶になっていく。
+
+もったいない、と私はいつも思っています。
+
+その日は、これまで支えてくれた方が一堂に会する日です。
+社長がどんな想いでここまで来たかを、
+社員の前で話す、たぶん最後に近い機会でもあります。
+
+その一日を、<span class="slot">◯◯</span> 年先まで残る形にできます。
+新しく入る社員が、入社初日に観るものにできます。
+採用の場で、言葉で説明しなくてよくなります。
+
+ただ、そのためには式典の前に、
+社長のお話を聞かせていただく時間が要ります。
+当日撮るだけでは、魂は映らないからです。
+
+まず一度、聞かせていただけないでしょうか。
+聞かせていただいたうえで、
+私が残す価値があると思えたときにだけ、ご提案します。
+
+数日中に、お電話を差し上げます。
+「手紙の前平です」とだけ申し上げます。
+
+
+　　　　　　　　　　株式会社TENOHIRA
+　　　　　　　　　　前平 <span class="slot">◯◯</span>
+　　　　　　　　　　沖縄県宜野湾市 <span class="slot">◯◯◯◯</span>
+　　　　　　　　　　<span class="slot">090-◯◯◯◯-◯◯◯◯</span></pre>
+  </div>
+
+  <h3>AIに原稿を下書きさせるための指示</h3>
+  <p>アタックリストDBの1行を渡して、書き出しの3〜4行だけを個別化させます。本文の骨格は上のテンプレートのまま固定してください。<strong>毎回全部を書き換えると、質がぶれます。</strong></p>
+
+  <div class="script">
+    <span class="who">AIへの指示（このまま使えます）</span>
+<pre>あなたはTENOHIRAの前平です。下の企業情報をもとに、手紙の
+「書き出し3〜4行」だけを書いてください。本文以降は固定テンプレートを使います。
+
+【企業情報】
+会社名：{company}／設立：{founded}／業種：{industry}
+代表者：{ceo}／求人出稿：{hiring}／SNS：{sns}／広告：{ads}
+
+【書き出しのルール】
+・1行目で必ず、その会社にしか当てはまらない事実に触れる
+・褒めない。事実を述べて、そこから自分が何を思ったかを書く
+・「御社の益々のご発展」等の定型句は使わない
+・3〜4行。長くしない
+・確認できていないことは書かない（推測で「大変でしたね」等を書かない）
+
+【良い例】
+御社が昭和48年の創業と拝見しました。
+52年、この沖縄で続けてこられたということです。
+それだけで、私は一度お話を伺いたいと思いました。
+
+【悪い例】
+御社の益々のご発展をお慶び申し上げます。
+この度は貴重なお時間を頂戴し…</pre>
+  </div>
+
+  <div class="tw">
+  <table>
+    <caption>月次サイクル。1.0人が7営業日で30件。AI下書きを入れれば原稿が1.5日になり、月60件まで伸ばせる。</caption>
+    <thead><tr><th class="n">日</th><th>やること</th><th class="n">量</th><th>備考</th></tr></thead>
+    <tbody>
+      <tr><td class="n">1–3日目</td><td>原稿制作（AI下書き → 人が仕上げ）</td><td class="n">30件</td><td>1日10件。DBの企業情報から書き出しを個別化</td></tr>
+      <tr><td class="n">4日目</td><td>機械で清書・封入・宛名</td><td class="n">30件</td><td>人は封入と宛名確認のみ</td></tr>
+      <tr><td class="n">5–7日目</td><td>訪問してお届け</td><td class="n">30件</td><td>1日10社。不在なら受付に託す</td></tr>
+      <tr class="goal"><td class="n">3〜5日後</td><td><strong>追跡架電</strong></td><td class="n">30件</td><td><strong>ここが本番。</strong>手紙は電話に出てもらうための前振り</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="script">
+    <span class="who">追跡架電の第一声</span>
+<pre>「お世話になります。先日お手紙をお届けにあがりました、
+　TENOHIRAの前平と申します。社長様、お手すきでしょうか」
+
+（本人に代わったら）
+
+「先日は突然のお手紙を失礼いたしました。お読みいただけましたでしょうか。
+　……ありがとうございます。
+
+　お手紙にも書かせていただいたのですが、
+　売り込みでお電話したのではなくて、
+　御社がどうやってここまで来られたのかを、
+　一度聞かせていただきたくて、お電話しました。
+
+　30分だけ、お時間をいただけないでしょうか。
+　来週でしたら、◯日か◯日の午後が空いております」</pre>
+  </div>
+
+  <div class="note hot">
+    <span class="tag">ここが勝負どころ</span>
+    <p>手紙の役割は<strong>「電話に出てもらうこと」まで</strong>です。届けた時点では何も起きていません。<br>
+    転換率15%は、<strong>手紙 → 訪問 → 追跡架電の3点セットで初めて出る数字</strong>です。届けて終わりにすると2〜3%まで落ちます。<strong>3〜5日後の追跡架電を、カレンダーに先に入れてから手紙を出してください。</strong></p>
+  </div>
+</section>
+
+<!-- ══════════ 02 ══════════ -->
+<section id="s2">
+  <h2><span class="num">02</span>架電スクリプトとリスト仕様</h2>
+  <p class="sub">外注先にそのまま渡すもの。1日60件・週3回・月720件。入口はAIリスキリング＋助成金の一本に絞る。</p>
+
+  <div class="note warn">
+    <span class="tag">絞る理由</span>
+    <p><strong>架電で理念映像を売ろうとしないでください。</strong>「創業の魂を映像に」は、電話口の30秒では絶対に伝わりません。外注のオペレーターならなおさらです。<br>
+    架電の入口は<strong>「助成金を使った社内のAI研修」の一本</strong>にします。制度の名前という具体物があるので、外注でも語れる。そしてアポが取れて前平さんが会いにいけば、そこで理念映像の話は自然に出せます。<strong>手紙＝理念映像、架電＝AI研修。この役割分担を崩さないこと。</strong></p>
+  </div>
+
+  <h3>受付突破</h3>
+  <div class="script">
+    <span class="who">オペレーター</span>
+<pre>「お世話になります。
+　宜野湾の株式会社TENOHIRAと申します。
+
+　厚生労働省の人材開発支援助成金を使った
+　社内のAI研修についてのご案内で、
+　社長様、もしくは人事のご担当者様は
+　いらっしゃいますでしょうか」</pre>
+  </div>
+  <div class="script them">
+    <span class="who">受付「どういったご用件ですか」</span>
+<pre>「はい、社員の方がChatGPTなどのAIを業務で使えるようになる研修で、
+　国の助成金を使いますと、会社のご負担がかなり抑えられるものです。
+　ご案内だけでもと思いまして。3分ほどで終わります」</pre>
+  </div>
+
+  <h3>本人が出たら（30秒）</h3>
+  <div class="script">
+    <span class="who">オペレーター</span>
+<pre>「お忙しいところ恐れ入ります。
+　宜野湾のTENOHIRA と申します。1分だけよろしいでしょうか。
+
+　いま沖縄の企業様で、社員の方にAIを使えるようになっていただく研修が
+　増えておりまして、厚労省の助成金の対象になっております。
+
+　カリキュラムは御社の業務に合わせて作りますので、
+　"AIをどう使うか分からない" という状態からで大丈夫です。
+
+　助成金を使いますと、会社のご負担は本来の3割前後まで下がります。
+
+　一度、担当の者が御社の状況を伺ってから、
+　使える制度をお調べしてご説明にあがっております。
+　来週あたり、30分だけお時間いただけないでしょうか」</pre>
+  </div>
+
+  <h3>切り返し</h3>
+  <div class="tw">
+  <table>
+    <caption>この4つで断りの8割をカバーします。これ以上粘らないこと。粘ると次がなくなります。</caption>
+    <thead><tr><th style="width:170px">言われたこと</th><th>返し方</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>「AIはうちには必要ない」</strong></td>
+        <td>「ありがとうございます。実は必要ないとおっしゃる会社様ほど、見積書や日報の作成といった、毎日の細かい作業で使われることが多いです。<strong>そこだけ見に行くこともできます</strong>ので、判断は見てからで結構です」</td>
+      </tr>
+      <tr>
+        <td><strong>「忙しい／間に合っている」</strong></td>
+        <td>「承知しました。<strong>助成金は申請の締切がある</strong>ものですので、時期だけ先にお伝えしておきます。資料を一枚お送りしてもよろしいでしょうか」<span class="chip s">資料送付でも成果</span></td>
+      </tr>
+      <tr>
+        <td><strong>「費用はいくら」</strong></td>
+        <td>「規模とカリキュラムで変わりますので正確には伺ってからですが、<strong>30万円から120万円の3つのプラン</strong>がございます。助成金が通りますと、実質のご負担はその3割前後です」</td>
+      </tr>
+      <tr>
+        <td><strong>「資料だけ送って」</strong></td>
+        <td>「かしこまりました。送り先をお伺いしてもよろしいですか。<strong>お送りしたあと、一度だけご感想を伺うお電話をさせてください</strong>。それで終わりにいたします」<span class="chip s">再架電の許可を取る</span></td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="note warn">
+    <span class="tag">オペレーターに必ず伝えること</span>
+    <p><strong>言ってはいけないこと：</strong>「助成金は必ず通ります」「無料です」「国から言われて電話しています」。<strong>助成金は審査があり、通らないこともある</strong>——ここを曖昧にすると、後で信用を全部失います。憲法の「嘘つく・誤魔化す・隠す」に真正面から反します。<br>
+    <strong>3回断られたら引く。</strong>粘って取ったアポは、商談で必ず崩れます。</p>
+  </div>
+
+  <h3>外注に渡すリストの仕様</h3>
+  <div class="tw">
+  <table>
+    <caption>アタックリストDBから出力するCSV。灰色の列は結果記入用（空で渡す）。1ファイル60行×稼働日数で納品指示。</caption>
+    <thead><tr><th class="n">#</th><th>列名</th><th>中身</th><th>用途</th></tr></thead>
+    <tbody>
+      <tr><td class="n">1</td><td class="mono">id</td><td>法人番号</td><td>突合キー。DBに書き戻す</td></tr>
+      <tr><td class="n">2</td><td class="mono">company</td><td>会社名</td><td>読み上げ</td></tr>
+      <tr><td class="n">3</td><td class="mono">tel</td><td>電話番号</td><td>—</td></tr>
+      <tr><td class="n">4</td><td class="mono">ceo</td><td>代表者名</td><td>受付突破で使う</td></tr>
+      <tr><td class="n">5</td><td class="mono">industry</td><td>業種</td><td>切り返しの具体例を変える</td></tr>
+      <tr><td class="n">6</td><td class="mono">employees</td><td>従業員規模（分かれば）</td><td>プラン提示の目安</td></tr>
+      <tr><td class="n">7</td><td class="mono">hiring</td><td>求人出稿の有無</td><td>「採用でお困りでは」の枕に使える</td></tr>
+      <tr><td class="n">8</td><td class="mono">contacted_before</td><td>名刺DBとの突合結果</td><td><strong>○なら「以前ご挨拶した」から入れる</strong></td></tr>
+      <tr><td class="n">9</td><td class="mono">area</td><td>市町村</td><td>訪問ルートの設計に使う</td></tr>
+      <tr style="opacity:.72"><td class="n">10</td><td class="mono">result</td><td>アポ／資料送付／再架電／NG／不通</td><td>結果記入用（空で渡す）</td></tr>
+      <tr style="opacity:.72"><td class="n">11</td><td class="mono">appo_datetime</td><td>アポ日時</td><td>結果記入用</td></tr>
+      <tr style="opacity:.72"><td class="n">12</td><td class="mono">memo</td><td>会話メモ（一言でよい）</td><td>結果記入用。<strong>ここが一番の資産になる</strong></td></tr>
+      <tr style="opacity:.72"><td class="n">13</td><td class="mono">recall_date</td><td>再架電の希望日</td><td>結果記入用</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="note">
+    <span class="tag">週次で見る数字はこれだけ</span>
+    <p><strong>① 接続率</strong>（本人に代われた割合。目安25〜35%）<strong>② アポ率</strong>（架電数に対して。目標1.5%＝月10.8件）<strong>③ 資料送付数</strong>（アポの手前の成果。ここが多いなら翌月の再架電で回収できる）。<br>
+    この3つだけを毎週見てください。<strong>アポ率が1%を切る週が2回続いたら、リストの絞り込み条件かスクリプトのどちらかを変えます。</strong>オペレーターを責めても数字は動きません。</p>
+  </div>
+</section>
+
+<!-- ══════════ 03 ══════════ -->
+<section id="s3">
+  <h2><span class="num">03</span>305万の提案書</h2>
+  <p class="sub">パッケージ①（理念映像2本＋式典撮影＋ダイジェスト＋AI研修L）。前平さんが立案し、0.5人とAIが清書する。</p>
+
+  <div class="note hot">
+    <span class="tag">この提案書の勝負は2ページ目です</span>
+    <p>2ページ目に<strong>「聞かせていただいたこと」</strong>を置きます。ヒアリングで社長が話したことを、社長の言葉のまま返す。<br>
+    ここで<em>「この人は本当に聞いていた」</em>と伝われば、残りのページは値段の確認作業になります。逆にここが薄いと、どんなに立派な企画書でも「よくある提案」になります。<strong>1ページ目より2ページ目に時間をかけてください。</strong></p>
+  </div>
+
+  <div class="tw">
+  <table>
+    <caption>全11ページ。各ページの「言うこと」は一つだけ。二つ入れたら分けてください。</caption>
+    <thead><tr><th class="n">P</th><th>タイトル</th><th>このページで言うこと（一つだけ）</th><th class="n">目安</th></tr></thead>
+    <tbody>
+      <tr><td class="n">1</td><td>表紙</td><td><span class="slot">◯◯</span>株式会社 御中／「創業の魂を、永遠に、万人に」／提案日</td><td class="n">—</td></tr>
+      <tr class="goal"><td class="n">2</td><td><strong>聞かせていただいたこと</strong></td><td><strong>社長の言葉をそのまま。</strong>「◯◯とおっしゃいました」を3〜5個。要約しない、きれいにしない</td><td class="n">1P</td></tr>
+      <tr><td class="n">3</td><td>いま起きていること</td><td>その言葉から見えた課題を1文で。「創業の話を知る人が、あと数年でいなくなる」など</td><td class="n">1P</td></tr>
+      <tr><td class="n">4</td><td>ご提案の全体像</td><td>4つが1本の線でつながっている図。バラバラの商品に見せない</td><td class="n">1P</td></tr>
+      <tr><td class="n">5</td><td>① 理念映像 2本</td><td>何を撮り、誰がいつ観るのか。<strong>尺と本数ではなく、使われる場面で説明する</strong></td><td class="n">2P</td></tr>
+      <tr><td class="n">6</td><td>② 式典の撮影</td><td>その一日を記録に変える。編集なし納品で当日中にお渡しできること</td><td class="n">1P</td></tr>
+      <tr><td class="n">7</td><td>③ ダイジェスト版</td><td>式典に来られなかった方・これから入る方へ届く形にする</td><td class="n">1P</td></tr>
+      <tr><td class="n">8</td><td>④ AIリスキリング研修</td><td>「あなたしかできない事に、あなたが集中する」ための時間をつくる。<strong>助成金で自己負担が3割前後に</strong></td><td class="n">2P</td></tr>
+      <tr><td class="n">9</td><td>進め方とスケジュール</td><td>誰がいつ何をするか。<strong>御社にお願いすることを明記する</strong>（ここを書くと信用が上がる）</td><td class="n">1P</td></tr>
+      <tr><td class="n">10</td><td>お見積り</td><td>305万円。内訳を出す。<strong>助成金適用後の実負担額を併記する</strong></td><td class="n">1P</td></tr>
+      <tr><td class="n">11</td><td>最後に</td><td>前平の言葉で、なぜこの会社をやりたいのか。<strong>ここだけは手書きに近い文体で</strong></td><td class="n">1P</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>P2「聞かせていただいたこと」の書き方</h3>
+  <div class="script">
+    <span class="who">テンプレート</span>
+<pre>聞かせていただいたこと
+
+<span class="slot">◯◯</span>年<span class="slot">◯</span>月<span class="slot">◯</span>日、御社にて。<span class="slot">◯◯</span>社長より。
+
+
+「<span class="slot">──社長が実際に言った言葉を、そのまま──</span>」
+
+「<span class="slot">──二つ目──</span>」
+
+「<span class="slot">──三つ目──</span>」
+
+
+この三つが、私がいちばん残したいと思った言葉です。
+
+<span class="slot">──なぜそう思ったかを、2〜3行。自分の言葉で。──</span></pre>
+  </div>
+
+  <div class="note">
+    <span class="tag">やってはいけないこと</span>
+    <p><strong>言葉をきれいにしないでください。</strong>「大変でしたけどね、まあ」みたいな言い淀みも、そのまま入れる。整えた瞬間に、その人の言葉ではなくなります。<br>
+    そして<strong>聞いていないことは書かない。</strong>推測で「さぞご苦労されたことと存じます」と書くと、2ページ目の効果が全部消えます。聞けた分だけ書く。3つしか聞けなかったなら3つでいい。</p>
+  </div>
+
+  <h3>P10 お見積りの見せ方</h3>
+  <div class="tw">
+  <table>
+    <caption>助成金の適用後を必ず併記する。ただし「通ります」とは書かない。「対象になる見込み」まで。</caption>
+    <thead><tr><th>項目</th><th class="n">金額</th><th>備考</th></tr></thead>
+    <tbody>
+      <tr><td>① 理念映像 2本（企画・撮影・編集・納品）</td><td class="n">1,500,000</td><td>本編＋短縮版</td></tr>
+      <tr><td>② 式典 撮影（編集なし納品）</td><td class="n">150,000</td><td>当日データお渡し</td></tr>
+      <tr><td>③ 式典 ダイジェスト版</td><td class="n">200,000</td><td>後日納品</td></tr>
+      <tr><td>④ AIリスキリング研修 全社型</td><td class="n">1,200,000</td><td>御社業務に合わせたカリキュラム</td></tr>
+      <tr class="total"><td>合計（税別）</td><td class="n">3,050,000</td><td></td></tr>
+      <tr class="goal"><td>④に助成金が適用された場合の実質負担</td><td class="n">▲840,000<br>程度</td><td><strong>人材開発支援助成金。審査があり、必ず適用されるものではありません。</strong>申請実務は提携社会保険労務士がお手伝いします</td></tr>
+      <tr class="total"><td>適用後の実質ご負担（見込み）</td><td class="n">2,210,000</td><td>前後</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="note warn">
+    <span class="tag">法令上の注意</span>
+    <p>助成金の<strong>申請書作成・提出代行は社会保険労務士の独占業務</strong>です。提案書には「申請実務は提携社労士が対応します」と明記し、TENOHIRAは研修提供者の立場に徹してください。<strong>提案書に「弊社が申請を代行します」と書いた時点でアウト</strong>です。</p>
+  </div>
+</section>
+
+<!-- ══════════ 04 ══════════ -->
+<section id="s4">
+  <h2><span class="num">04</span>ヒアリング設計</h2>
+  <p class="sub">初回商談でもあり、YouTubeの本編でもあり、理念映像の素材でもある。一度で三つを取る。</p>
+
+  <div class="note hot">
+    <span class="tag">この質問設計が四つを兼ねます</span>
+    <p><strong>① 初回ヒアリング商談</strong>（共鳴できるか・課題は何かを確かめる）<br>
+    <strong>② YouTubeの本編＋ショート</strong>（深い話を引き出している様子そのものがコンテンツ）<br>
+    <strong>③ 理念映像の素材</strong>（受注できたとき、この録画がそのまま構成の元になる）<br>
+    <strong>④ 提案書P2の原稿</strong>（社長の言葉をそのまま書き写す）<br><br>
+    だから<strong>必ず録画してください。</strong>公開しない場合でも録る。許可の取り方は下にあります。</p>
+  </div>
+
+  <h3>質問の階段 ─ 事実から使命へ</h3>
+  <div class="tw">
+  <table>
+    <caption>上から順に聞く。飛ばさない。事実を積んでからでないと、感情も使命も出てきません。所要60〜90分。</caption>
+    <thead><tr><th class="n">段</th><th>狙い</th><th>質問</th></tr></thead>
+    <tbody>
+      <tr><td class="qh">1</td><td rowspan="3">事実<br><span class="chip">温める</span></td><td>この会社は、いつ、どなたが始められたんですか</td></tr>
+      <tr><td class="qh">2</td><td>そのときは、何人で、どこでやっていたんですか</td></tr>
+      <tr><td class="qh">3</td><td>いちばん最初のお客様は、どなたでしたか。覚えていますか</td></tr>
+      <tr><td class="qh">4</td><td rowspan="3">転機<br><span class="chip">具体を掘る</span></td><td>ここまでで、いちばん大変だった時期はいつですか</td></tr>
+      <tr><td class="qh">5</td><td>そのとき、何をして乗り越えたんですか</td></tr>
+      <tr><td class="qh">6</td><td>やめようと思ったことは、ありますか</td></tr>
+      <tr class="goal"><td class="qh">7</td><td rowspan="3">感情<br><span class="chip a">ここが山場</span></td><td><strong>やめなかったのは、なぜですか</strong></td></tr>
+      <tr class="goal"><td class="qh">8</td><td>そのとき、支えてくれた人はいましたか。どなたですか</td></tr>
+      <tr class="goal"><td class="qh">9</td><td>その方に、いま言えるとしたら、何と言いますか</td></tr>
+      <tr><td class="qh">10</td><td rowspan="3">使命<br><span class="chip">言語化を助ける</span></td><td>お客様に、どうなってほしくてこの仕事をしていますか</td></tr>
+      <tr><td class="qh">11</td><td>社員の方に、どうなってほしいですか</td></tr>
+      <tr><td class="qh">12</td><td>この会社が世の中からなくなったら、誰が困りますか</td></tr>
+      <tr><td class="qh">13</td><td rowspan="3">次世代<br><span class="chip s">課題が出る</span></td><td>10年後、この会社はどうなっていてほしいですか</td></tr>
+      <tr><td class="qh">14</td><td>いまの話、社員の方はご存じですか</td></tr>
+      <tr class="goal"><td class="qh">15</td><td><strong>次に継ぐ方には、何を渡したいですか</strong></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="note">
+    <span class="tag">14番が、商談への橋になります</span>
+    <p><strong>「いまの話、社員の方はご存じですか」</strong>——ほぼ全員が「いや、話したことないですね」と答えます。<br>
+    そこで<em>「もったいないです。残しませんか」</em>と言えばいい。<strong>売り込みではなく、その場の自然な流れになります。</strong>この一問のために、1〜13番があると言ってもいい。<br><br>
+    そして15番の答えが、そのまま提案書P3「いま起きていること」になります。</p>
+  </div>
+
+  <h3>聞き方のルール</h3>
+  <ul>
+    <li><strong>沈黙を待つ。</strong>7〜9番のあとの沈黙は、考えている時間です。埋めない。ここで待てるかどうかが、この仕事の技術のほぼ全部です</li>
+    <li><strong>相づちで評価しない。</strong>「すごいですね」を言うと、そこで話が終わります。「それで、どうされたんですか」と続ける</li>
+    <li><strong>自社の話をしない。</strong>60分のうち、TENOHIRAの説明は最後の5分だけ。それ以前に話すと、ヒアリングが営業トークに変質します</li>
+    <li><strong>メモより、目を見る。</strong>録画しているのでメモは要りません。0.5人が同席してメモを取るのが理想です</li>
+    <li><strong>その場で提案しない。</strong>「持ち帰って考えさせてください」。次回の提案商談が2回目の接点になります</li>
+  </ul>
+
+  <h3>撮影と公開の実務</h3>
+  <div class="tw">
+  <table>
+    <caption>月4本。撮影は前平の訪問に同行、編集と投稿は1.0人（月3日）。</caption>
+    <thead><tr><th>項目</th><th>やり方</th></tr></thead>
+    <tbody>
+      <tr><td>機材</td><td>カメラ2台（社長の寄り／2人の引き）＋ピンマイク2本。三脚固定で回しっぱなし。<strong>凝らない</strong></td></tr>
+      <tr><td>場所</td><td>その会社の中。応接室より、作業現場や創業当時の写真がある場所のほうがいい</td></tr>
+      <tr><td>尺</td><td>本編15〜25分（YouTube）／ショート30〜60秒を1本あたり3〜5本（Instagram・TikTok）</td></tr>
+      <tr><td>編集</td><td>カット中心。BGMは薄く。<strong>テロップで盛らない</strong>。良いことを言った瞬間を切り出すだけ</td></tr>
+      <tr><td>ショートの切り出し</td><td>7番「やめなかったのは、なぜですか」の答え／9番／15番。<strong>質問と答えをセットで</strong>切る</td></tr>
+      <tr><td>公開許可</td><td>撮影前に口頭＋書面。<strong>「公開前に必ず一度ご確認いただき、NGがあれば出しません」</strong>と約束する</td></tr>
+      <tr><td>公開前確認</td><td>編集後、必ず本人に見せる。ここを飛ばすと信用を失い、団体内での評判に直結する</td></tr>
+      <tr><td>出演者へのお渡し</td><td>本編とショートのデータを差し上げる。<strong>自社の採用や広報で自由に使ってくださいと伝える</strong>（拡散はここから起きる）</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="script">
+    <span class="who">撮影許可の取り方（訪問時にこう言う）</span>
+<pre>「今日のお話、私のYouTubeで公開させていただくことは可能でしょうか。
+
+　目的は再生数ではなくて、
+　沖縄の経営者の方が何を考えてやってこられたのかを、
+　そのまま残していきたいというものです。
+
+　編集したものは公開前に必ずお見せします。
+　一言でもNGがあれば、その部分は出しません。
+　全部だめだとおっしゃれば、公開しません。
+
+　データは御社にもお渡しします。
+　採用でも社内でも、自由にお使いください」</pre>
+  </div>
+
+  <div class="note">
+    <span class="tag">最初の1本の選び方</span>
+    <p><strong>4団体の中で、いちばん話しやすい方から始めてください。</strong>1本目は必ず硬くなります。関係ができている方なら、失敗しても撮り直せる。<br>
+    そして<strong>1本目が公開されたら、その方に「次に聞くべき方」を紹介してもらう。</strong>紹介の連鎖でつないでいくのが、この企画のいちばん速い伸ばし方です。</p>
+  </div>
+</section>
+
+<!-- ══════════ 05 ══════════ -->
+<section id="s5">
+  <h2><span class="num">05</span>今週やること</h2>
+  <p class="sub">四つの道具を動かし始めるために、Q0（8月22日〜31日）で片づける順番。</p>
+
+  <div class="tw">
+  <table>
+    <caption>上から順に。①②③は他が全部これに乗るので、先に潰す。</caption>
+    <thead><tr><th class="n">#</th><th>やること</th><th>担当</th><th>これが済むと</th></tr></thead>
+    <tbody>
+      <tr class="goal"><td class="n">①</td><td><strong>決算期を確認し、税理士に役員報酬の改定時期と事前確定届出の期限を聞く</strong></td><td>前平</td><td>報酬引き上げカレンダーが確定する（賞与420万の損金算入がかかっている）</td></tr>
+      <tr class="goal"><td class="n">②</td><td><strong>1.5人を誰にするか決める</strong>（既存5名から回すか、新規採用か）</td><td>前平＋役員2名</td><td>Q1のスタート日が決まる</td></tr>
+      <tr class="goal"><td class="n">③</td><td><strong>架電外注先を選び、1日1万円・60件の条件を確認する</strong></td><td>前平</td><td>月10.8商談（必要商談の半分）の供給が立つ</td></tr>
+      <tr><td class="n">④</td><td>提携社労士に打診する</td><td>前平</td><td>AIリスキリングL・Mの価格説得力が立つ</td></tr>
+      <tr><td class="n">⑤</td><td>県内の対象業種法人が何社あるか、法人番号データで数える</td><td>前平＋AI</td><td>計画の耐用年数と、県外に出る時期が分かる</td></tr>
+      <tr><td class="n">⑥</td><td>名刺DBから「会ったことがある企業」を全件抽出する</td><td>前平＋AI</td><td>手紙の1通目を出す先が決まる（既接触は転換率が高い）</td></tr>
+      <tr><td class="n">⑦</td><td>手紙の1通目を書いて、出す</td><td>前平</td><td>1件目の商談が動き出す。<strong>完璧を待たない</strong></td></tr>
+      <tr><td class="n">⑧</td><td>YouTubeの1本目を、いちばん話しやすい方に依頼する</td><td>前平</td><td>半年後に効いてくるものは、今日始めるしかない</td></tr>
+      <tr><td class="n">⑨</td><td>固定費DBの重複81行を24行に整理する</td><td>AI</td><td>アプリの数字が正になる</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="note hot">
+    <span class="tag">ドースル コースル ソースル ハッスル</span>
+    <p>この四つの道具は、全部そろってから始めるものではありません。<strong>⑦の手紙1通と、⑧のヒアリング1本は、今週できます。</strong><br><br>
+    手紙は1通出せば、3日後に電話する理由ができる。ヒアリングは1本撮れば、2本目の紹介が生まれる。<strong>動いた分だけ、次が決まります。</strong></p>
+  </div>
+</section>
+
+</main>
+</div>
+
+<footer>
+  <p>株式会社TENOHIRA 販売営業部 ／ Q1 実務ツール ／ 作成 2026年8月22日<br>
+  事業計画の本体は <code>docs/business-plan.html</code>。数値の前提は <code>plan/division_a.py</code>。</p>
+</footer>

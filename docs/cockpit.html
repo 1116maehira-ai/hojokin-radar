@@ -573,6 +573,27 @@ footer{border-top:1px solid var(--line);margin-top:48px;padding:26px 0 60px;font
 
 <script>
 (function(){
+  var SK = 'cockpit_checks_v1';
+
+  function save(){
+    try{
+      var s={};
+      document.querySelectorAll('ul.tasks input[type=checkbox]').forEach(function(b){
+        if(b.id) s[b.id]=b.checked;
+      });
+      localStorage.setItem(SK, JSON.stringify(s));
+    }catch(e){}
+  }
+
+  function restore(){
+    try{
+      var s=JSON.parse(localStorage.getItem(SK)||'{}');
+      document.querySelectorAll('ul.tasks input[type=checkbox]').forEach(function(b){
+        if(b.id && s[b.id]) b.checked=true;
+      });
+    }catch(e){}
+  }
+
   function upd(){
     var b=document.querySelectorAll('ul.tasks input[type=checkbox]');
     var d=0; for(var i=0;i<b.length;i++){ if(b[i].checked) d++; }
@@ -580,9 +601,12 @@ footer{border-top:1px solid var(--line);margin-top:48px;padding:26px 0 60px;font
     if(p) p.textContent = d + ' / ' + b.length;
     if(f) f.style.width = (b.length? (d/b.length*100):0) + '%';
   }
-  document.addEventListener('change', function(e){
-    if(e.target && e.target.type==='checkbox') upd();
-  });
+
+  restore();
   upd();
+
+  document.addEventListener('change', function(e){
+    if(e.target && e.target.type==='checkbox'){ save(); upd(); }
+  });
 })();
 </script>

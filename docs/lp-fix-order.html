@@ -1,0 +1,298 @@
+<title>映像LP 修正指示書</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@700;900&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#ffffff; --panel:#f2f5f8; --panel2:#e7edf3; --line:#dbe3ec;
+  --ink:#16202b; --ink2:#5a6b7c;
+  --red:#c0392b; --red-bg:#fdecea; --grn:#0d7c72; --grn-bg:#e2f2f0;
+  --amb:#b57708; --amb-bg:#fdf1da; --blu:#2560a8; --blu-bg:#e6eefa;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#10151b; --panel:#1a222c; --panel2:#232d39; --line:#2e3a48;
+  --ink:#e8eef4; --ink2:#95a6b8;
+  --red:#ff7a68; --red-bg:#2d1614; --grn:#43c3b6; --grn-bg:#0f2724;
+  --amb:#f5bb4a; --amb-bg:#2a2113; --blu:#74aae8; --blu-bg:#141f2e;}}
+:root[data-theme="dark"]{
+  --bg:#10151b; --panel:#1a222c; --panel2:#232d39; --line:#2e3a48;
+  --ink:#e8eef4; --ink2:#95a6b8;
+  --red:#ff7a68; --red-bg:#2d1614; --grn:#43c3b6; --grn-bg:#0f2724;
+  --amb:#f5bb4a; --amb-bg:#2a2113; --blu:#74aae8; --blu-bg:#141f2e;}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Zen Kaku Gothic New",-apple-system,"Hiragino Kaku Gothic ProN",sans-serif;
+  font-size:16px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:880px;margin:0 auto;padding:0 20px}
+.maru{font-family:"Zen Maru Gothic",sans-serif}
+code{font-family:"IBM Plex Mono",monospace;font-size:.9em;background:var(--panel);padding:1px 5px;border-radius:3px}
+
+header{padding:56px 0 32px;border-bottom:1px solid var(--line);margin-bottom:36px}
+.kick{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.2em;color:var(--red);font-weight:600;margin:0 0 16px}
+h1{font-family:"Zen Maru Gothic",sans-serif;font-weight:900;font-size:clamp(26px,5vw,40px);line-height:1.35;margin:0 0 18px;text-wrap:balance}
+.lede{color:var(--ink2);max-width:38em;margin:0 0 22px}
+.howto{background:var(--blu-bg);border-radius:14px;padding:18px 22px;font-size:14.5px;line-height:1.85}
+.howto b{color:var(--blu)}
+
+section{margin-bottom:56px;scroll-margin-top:20px}
+h2{font-family:"Zen Maru Gothic",sans-serif;font-weight:900;font-size:clamp(20px,3.4vw,27px);margin:0 0 8px;
+   display:flex;gap:12px;align-items:baseline;text-wrap:balance}
+h2 .n{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--red);flex:none}
+.sub{color:var(--ink2);font-size:14.5px;margin:0 0 22px}
+h3{font-family:"Zen Maru Gothic",sans-serif;font-size:17px;font-weight:700;margin:30px 0 10px}
+p{margin:0 0 14px;max-width:42em}
+ul{margin:0 0 14px;padding-left:1.35em;max-width:42em}
+li{margin-bottom:5px}
+
+.fix{border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-bottom:18px}
+.fix>.hd{display:flex;gap:12px;align-items:center;padding:14px 18px;background:var(--panel);
+  font-family:"Zen Maru Gothic",sans-serif;font-weight:700;font-size:15.5px;flex-wrap:wrap}
+.fix>.hd .loc{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--ink2);
+  background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:2px 11px;white-space:nowrap}
+.fix>.bd{padding:16px 18px}
+.pri{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:700;padding:2px 10px;border-radius:999px;white-space:nowrap}
+.p1{background:var(--red-bg);color:var(--red)}
+.p2{background:var(--amb-bg);color:var(--amb)}
+.p3{background:var(--panel2);color:var(--ink2)}
+
+.ba{display:grid;gap:12px;grid-template-columns:1fr;margin-bottom:12px}
+@media(min-width:720px){.ba{grid-template-columns:1fr 1fr}}
+.box{border-radius:12px;padding:14px 16px;font-size:14.5px;line-height:1.85;white-space:pre-wrap;word-break:break-word}
+.box .lbl{display:block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.14em;
+  font-weight:700;margin-bottom:8px;white-space:normal}
+.before{background:var(--red-bg)} .before .lbl{color:var(--red)}
+.after{background:var(--grn-bg)}  .after .lbl{color:var(--grn)}
+.why{font-size:14px;color:var(--ink2);border-left:3px solid var(--line);padding-left:14px;margin:0}
+.why b{color:var(--ink)}
+
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:14px;margin-bottom:18px}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:560px}
+th,td{padding:10px 13px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+thead th{background:var(--panel2);font-size:11.5px;letter-spacing:.08em;color:var(--ink2);
+  font-family:"IBM Plex Mono",monospace;font-weight:700;white-space:nowrap}
+tbody tr:last-child td{border-bottom:none}
+td.b{color:var(--red)} td.a{color:var(--grn);font-weight:500}
+
+.note{border:1px solid var(--line);border-left:4px solid var(--grn);background:var(--panel);
+  border-radius:0 12px 12px 0;padding:16px 20px;margin:0 0 20px;font-size:14.5px}
+.note.warn{border-left-color:var(--red)}
+.note p{max-width:none;margin:0 0 10px} .note p:last-child{margin:0}
+.note .tag{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.14em;font-weight:700;
+  color:var(--grn);display:block;margin-bottom:6px}
+.note.warn .tag{color:var(--red)}
+footer{border-top:1px solid var(--line);margin-top:48px;padding:26px 0 56px;font-size:13px;color:var(--ink2)}
+</style>
+
+<header>
+  <div class="wrap">
+    <p class="kick">株式会社TENOHIRA ／ 理念映像LP（tenohira_lp_merged.html）</p>
+    <h1>映像LPの修正指示書</h1>
+    <p class="lede">
+      このLPは直接いじりません。<b>元のチャットに、この指示をそのまま渡してください。</b>
+      優先度1が法令リスク、2が数字の矛盾、3が誤字です。1だけは今日中にお願いします。
+    </p>
+    <div class="howto">
+      <b>渡し方</b>：「LPを直したい。下の指示のとおりに修正して」と書いて、このページの内容をコピーして貼ってください。<br>
+      <b>変更前</b>の文字列で検索して、<b>変更後</b>に置き換えるだけです。構造もデザインも変えません。
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+<!-- ═══ 優先度1 ═══ -->
+<section id="p1">
+  <h2><span class="n">01</span>法令リスク ─ 今日中に</h2>
+  <p class="sub">「補助金申請代行」の表記が2箇所。これは社会保険労務士の独占業務にあたります。</p>
+
+  <div class="note warn">
+    <span class="tag">なぜ直すのか</span>
+    <p>AI研修と組み合わせる助成金は<b>人材開発支援助成金＝厚生労働省</b>のものです。この<b>申請書類の作成・提出は、社会保険労務士の独占業務</b>（社会保険労務士法27条／違反すると1年以下の懲役または100万円以下の罰金）。</p>
+    <p><b>実際にやっていなくても、「代行します」と表示すること自体</b>が問題になり得ます。「嘘つく・誤魔化す・隠す」を掲げている会社が、ここで足を掬われるのがいちばんもったいない。</p>
+    <p><b>やることは変わりません。</b>TENOHIRAは「研修の提供者」に徹し、書類を書くのは御社。TENOHIRAは書き方をお伝えする──この立ち位置に言い換えるだけです。</p>
+  </div>
+
+  <div class="fix">
+    <div class="hd"><span class="pri p1">優先度 1</span><span>FAQ ─ 5つ目の質問の答え</span><span class="loc">#faq</span></div>
+    <div class="bd">
+      <div class="ba">
+        <div class="box before"><span class="lbl">変更前</span>A. できます。映像制作とAIリスキリング研修・補助金申請代行のセット提案も行っています。ご相談ください。</div>
+        <div class="box after"><span class="lbl">変更後</span>A. できます。映像制作とAIリスキリング研修のセット提案を行っています。
+研修には厚生労働省の人材開発支援助成金が使え、要件を満たせば費用の大部分が戻ります（支給には審査があります）。
+申請書類を書いて出すのは御社ですが、何をどう書くか、手順と記入例はすべてご案内します。ご相談ください。</div>
+      </div>
+      <p class="why"><b>ポイント</b>：主語を「御社が」にする。TENOHIRAは「ご案内する」側に置く。「必ず通る」とは書かない。</p>
+    </div>
+  </div>
+
+  <div class="fix">
+    <div class="hd"><span class="pri p1">優先度 1</span><span>最下部 ─ 公式サイトへの導線</span><span class="loc">#link</span></div>
+    <div class="bd">
+      <div class="ba">
+        <div class="box before"><span class="lbl">変更前</span>株式会社TENOHIRAの会社情報・映像制作実績・AIリスキリング・補助金申請代行など、すべての事業はこちらからご覧いただけます。</div>
+        <div class="box after"><span class="lbl">変更後</span>株式会社TENOHIRAの会社情報・映像制作実績・AIリスキリング研修・助成金の活用支援など、すべての事業はこちらからご覧いただけます。</div>
+      </div>
+      <p class="why"><b>ポイント</b>：「補助金申請代行」→「助成金の活用支援」。1語の入れ替えです。</p>
+    </div>
+  </div>
+
+  <div class="fix">
+    <div class="hd"><span class="pri p1">優先度 1</span><span>追加 ─ 注記を1行</span><span class="loc">#faq の直後 または フッター</span></div>
+    <div class="bd">
+      <div class="box after"><span class="lbl">この一文を追加</span>※ 助成金の申請書類の作成・提出は、御社（または御社がご依頼される社会保険労務士）が行います。TENOHIRAは研修の提供者として、制度と手順のご案内、記入例のご提示、研修に関する書類の発行を担当します。申請書類の作成・提出の代行は行いません。</div>
+      <p class="why"><b>ポイント</b>：小さい字で構いません。<b>これが書いてあるかどうかで、後から見られたときの意味がまったく変わります。</b></p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 優先度2 ═══ -->
+<section id="p2">
+  <h2><span class="n">02</span>数字の矛盾と、機会損失</h2>
+  <p class="sub">読んだ人が「どっちが本当？」となる箇所と、商談が遅くなる箇所。</p>
+
+  <div class="fix">
+    <div class="hd"><span class="pri p2">優先度 2</span><span>CASE 02 宜野湾電設 ─ 尺が矛盾している</span><span class="loc">#case</span></div>
+    <div class="bd">
+      <div class="ba">
+        <div class="box before"><span class="lbl">変更前（本文）</span>創業者〜現在の変遷や次世代エネルギーへの挑戦── 50年の意を8分間に凝縮しました。
+
+【DATA】尺　約3分（短編・周年ブランディング映像）</div>
+        <div class="box after"><span class="lbl">変更後（どちらかに揃える）</span>創業者〜現在の変遷や次世代エネルギーへの挑戦── 50年の想いを3分間に凝縮しました。
+
+【DATA】尺　約3分（短編・周年ブランディング映像）</div>
+      </div>
+      <p class="why"><b>ポイント</b>：本文が8分、DATAが3分になっています。<b>実際の尺に合わせてください。</b>あわせて「50年の<b>意</b>」→「50年の<b>想い</b>」。</p>
+    </div>
+  </div>
+
+  <div class="fix">
+    <div class="hd"><span class="pri p2">優先度 2</span><span>PACKAGE ─ 式典撮影の金額が「別途」になっている</span><span class="loc">#package</span></div>
+    <div class="bd">
+      <div class="ba">
+        <div class="box before"><span class="lbl">変更前（OPTION内）</span>式典当日収録　＋別途</div>
+        <div class="box after"><span class="lbl">変更後</span>式典当日の撮影（編集なし・当日データお渡し）　＋15万円
+式典ダイジェスト版（後日納品）　＋20万円</div>
+      </div>
+      <p class="why"><b>ポイント</b>：「別途」は値引き交渉の入口になります。<b>金額を書くと、商談がその場で終わります。</b>この2つは原価がほぼかからず粗利率90%なので、書いて売るほうが得です。</p>
+    </div>
+  </div>
+
+  <div class="fix">
+    <div class="hd"><span class="pri p2">優先度 2</span><span>追加 ─ AI研修LPへのリンク</span><span class="loc">#faq の答えの中／#link セクション</span></div>
+    <div class="bd">
+      <div class="box after"><span class="lbl">FAQ Q5の答えの最後に追加</span>▶ AIリスキリング研修の詳しいカリキュラムと料金はこちら
+　https://1116maehira-ai.github.io/reskilling-lp/</div>
+      <p class="why"><b>ポイント</b>：<b>1社に映像とAI研修を両方売るのが計画の背骨</b>です。いまは2枚のLPが互いを知らない状態。リンク1本で繋がります。（研修LP側にも映像への導線を追加済み）</p>
+    </div>
+  </div>
+
+  <div class="fix">
+    <div class="hd"><span class="pri p2">優先度 2</span><span>MESSAGE ─ 文が繋がっていない</span><span class="loc">#message</span></div>
+    <div class="bd">
+      <p style="margin-bottom:12px">ここは<b>前平さん自身の言葉</b>なので、私が書き換えるべきではありません。<b>声に出して読み直してください。</b>音声入力の変換ミスが残っています。</p>
+      <div class="tw"><table>
+        <thead><tr><th>いま</th><th>たぶん</th></tr></thead>
+        <tbody>
+          <tr><td class="b">志や使命を持った方の背中に在り、実践や形を伴う、共に立ち上がり、攫みたいと。</td><td class="a"><b>文として繋がっていません。</b>「背中に在り」「実践や形を伴う」「共に立ち上がり」が並列なのか順接なのか不明。／「攫みたい」→「掴みたい」</td></tr>
+          <tr><td class="b">まだ<b>種中</b>には至りませんが</td><td class="a">まだ<b>道半ば</b>ですが？</td></tr>
+          <tr><td class="b">価値の上昇</td><td class="a"><b>物価</b>の上昇？</td></tr>
+          <tr><td class="b">その魂を見つめ、万人に届く、長く残る<b>戦略</b>に</td><td class="a">長く残る<b>形</b>に？</td></tr>
+        </tbody>
+      </table></div>
+      <p class="why"><b>ポイント</b>：ここに違和感があると、LP全体の説得力が落ちます。<b>他のどこよりも大事な4行です。</b></p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 優先度3 ═══ -->
+<section id="p3">
+  <h2><span class="n">03</span>誤字</h2>
+  <p class="sub">読めば分かる範囲ですが、直しておくと印象が変わります。</p>
+  <div class="tw">
+  <table>
+    <thead><tr><th>場所</th><th>変更前</th><th>変更後</th></tr></thead>
+    <tbody>
+      <tr><td>CASE 03 見出し</td><td class="b">IMI 35周年（制作中）<b>動作中</b></td><td class="a">IMI 35周年（制作中）</td></tr>
+      <tr><td>CASE 03 バッジ</td><td class="b">▶ <b>動作中</b></td><td class="a">▶ 制作中</td></tr>
+      <tr><td>CASE 01 本文</td><td class="b"><b>会社員</b>が「至誠、天に通ず」を胸に8分間。</td><td class="a">文が途中で切れています。<b>意図した一文に直してください</b></td></tr>
+      <tr><td>CASE 02 本文</td><td class="b">創業者自身からの<b>出発信</b>、</td><td class="a">創業者自身からの<b>発信</b>？</td></tr>
+      <tr><td>CASE 02 本文</td><td class="b">社員が歩んだ独自の<b>夢発信文化</b></td><td class="a">意味が取りづらい。実際の社内文化の名称に</td></tr>
+      <tr><td>REASON 02</td><td class="b">動画を<b>利用</b>まで一貫支援でサポート可能</td><td class="a">動画の<b>活用</b>まで一貫してサポート可能</td></tr>
+      <tr><td>REASON 03</td><td class="b">作った<b>とこのある</b>編集者<b>に</b>、ない編集者では</td><td class="a">作った<b>ことのある</b>編集者<b>と</b>、ない編集者では</td></tr>
+      <tr><td>PROMISE 04</td><td class="b">「こんなこと聞いていいの？」という些細な疑問も遠慮なくどうぞ。<b>（2回書かれています）</b></td><td class="a">1回に</td></tr>
+      <tr><td>FORM 検討内容</td><td class="b">式典・<b>竣工式発表会</b></td><td class="a">式典・竣工式・<b>発表会</b>？</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- ═══ 触らないで ═══ -->
+<section id="keep">
+  <h2><span class="n">04</span>ここは、絶対に触らないでください</h2>
+  <p class="sub">このLPの強いところ。直すついでに薄めてしまうと、もったいない。</p>
+  <div class="tw">
+  <table>
+    <thead><tr><th>残すもの</th><th>理由</th></tr></thead>
+    <tbody>
+      <tr><td><b>CASE 4件（実績）</b></td><td>アイムユニバース／宜野湾電設／IMI／琉球スフィア。<b>具体名・具体の言葉・動画リンクまである実績は、沖縄の同業でほぼ持っていません。</b>ここがこのLPの心臓です</td></tr>
+      <tr><td><b>「沖縄を拠点に15年、1,000本以上」</b></td><td>手紙にも架電スクリプトにも転用しています。数字が効いています</td></tr>
+      <tr><td><b>「発注前に、企画構成を無料でご提案」</b></td><td>ヒアリング商談へのハードルを下げる最強の材料。<b>手紙の締めにも使っています</b></td></tr>
+      <tr><td><b>「8万円〜500万円前後まで」</b></td><td>500万の実績があると言えている。<b>305万のフルパッケージが射程内だと示す根拠</b></td></tr>
+      <tr><td><b>「最短3週間で納品」</b></td><td>式典に間に合わないと諦めている会社を拾えます</td></tr>
+      <tr><td><b>MESSAGEの温度</b></td><td>文法は直しても、<b>言い切りの熱は削らないでください。</b>整えすぎると別人の文章になります</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section id="order">
+  <h2><span class="n">05</span>そのまま貼れる指示文</h2>
+  <p class="sub">元のチャットに、これをコピーして渡してください。</p>
+  <div class="box after" style="border:1px solid var(--line)"><span class="lbl">コピーして貼る</span>LPを修正したいです。デザインと構造は一切変えず、以下の文字列の置き換えだけをお願いします。
+
+【優先度1：法令対応（必須）】
+1. FAQの5つ目の答えを、以下に差し替え
+   変更前：A. できます。映像制作とAIリスキリング研修・補助金申請代行のセット提案も行っています。ご相談ください。
+   変更後：A. できます。映像制作とAIリスキリング研修のセット提案を行っています。研修には厚生労働省の人材開発支援助成金が使え、要件を満たせば費用の大部分が戻ります（支給には審査があります）。申請書類を書いて出すのは御社ですが、何をどう書くか、手順と記入例はすべてご案内します。ご相談ください。
+   ▶ AIリスキリング研修の詳しいカリキュラムと料金はこちら
+   　https://1116maehira-ai.github.io/reskilling-lp/
+
+2. 最下部LINKセクションの「AIリスキリング・補助金申請代行など」を
+   「AIリスキリング研修・助成金の活用支援など」に変更
+
+3. FAQの直後（またはフッター）に、以下の注記を小さい文字で追加
+   ※ 助成金の申請書類の作成・提出は、御社（または御社がご依頼される社会保険労務士）が行います。TENOHIRAは研修の提供者として、制度と手順のご案内、記入例のご提示、研修に関する書類の発行を担当します。申請書類の作成・提出の代行は行いません。
+
+【優先度2：数字と導線】
+4. CASE 02の本文「50年の意を8分間に凝縮しました」を
+   「50年の想いを3分間に凝縮しました」に変更（DATAの「約3分」に合わせる）
+
+5. PACKAGEのOPTION「式典当日収録　＋別途」を、以下2行に変更
+   式典当日の撮影（編集なし・当日データお渡し）　＋15万円
+   式典ダイジェスト版（後日納品）　＋20万円
+
+【優先度3：誤字】
+6. CASE 03の「動作中」を2箇所とも「制作中」に
+7. REASON 02「動画を利用まで一貫支援でサポート可能」→「動画の活用まで一貫してサポート可能」
+8. REASON 03「作ったとこのある編集者に、ない編集者では」→「作ったことのある編集者と、ない編集者では」
+9. PROMISE 04で同じ文が2回出ています。1回に減らしてください
+10. FORM「式典・竣工式発表会」→「式典・竣工式・発表会」
+
+【触らないでほしいところ】
+・CASE 4件の実績（内容・動画リンク）
+・「沖縄を拠点に15年、1,000本以上」
+・「発注前に、企画構成を無料でご提案」
+・「8万円〜500万円前後まで」「最短3週間で納品」
+・MESSAGEセクションの文体と熱量（※文法の乱れは私が別途直します）</div>
+</section>
+
+</div>
+
+<footer>
+  <div class="wrap">
+    株式会社TENOHIRA ／ 映像LP 修正指示書 ／ 2026年8月23日<br>
+    AI研修LPのほうは、修正済みのHTMLを別途お渡ししています（そのまま差し替え可能）。
+  </div>
+</footer>

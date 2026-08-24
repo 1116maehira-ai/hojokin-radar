@@ -1,0 +1,1089 @@
+<title>販売営業部の設計図</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
+<style>
+:root{
+  --ground:#ffffff; --surface:#eef1f6; --surface-2:#e3e8f0; --line:#c9d2df;
+  --ink:#101a26; --ink-soft:#4c5b6e;
+  --indigo:#22436e; --brass:#96682a; --brass-soft:#f2e6d1;
+  --sea:#1f6b64; --warn:#9a4a1f; --flame:#b03a1a;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#0d141c; --surface:#16202b; --surface-2:#1e2b38; --line:#2d3f52;
+    --ink:#e4ebf3; --ink-soft:#9aabbf;
+    --indigo:#8fb3dd; --brass:#d9a45b; --brass-soft:#2e2517;
+    --sea:#5cbdb1; --warn:#e0925f; --flame:#e8734f;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0d141c; --surface:#16202b; --surface-2:#1e2b38; --line:#2d3f52;
+  --ink:#e4ebf3; --ink-soft:#9aabbf;
+  --indigo:#8fb3dd; --brass:#d9a45b; --brass-soft:#2e2517;
+  --sea:#5cbdb1; --warn:#e0925f; --flame:#e8734f;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);
+  font-family:"Zen Kaku Gothic New",-apple-system,"Hiragino Kaku Gothic ProN",sans-serif;
+  font-size:16px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+code{font-family:"IBM Plex Mono",monospace;font-size:.9em;background:var(--surface);padding:1px 5px;border-radius:2px}
+
+.shell{max-width:1200px;margin:0 auto;padding:0 20px 96px;display:grid;grid-template-columns:1fr;gap:0}
+@media(min-width:1060px){.shell{grid-template-columns:222px minmax(0,1fr);gap:56px;padding-right:40px}}
+
+.hero{border-bottom:1px solid var(--line);margin-bottom:48px;padding:56px 0 40px}
+.hero-inner{max-width:1200px;margin:0 auto;padding:0 20px}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--brass);margin:0 0 20px}
+h1{font-family:"Shippori Mincho B1","Hiragino Mincho ProN",serif;font-weight:700;
+   font-size:clamp(27px,4.6vw,46px);line-height:1.4;margin:0 0 22px;text-wrap:balance}
+.hero-lede{max-width:64ch;color:var(--ink-soft);margin:0 0 32px;font-size:16.5px}
+.hero-stats{display:flex;flex-wrap:wrap;gap:12px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:3px;padding:12px 18px;min-width:132px}
+.stat.hot{border-color:var(--brass);background:var(--brass-soft)}
+.stat .k{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.14em;color:var(--ink-soft);text-transform:uppercase}
+.stat .v{font-family:"IBM Plex Mono",monospace;font-size:21px;font-weight:600;font-variant-numeric:tabular-nums;margin-top:4px}
+.stat.hot .v{color:var(--brass)}
+.stat .v small{font-size:12.5px;font-weight:400;color:var(--ink-soft)}
+
+nav.rail{display:none}
+@media(min-width:1060px){
+  nav.rail{display:block;position:sticky;top:0;align-self:start;padding-top:8px;max-height:100vh;overflow-y:auto}
+  nav.rail ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:1px}
+  nav.rail a{display:flex;gap:10px;text-decoration:none;color:var(--ink-soft);font-size:12.5px;
+    line-height:1.5;padding:5px 8px;border-left:2px solid transparent;border-radius:0 3px 3px 0}
+  nav.rail a:hover{color:var(--ink);background:var(--surface);border-left-color:var(--brass)}
+  nav.rail a:focus-visible{outline:2px solid var(--brass);outline-offset:1px}
+  nav.rail .n{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--brass);flex:none;padding-top:2px}
+}
+main{min-width:0}
+section{margin-bottom:76px;scroll-margin-top:24px}
+h2{font-family:"Shippori Mincho B1",serif;font-weight:600;font-size:clamp(20px,3vw,27px);
+   line-height:1.45;margin:0 0 8px;text-wrap:balance;display:flex;gap:14px;align-items:baseline}
+h2 .num{font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:600;color:var(--brass);letter-spacing:.08em;flex:none;padding-top:2px}
+.sub{color:var(--ink-soft);font-size:14px;margin:0 0 28px}
+@media(min-width:600px){.sub{padding-left:34px}}
+h3{font-size:15px;font-weight:700;margin:38px 0 12px;letter-spacing:.02em}
+h3::before{content:"";display:inline-block;width:14px;height:1px;background:var(--brass);vertical-align:middle;margin-right:9px}
+p{margin:0 0 16px;max-width:70ch}
+ul{margin:0 0 16px;padding-left:1.3em;max-width:70ch}
+li{margin-bottom:7px}
+em{font-style:normal;color:var(--brass);font-weight:500}
+a{color:var(--indigo)}
+
+.const{display:grid;gap:14px;grid-template-columns:1fr;margin-bottom:26px}
+@media(min-width:720px){.const{grid-template-columns:1fr 1fr}}
+.card{border:1px solid var(--line);border-radius:4px;background:var(--surface);padding:18px 20px}
+.card.wide{grid-column:1/-1}
+.card.hot{border-color:var(--brass);background:var(--brass-soft)}
+.card.no{border-left:3px solid var(--flame)}
+.card h4{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--brass);margin:0 0 10px;font-weight:600}
+.card.no h4{color:var(--flame)}
+.card p{margin:0;font-size:14.5px;line-height:1.8;max-width:none}
+.card p+p{margin-top:8px}
+.card .big{font-family:"Shippori Mincho B1",serif;font-size:clamp(15px,2vw,18px);line-height:1.9}
+.card ul{margin:0;padding-left:1.15em;font-size:14.5px}
+
+.creed{border-left:3px solid var(--brass);background:var(--surface);padding:24px 26px;margin:0 0 28px;border-radius:0 4px 4px 0}
+.creed p{font-family:"Shippori Mincho B1",serif;font-size:clamp(16px,2.4vw,20px);line-height:2;margin:0;max-width:38ch}
+.note{border:1px solid var(--line);border-left:3px solid var(--sea);background:var(--surface);padding:16px 20px;margin:0 0 22px;font-size:14px;border-radius:0 4px 4px 0}
+.note.warn{border-left-color:var(--warn)}
+.note.hot{border-left-color:var(--flame)}
+.note p{max-width:none} .note p:last-child{margin-bottom:0}
+.note .tag{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--sea);display:block;margin-bottom:6px;font-weight:600}
+.note.warn .tag{color:var(--warn)} .note.hot .tag{color:var(--flame)}
+
+.tw{overflow-x:auto;margin:0 0 8px;border:1px solid var(--line);border-radius:4px;background:var(--ground)}
+table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:560px}
+caption{caption-side:bottom;text-align:left;font-size:12.5px;color:var(--ink-soft);padding:10px 2px 0;line-height:1.6}
+th,td{padding:9px 13px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+thead th{background:var(--surface-2);font-size:11px;letter-spacing:.09em;font-weight:700;color:var(--ink-soft);
+  text-transform:uppercase;white-space:nowrap;font-family:"IBM Plex Mono",monospace}
+tbody tr:last-child td{border-bottom:none}
+tbody tr.total td{background:var(--surface);font-weight:700;border-top:2px solid var(--brass)}
+tbody tr.goal td{background:var(--brass-soft)}
+td.n,th.n{text-align:right;font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;white-space:nowrap}
+td.neg{color:var(--warn)} td.pos{color:var(--sea)}
+.qh{font-family:"IBM Plex Mono",monospace;font-weight:600;color:var(--brass)}
+.bar{display:block;height:5px;background:var(--brass);border-radius:2px;margin-top:5px;min-width:2px}
+.chip{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;padding:1px 7px;border-radius:2px;
+  border:1px solid var(--line);background:var(--surface);color:var(--ink-soft);letter-spacing:.04em;white-space:nowrap}
+.chip.a{border-color:var(--brass);color:var(--brass);background:var(--brass-soft)}
+.chip.s{border-color:var(--sea);color:var(--sea)}
+
+figure{margin:0 0 30px}
+figure svg{width:100%;height:auto;display:block;color:var(--ink)}
+.figwrap{border:1px solid var(--line);border-radius:4px;background:var(--surface);padding:22px 18px;overflow-x:auto}
+figcaption{font-size:12.5px;color:var(--ink-soft);padding-top:10px;line-height:1.6;max-width:70ch}
+svg text{font-family:"Zen Kaku Gothic New",sans-serif}
+svg .m{font-family:"IBM Plex Mono",monospace}
+
+footer{border-top:1px solid var(--line);margin:16px auto 0;padding:28px 20px 0;max-width:1200px;font-size:12.5px;color:var(--ink-soft)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<header class="hero">
+  <div class="hero-inner">
+    <p class="eyebrow">株式会社TENOHIRA 販売営業部 ／ 事業計画 2026.08.22 → 2028.02.28</p>
+    <h1>命の使い方が使命。<br>ともに立ち上がり、挑む。</h1>
+    <p class="hero-lede">
+      前平が率いる販売営業部の設計図。制作は役員2名の映像制作事業部へ社内発注し、
+      この部署は<strong>プランニング・スケジューリング・アタック・フロント営業・商談・成約</strong>に集中する。
+      前平＋1.5人で年間1.5億。それで、3人の手取り100万も、全員の手取り2倍も、成立する。
+    </p>
+    <div class="hero-stats">
+      <div class="stat hot"><div class="k">事業部A 売上</div><div class="v">1.58<small>億円</small></div></div>
+      <div class="stat hot"><div class="k">粗利率</div><div class="v">85<small>%</small></div></div>
+      <div class="stat"><div class="k">体制</div><div class="v">1＋1.5<small>人</small></div></div>
+      <div class="stat"><div class="k">貢献利益</div><div class="v">9,635<small>万円</small></div></div>
+      <div class="stat"><div class="k">全社 税引後</div><div class="v">3,328<small>万円</small></div></div>
+    </div>
+  </div>
+</header>
+
+<div class="shell">
+<nav class="rail" aria-label="目次">
+  <ol>
+    <li><a href="#s0"><span class="n">00</span><span>経営の憲法</span></a></li>
+    <li><a href="#s1"><span class="n">01</span><span>二つの事業部</span></a></li>
+    <li><a href="#s2"><span class="n">02</span><span>使命 → 商品</span></a></li>
+    <li><a href="#s3"><span class="n">03</span><span>商品とパッケージ</span></a></li>
+    <li><a href="#s4"><span class="n">04</span><span>目標数字の立て方</span></a></li>
+    <li><a href="#s5"><span class="n">05</span><span>数値計画</span></a></li>
+    <li><a href="#s6"><span class="n">06</span><span>ストック</span></a></li>
+    <li><a href="#s7"><span class="n">07</span><span>集客チャネル</span></a></li>
+    <li><a href="#s8"><span class="n">08</span><span>ヒアリングの循環</span></a></li>
+    <li><a href="#s9"><span class="n">09</span><span>1.5人と前平の稼働</span></a></li>
+    <li><a href="#s10"><span class="n">10</span><span>6クォーター計画</span></a></li>
+    <li><a href="#s11"><span class="n">11</span><span>データ資産</span></a></li>
+    <li><a href="#s12"><span class="n">12</span><span>採用と離脱の基準</span></a></li>
+    <li><a href="#s13"><span class="n">13</span><span>リスクと決めごと</span></a></li>
+  </ol>
+</nav>
+
+<main>
+
+<!-- ══════════ 00 ══════════ -->
+<section id="s0">
+  <h2><span class="num">00</span>経営の憲法</h2>
+  <p class="sub">2026年8月22日 最新版。すべてこの計画の上位にある。数字が憲法と矛盾したら、直すのは数字のほう。</p>
+
+  <div class="creed">
+    <p>命の使い方が使命。<br>
+    あなたの声になり、腕に、足に、武器に、盾に、勇気になる。<br>
+    ともに立ち上がり挑む。<br>
+    君を抱きしめる、君もいつか誰かのヒーロー。</p>
+  </div>
+
+  <div class="const">
+    <div class="card"><h4>対象顧客</h4>
+      <p>共鳴できる使命の持ち主。<br>愛せると思える、TENOHIRAと出会う人。</p></div>
+    <div class="card"><h4>提供手段</h4>
+      <p>代わりにやっておく。<br>やり方を教える。</p></div>
+
+    <div class="card hot wide"><h4>ビジョン 10年</h4>
+      <p class="big">世界中の中小企業の経営者が、「俺には最高の仲間もいる、TENOHIRAもいる。いける」と言っている。<br>
+      関わったあなたが最強になっている。<br>あなたも我々も、お金の心配から解放されている。</p></div>
+
+    <div class="card"><h4>ビジョン 2年</h4>
+      <p>考えない作業みたいな仕事は、誰もやっていない。</p>
+      <p>代理店の仕事は全体の25%。代理店からの仕事は、今と同じ売上。</p></div>
+    <div class="card"><h4>バリュー</h4>
+      <p>あなたが挑める状態をクリエイティブで提供する。<br>あなたの可能性を広げる。<br>
+      あなたがエキサイティングできる。<br>あなたを深く理解する。</p></div>
+
+    <div class="card hot wide"><h4>商品定義</h4>
+      <p class="big">あなたの歩み・歴史を資産に。<br>あなたしか持ち得ない魅力を、届けるべきあの人に。<br>
+      あなたしかできない事に、あなたが集中する。<br>創業の魂を永遠に、万人に。</p></div>
+
+    <div class="card"><h4>行動指針</h4>
+      <p class="big">ドースル コースル ソースル ハッスル</p></div>
+    <div class="card no"><h4>やったらダメ</h4>
+      <ul><li>人のせいにする（全部自分のせい）</li><li>嘘つく・誤魔化す・隠す</li>
+      <li>人を落とす・足を引っ張る・邪魔する</li></ul></div>
+
+    <div class="card no"><h4>嫌なこと</h4>
+      <ul><li>使命に賛同できない人のために働くこと</li>
+      <li>使命に賛同できないまま居座る人がいる状態</li></ul></div>
+    <div class="card"><h4>コンフォートゾーン</h4>
+      <p>最低5億円稼いでいる。いつでも旅行に行ける。家もある。お金が私のために動いている。</p></div>
+
+    <div class="card hot"><h4>数字目標 ／ 2027.03.01 – 2028.02.28</h4>
+      <p class="big">売上 4億円<br>粗利 2億円<br>税引後 2,000万円<br>ストック 月500万円</p></div>
+    <div class="card"><h4>目標数字の立て方</h4>
+      <ul><li>あなたが欲しい手取り、いつからその手取りになってる × 人数</li>
+      <li>会社が残したいチャレンジと守りのお金、いつまでにいくら</li>
+      <li>それに必要な、いつもかかる経費（家賃・光熱費・ガソリン・ご飯・雑費）</li>
+      <li>それらが粗利。粗利は売上の何%にする？</li></ul></div>
+
+    <div class="card wide"><h4>達成後 ／ 2028.03.01 –</h4>
+      <p>みんなの給料が手取り2倍。（人件費 月600万・その他経費 月600万 想定）</p></div>
+  </div>
+</section>
+
+<!-- ══════════ 01 ══════════ -->
+<section id="s1">
+  <h2><span class="num">01</span>二つの事業部</h2>
+  <p class="sub">同じ報酬を約束された役員が3人。うち2人は映像制作事業部を、1人は販売営業部を持つ。</p>
+
+  <p>手取り月100万円・額面月150万円・年1回の賞与 手取り100万円。<strong>この条件が3人分あります。</strong>1人あたり年2,110万円（法定福利込）、3人で<strong>年6,331万円＝月528万円</strong>。この固定費が、計画の出発点であり最大の制約です。</p>
+
+  <figure>
+    <div class="figwrap">
+    <svg viewBox="0 0 880 330" role="img" aria-label="販売営業部と映像制作事業部の関係。販売営業部が受注し粗利80から90パーセントを確保したうえで制作を社内発注し、映像制作事業部が制作と代理店案件を担う構造">
+      <defs><marker id="ar1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="var(--brass)"/></marker>
+        <marker id="ar1b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="var(--indigo)"/></marker></defs>
+
+      <rect x="10" y="28" width="400" height="168" rx="4" fill="var(--brass)" fill-opacity=".1" stroke="var(--brass)"/>
+      <text x="26" y="50" font-size="13.5" font-weight="700" fill="var(--brass)">販売営業部（事業A）</text>
+      <text x="394" y="50" text-anchor="end" class="m" font-size="17" font-weight="700" fill="var(--brass)">1.58億</text>
+      <text x="26" y="72" font-size="11.5" font-weight="700">前平 ＋ 1.5人</text>
+      <text x="26" y="94" font-size="11.5">プランニング／スケジューリング／アタック</text>
+      <text x="26" y="113" font-size="11.5">フロント営業／商談／成約</text>
+      <line x1="26" y1="128" x2="394" y2="128" stroke="var(--brass)" stroke-opacity=".3"/>
+      <text x="26" y="148" font-size="11.5">理念映像・式典・AIリスキリング・ストック</text>
+      <text x="26" y="168" font-size="11.5" fill="currentColor" fill-opacity=".75">粗利率 85%（外部への実支出は10〜20%）</text>
+      <text x="26" y="187" font-size="11" fill="var(--brass)">年96社成約／平均客単価149万</text>
+
+      <rect x="470" y="28" width="400" height="168" rx="4" fill="var(--indigo)" fill-opacity=".1" stroke="var(--indigo)"/>
+      <text x="486" y="50" font-size="13.5" font-weight="700" fill="var(--indigo)">映像制作事業部（事業B）</text>
+      <text x="854" y="50" text-anchor="end" class="m" font-size="17" font-weight="700" fill="var(--indigo)">1.00億</text>
+      <text x="486" y="72" font-size="11.5" font-weight="700">役員2名 ＋ 制作チーム</text>
+      <text x="486" y="94" font-size="11.5">代理店経由のTVCM・ブランドムービー</text>
+      <text x="486" y="113" font-size="11.5">最高品質を求められる映像制作</text>
+      <line x1="486" y1="128" x2="854" y2="128" stroke="var(--indigo)" stroke-opacity=".3"/>
+      <text x="486" y="148" font-size="11.5">＋ 販売営業部からの社内受注をすべて制作</text>
+      <text x="486" y="168" font-size="11.5" fill="currentColor" fill-opacity=".75">代理店分の粗利率 48%／金額は据え置き</text>
+      <text x="486" y="187" font-size="11" fill="var(--indigo)">比率だけが25%へ下がる（ビジョン2年）</text>
+
+      <path d="M414 100 L466 100" stroke="var(--brass)" stroke-width="2" marker-end="url(#ar1)"/>
+      <text x="440" y="92" text-anchor="middle" font-size="10.5" fill="var(--brass)">社内発注</text>
+      <path d="M466 132 L414 132" stroke="var(--indigo)" stroke-width="2" marker-end="url(#ar1b)"/>
+      <text x="440" y="150" text-anchor="middle" font-size="10.5" fill="var(--indigo)">納品物</text>
+
+      <line x1="10" y1="216" x2="870" y2="216" stroke="currentColor" stroke-opacity=".2"/>
+      <text x="10" y="238" font-size="12" font-weight="700">この振替が、会社全体の数字を変えない理由</text>
+      <text x="10" y="260" font-size="11.5" fill="currentColor" fill-opacity=".78">販売営業部は、商材の粗利80〜90%を<tspan font-weight="700">確保したうえで</tspan>制作を社内へ回す。事業部間の振替は社内取引なので、</text>
+      <text x="10" y="280" font-size="11.5" fill="currentColor" fill-opacity=".78">会社全体で見れば粗利率85%はそのまま残る。外に出ていくのは実費（機材・出演・音源・一部外注）だけ。</text>
+      <text x="10" y="302" font-size="11.5" font-weight="700" fill="var(--brass)">＝ 前計画で置いていた「映像の粗利率50%」は誤り。実勢は80〜90%。ここが計画の全体を変えた。</text>
+      <text x="10" y="322" font-size="11.5" fill="currentColor" fill-opacity=".78">粗利率が50%→85%に上がると、同じ粗利を出すのに必要な売上は4割減る。売上4億は要らなくなる。</text>
+    </svg>
+    </div>
+    <figcaption>図1 — 販売営業部が売り、映像制作事業部が作る。振替は社内取引なので、会社全体の粗利率85%は維持される。</figcaption>
+  </figure>
+
+  <div class="note hot">
+    <span class="tag">この計画で最も重要な発見</span>
+    <p><strong>憲法の「売上4億」は、粗利率50%という前提から逆算された数字でした。</strong>実勢は理念映像80%、式典90%、AIリスキリング90%。事業Aで85%、全社で71%です。<br><br>
+    粗利率が上がれば、同じ粗利を出すのに必要な売上は下がります。憲法の数字目標（3人の手取り100万・全員の手取り2倍・税引後2,000万・借入返済）を<strong>すべて満たすのに必要な事業A売上は 1.41億</strong>。全社で2.41億です。<br><br>
+    <strong>前平さんが「1.5億つくれたら優秀」と言った数字と、ほぼ完全に一致します。</strong>感覚が計算と合っている。だからこの計画は、4億ではなく1.5億を目標に置きます。</p>
+  </div>
+
+  <h3>事業Bは「役員2名の給与の土台」であり、この計画の前提資産</h3>
+  <p>
+    事業B（映像制作事業部）は、この計画が始まる前から存在する、<strong>稼働済みの収益基盤</strong>です。
+    役員2名が責任を持つ代理店TVCM・ハイバジェット映像の受注・制作は、現状の規模（売上1億・粗利4,800万）のまま継続します。
+    この計画では「拡大」も「縮小」も指示しません。<em>現状維持が前提</em>です。
+  </p>
+
+  <div class="tw">
+  <table>
+    <caption>事業B単体での役員2名の給与カバー計算。粗利は据え置き1億×48%で算出。</caption>
+    <thead><tr><th>項目</th><th class="n">年額（万円）</th><th>備考</th></tr></thead>
+    <tbody>
+      <tr><td>事業B 売上（代理店TVCM据え置き）</td><td class="n">10,000</td><td>現状維持。拡大は求めない</td></tr>
+      <tr><td>事業B 粗利（48%）</td><td class="n">4,800</td><td>外注・制作費を差し引いた後</td></tr>
+      <tr><td>役員2名 会社負担合計（法定福利込）</td><td class="n">▲4,220</td><td>額面150万×2名＋賞与140万×2名＋法定福利</td></tr>
+      <tr><td>固定費（事業部按分）</td><td class="n">▲約380</td><td>家賃・設備・ソフト等の事業B分</td></tr>
+      <tr class="total"><td>事業B 残余（事業A支援前）</td><td class="n">約200</td><td class="pos">2名の手取りを支えながら、わずかに黒字</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="note">
+    <span class="tag">読み方</span>
+    <p>
+      上表が示すのは「事業Bだけでは豊かにはなれないが、<strong>2名の生活と雇用は維持できる</strong>」という事実です。
+      事業Aが立ち上がる間（Q1〜Q2）、役員2名の報酬の裏付けは事業Bが担います。
+      事業Aが軌道に乗るQ3以降、全社粗利が厚くなり、3名全員の報酬を事業全体で支える構造に移行します。
+      <strong>事業Bは「消えていく仕事」ではなく、2年後も同規模で継続する会社の柱のひとつです。</strong>
+    </p>
+    <p>
+      また、代理店比率25%への移行（ビジョン2年）は、<em>禁止ではなく上限</em>の設定です。
+      新規の代理店案件を追わないが、既存取引は大切に続ける。それが「25%」の意味です。
+    </p>
+  </div>
+
+  <h3>不干渉の設計 — 事業Aは制作チームを引き抜かない</h3>
+  <div class="const">
+    <div class="card">
+      <h4>事業A（前平の販売営業部）がやること</h4>
+      <ul>
+        <li>アタック・ヒアリング・商談・成約</li>
+        <li>プランニング・スケジューリング</li>
+        <li>受注後、制作を事業Bへ社内発注</li>
+        <li>AIリスキリングの提案・販売（外注なし）</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>事業B（映像制作事業部）がやること</h4>
+      <ul>
+        <li>代理店TVCM・ブランドムービーの受注・制作</li>
+        <li>事業Aからの社内発注を全件制作・納品</li>
+        <li>クオリティ保証・スケジュール管理</li>
+        <li>役員2名が制作チームを指揮</li>
+      </ul>
+    </div>
+    <div class="card no wide">
+      <h4>設計上の禁止事項</h4>
+      <p>
+        事業Aの拡大を理由として、映像制作事業部のスタッフ・役員・制作リソースを
+        販売営業部へ転用することは<strong>しない</strong>。
+        制作チームのキャパシティは、代理店案件と社内発注の両方を確実にこなすために確保する。
+        超過した場合は外部制作への発注を検討するが、事業Bの体制は守る。
+      </p>
+    </div>
+  </div>
+
+  <div class="note warn">
+    <span class="tag">事業Bが計画に薄く見える理由</span>
+    <p>
+      この文書のタイトルは「<strong>販売営業部の設計図</strong>」です。前平が率いる事業A（1.58億目標）の計画書であるため、
+      事業Bの詳細（受注フロー・制作体制・代理店との取引条件）はここでは扱いません。
+      ただし、会社の財務計画・役員報酬計画・リスク設計のいずれも、<em>事業Bの継続を前提として組み立てています</em>。
+      事業Bが停止・大幅縮小した場合は、この計画全体の見直しが必要です。
+    </p>
+  </div>
+</section>
+
+<!-- ══════════ 02 ══════════ -->
+<section id="s2">
+  <h2><span class="num">02</span>使命 → 商品の構造</h2>
+  <p class="sub">使命の言葉が、そのまま提供手段と商品の設計図になっている。だから商品は絞れる。</p>
+
+  <figure>
+    <div class="figwrap">
+    <svg viewBox="0 0 880 322" role="img" aria-label="使命の各節が2つの提供手段に変換され、映像・AI研修・前平本人の稼働という3つの提供物になる構造図">
+      <defs><marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+        <marker id="ar2b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="var(--brass)"/></marker></defs>
+      <text x="10" y="22" class="m" font-size="11" letter-spacing="1.6" fill="var(--brass)">使命の言葉</text>
+      <text x="318" y="22" class="m" font-size="11" letter-spacing="1.6" fill="var(--brass)">提供手段</text>
+      <text x="622" y="22" class="m" font-size="11" letter-spacing="1.6" fill="var(--brass)">商品・稼働</text>
+
+      <rect x="10" y="38" width="278" height="62" rx="3" fill="var(--ground)" stroke="currentColor" stroke-opacity=".35"/>
+      <text x="26" y="62" font-size="13">あなたの声になり、</text>
+      <text x="26" y="82" font-size="13">腕に、足になる</text>
+      <line x1="292" y1="69" x2="314" y2="69" stroke="currentColor" stroke-opacity=".5" marker-end="url(#ar2)"/>
+      <rect x="318" y="38" width="230" height="62" rx="3" fill="var(--ground)" stroke="currentColor" stroke-opacity=".35"/>
+      <text x="334" y="66" font-size="14" font-weight="700">代わりに、やっておく</text>
+      <text x="334" y="86" font-size="11" fill="currentColor" fill-opacity=".7">歴史を資産に。魅力をあの人に</text>
+      <line x1="552" y1="69" x2="618" y2="69" stroke="var(--brass)" stroke-width="1.6" marker-end="url(#ar2b)"/>
+      <rect x="622" y="38" width="248" height="62" rx="3" fill="var(--brass-soft)" stroke="var(--brass)"/>
+      <text x="638" y="62" font-size="14" font-weight="700" fill="var(--brass)">理念映像・式典</text>
+      <text x="638" y="82" font-size="11" fill="currentColor" fill-opacity=".78">創業の魂／周年／採用／ブランディング</text>
+
+      <rect x="10" y="112" width="278" height="62" rx="3" fill="var(--ground)" stroke="currentColor" stroke-opacity=".35"/>
+      <text x="26" y="136" font-size="13">あなたの武器に、</text>
+      <text x="26" y="156" font-size="13">盾になる</text>
+      <line x1="292" y1="143" x2="314" y2="143" stroke="currentColor" stroke-opacity=".5" marker-end="url(#ar2)"/>
+      <rect x="318" y="112" width="230" height="62" rx="3" fill="var(--ground)" stroke="currentColor" stroke-opacity=".35"/>
+      <text x="334" y="140" font-size="14" font-weight="700">やり方を、教える</text>
+      <text x="334" y="160" font-size="11" fill="currentColor" fill-opacity=".7">あなたしかできない事に集中する</text>
+      <line x1="552" y1="143" x2="618" y2="143" stroke="var(--brass)" stroke-width="1.6" marker-end="url(#ar2b)"/>
+      <rect x="622" y="112" width="248" height="62" rx="3" fill="var(--brass-soft)" stroke="var(--brass)"/>
+      <text x="638" y="136" font-size="14" font-weight="700" fill="var(--brass)">AIリスキリング</text>
+      <text x="638" y="156" font-size="11" fill="currentColor" fill-opacity=".78">L120／M80／S30 ＋ AI補佐サポート</text>
+
+      <rect x="10" y="186" width="278" height="62" rx="3" fill="var(--ground)" stroke="currentColor" stroke-opacity=".35"/>
+      <text x="26" y="210" font-size="13">あなたの勇気になる。</text>
+      <text x="26" y="230" font-size="13">ともに立ち上がり挑む</text>
+      <line x1="292" y1="217" x2="314" y2="217" stroke="currentColor" stroke-opacity=".5" marker-end="url(#ar2)"/>
+      <rect x="318" y="186" width="230" height="62" rx="3" fill="var(--ground)" stroke="currentColor" stroke-opacity=".35"/>
+      <text x="334" y="214" font-size="14" font-weight="700">最初と最後は、私が立つ</text>
+      <text x="334" y="234" font-size="11" fill="currentColor" fill-opacity=".7">共鳴と愛が判定基準</text>
+      <line x1="552" y1="217" x2="618" y2="217" stroke="var(--brass)" stroke-width="1.6" marker-end="url(#ar2b)"/>
+      <rect x="622" y="186" width="248" height="62" rx="3" fill="var(--ground)" stroke="var(--brass)" stroke-dasharray="3 3"/>
+      <text x="638" y="210" font-size="13" font-weight="700">前平の稼働範囲</text>
+      <text x="638" y="230" font-size="11" fill="currentColor" fill-opacity=".78">ヒアリング／立案／商談／成約／登壇</text>
+
+      <line x1="10" y1="270" x2="870" y2="270" stroke="currentColor" stroke-opacity=".2"/>
+      <text x="10" y="292" font-size="11.5" fill="currentColor" fill-opacity=".75">この3行の外側にある作業は、すべて「1.5人・AI・制作事業部」に渡す。渡せない作業は、商品にしない。</text>
+      <text x="10" y="312" font-size="11.5" fill="var(--brass)">＝ ビジョン2年「考えない作業みたいな仕事は誰もやってない」を、まず自分に適用する。</text>
+    </svg>
+    </div>
+    <figcaption>図2 — 使命の3節が、2つの提供手段を経て、2つの商品群と前平の稼働範囲に一対一で対応する。</figcaption>
+  </figure>
+
+  <div class="tw">
+  <table>
+    <caption>選定基準。①②は「対象顧客」と「嫌なこと」から直接来る。どちらかがNOなら、金額がいくらでも受けない。</caption>
+    <thead><tr><th style="width:34px">#</th><th>問い</th><th>出典</th><th>判定</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">①</td><td>その人の使命に、私が共鳴できるか</td><td>対象顧客／嫌なこと</td><td><span class="chip a">必須</span></td></tr>
+      <tr><td class="mono">②</td><td>その人を、私が愛せると思えるか</td><td>対象顧客</td><td><span class="chip a">必須</span></td></tr>
+      <tr><td class="mono">③</td><td>歩み・歴史・魅力に、資産化できるものがあるか</td><td>商品定義</td><td><span class="chip">商談で確認</span></td></tr>
+      <tr><td class="mono">④</td><td>予算と意思決定者にたどり着けるか</td><td>—</td><td><span class="chip">商談で確認</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- ══════════ 03 ══════════ -->
+<section id="s3">
+  <h2><span class="num">03</span>商品と販売パッケージ</h2>
+  <p class="sub">単品では単価が足りない。1社に映像とAI研修を両方売ることで、平均客単価149万をつくる。</p>
+
+  <div class="tw">
+  <table>
+    <caption>実勢価格。粗利は制作事業部への社内振替を差し引く前の、会社全体で残る額。</caption>
+    <thead><tr><th>商品</th><th class="n">単価</th><th class="n">粗利</th><th class="n">粗利率</th><th>備考</th></tr></thead>
+    <tbody>
+      <tr><td><strong>理念映像 2本パック</strong></td><td class="n">150万</td><td class="n">120万</td><td class="n">80%</td><td>主力。周年・承継・採用の入口</td></tr>
+      <tr><td>理念映像 1本</td><td class="n">100万</td><td class="n">80万</td><td class="n">80%</td><td>単発</td></tr>
+      <tr><td>式典 撮影のみ（編集なし納品）</td><td class="n">15万</td><td class="n">13.5万</td><td class="n">90%</td><td>抱き合わせで効く</td></tr>
+      <tr><td>式典 ダイジェスト版</td><td class="n">20万</td><td class="n">18万</td><td class="n">90%</td><td>同上</td></tr>
+      <tr><td><strong>AIリスキリング L</strong></td><td class="n">120万</td><td class="n">108万</td><td class="n">90%</td><td>外注なし。助成金活用で自己負担を圧縮</td></tr>
+      <tr><td>AIリスキリング M</td><td class="n">80万</td><td class="n">72万</td><td class="n">90%</td><td>同上</td></tr>
+      <tr><td>AIリスキリング S</td><td class="n">30万</td><td class="n">27万</td><td class="n">90%</td><td>入口商品。L・Mへの階段</td></tr>
+      <tr class="goal"><td><strong>AI補佐サポート</strong>（ストック）</td><td class="n">10万／月</td><td class="n">8.5万／月</td><td class="n">85%</td><td>映像・式典の受注顧客のみ。詳細は06</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>販売パッケージ（年96社）</h3>
+  <div class="tw">
+  <table>
+    <caption>①②③⑤が映像・式典を含む＝ストックの対象（50社）。①②だけで売上の52%を占める。</caption>
+    <thead><tr><th style="width:96px">パッケージ</th><th>構成</th><th class="n">単価</th><th class="n">社数</th><th class="n">売上</th><th class="n">粗利</th></tr></thead>
+    <tbody>
+      <tr class="goal"><td class="qh">① フル</td><td>理念映像2本 ＋ 式典撮影 ＋ ダイジェスト ＋ 研修L</td><td class="n">305万</td><td class="n">12</td><td class="n">3,660</td><td class="n">3,114</td></tr>
+      <tr class="goal"><td class="qh">② 映像＋研修</td><td>理念映像2本 ＋ 研修L</td><td class="n">270万</td><td class="n">14</td><td class="n">3,780</td><td class="n">3,192</td></tr>
+      <tr><td class="qh">③ 映像＋式典</td><td>理念映像2本 ＋ 式典一式</td><td class="n">185万</td><td class="n">12</td><td class="n">2,220</td><td class="n">1,818</td></tr>
+      <tr><td class="qh">④ 研修L単体</td><td>AIリスキリング L</td><td class="n">120万</td><td class="n">14</td><td class="n">1,680</td><td class="n">1,512</td></tr>
+      <tr><td class="qh">⑤ 映像1本</td><td>理念映像 1本</td><td class="n">100万</td><td class="n">12</td><td class="n">1,200</td><td class="n">960</td></tr>
+      <tr><td class="qh">⑥ 研修M</td><td>AIリスキリング M</td><td class="n">80万</td><td class="n">16</td><td class="n">1,280</td><td class="n">1,152</td></tr>
+      <tr><td class="qh">⑦ 研修S</td><td>AIリスキリング S（入口）</td><td class="n">30万</td><td class="n">16</td><td class="n">480</td><td class="n">432</td></tr>
+      <tr class="total"><td>フロー計</td><td>平均客単価 149万</td><td class="n">149万</td><td class="n">96</td><td class="n">14,300</td><td class="n">12,180</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="note hot">
+    <span class="tag">この計画の背骨</span>
+    <p><strong>1社に映像とAI研修を両方売る。</strong>これが平均客単価149万をつくる唯一の方法です。①②の26社だけで7,440万＝全体の52%。<br><br>
+    しかもこれは、前平さんの時間効率をそのまま2倍にします。<strong>ヒアリングは1回で済むから。</strong>創業の魂を聞き出したその同じ場で、「その魂を、社員全員がAIを使いこなす形でも守りませんか」と繋げられる。別々の商談にすると、商談数が倍になり、時間が破綻します。</p>
+  </div>
+
+  <div class="note warn">
+    <span class="tag">法令上の制約</span>
+    <p>厚労省系助成金の<strong>申請書作成・提出代行は社会保険労務士の独占業務</strong>です。TENOHIRAは「研修提供者」に徹し、申請実務は提携社労士へ。<strong>提携社労士の確保はQ1の必達事項</strong>です。AIリスキリングL・Mの価格説得力の土台がここにあります。</p>
+  </div>
+</section>
+
+<!-- ══════════ 04 ══════════ -->
+<section id="s4">
+  <h2><span class="num">04</span>目標数字の立て方 ─ 前平メソッドで検算する</h2>
+  <p class="sub">憲法の4ステップに実数を入れて、いくら必要なのかを確かめる。</p>
+
+  <figure>
+    <div class="figwrap">
+    <svg viewBox="0 0 880 400" role="img" aria-label="役員3名と一般社員5名の人件費、残したいお金、借入返済、経費を積み上げて必要粗利を求め、粗利率85パーセントで割って事業A売上1.41億を導く逆算図">
+      <defs><marker id="ar4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="var(--brass)"/></marker></defs>
+      <text x="10" y="20" class="m" font-size="11" letter-spacing="1.6" fill="var(--brass)">① 欲しい手取り × 人数 × いつから</text>
+      <rect x="10" y="30" width="560" height="52" rx="3" fill="var(--brass)" fill-opacity=".12" stroke="var(--brass)"/>
+      <text x="26" y="52" font-size="13" font-weight="700">役員級3名　額面150万/月 ＋ 賞与140万 ＋ 法定福利</text>
+      <text x="26" y="72" font-size="11" fill="currentColor" fill-opacity=".75">1人 2,110万 × 3名。2028年3月から、この水準で毎月支払われている</text>
+      <text x="864" y="62" text-anchor="end" class="m" font-size="17" font-weight="700" fill="var(--brass)">6,331万</text>
+
+      <rect x="10" y="88" width="560" height="46" rx="3" fill="var(--ground)" stroke="currentColor" stroke-opacity=".35"/>
+      <text x="26" y="108" font-size="12.5">一般社員5名　額面60万/月（手取り約47万＝現在の2倍）＋ 法定福利</text>
+      <text x="26" y="126" font-size="11" fill="currentColor" fill-opacity=".7">現在は平均額面29万・手取り約23万。憲法の「手取り2倍」を満たす水準</text>
+      <text x="864" y="116" text-anchor="end" class="m" font-size="16" font-weight="600">4,140万</text>
+
+      <text x="10" y="160" class="m" font-size="11" letter-spacing="1.6" fill="var(--brass)">② 会社が残したいお金（チャレンジと守り）</text>
+      <rect x="10" y="170" width="560" height="52" rx="3" fill="var(--ground)" stroke="currentColor" stroke-opacity=".35"/>
+      <text x="26" y="192" font-size="12.5">税引後 2,000万円 ＋ 借入返済 354万円</text>
+      <text x="26" y="212" font-size="11" fill="currentColor" fill-opacity=".7">元本返済は税引後利益から出る。実効税率34%で逆算すると税引前 3,567万</text>
+      <text x="864" y="200" text-anchor="end" class="m" font-size="16" font-weight="600">3,567万</text>
+
+      <text x="10" y="248" class="m" font-size="11" letter-spacing="1.6" fill="var(--brass)">③ いつもかかる経費</text>
+      <rect x="10" y="258" width="560" height="52" rx="3" fill="var(--ground)" stroke="currentColor" stroke-opacity=".35"/>
+      <text x="26" y="280" font-size="12.5">全社共通 1,626万 ＋ 販売営業部の直接経費 468万 ＋ 積立・利益枠 648万</text>
+      <text x="26" y="300" font-size="11" fill="currentColor" fill-opacity=".7">全社共通はDB実測（月135.5万）。前計画の「月600万」は現状の4.4倍で過大だった</text>
+      <text x="864" y="288" text-anchor="end" class="m" font-size="16" font-weight="600">2,742万</text>
+
+      <line x1="10" y1="326" x2="870" y2="326" stroke="var(--brass)" stroke-width="1.5"/>
+      <text x="10" y="350" class="m" font-size="11" letter-spacing="1.6" fill="var(--brass)">④ ①+②+③ ＝ 必要粗利</text>
+      <text x="700" y="352" text-anchor="end" font-size="12.5" fill="currentColor" fill-opacity=".7">うち事業B（代理店）が 4,800万</text>
+      <text x="864" y="354" text-anchor="end" class="m" font-size="20" font-weight="700">16,780万</text>
+
+      <line x1="700" y1="362" x2="700" y2="376" stroke="var(--brass)" stroke-width="1.5" marker-end="url(#ar4)"/>
+      <text x="10" y="380" class="m" font-size="11" letter-spacing="1.6" fill="var(--brass)">⑤ 粗利は売上の何%にする？ → 事業A 85%</text>
+      <text x="864" y="382" text-anchor="end" class="m" font-size="20" font-weight="700" fill="var(--brass)">事業A 1.41億</text>
+      <text x="10" y="398" font-size="12" fill="var(--sea)">✓ 「1.5億つくれたら優秀」という感覚と一致。全社では 2.41億。</text>
+    </svg>
+    </div>
+    <figcaption>図3 — 憲法の立て方に実数を入れると、必要な事業A売上は1.41億。本計画は1.58億を置いているので、1,700万の余裕がある。</figcaption>
+  </figure>
+
+  <div class="tw">
+  <table>
+    <caption>3段階で置く。1.5億は「優秀」ライン、1.79億まで行くと憲法の「粗利2億」も届く。</caption>
+    <thead><tr><th>ライン</th><th class="n">事業A</th><th class="n">全社</th><th class="n">税引後</th><th class="n">返済後</th><th>意味</th></tr></thead>
+    <tbody>
+      <tr><td><strong>必達</strong></td><td class="n">1.41億</td><td class="n">2.41億</td><td class="n">2,354万</td><td class="n">2,000万</td><td>3人の手取り100万＋全員2倍＋守りの2,000万＋返済</td></tr>
+      <tr class="goal"><td><strong>本計画</strong></td><td class="n">1.58億</td><td class="n">2.58億</td><td class="n">3,328万</td><td class="n">2,973万</td><td>前平さんの「優秀」ライン。1,700万の安全余裕</td></tr>
+      <tr><td><strong>ストレッチ</strong></td><td class="n">1.79億</td><td class="n">2.79億</td><td class="n">4,508万</td><td class="n">4,154万</td><td>憲法の「粗利2億」も達成</td></tr>
+      <tr><td>憲法の売上4億</td><td class="n">3.00億</td><td class="n">4.00億</td><td class="n">—</td><td class="n">—</td><td>粗利率50%前提で出た数字。今の体制の2倍が必要</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="note">
+    <span class="tag">4億をどう扱うか</span>
+    <p>売上4億は、コンフォートゾーンの「最低5億稼いでいる」へ向かう<strong>その次の段</strong>として置くのが自然です。前平＋1.5人の1年目の目標にするには大きすぎます。<br>
+    ただし<strong>「粗利2億」は射程内</strong>です。事業A 1.79億（本計画＋2,100万）で届きます。ストレッチ目標として残す価値があります。</p>
+  </div>
+</section>
+
+<!-- ══════════ 05 ══════════ -->
+<section id="s5">
+  <h2><span class="num">05</span>数値計画</h2>
+  <p class="sub">単位は万円。計算式は <code>plan/division_a.py</code>。固定費は <code>plan/fixed_costs.sql</code> のDB実測値。</p>
+
+  <h3>販売営業部A 単体</h3>
+  <div class="tw">
+  <table>
+    <caption>貢献利益9,635万が、全社の共通費と役員2名を賄う原資になる。</caption>
+    <thead><tr><th>項目</th><th class="n">年額</th><th>内訳</th></tr></thead>
+    <tbody>
+      <tr><td>売上</td><td class="n">15,800</td><td>フロー 14,300（96社）＋ ストック 1,500</td></tr>
+      <tr><td>原価</td><td class="n">2,345</td><td>制作事業部への社内発注に伴う実費・外部支出</td></tr>
+      <tr class="total"><td>粗利</td><td class="n">13,455</td><td>粗利率 85%</td></tr>
+      <tr><td>前平（報酬・賞与・社保）</td><td class="n">2,110</td><td>額面150万×12 ＋ 賞与140万 ＋ 法定福利170万</td></tr>
+      <tr><td>1.5人（額面60万・手取り2倍）</td><td class="n">1,242</td><td>1.0人＝営業実働／0.5人＝企画・進行</td></tr>
+      <tr><td>直接経費</td><td class="n">468</td><td>架電外注240／ツール120／ポスティング60／SNS広告36／交通36／手紙18</td></tr>
+      <tr class="total"><td>貢献利益</td><td class="n">9,635</td><td>売上対比 61%</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>全社ロールアップ</h3>
+  <div class="tw">
+  <table>
+    <caption>上4行は<b>役員3名が満額（年6,331万）を受け取っている前提</b>の目安。<b>実際のFY2027は移行期のため役員費が軽く、最下段（緑）が実際の着地</b>（役員報酬カレンダーは本ページ10節）。</caption>
+    <thead><tr><th class="n">事業A売上</th><th class="n">全社売上</th><th class="n">粗利</th><th class="n">率</th><th class="n">営業利益</th><th class="n">税引後</th><th class="n">返済後</th><th>判定</th></tr></thead>
+    <tbody>
+      <tr><td class="n">12,000</td><td class="n">22,000</td><td class="n">15,019</td><td class="n">68%</td><td class="n">1,806</td><td class="n">1,192</td><td class="n">837</td><td>満額換算・目安</td></tr>
+      <tr><td class="n">14,000</td><td class="n">24,000</td><td class="n">16,722</td><td class="n">70%</td><td class="n">3,509</td><td class="n">2,316</td><td class="n pos">1,962</td><td class="pos">満額換算・目安</td></tr>
+      <tr><td class="n"><strong>15,800</strong></td><td class="n"><strong>25,800</strong></td><td class="n">18,255</td><td class="n">71%</td><td class="n">5,042</td><td class="n">3,328</td><td class="n pos">2,973</td><td class="pos">満額換算・目安</td></tr>
+      <tr><td class="n">17,900</td><td class="n">27,900</td><td class="n">20,043</td><td class="n">72%</td><td class="n">6,830</td><td class="n">4,508</td><td class="n pos">4,154</td><td class="pos">満額換算・粗利2億</td></tr>
+      <tr class="goal"><td class="n"><strong>15,800</strong></td><td class="n"><strong>25,800</strong></td><td class="n">18,255</td><td class="n">71%</td><td class="n">6,674</td><td class="n">4,405</td><td class="n pos">4,051</td><td class="pos"><strong>★ FY2027 実際</strong>（役員費4,699万）</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>現在の固定費（DB実測・重複排除済み）</h3>
+  <div class="tw">
+  <table>
+    <caption>アプリ上は1,196万に見えていたが、8月9日の01:02〜01:07に同じデータが5回再投入されており、実額の2.2倍だった。</caption>
+    <thead><tr><th>区分</th><th class="n">月額</th><th>内訳</th></tr></thead>
+    <tbody>
+      <tr><td>人件費（社員8名）</td><td class="n">3,150,000</td><td>MAGE 60万／KOSUKE 60万／GAFU 50万／PON 40万／NAOKI 34万／HARUHI 25万／HIBIKI 23万／U-KUN 23万</td></tr>
+      <tr><td>法定福利（15%）</td><td class="n">410,000</td><td>健康保険・厚生年金</td></tr>
+      <tr><td>外部委託（経理）</td><td class="n">150,000</td><td>比嘉さん</td></tr>
+      <tr><td>住居・オフィス</td><td class="n">425,000</td><td>社宅3件300,000／事務所100,000／倉庫15,000／プロバイダー10,000</td></tr>
+      <tr><td>車両・交通</td><td class="n">170,000</td><td>ガソリン7名分＋社用車</td></tr>
+      <tr><td>通信・ソフト</td><td class="n">270,000</td><td>ソフト関係260,000／携帯10,000</td></tr>
+      <tr><td>雑費</td><td class="n">288,000</td><td>1,200円 × 30日 × 8人</td></tr>
+      <tr><td>保険・会費ほか<span class="chip s">未登録</span></td><td class="n">54,937</td><td>那覇会議所18,000／大同火災16,470／ソニー生命8,140／TGひかり6,827／他</td></tr>
+      <tr class="total"><td>実費 小計</td><td class="n">4,917,937</td><td>年 5,902万</td></tr>
+      <tr><td>積立・利益枠</td><td class="n">540,000</td><td>ボーナス積立340,000／会社利益・チャレンジ枠200,000</td></tr>
+      <tr class="total"><td>固定費 合計</td><td class="n">5,457,937</td><td>年 6,550万</td></tr>
+      <tr><td>借入返済<span class="chip s">別枠</span></td><td class="n">295,390</td><td>日本政策金融公庫223,734／別口71,656。費用ではないが毎月出る</td></tr>
+      <tr class="total"><td>毎月の現金流出</td><td class="n">5,753,327</td><td>年 6,904万</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="note ok">
+    <span class="tag">税務 ─ 決算期をもとに確定（仮）</span>
+    <p><strong>決算期は2月末、新事業年度は3月1日開始。</strong>役員報酬は事業年度の途中で増額できないため（定期同額給与）、<strong>四半期ごとに引き上げる前回の計画は成立しません。</strong>改定できるのは事業年度の頭（3月支給分）だけ。詳しいカレンダーは10節に置きました。</p>
+    <p>要点だけ：<strong>Q1・Q2は現状170万/月を据え置き、Q3〜Q6は1人120万・合計360万/月でQ6まで固定、満額450万＋賞与420万は2028年3月から。</strong>賞与は「事前確定届出給与」の届出を<strong>決議から1ヶ月以内</strong>に出す必要があり（届出漏れは420万が全額損金不算入）、2027年12月に決議するなら<strong>2028年1月末が期限</strong>です。</p>
+  </div>
+</section>
+
+<!-- ══════════ 06 ══════════ -->
+<section id="s6">
+  <h2><span class="num">06</span>ストック ─ AI補佐サポート</h2>
+  <p class="sub">憲法で唯一「月額」で書かれた目標。月500万に届くのは2年目。初年度は月250万まで積む。</p>
+
+  <p>中身は<strong>AIの補佐サポート</strong>と、<strong>月に1人だけ、従業員のインタビュー動画（縦型1分）を撮影して納品する</strong>こと。対象は<em>式典映像・理念映像を受注いただいた企業のみ</em>のサービスです。</p>
+
+  <div class="tw">
+  <table>
+    <caption>映像・式典を含むパッケージ①②③⑤の50社が母集団。継続率50%で期末25社。</caption>
+    <thead><tr><th>Q</th><th class="n">映像受注（累計）</th><th class="n">継続契約（期末）</th><th class="n">ストック月商</th><th>この四半期にやること</th></tr></thead>
+    <tbody>
+      <tr><td class="qh">Q1</td><td class="n">4社</td><td class="n">1社</td><td class="n">10万</td><td>メニューを設計。映像の契約書に「納品後の伴走オプション」を最初から入れる</td></tr>
+      <tr><td class="qh">Q2</td><td class="n">10社</td><td class="n">4社</td><td class="n">40万</td><td>1〜4社目で提供の型をつくる。縦型インタビューの撮影・編集フローを固める</td></tr>
+      <tr><td class="qh">Q3</td><td class="n">20社</td><td class="n">9社</td><td class="n">90万</td><td>月1本の撮影が9本に。制作事業部と月次の撮影日を固定化</td></tr>
+      <tr><td class="qh">Q4</td><td class="n">31社</td><td class="n">15社</td><td class="n">150万</td><td>解約率を実測。3ヶ月継続した顧客の共通点を型に反映</td></tr>
+      <tr><td class="qh">Q5</td><td class="n">41社</td><td class="n">20社</td><td class="n">200万</td><td>AI補佐の提供内容を標準化し、0.5人でも回るようにする</td></tr>
+      <tr class="goal"><td class="qh">Q6</td><td class="n">50社</td><td class="n">25社</td><td class="n">250万</td><td><strong>初年度着地。</strong>2年目に50社＝月500万で憲法の目標に到達</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="note hot">
+    <span class="tag">なぜ映像顧客限定が正しいのか</span>
+    <p>この設計、とても良いと思います。理由が3つあります。<br><br>
+    <strong>① 撮る理由がすでにある。</strong>理念映像で創業の魂を撮った会社です。「その魂を継ぐ社員を、毎月1人ずつ記録していきましょう」——これは新しい提案ではなく、<strong>同じ物語の続き</strong>です。売り込みになりません。<br>
+    <strong>② 1年で12人分の資産になる。</strong>縦型1分が12本。採用にも、社内広報にも、SNSにも使える。<em>「あなたの歩み・歴史を資産に」</em>が、毎月積み上がる形で実現します。<br>
+    <strong>③ 解約されにくい。</strong>止めると社員の記録が途切れる。積み上がるほど止めづらくなる、良い意味での粘着性があります。<br><br>
+    そして10年ビジョンの<em>「あなたも我々も、お金の心配から解放されてる」</em>——月250万のストックは、役員3名の報酬（月528万）の約半分を、営業ゼロでも賄います。<strong>これが「お金が私のために動いてる」の中身です。</strong></p>
+  </div>
+</section>
+
+<!-- ══════════ 07 ══════════ -->
+<section id="s7">
+  <h2><span class="num">07</span>集客チャネル</h2>
+  <p class="sub">月20商談が必要。実勢の作業量から積み上げると、23.3商談つくれる。月24.5万円で。</p>
+
+  <div class="tw">
+  <table>
+    <caption>すべて実際に回せる作業量ベース。合計 月24.5万円（年294万）。前計画の広告費 月120万から大幅に下がった。</caption>
+    <thead><tr><th>チャネル</th><th class="n">月間量</th><th class="n">転換率</th><th class="n">商談/月</th><th class="n">費用/月</th><th>設計</th></tr></thead>
+    <tbody>
+      <tr class="goal"><td><strong>架電外注</strong></td><td class="n">720件</td><td class="n">1.5%</td><td class="n">10.8</td><td class="n">20.0万</td><td>1日1万円 × 60件 × 週3回。<strong>最大の商談供給源</strong></td></tr>
+      <tr class="goal"><td><strong>手紙＋訪問手渡し</strong></td><td class="n">30件</td><td class="n">15.0%</td><td class="n">4.5</td><td class="n">1.5万</td><td>原稿3日＋機械1日＋訪問3日。<strong>最も転換率が高い</strong></td></tr>
+      <tr><td>経営者団体4つ</td><td class="n">—</td><td class="n">—</td><td class="n">2.5</td><td class="n">—</td><td>倫理法人会・同友会・経営実践研究会・経営品質研究会</td></tr>
+      <tr><td>YouTube／ショート</td><td class="n">—</td><td class="n">—</td><td class="n">2.0</td><td class="n">0万</td><td>経営者ヒアリングをそのまま公開（詳細は08）</td></tr>
+      <tr><td>既存顧客・紹介</td><td class="n">—</td><td class="n">—</td><td class="n">2.0</td><td class="n">—</td><td>納品後の2本目とリファラル</td></tr>
+      <tr><td>SNS広告</td><td class="n">—</td><td class="n">—</td><td class="n">1.5</td><td class="n">3.0万</td><td>エリアとターゲットをセグメントして</td></tr>
+      <tr class="total"><td>合計</td><td class="n"></td><td class="n"></td><td class="n">23.3</td><td class="n">24.5万</td><td>必要20商談に対し <strong>余力3.3商談</strong></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>手紙の月次サイクル ─ 7営業日で30件</h3>
+  <figure>
+    <div class="figwrap">
+    <svg viewBox="0 0 880 208" role="img" aria-label="手紙営業の7営業日サイクル。原稿制作3日、機械で清書1日、訪問お届け3日で月30件を届ける工程図">
+      <defs><marker id="ar7" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="var(--brass)"/></marker></defs>
+      <text x="10" y="20" class="m" font-size="11" letter-spacing="1.6" fill="var(--brass)">月30件 ／ 7営業日 ／ 担当は1.0人</text>
+      <rect x="10" y="34" width="256" height="72" rx="4" fill="var(--brass)" fill-opacity=".14" stroke="var(--brass)"/>
+      <text x="26" y="56" font-size="13" font-weight="700">① 原稿制作</text>
+      <text x="250" y="56" text-anchor="end" class="m" font-size="14" font-weight="700" fill="var(--brass)">3日</text>
+      <text x="26" y="77" font-size="11.5">1日10件ペース。アタックリストの企業情報</text>
+      <text x="26" y="95" font-size="11.5">（設立年・代表者名・求人・SNS）から個別に</text>
+
+      <path d="M270 70 L296 70" stroke="var(--brass)" stroke-width="1.6" marker-end="url(#ar7)"/>
+
+      <rect x="300" y="34" width="200" height="72" rx="4" fill="var(--brass)" fill-opacity=".14" stroke="var(--brass)"/>
+      <text x="316" y="56" font-size="13" font-weight="700">② 機械で清書</text>
+      <text x="484" y="56" text-anchor="end" class="m" font-size="14" font-weight="700" fill="var(--brass)">1日</text>
+      <text x="316" y="77" font-size="11.5">30件分を直筆風に書かせる</text>
+      <text x="316" y="95" font-size="11.5">人は封入と宛名確認のみ</text>
+
+      <path d="M504 70 L530 70" stroke="var(--brass)" stroke-width="1.6" marker-end="url(#ar7)"/>
+
+      <rect x="534" y="34" width="336" height="72" rx="4" fill="var(--brass)" fill-opacity=".22" stroke="var(--brass)"/>
+      <text x="550" y="56" font-size="13" font-weight="700">③ 訪問して直接お届け</text>
+      <text x="854" y="56" text-anchor="end" class="m" font-size="14" font-weight="700" fill="var(--brass)">3日</text>
+      <text x="550" y="77" font-size="11.5">1日10社。手渡しできなければ受付に託す</text>
+      <text x="550" y="95" font-size="11.5">その後、追跡架電でアポイントへ ─ 転換率15%</text>
+
+      <line x1="10" y1="126" x2="870" y2="126" stroke="currentColor" stroke-opacity=".2"/>
+      <text x="10" y="148" font-size="12" font-weight="700" fill="var(--sea)">AIで原稿を下書きすれば、①が3日→1.5日になる</text>
+      <text x="10" y="169" font-size="11.5" fill="currentColor" fill-opacity=".78">企業情報はすでにアタックリストDBにある。設立年から周年を、求人有無から採用課題を、SNS有無から発信課題を</text>
+      <text x="10" y="188" font-size="11.5" fill="currentColor" fill-opacity=".78">読み取って、AIが個別の書き出しを生成する。人は事実確認と、心のこもった一文の追記だけ。<tspan font-weight="700" fill="var(--brass)">月30件 → 60件へ。</tspan></text>
+    </svg>
+    </div>
+    <figcaption>図4 — 手紙は転換率15%と最も高いが、月30件が人力の上限。原稿の下書きをAIに渡せば倍に増やせる。ここが商談数を伸ばす最短ルート。</figcaption>
+  </figure>
+
+  <div class="note">
+    <span class="tag">架電外注が効く理由</span>
+    <p>1日1万円で60件、週3回で<strong>月720件・20万円</strong>。転換率1.5%でも月10.8商談。<strong>これ1つで必要商談の半分を賄います。</strong><br><br>
+    そして何より、<strong>1.0人の手が空きます。</strong>自分で架電していたら1日15件で手一杯になり、訪問も中継対応もできなくなる。外注したことで、1.0人は「手紙の訪問手渡し」と「商談後のフォロー」という、<em>人がやる意味のある仕事</em>だけに集中できます。これも「考えない作業は誰もやらない」の実践です。</p>
+  </div>
+
+  <div class="note warn">
+    <span class="tag">法令上の制約</span>
+    <p>メールDMは<strong>特定電子メール法</strong>により原則オプトイン（事前同意）が必要です。名刺交換済みの相手は例外ですが、リストから抽出した未接触企業への一斉メールは違法になり得ます。<strong>名刺DB＝メール可／抽出リスト＝手紙と電話のみ</strong>と、システム上で経路を分けてください。「嘘つく・誤魔化す・隠す」を掲げる会社が、ここで足を掬われるわけにはいきません。</p>
+  </div>
+</section>
+
+<!-- ══════════ 08 ══════════ -->
+<section id="s8">
+  <h2><span class="num">08</span>ヒアリングの循環 ─ YouTubeという発明</h2>
+  <p class="sub">やりたいことが、そのまま営業になり、コンテンツになり、商品のデモになる。</p>
+
+  <p>倫理法人会・中小企業同友会・経営実践研究会・経営品質研究会。所属する4団体の経営者・経営幹部を直接訪問してヒアリングし、<strong>そのヒアリング自体をインタビュームービーとしてYouTubeに公開する。</strong>ショート版をInstagramとTikTokにも量産する。</p>
+
+  <p>視聴数を取ることが目的ではなく、<em>「意外と深いことを聞き出している」「意外と良いコミュニケーションが取れている」こと自体を見せる</em>のが目的——この設計、構造として非常に強いです。</p>
+
+  <figure>
+    <div class="figwrap">
+    <svg viewBox="0 0 880 340" role="img" aria-label="経営者へのヒアリングが、営業・コンテンツ・商品デモ・信用の4つを同時に生み、次のヒアリング希望者を呼び込む循環図">
+      <defs><marker id="ar8" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="var(--brass)"/></marker></defs>
+
+      <circle cx="440" cy="164" r="76" fill="var(--brass)" fill-opacity=".92"/>
+      <text x="440" y="152" text-anchor="middle" font-size="15" font-weight="700" fill="var(--ground)">経営者への</text>
+      <text x="440" y="174" text-anchor="middle" font-size="15" font-weight="700" fill="var(--ground)">ヒアリング</text>
+      <text x="440" y="196" text-anchor="middle" font-size="10.5" fill="var(--ground)" fill-opacity=".85">月4本・前平が訪問</text>
+
+      <rect x="10" y="34" width="230" height="62" rx="4" fill="var(--ground)" stroke="var(--brass)"/>
+      <text x="26" y="56" font-size="12.5" font-weight="700" fill="var(--brass)">① これは営業そのもの</text>
+      <text x="26" y="76" font-size="11">使命を聞き、共鳴できるか確かめる</text>
+      <text x="26" y="92" font-size="11">＝ 初回ヒアリング商談と同じ行為</text>
+      <path d="M244 76 C300 90, 340 120, 372 140" stroke="var(--brass)" stroke-width="1.6" fill="none" marker-end="url(#ar8)"/>
+
+      <rect x="640" y="34" width="230" height="62" rx="4" fill="var(--ground)" stroke="var(--brass)"/>
+      <text x="656" y="56" font-size="12.5" font-weight="700" fill="var(--brass)">② これは商品のデモ</text>
+      <text x="656" y="76" font-size="11">理念映像で何が撮れるかを、</text>
+      <text x="656" y="92" font-size="11">見込み客が完成品で確認できる</text>
+      <path d="M636 76 C580 90, 540 120, 508 140" stroke="var(--brass)" stroke-width="1.6" fill="none" marker-end="url(#ar8)"/>
+
+      <rect x="10" y="238" width="230" height="62" rx="4" fill="var(--ground)" stroke="var(--brass)"/>
+      <text x="26" y="260" font-size="12.5" font-weight="700" fill="var(--brass)">③ 出演者が拡散する</text>
+      <text x="26" y="280" font-size="11">自分が良く映った動画は自分で配る</text>
+      <text x="26" y="296" font-size="11">＝ 広告費ゼロでリーチが伸びる</text>
+      <path d="M372 190 C340 210, 300 240, 244 254" stroke="var(--brass)" stroke-width="1.6" fill="none" marker-end="url(#ar8)"/>
+
+      <rect x="640" y="238" width="230" height="62" rx="4" fill="var(--ground)" stroke="var(--brass)"/>
+      <text x="656" y="260" font-size="12.5" font-weight="700" fill="var(--brass)">④ 次の人が手を挙げる</text>
+      <text x="656" y="280" font-size="11">「自分もヒアリングされたい」</text>
+      <text x="656" y="296" font-size="11">＝ インバウンドが生まれる</text>
+      <path d="M508 190 C540 210, 580 240, 636 254" stroke="var(--brass)" stroke-width="1.6" fill="none" marker-end="url(#ar8)"/>
+
+      <path d="M700 234 C740 200, 740 130, 700 100" stroke="var(--brass)" stroke-width="2" fill="none" stroke-dasharray="4 3" marker-end="url(#ar8)"/>
+      <text x="790" y="170" text-anchor="middle" font-size="11" font-weight="700" fill="var(--brass)">循環する</text>
+
+      <line x1="10" y1="316" x2="870" y2="316" stroke="currentColor" stroke-opacity=".2"/>
+      <text x="10" y="334" font-size="11.5" fill="currentColor" fill-opacity=".78">費用ゼロ。撮影は前平の訪問に同行、編集は1.0人。しかも4団体はすでに信頼関係のある場だから、断られにくい。</text>
+    </svg>
+    </div>
+    <figcaption>図5 — ヒアリングという1つの行為が、営業・商品デモ・拡散・インバウンドの4つを同時に生む。「やりたいこと」と「稼ぐこと」が完全に重なっている、稀な設計。</figcaption>
+  </figure>
+
+  <div class="note hot">
+    <span class="tag">ここが一番の武器になります</span>
+    <p>多くの会社にとって、営業は「やりたくないけどやること」です。この設計では違います。<br><br>
+    <strong>前平さんが一番やりたい「人の使命を聞き出すこと」が、そのまま商談であり、コンテンツであり、商品のサンプルであり、信用の証明になっている。</strong><br><br>
+    しかも見込み客は、提案書を読む前に<em>「この人にヒアリングされたら、こういう深い話が引き出される」</em>を動画で体験できます。理念映像を売るのに、これ以上の材料はありません。<br><br>
+    数字としては控えめに月2商談で見ていますが、<strong>半年〜1年で効き始めれば、これが最大のチャネルになる可能性があります。</strong>Q1から始めて、Q4に効果を実測してください。</p>
+  </div>
+</section>
+
+<!-- ══════════ 09 ══════════ -->
+<section id="s9">
+  <h2><span class="num">09</span>1.5人と前平の稼働</h2>
+  <p class="sub">全員に余力がある。人を増やす前に、まだAIに渡せる作業がある。</p>
+
+  <div class="tw">
+  <table>
+    <caption>1.0人＝営業実働（月20日）。架電を外注したことで5.5日の余力が生まれた。手紙を月60件に増やす原資はここにある。</caption>
+    <thead><tr><th>1.0人：営業実働</th><th class="n">日数/月</th><th>備考</th></tr></thead>
+    <tbody>
+      <tr><td>手紙の原稿制作（AI下書き＋仕上げ）</td><td class="n">3.0</td><td>AI化で1.5日に短縮可能</td></tr>
+      <tr><td>機械で清書・封入</td><td class="n">1.0</td><td>30件分</td></tr>
+      <tr><td>訪問お届け（30件）</td><td class="n">3.0</td><td>1日10社</td></tr>
+      <tr><td>YouTube／ショートの撮影同行・投稿</td><td class="n">3.0</td><td>本編4本＋ショート量産</td></tr>
+      <tr><td>架電外注のリスト作成・進行管理</td><td class="n">2.0</td><td>720件分のリストと結果回収</td></tr>
+      <tr><td>中継コミュニケーション（商談後フォロー）</td><td class="n">1.5</td><td>月20商談の後追い</td></tr>
+      <tr><td>SNS広告・ポスティング手配</td><td class="n">1.0</td><td></td></tr>
+      <tr class="total"><td>計</td><td class="n">14.5 / 20</td><td class="pos">✓ 余力 5.5日</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="tw">
+  <table>
+    <caption>0.5人＝企画・進行（月10日）。プランニングの具体化とスケジュール遂行管理。</caption>
+    <thead><tr><th>0.5人：企画・進行</th><th class="n">日数/月</th><th>備考</th></tr></thead>
+    <tbody>
+      <tr><td>プランニング補助（前平の立案を具体化）</td><td class="n">2.0</td><td>月8件</td></tr>
+      <tr><td>提案書の清書</td><td class="n">2.0</td><td>AIが下書き、この人が仕上げる</td></tr>
+      <tr><td>スケジュール遂行管理</td><td class="n">2.0</td><td>稼働中30案件の進行と制作事業部との調整</td></tr>
+      <tr class="total"><td>計</td><td class="n">6.0 / 10</td><td class="pos">✓ 余力 4.0日</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="tw">
+  <table>
+    <caption>前平さんの月間稼働。やりたいこと（ヒアリング・立案・商談・登壇）はすべて維持したうえで、週37.7時間。</caption>
+    <thead><tr><th>やること</th><th class="n">件数/月</th><th class="n">単位</th><th class="n">合計</th><th>区分</th></tr></thead>
+    <tbody>
+      <tr><td>初回ヒアリング商談</td><td class="n">20.0</td><td class="n">2.5h</td><td class="n">50.0h</td><td><span class="chip a">やりたいこと</span></td></tr>
+      <tr><td>提案・成約商談</td><td class="n">8.0</td><td class="n">2.5h</td><td class="n">20.0h</td><td><span class="chip a">やりたいこと</span></td></tr>
+      <tr><td>立案（プランニング）</td><td class="n">8.0</td><td class="n">2.0h</td><td class="n">16.0h</td><td><span class="chip a">やりたいこと</span></td></tr>
+      <tr><td>AI研修 登壇（L＝初回と最終／M・S＝1回）</td><td class="n">9.3</td><td class="n">3.0h</td><td class="n">27.9h</td><td><span class="chip a">やりたいこと</span></td></tr>
+      <tr><td>YouTube用 経営者ヒアリング撮影</td><td class="n">4.0</td><td class="n">2.0h</td><td class="n">8.0h</td><td><span class="chip s">営業と広報を兼ねる</span></td></tr>
+      <tr><td>経営・セミナー・団体活動</td><td class="n">—</td><td class="n">—</td><td class="n">40.0h</td><td></td></tr>
+      <tr class="total"><td>合計</td><td class="n"></td><td class="n"></td><td class="n">161.9h</td><td class="pos">週37.7h ／ 余力18h</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="note">
+    <span class="tag">前計画からの改善</span>
+    <p>4億版では前平さんの稼働が月187時間で<strong>上限を超えていました。</strong>目標を1.5億に置き直し、架電を外注し、提案書の清書を0.5人とAIに渡したことで、<strong>月162時間・週37.7時間</strong>に収まりました。<br>
+    余力18時間は、意図的に空けています。<strong>商談が想定より伸びたとき、ここで受け止めるため</strong>です。埋めきった計画は、良いことが起きたときに壊れます。</p>
+  </div>
+</section>
+
+<!-- ══════════ 10 ══════════ -->
+<section id="s10">
+  <h2><span class="num">10</span>6クォーター実行計画</h2>
+  <p class="sub">準備2クォーター、本番4クォーター。受注は売上より1四半期先行する。</p>
+
+  <div class="tw">
+  <table>
+    <caption>決算期は2月末（新事業年度は3/1開始）で仮確定。<b>定期同額給与のルール上、期の途中で増額できない</b>ため、改定は事業年度の頭（3月）でしか行えない。Q1・Q2は現状の170万/月を据え置き、Q3〜Q6はフラット360万/月（1人120万）、満額450万＋賞与420万は2028年3月から。</caption>
+    <thead><tr><th>Q</th><th>期間</th><th>区分</th><th class="n">A売上</th><th class="n">全社売上</th><th class="n">ｽﾄｯｸ/月</th><th class="n">役員報酬/月</th><th>主題と必達事項</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="qh">Q0</td><td class="mono">26/08/22-31</td><td><span class="chip">助走</span></td>
+        <td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="n">現状</td>
+        <td><strong>土台を決める。</strong>1.5人を誰にするか決定／架電外注先の選定と単価交渉／提携社労士に打診／県内の対象法人数を法人番号データで実測／固定費DBの重複81行を整理</td>
+      </tr>
+      <tr>
+        <td class="qh">Q1</td><td class="mono">26/09-11</td><td><span class="chip">準備</span></td>
+        <td class="n">1,200</td><td class="n">3,700</td><td class="n">10万</td><td class="n">170万<span class="chip s">据置</span></td>
+        <td><strong>回し始める。</strong>架電外注を週3回で開始／手紙の型をつくり月30件を走らせる／<strong>YouTubeのヒアリング撮影を開始（月4本）</strong>／パッケージ①を1件必ず取る（実績がないと305万は売れない）</td>
+      </tr>
+      <tr>
+        <td class="qh">Q2</td><td class="mono">26/12-27/02</td><td><span class="chip">準備</span></td>
+        <td class="n">2,000</td><td class="n">4,500</td><td class="n">40万</td><td class="n">170万<span class="chip s">据置</span></td>
+        <td><strong>本番期の受注を積む。</strong>Q3売上3,000万の半分以上をこの四半期で受注／ストック1〜4社目で提供の型をつくる／手紙の原稿をAI下書き化し月60件へ／SNS広告開始／<strong>12月に取締役会で役員報酬改定を決議</strong>（27年3月支給分から適用するため）</td>
+      </tr>
+      <tr class="goal">
+        <td class="qh">Q3</td><td class="mono">27/03-05</td><td><span class="chip a">本番</span></td>
+        <td class="n">3,000</td><td class="n">5,500</td><td class="n">90万</td><td class="n">360万<span class="chip a">改定</span></td>
+        <td><strong>年度替わり需要を取り切る。新事業年度スタート。</strong>式典・周年・研修予算が動く四半期／縦型インタビューの月次撮影日を制作事業部と固定化／<strong>役員報酬 1人120万（合計360万/月）でスタート、Q6まで固定</strong></td>
+      </tr>
+      <tr class="goal">
+        <td class="qh">Q4</td><td class="mono">27/06-08</td><td><span class="chip a">本番</span></td>
+        <td class="n">3,800</td><td class="n">6,300</td><td class="n">150万</td><td class="n">360万<span class="chip s">固定</span></td>
+        <td><strong>再現性を確認する。</strong>成約率・転換率の実測値で逆算を引き直す／<strong>YouTube経由の商談数を実測</strong>（ここが伸びていれば最大チャネルになる）／解約率を実測</td>
+      </tr>
+      <tr class="goal">
+        <td class="qh">Q5</td><td class="mono">27/09-11</td><td><span class="chip a">本番</span></td>
+        <td class="n">4,300</td><td class="n">6,800</td><td class="n">200万</td><td class="n">360万<span class="chip s">固定</span></td>
+        <td><strong>型を固める。</strong>AI補佐の提供内容を標準化し0.5人で回るようにする／パッケージ①②の比率を上げて客単価を押し上げる／<strong>12月に取締役会で満額改定を決議、賞与420万の事前確定届出給与を申請</strong>（28年1月末までに）</td>
+      </tr>
+      <tr class="goal">
+        <td class="qh">Q6</td><td class="mono">27/12-28/02</td><td><span class="chip a">本番</span></td>
+        <td class="n">4,700</td><td class="n">7,200</td><td class="n">250万</td><td class="n">360万<span class="chip s">固定</span></td>
+        <td><strong>着地させる。</strong>A売上1.58億を締める／FY2027は役員報酬360万/月のままで完走／2028年3月からの全員手取り2倍を確定し、全社に開示する</td>
+      </tr>
+      <tr class="total"><td colspan="3">本番4Q ＝ FY2027</td><td class="n">15,800</td><td class="n">25,800</td><td class="n">250万</td><td class="n">360万</td><td>税引後4,405万／返済後4,051万<span class="chip a">満額より軽い分、増益</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="note">
+    <span class="tag">ここを外すと計画が崩れる</span>
+    <p><strong>2027年3月に売上を立てるための受注は、2026年12月に取る必要があります。</strong>映像も研修も、受注から売上計上まで2〜3ヶ月かかる。受注カレンダーは売上カレンダーより1四半期前倒しです。<br>
+    だから準備期（Q1・Q2）は「仕込み」ではなく<strong>すでに本番</strong>。Q2の受注が、本番期初月の売上そのものになります。</p>
+  </div>
+
+  <div class="note ok">
+    <span class="tag">役員報酬のカレンダー ─ 決算期をもとに確定（仮）</span>
+    <p><strong>決算期は2月末、新事業年度は3月1日開始。</strong>役員報酬は「定期同額給与」のルールで、<strong>事業年度の途中では増額できません。</strong>改定できるのは事業年度の頭（3月支給分）だけです。</p>
+    <p>だから、四半期ごとに引き上げていく前回の計画は、税務上そのままでは通せませんでした。正しくはこうなります。</p>
+    <ul>
+      <li><strong>Q1・Q2（〜27年2月）</strong>：今の事業年度の途中なので、現状の170万/月（3人合計）を<strong>据え置き</strong></li>
+      <li><strong>Q3〜Q6（27年3月〜28年2月＝FY2027）</strong>：<strong>2026年12月に取締役会で決議</strong>し、27年3月支給分から1人120万・合計360万/月に改定。<strong>ここから先は四半期ごとに動かさず、Q6まで固定</strong></li>
+      <li><strong>2028年3月〜（達成後）</strong>：<strong>2027年12月に取締役会で決議</strong>し、満額150万×3名＋賞与140万×3名へ。<strong>賞与は「事前確定届出給与」の届出が決議から1ヶ月以内＝2028年1月末までに必要</strong>（ここを逃すと420万が全額損金不算入）</li>
+    </ul>
+    <p>是正した結果、<strong>FY2027の役員報酬は年4,699万（旧モデルの6,331万より1,632万少ない）。</strong>満額になるのは2028年3月からなので、その分FY2027の利益は上振れします。税引後3,328万→<strong>4,405万</strong>、返済後2,973万→<strong>4,051万</strong>。<br>
+    この上振れ分（約1,000万）は、Q0でお伝えした選択肢のとおり、<strong>採用の前倒しか、翌年5億へ向けた広告投資</strong>に回すのがおすすめです。</p>
+  </div>
+</section>
+
+<!-- ══════════ 11 ══════════ -->
+<section id="s11">
+  <h2><span class="num">11</span>すでに持っているデータ資産</h2>
+  <p class="sub">アタックリスト生成と名刺データバンクは構築済み。手紙の原稿制作が、この2つの上で回る。</p>
+
+  <figure>
+    <div class="figwrap">
+    <svg viewBox="0 0 880 300" role="img" aria-label="法人番号データとGoogle Maps APIを母体に外部検索APIで企業情報を深掘りし、名刺データベースと突合して3種類のセグメントを抽出し手紙の原稿生成につなげる構造図">
+      <defs><marker id="ar11" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+        <marker id="ar11b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="var(--brass)"/></marker></defs>
+      <g font-size="11.5">
+        <rect x="10" y="34" width="176" height="46" rx="3" fill="var(--ground)" stroke="currentColor" stroke-opacity=".35"/>
+        <text x="24" y="54" font-size="12" font-weight="700">法人番号データ</text>
+        <text x="24" y="71" font-size="10.5" fill="currentColor" fill-opacity=".7">全法人の母集団</text>
+        <rect x="10" y="90" width="176" height="46" rx="3" fill="var(--ground)" stroke="currentColor" stroke-opacity=".35"/>
+        <text x="24" y="110" font-size="12" font-weight="700">Google Maps API</text>
+        <text x="24" y="127" font-size="10.5" fill="currentColor" fill-opacity=".7">実在確認・業種・エリア</text>
+        <path d="M190 57 L226 84" stroke="currentColor" stroke-opacity=".5" marker-end="url(#ar11)"/>
+        <path d="M190 113 L226 100" stroke="currentColor" stroke-opacity=".5" marker-end="url(#ar11)"/>
+        <rect x="232" y="66" width="150" height="46" rx="3" fill="var(--indigo)" fill-opacity=".16" stroke="var(--indigo)" stroke-opacity=".55"/>
+        <text x="246" y="86" font-size="12" font-weight="700" fill="var(--indigo)">業種 × エリアで抽出</text>
+        <text x="246" y="103" font-size="10.5" fill="currentColor" fill-opacity=".7">沖縄県内・対象業種</text>
+        <path d="M386 89 L422 89" stroke="currentColor" stroke-opacity=".5" marker-end="url(#ar11)"/>
+        <rect x="428" y="40" width="196" height="98" rx="3" fill="var(--ground)" stroke="currentColor" stroke-opacity=".35"/>
+        <text x="442" y="60" font-size="12" font-weight="700">外部検索APIで深掘り</text>
+        <text x="442" y="79" font-size="10.5" fill="currentColor" fill-opacity=".75">創業／設立年月日・代表者名</text>
+        <text x="442" y="96" font-size="10.5" fill="currentColor" fill-opacity=".75">電話・メール・SNSの有無</text>
+        <text x="442" y="113" font-size="10.5" fill="currentColor" fill-opacity=".75">広告展開の有無・求人の有無</text>
+        <text x="442" y="130" font-size="10" fill="var(--sea)">ハルシネーション防止のため一次情報で裏取り</text>
+        <rect x="232" y="168" width="150" height="46" rx="3" fill="var(--brass-soft)" stroke="var(--brass)"/>
+        <text x="246" y="188" font-size="12" font-weight="700" fill="var(--brass)">名刺データバンク</text>
+        <text x="246" y="205" font-size="10.5" fill="currentColor" fill-opacity=".75">過去・直近の名刺を撮影→DB化</text>
+        <path d="M386 186 L520 148" stroke="var(--brass)" stroke-opacity=".7" stroke-dasharray="4 3" marker-end="url(#ar11b)"/>
+        <text x="398" y="176" font-size="10" fill="var(--brass)">突合して「既接触」フラグ</text>
+        <path d="M628 89 L664 89" stroke="currentColor" stroke-opacity=".5" marker-end="url(#ar11)"/>
+        <rect x="670" y="34" width="200" height="30" rx="3" fill="var(--ground)" stroke="var(--brass)"/>
+        <text x="684" y="54" font-size="11.5"><tspan font-weight="700">A.</tspan> 会ったことがある企業</text>
+        <rect x="670" y="70" width="200" height="30" rx="3" fill="var(--ground)" stroke="var(--brass)"/>
+        <text x="684" y="90" font-size="11.5"><tspan font-weight="700">B.</tspan> 承継期（設立30〜50年）</text>
+        <rect x="670" y="106" width="200" height="30" rx="3" fill="var(--ground)" stroke="var(--brass)"/>
+        <text x="684" y="126" font-size="11.5"><tspan font-weight="700">C.</tspan> 周年期・求人出稿中</text>
+        <path d="M770 142 L770 172" stroke="var(--brass)" stroke-width="1.6" marker-end="url(#ar11b)"/>
+        <rect x="646" y="178" width="224" height="52" rx="3" fill="var(--brass)" fill-opacity=".12" stroke="var(--brass)"/>
+        <text x="660" y="198" font-size="11.5" font-weight="700">手紙の原稿を、群ごとに書き分ける</text>
+        <text x="660" y="216" font-size="10.5" fill="currentColor" fill-opacity=".75">A＝メール可／B・C＝手紙と電話のみ</text>
+      </g>
+      <line x1="10" y1="252" x2="870" y2="252" stroke="currentColor" stroke-opacity=".2"/>
+      <text x="10" y="272" font-size="11.5" fill="currentColor" fill-opacity=".75">この仕組みの価値は「リストが多いこと」ではなく、<tspan font-weight="700">設立年月日で承継期の企業を狙い撃ちできること</tspan>にある。</text>
+      <text x="10" y="290" font-size="11.5" fill="var(--brass)">創業50年・55年・60年の企業には、パッケージ①（305万）が最も刺さる。ここが最重要セグメント。</text>
+    </svg>
+    </div>
+    <figcaption>図6 — このDBがあるから、手紙の原稿をAIが個別に下書きできる。設立年から周年を、求人有無から採用課題を読み取って書き分ける。</figcaption>
+  </figure>
+
+  <div class="note">
+    <span class="tag">Q0でやること（今週）</span>
+    <p><strong>沖縄県内の対象業種法人が実際に何社あるかを、法人番号データで数えてください。</strong>この計画は年間で架電8,640件・手紙360件に接触します。母数が5,000社なら十分回りますが、3,000社なら2年で一巡します。<strong>この1本のクエリが、計画の耐用年数と「いつ県外に出るか」を決めます。</strong></p>
+  </div>
+</section>
+
+<!-- ══════════ 12 ══════════ -->
+<section id="s12">
+  <h2><span class="num">12</span>採用と離脱の基準</h2>
+  <p class="sub">増やすのは1.5人だけ。少人数だからこそ、1人の判断ミスが計画を直撃する。</p>
+
+  <p>この計画で新しく確保するのは<strong>1.5人分</strong>です。既存の一般社員5名（HIBIKI・PON・U-KUN・NAOKI・HARUHI）から回すのか、新規で採るのか。いずれにせよ、<strong>1人が担う割合が大きすぎるので、基準を先に文字にしておきます。</strong></p>
+
+  <div class="tw">
+  <table>
+    <caption>「嫌なこと」に<em>「使命に賛同できないまま居座る人がいる状態」</em>と書かれている以上、入口の基準と同じだけ、出口の基準も明示しておく必要があります。</caption>
+    <thead><tr><th style="width:96px">場面</th><th>基準</th><th>出典</th></tr></thead>
+    <tbody>
+      <tr><td><strong>1.0人に求める</strong></td><td>企業の門を叩くことに抵抗がないこと。手紙を届け、断られ、また次へ行ける人。スキルより先に、ここを見る</td><td>—</td></tr>
+      <tr><td><strong>0.5人に求める</strong></td><td>段取りが好きなこと。前平の立案を具体化し、30案件の進行を落とさず回せる人。HIBIKI（制作進行）の適性に近い</td><td>—</td></tr>
+      <tr><td><strong>採用の入口</strong></td><td>使命に共鳴できるか。ドースル・コースル・ソースル・ハッスルを面白がれるか</td><td>行動指針／嫌なこと</td></tr>
+      <tr><td><strong>即アウト</strong></td><td>人のせいにする ／ 嘘つく・誤魔化す・隠す ／ 人を落とす・足を引っ張る・邪魔する</td><td>やったらダメ</td></tr>
+      <tr><td><strong>離脱の判断</strong></td><td>使命に賛同できないまま居座っている状態を放置しない。会社側から先に対話を持ちかける</td><td>嫌なこと</td></tr>
+      <tr><td><strong>約束すること</strong></td><td>2028年3月から、全員の給料が手取り2倍（額面60万・手取り約47万）。<strong>採用の時点で明示し、四半期ごとに進捗を全員に開示する</strong></td><td>達成後</td></tr>
+      <tr><td><strong>渡さない仕事</strong></td><td>考えない作業。それはAIか外注に渡す。人には考える仕事だけを渡す</td><td>ビジョン2年</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="note hot">
+    <span class="tag">この計画書は、採用資料でもあります</span>
+    <p>「2028年3月に、全員の手取りを2倍にする」——<strong>これを数字の根拠つきで言い切れる中小企業は、沖縄にほとんどありません。</strong><br>
+    現在の一般社員5名の平均手取りは約22.6万円。それが約47万円になる。この計画書そのものが、その道筋の証明です。<strong>給与水準で大手に勝てなくても、共鳴する人は採れます。</strong></p>
+  </div>
+</section>
+
+<!-- ══════════ 13 ══════════ -->
+<section id="s13">
+  <h2><span class="num">13</span>リスクと、決めるべきこと</h2>
+  <p class="sub">この計画で最も危ういのは数字ではなく、まだ決まっていない前提のほう。</p>
+
+  <h3>リスクと打ち手</h3>
+  <div class="tw">
+  <table>
+    <caption>上から順に、計画が壊れる確率が高いもの。</caption>
+    <thead><tr><th>リスク</th><th>何が起きるか</th><th>打ち手</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>役員級3名の固定費が重い</strong><br><span class="chip a">最大</span></td>
+        <td>年6,331万は売上に連動しない。計画を1割下回っただけで一気に効く</td>
+        <td>Q1は3人×80万から始め、四半期ごとに段階引き上げ。<strong>売上が計画を下回った四半期は次の引き上げを見送る</strong>ルールを、最初に3人で合意しておく</td>
+      </tr>
+      <tr>
+        <td><strong>1社に映像＋研修を売れない</strong></td>
+        <td>パッケージ①②が崩れると客単価149万→100万台前半に落ち、96社では1.5億に届かない。件数を増やすと前平の時間が破綻する</td>
+        <td>Q1で①を1件つくる。ヒアリングの中で必ず両方の課題を聞く設計にする。実績1件が次の10件を連れてくる</td>
+      </tr>
+      <tr>
+        <td><strong>1.0人が続かない</strong></td>
+        <td>手紙を届け、断られ続ける仕事。辞められると月4.5商談が消え、代わりがすぐには効かない</td>
+        <td>訪問の成果（アポ数）を毎週可視化し、成果が見える形にする。YouTube撮影の同行など、面白い仕事を意図的に混ぜる</td>
+      </tr>
+      <tr>
+        <td><strong>制作事業部とのキャパ競合</strong></td>
+        <td>年96社の映像とストックの縦型動画（年150本超）が、代理店TVCMの制作と取り合いになる</td>
+        <td>Q0で制作事業部と月次の受け入れ枠を合意する。縦型1分は月次撮影日を固定してまとめ撮り</td>
+      </tr>
+      <tr>
+        <td><strong>助成金前提の価格が崩れる</strong></td>
+        <td>不採択・制度改定で「実質負担が小さい」が崩れ、研修L・Mが失注または値引き</td>
+        <td>助成金なしでも成立する価格帯を第2案として常備。提携社労士を複数持つ</td>
+      </tr>
+      <tr>
+        <td><strong>県内市場の有限性</strong></td>
+        <td>年間で架電8,640件・手紙360件に接触する。数年で対象企業を一巡する</td>
+        <td>Q0で母数を実測。既存顧客の2本目とストック化、そして県外展開の時期を母数から逆算する</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>私が答えを持っていない、8の問い</h3>
+  <div class="tw">
+  <table>
+    <caption>①は仮確定（10節に反映済み）。②③が決まるまで、それ以外の数字も仮置きとして扱ってください。</caption>
+    <thead><tr><th style="width:34px">#</th><th>問い</th><th>なぜ効くか</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">①</td><td><strong>決算期はいつか</strong><span class="chip s">仮確定</span></td><td>2月末決算・3月1日新事業年度、役員報酬は12月決議の想定で反映済み（10節）。実際の決議日が動いたら、その都度置き直す</td></tr>
+      <tr><td class="mono">②</td><td><strong>1.5人は誰か。既存5名から回すか、新規で採るか</strong></td><td>既存から回すと制作の手が減る。新規なら採用期間がQ1に必要。Q1の売上1,200万の前提が変わる</td></tr>
+      <tr><td class="mono">③</td><td><strong>現預金と借入残高はいくらか</strong></td><td>Q1〜Q2の先行投資をどこまで踏めるか。累積利益は黒字だが入金サイトの谷は別問題</td></tr>
+      <tr><td class="mono">④</td><td>「ガソリン(比嘉)」と「ガソリン(びき)」は同一人物か</td><td>固定費の確定。別人として両方計上している。同じなら月2万下がる</td></tr>
+      <tr><td class="mono">⑤</td><td>架電外注先のあてはあるか。1日1万円で60件は実勢か</td><td>最大の商談供給源（月10.8商談）。ここが動かないと計画の半分が消える</td></tr>
+      <tr><td class="mono">⑥</td><td>提携社労士のあてはあるか</td><td>AIリスキリングL・Mの価格説得力の核</td></tr>
+      <tr><td class="mono">⑦</td><td>AI補佐サポートの月10万は妥当か。中身をどこまで約束するか</td><td>ストックの単価。月500万への到達年が変わる</td></tr>
+      <tr><td class="mono">⑧</td><td>ドースル・コースル・ソースル・ハッスルの定義／県内の対象法人数</td><td>前者はLP・パンフ・採用の全文言の土台。後者は計画の耐用年数</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="note">
+    <span class="tag">次にやること</span>
+    <p>①〜③を教えていただければ、<code>plan/division_a.py</code> の前提を差し替えて全数値を引き直します。<br><br>
+    あわせて、すぐ作れるものがこれだけあります。<strong>①手紙の文面テンプレート（承継期・周年期の2パターン） ②架電外注に渡すトークスクリプトとリスト仕様 ③パッケージ①（305万）の提案書テンプレート ④YouTubeのヒアリング質問設計 ⑤AI補佐サポートの月次提供メニュー ⑥この計画書の「役員3名で読み合わせる版」（報酬引き上げカレンダーの合意用） ⑦採用版（求職者向け）</strong>。<br><br>
+    どれからいきますか。</p>
+  </div>
+</section>
+
+</main>
+</div>
+
+<footer>
+  <p>株式会社TENOHIRA 販売営業部 事業計画 ／ 憲法 2026年8月22日版に基づく ／ 作成 2026年8月22日<br>
+  計画期間 2026年8月22日 – 2028年2月28日（Q0–Q6）／ 目標年度 FY2027：2027年3月1日 – 2028年2月28日<br>
+  数値の前提と計算式は <code>plan/division_a.py</code>、固定費のDB実測は <code>plan/fixed_costs.sql</code>。前提を書き換えて再実行すれば、全表が更新されます。</p>
+</footer>

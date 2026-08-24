@@ -573,40 +573,71 @@ footer{border-top:1px solid var(--line);margin-top:48px;padding:26px 0 60px;font
 
 <script>
 (function(){
-  var SK = 'cockpit_checks_v1';
+  var SB_URL = 'https://vfgujkocemgezvcuixpp.supabase.co';
+  var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmZ3Vqa29jZW1nZXp2Y3VpeHBwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NjA4MTEsImV4cCI6MjA5MDEzNjgxMX0.-IxXJw7St2pLKSXKDU3dunJdgIkL-bhobD53SS-ci1s';
+  var TABLE = '/rest/v1/cockpit_checks';
+  var SK = 'cockpit_checks_v1'; // localStorageはフォールバック用
 
-  function save(){
-    try{
-      var s={};
-      document.querySelectorAll('ul.tasks input[type=checkbox]').forEach(function(b){
-        if(b.id) s[b.id]=b.checked;
-      });
-      localStorage.setItem(SK, JSON.stringify(s));
-    }catch(e){}
-  }
-
-  function restore(){
-    try{
-      var s=JSON.parse(localStorage.getItem(SK)||'{}');
-      document.querySelectorAll('ul.tasks input[type=checkbox]').forEach(function(b){
-        if(b.id && s[b.id]) b.checked=true;
-      });
-    }catch(e){}
+  function headers(extra){
+    return Object.assign({'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json'}, extra||{});
   }
 
   function upd(){
-    var b=document.querySelectorAll('ul.tasks input[type=checkbox]');
-    var d=0; for(var i=0;i<b.length;i++){ if(b[i].checked) d++; }
-    var p=document.getElementById('pAll'), f=document.getElementById('fAll');
+    var b = document.querySelectorAll('ul.tasks input[type=checkbox]');
+    var d = 0; for(var i=0;i<b.length;i++){ if(b[i].checked) d++; }
+    var p = document.getElementById('pAll'), f = document.getElementById('fAll');
     if(p) p.textContent = d + ' / ' + b.length;
     if(f) f.style.width = (b.length? (d/b.length*100):0) + '%';
   }
 
-  restore();
-  upd();
+  // Supabaseから全チェック状態を読み込む
+  function loadFromSupabase(){
+    fetch(SB_URL + TABLE + '?select=task_id,checked', {headers: headers()})
+      .then(function(r){ return r.json(); })
+      .then(function(rows){
+        var map = {};
+        rows.forEach(function(r){ map[r.task_id] = r.checked; });
+        // localStorageにもキャッシュ
+        try{ localStorage.setItem(SK, JSON.stringify(map)); }catch(e){}
+        document.querySelectorAll('ul.tasks input[type=checkbox]').forEach(function(b){
+          if(b.id && map[b.id] !== undefined) b.checked = map[b.id];
+        });
+        upd();
+      })
+      .catch(function(){
+        // Supabase失敗時はlocalStorageにフォールバック
+        try{
+          var s = JSON.parse(localStorage.getItem(SK)||'{}');
+          document.querySelectorAll('ul.tasks input[type=checkbox]').forEach(function(b){
+            if(b.id && s[b.id]) b.checked = true;
+          });
+        }catch(e){}
+        upd();
+      });
+  }
+
+  // 1件のチェック状態をSupabaseにupsert
+  function saveToSupabase(taskId, checked){
+    // localStorageにも保存（フォールバック）
+    try{
+      var s = JSON.parse(localStorage.getItem(SK)||'{}');
+      s[taskId] = checked;
+      localStorage.setItem(SK, JSON.stringify(s));
+    }catch(e){}
+    fetch(SB_URL + TABLE, {
+      method: 'POST',
+      headers: headers({'Prefer': 'resolution=merge-duplicates'}),
+      body: JSON.stringify({task_id: taskId, checked: checked, updated_at: new Date().toISOString()})
+    }).catch(function(){});
+  }
+
+  loadFromSupabase();
 
   document.addEventListener('change', function(e){
-    if(e.target && e.target.type==='checkbox'){ save(); upd(); }
+    if(e.target && e.target.type==='checkbox'){
+      saveToSupabase(e.target.id, e.target.checked);
+      upd();
+    }
   });
 })();
 </script>

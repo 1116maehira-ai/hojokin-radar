@@ -62,11 +62,11 @@
 | AI補佐サポート（ストック） | 10万/月 | 85% |
 
 ## 参照リンク（前平さんが送ってくれたら読んでください）
-- **計画書：** https://1116maehira-ai.github.io/hojokin-radar/docs/business-plan.html
-- **全体マップ：** https://1116maehira-ai.github.io/hojokin-radar/docs/index-map.html
-- **コックピット（チェックリスト）：** https://1116maehira-ai.github.io/hojokin-radar/docs/cockpit.html
-- **営業4つ道具：** https://1116maehira-ai.github.io/hojokin-radar/docs/sales-toolkit.html
-- **アタックリスト：** https://1116maehira-ai.github.io/hojokin-radar/docs/attack-list.html
+- **計画書：** https://1116maehira-ai.github.io/hojokin-radar/business-plan.html
+- **全体マップ：** https://1116maehira-ai.github.io/hojokin-radar/index-map.html
+- **コックピット（チェックリスト）：** https://1116maehira-ai.github.io/hojokin-radar/cockpit.html
+- **営業4つ道具：** https://1116maehira-ai.github.io/hojokin-radar/sales-toolkit.html
+- **アタックリスト：** https://1116maehira-ai.github.io/hojokin-radar/attack-list.html
 
 ## Supabaseから案件・進捗を読む方法
 

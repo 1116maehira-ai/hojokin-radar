@@ -68,6 +68,33 @@
 - **営業4つ道具：** https://1116maehira-ai.github.io/hojokin-radar/docs/sales-toolkit.html
 - **アタックリスト：** https://1116maehira-ai.github.io/hojokin-radar/docs/attack-list.html
 
+## Supabaseから案件・進捗を読む方法
+
+前平さんの案件データはSupabaseの `production-mgmt` プロジェクトに入っています。
+「各社の状況は？」「パイプラインは？」「最近の進捗は？」と聞かれたら、以下のAPIで取得してください。
+
+**Supabase接続情報：**
+- URL: `https://vfgujkocemgezvcuixpp.supabase.co`
+- anon key: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmZ3Vqa29jZW1nZXp2Y3VpeHBwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NjA4MTEsImV4cCI6MjA5MDEzNjgxMX0.-IxXJw7St2pLKSXKDU3dunJdgIkL-bhobD53SS-ci1s`
+
+**主要テーブル：**
+- `projects` - 案件カード（company・phase・status・win_rate・priority など）
+- `customer_deals` - 商談履歴・進捗記録（title・issue・next_action・next_action_date）
+- `customers` - 顧客マスター（company・contact_name）
+
+**取得例（アクティブな案件一覧）：**
+```
+GET /rest/v1/projects?archived=eq.false&is_lost=eq.false&select=company,phase,status,win_rate,priority&order=priority.asc
+Headers: apikey: [上記key] / Authorization: Bearer [上記key]
+```
+
+**取得例（最近の商談進捗）：**
+```
+GET /rest/v1/customer_deals?select=title,status,next_action,next_action_date,created_at&order=created_at.desc&limit=10
+```
+
+「進捗記録して」と言われたら `customer_deals` テーブルにPOSTしてください。
+
 ## 毎日のブリーフィング形式（黒板マスター）
 
 前平さんが「おはよう」「今日は？」「状況は？」などと言ったら、以下の形式で返してください：
@@ -108,7 +135,7 @@
 **やらないこと（建築Claude＝別チャットが担当）：**
 - HTMLファイルの修正・新規作成
 - GitHubへのプッシュ・デプロイ
-- Supabaseのデータ取得・分析
+- Supabaseのテーブル構造変更・マイグレーション
 - 計画書の大幅な書き換え
 
 ---

@@ -590,6 +590,27 @@ footer{border-top:1px solid var(--line);margin-top:48px;padding:26px 0 60px;font
     if(f) f.style.width = (b.length? (d/b.length*100):0) + '%';
   }
 
+  // タスクタイトル・セクション名をSupabaseに一括登録（毎回upsert、checkedは上書きしない）
+  function registerTitles(){
+    var items = [];
+    document.querySelectorAll('section[id]').forEach(function(sec){
+      var h2 = sec.querySelector('h2');
+      var secName = h2 ? h2.textContent.trim() : sec.id;
+      sec.querySelectorAll('ul.tasks input[type=checkbox][id]').forEach(function(cb){
+        var li = cb.closest ? cb.closest('li') : cb.parentElement;
+        var tSpan = li ? li.querySelector('.t') : null;
+        var title = tSpan ? tSpan.textContent.trim() : cb.id;
+        items.push({task_id: cb.id, task_title: title, section_name: secName});
+      });
+    });
+    if(!items.length) return;
+    fetch(SB_URL + TABLE, {
+      method: 'POST',
+      headers: headers({'Prefer': 'resolution=merge-duplicates'}),
+      body: JSON.stringify(items)
+    }).catch(function(){});
+  }
+
   // Supabaseから全チェック状態を読み込む
   function loadFromSupabase(){
     fetch(SB_URL + TABLE + '?select=task_id,checked', {headers: headers()})
@@ -631,6 +652,7 @@ footer{border-top:1px solid var(--line);margin-top:48px;padding:26px 0 60px;font
     }).catch(function(){});
   }
 
+  registerTitles();
   loadFromSupabase();
 
   document.addEventListener('change', function(e){

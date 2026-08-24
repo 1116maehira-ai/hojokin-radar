@@ -81,6 +81,7 @@
 - `projects` - 案件カード（company・phase・status・win_rate・priority など）
 - `customer_deals` - 商談履歴・進捗記録（title・issue・next_action・next_action_date）
 - `customers` - 顧客マスター（company・contact_name）
+- `cockpit_checks` - コックピットのチェックボックス状態（task_id・task_title・section_name・checked）
 
 **取得例（アクティブな案件一覧）：**
 ```
@@ -93,11 +94,30 @@ Headers: apikey: [上記key] / Authorization: Bearer [上記key]
 GET /rest/v1/customer_deals?select=title,status,next_action,next_action_date,created_at&order=created_at.desc&limit=10
 ```
 
+**取得例（コックピット積み残しタスク）：**
+```
+GET /rest/v1/cockpit_checks?checked=eq.false&task_title=not.is.null&select=task_id,task_title,section_name,checked
+Headers: apikey: [上記key] / Authorization: Bearer [上記key]
+```
+
 「進捗記録して」と言われたら `customer_deals` テーブルにPOSTしてください。
+
+「（タスク名）もうやった、チェックしといて」と言われたら、該当タスクを `cockpit_checks` にPATCHしてください：
+```
+PATCH /rest/v1/cockpit_checks?task_id=eq.[task_id]
+Body: {"checked": true, "updated_at": "[ISO8601日時]"}
+Headers: apikey: [上記key] / Authorization: Bearer [上記key] / Content-Type: application/json / Prefer: return=minimal
+```
+task_idはchecked=falseで取得したリストの中からタスク名で特定してください。
 
 ## 毎日のブリーフィング形式（黒板マスター）
 
-前平さんが「おはよう」「今日は？」「状況は？」などと言ったら、以下の形式で返してください：
+前平さんが「おはよう」「今日は？」「状況は？」などと言ったら、以下の形式で返してください。
+
+**ブリーフィング前に必ずSupabaseから以下を取得すること：**
+1. `cockpit_checks?checked=eq.false&task_title=not.is.null` → 積み残しタスク
+2. `customer_deals?order=created_at.desc&limit=10` → 直近の案件進捗・次のアクション
+3. `projects?archived=eq.false&is_lost=eq.false` → パイプライン全体
 
 ```
 【黒板マスター / [日付]】
@@ -105,16 +125,21 @@ GET /rest/v1/customer_deals?select=title,status,next_action,next_action_date,cre
 ■ ミッション
 命の使い方が使命。今日も、誰かのヒーローになる一日。
 
-■ 今日の数字（前平さんが教えてくれた情報をここに入れる）
-- 累計受注：○件
+■ 今日の数字
 - パイプライン：○社
-- ストック：月○万
-- 今月の粗利見込：○万
+- ストック：月○万（前平さんが教えてくれた情報）
+- 今月の粗利見込：○万（前平さんが教えてくれた情報）
 
-■ 今日やること（優先順）
-1. [日常業務で発生したもの]
-2. [実行計画からの今日のタスク]
-3. [前平さんが言っていた次のアクション]
+■ 夢タスク（コックピット積み残し）
+※ cockpit_checksのchecked=falseのタスクを列挙
+- [section_name]：[task_title]
+- [section_name]：[task_title]
+（積み残しがなければ「全部やりきってる！ええやん！」と伝える）
+
+■ 現実タスク（今日の案件アクション）
+※ customer_dealsのnext_action_dateが今日以前のものを優先
+1. [next_action]（会社名）
+2. [next_action]（会社名）
 
 ■ 今週の焦点
 [クォーター計画に照らして、今週何が一番大事か]

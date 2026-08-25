@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TENOHIRA × エジプト｜販売協力スキーム提案</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --ground:#ffffff; --surface:#eef1f6; --surface-2:#e3e8f0; --line:#c9d2df;
+  --ink:#101a26; --ink-soft:#4c5b6e;
+  --indigo:#22436e; --brass:#96682a; --brass-soft:#f2e6d1;
+  --sea:#1f6b64; --warn:#9a4a1f; --flame:#b03a1a;
+  --paper:#fbfaf7; --paper-line:#ddd6c6;
+  --green:#1a7a4a; --green-soft:#e6f5ec;
+  --blue:#1a4a7a; --blue-soft:#e6edf5;
+}
+@media(prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#0d141c; --surface:#16202b; --surface-2:#1e2b38; --line:#2d3f52;
+    --ink:#e4ebf3; --ink-soft:#9aabbf;
+    --indigo:#8fb3dd; --brass:#d9a45b; --brass-soft:#2e2517;
+    --sea:#5cbdb1; --warn:#e0925f; --flame:#e8734f;
+    --paper:#141c25; --paper-line:#33404e;
+    --green:#5cbf8a; --green-soft:#0d2018;
+    --blue:#7aa8d9; --blue-soft:#0d1a2e;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0d141c; --surface:#16202b; --surface-2:#1e2b38; --line:#2d3f52;
+  --ink:#e4ebf3; --ink-soft:#9aabbf;
+  --indigo:#8fb3dd; --brass:#d9a45b; --brass-soft:#2e2517;
+  --sea:#5cbdb1; --warn:#e0925f; --flame:#e8734f;
+  --paper:#141c25; --paper-line:#33404e;
+  --green:#5cbf8a; --green-soft:#0d2018;
+  --blue:#7aa8d9; --blue-soft:#0d1a2e;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);
+  font-family:"Zen Kaku Gothic New",-apple-system,"Hiragino Kaku Gothic ProN",sans-serif;
+  font-size:16px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+a{color:var(--indigo)}
+
+/* HERO */
+.hero{border-bottom:2px solid var(--line);background:var(--paper);padding:52px 20px 44px}
+.hero-inner{max-width:840px;margin:0 auto}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--brass);margin:0 0 18px;display:block}
+h1{font-family:"Shippori Mincho B1","Hiragino Mincho ProN",serif;font-weight:700;
+   font-size:clamp(26px,4.4vw,40px);line-height:1.42;margin:0 0 18px;text-wrap:balance}
+.hero-lede{max-width:66ch;color:var(--ink-soft);margin:0 0 28px;font-size:15.5px}
+.badge-row{display:flex;flex-wrap:wrap;gap:10px}
+.badge{display:inline-flex;align-items:center;gap:7px;font-family:"IBM Plex Mono",monospace;
+  font-size:11.5px;font-weight:600;letter-spacing:.06em;padding:6px 14px;border-radius:20px;border:1.5px solid}
+.badge.t{color:var(--indigo);border-color:var(--indigo);background:var(--blue-soft)}
+.badge.e{color:var(--green);border-color:var(--green);background:var(--green-soft)}
+.badge.c{color:var(--brass);border-color:var(--brass);background:var(--brass-soft)}
+
+/* LAYOUT */
+.shell{max-width:840px;margin:0 auto;padding:0 20px 96px}
+section{margin-top:72px;scroll-margin-top:24px}
+h2{font-family:"Shippori Mincho B1",serif;font-weight:600;font-size:clamp(20px,3vw,27px);
+   line-height:1.45;margin:0 0 8px;text-wrap:balance;display:flex;gap:14px;align-items:baseline}
+h2 .num{font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:600;color:var(--brass);letter-spacing:.08em;flex:none;padding-top:2px}
+.sub{color:var(--ink-soft);font-size:14px;margin:0 0 26px}
+h3{font-size:15px;font-weight:700;margin:36px 0 12px;letter-spacing:.02em}
+h3::before{content:"";display:inline-block;width:14px;height:1px;background:var(--brass);vertical-align:middle;margin-right:9px}
+p{margin:0 0 16px;max-width:70ch}
+ul,ol{margin:0 0 16px;padding-left:1.4em;max-width:70ch}
+li{margin-bottom:6px}
+em{font-style:normal;color:var(--brass);font-weight:500}
+
+/* NOTE / CALLOUT */
+.note{border:1px solid var(--line);border-left:3px solid var(--sea);background:var(--surface);
+  padding:16px 20px;margin:0 0 22px;font-size:14px;border-radius:0 4px 4px 0}
+.note.warn{border-left-color:var(--warn)}
+.note.key{border-left-color:var(--brass);background:var(--brass-soft)}
+
+/* FLOW DIAGRAM */
+.flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:0;
+  border:1px solid var(--line);border-radius:6px;overflow:hidden;margin:0 0 28px}
+.flow-step{padding:20px 18px;border-right:1px solid var(--line);background:var(--surface);position:relative}
+.flow-step:last-child{border-right:none}
+.flow-step .fs-num{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.14em;
+  color:var(--brass);text-transform:uppercase;font-weight:600;display:block;margin-bottom:8px}
+.flow-step .fs-label{font-size:13.5px;font-weight:700;line-height:1.4;margin-bottom:6px}
+.flow-step .fs-amount{font-family:"IBM Plex Mono",monospace;font-size:22px;font-weight:600;
+  color:var(--indigo);letter-spacing:-.01em}
+.flow-step .fs-note{font-size:11.5px;color:var(--ink-soft);margin-top:6px;line-height:1.5}
+.flow-step.gov{background:var(--green-soft);border-color:var(--green)}
+.flow-step.gov .fs-amount{color:var(--green)}
+.flow-step.tkt{background:var(--brass-soft)}
+.flow-step.tkt .fs-amount{color:var(--brass)}
+.flow-step.zero{background:var(--blue-soft)}
+.flow-step.zero .fs-amount{color:var(--blue)}
+.flow-arrow{display:flex;align-items:center;justify-content:center;
+  font-size:20px;color:var(--ink-soft);padding:0 4px;background:var(--ground)}
+@media(max-width:600px){
+  .flow{grid-template-columns:1fr}
+  .flow-step{border-right:none;border-bottom:1px solid var(--line)}
+  .flow-step:last-child{border-bottom:none}
+  .flow-arrow{padding:8px 0;transform:rotate(90deg)}
+}
+
+/* WIN TABLE */
+.win-table{width:100%;border-collapse:collapse;font-size:14px;margin:0 0 28px}
+.win-table th{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--ink-soft);font-weight:600;
+  padding:10px 14px;border-bottom:2px solid var(--line);text-align:left;white-space:nowrap}
+.win-table td{padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.6}
+.win-table tr:last-child td{border-bottom:none}
+.win-table .tag{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:10px;
+  font-weight:700;letter-spacing:.08em;padding:2px 8px;border-radius:3px;margin-bottom:4px}
+.tag.t{background:var(--blue-soft);color:var(--indigo)}
+.tag.e{background:var(--green-soft);color:var(--green)}
+.tag.c{background:var(--brass-soft);color:var(--brass)}
+
+/* MECHANICS */
+.mech{border:1px solid var(--line);border-radius:6px;overflow:hidden;margin:0 0 28px}
+.mech-head{background:var(--surface-2);padding:14px 20px;font-weight:700;font-size:14px;
+  border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.mech-body{padding:20px;font-size:14px}
+.mech-row{display:flex;gap:16px;margin-bottom:16px;align-items:flex-start}
+.mech-row:last-child{margin-bottom:0}
+.mech-n{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:700;
+  color:var(--brass);background:var(--brass-soft);border-radius:3px;
+  padding:2px 8px;flex:none;margin-top:2px}
+.mech-text{line-height:1.65}
+.mech-text strong{font-weight:700}
+
+/* PITCH BOX */
+.pitch{background:var(--paper);border:1px solid var(--paper-line);border-radius:4px;
+  padding:28px 32px;margin:0 0 24px}
+.pitch pre{font-family:"Shippori Mincho B1","Hiragino Mincho ProN",serif;font-size:14.5px;
+  line-height:2.1;margin:0;white-space:pre-wrap;word-break:break-word}
+
+/* NUMBERS STRIP */
+.nums{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:1px;background:var(--line);border-radius:6px;overflow:hidden;margin:0 0 28px}
+.num-cell{background:var(--ground);padding:20px 18px}
+.num-cell .nc-v{font-family:"IBM Plex Mono",monospace;font-size:clamp(26px,5vw,38px);
+  font-weight:600;line-height:1;margin-bottom:6px}
+.num-cell .nc-l{font-size:12px;color:var(--ink-soft);line-height:1.4}
+.nc-v.pos{color:var(--green)}
+.nc-v.neg{color:var(--flame)}
+.nc-v.neu{color:var(--indigo)}
+.nc-v.brs{color:var(--brass)}
+
+/* TICKET URGENCY */
+.urgency{background:var(--surface);border:1px solid var(--line);border-radius:6px;
+  padding:24px;margin:0 0 28px;display:grid;gap:16px}
+.urg-item{display:flex;gap:14px;align-items:flex-start}
+.urg-icon{font-size:22px;flex:none}
+.urg-text{font-size:14px;line-height:1.6}
+.urg-text strong{display:block;font-weight:700;margin-bottom:3px}
+
+/* ATTACK TARGETS */
+.target-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;margin:0 0 28px}
+.tcard{border:1px solid var(--line);border-radius:5px;padding:16px 18px;background:var(--surface)}
+.tcard .tc-head{font-weight:700;font-size:14px;margin-bottom:6px}
+.tcard .tc-why{font-size:13px;color:var(--ink-soft);line-height:1.55}
+.tcard .tc-tag{font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--brass);
+  font-weight:600;letter-spacing:.08em;display:block;margin-bottom:8px}
+
+/* REVENUE MODEL */
+.rev-table{width:100%;border-collapse:collapse;font-size:13.5px;margin:0 0 20px}
+.rev-table th{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink-soft);padding:8px 12px;border-bottom:2px solid var(--line);text-align:right}
+.rev-table th:first-child{text-align:left}
+.rev-table td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:right;font-family:"IBM Plex Mono",monospace}
+.rev-table td:first-child{text-align:left;font-family:"Zen Kaku Gothic New",sans-serif;font-weight:500}
+.rev-table .total td{font-weight:700;border-top:2px solid var(--line);border-bottom:2px solid var(--line);
+  background:var(--surface)}
+.rev-table .total td:first-child{font-family:"Zen Kaku Gothic New",sans-serif}
+.pos{color:var(--green)}
+.neg{color:var(--flame)}
+
+/* TIMELINE */
+.timeline{list-style:none;margin:0 0 28px;padding:0;position:relative}
+.timeline::before{content:"";position:absolute;left:11px;top:6px;bottom:6px;
+  width:2px;background:var(--line)}
+.timeline li{padding:0 0 24px 34px;position:relative}
+.timeline li:last-child{padding-bottom:0}
+.timeline .tl-dot{position:absolute;left:0;top:4px;width:24px;height:24px;border-radius:50%;
+  background:var(--brass);display:flex;align-items:center;justify-content:center;
+  font-family:"IBM Plex Mono",monospace;font-size:10px;font-weight:700;color:var(--ground)}
+.timeline .tl-label{font-weight:700;font-size:14px;margin-bottom:4px}
+.timeline .tl-desc{font-size:13.5px;color:var(--ink-soft);line-height:1.6}
+
+/* DIVIDER */
+hr{border:none;border-top:1px solid var(--line);margin:52px 0}
+
+/* FOOTER */
+footer{border-top:1px solid var(--line);padding:32px 20px;text-align:center;
+  font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.1em;color:var(--ink-soft)}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <span class="eyebrow">Partnership Proposal · Confidential</span>
+    <h1>TENOHIRA × エジプト<br>販売協力スキーム</h1>
+    <p class="hero-lede">
+      「緊急性がない」を武器に変える。リスキリング補助金を軸にした共同営業スキームで、
+      エジプトのコンサルへの入口を自動で開き、TENOHIRAに開発案件を生む。
+      どちらも実質的に出前なし・リスクなし。
+    </p>
+    <div class="badge-row">
+      <span class="badge t">TENOHIRA｜アプリ開発</span>
+      <span class="badge e">エジプト｜HR・組織コンサル</span>
+      <span class="badge c">クライアント｜中小企業</span>
+    </div>
+  </div>
+</div>
+
+<div class="shell">
+
+<!-- ─────── 0. 課題の核心 ─────── -->
+<section id="problem">
+  <h2><span class="num">00</span>解かなければならない問い</h2>
+  <p class="sub">エジプトとTENOHIRAが共有している構造的な問題</p>
+
+  <div class="nums">
+    <div class="num-cell">
+      <div class="nc-v neg">低緊急性</div>
+      <div class="nc-l">エジプトの商材は"頭ではわかるが<br>後回しにできる"</div>
+    </div>
+    <div class="num-cell">
+      <div class="nc-v neg">紹介頼み</div>
+      <div class="nc-l">新規開拓はお試し体感 → 紹介が<br>ほぼ唯一のルート</div>
+    </div>
+    <div class="num-cell">
+      <div class="nc-v neg">商材難</div>
+      <div class="nc-l">TENOHIRAの核心サービスは電話口で<br>「？」となる</div>
+    </div>
+    <div class="num-cell">
+      <div class="nc-v neg">代理店依存</div>
+      <div class="nc-l">TENOHIRA売上の約90%が<br>代理店経由でいつ切られるかわからない</div>
+    </div>
+  </div>
+
+  <div class="note key">
+    <strong>突破口:</strong>
+    「お試し体感」という条件を先に作れれば、エジプトの紹介連鎖が自走する。
+    それを<em>国の補助金で0円体験</em>として設計することで、緊急性のなさを無力化できる。
+  </div>
+</section>
+
+<!-- ─────── 1. スキームの全体像 ─────── -->
+<section id="scheme">
+  <h2><span class="num">01</span>スキームの全体像</h2>
+  <p class="sub">「実質0円でアプリが手に入り、エジプトの研修チケットもついてくる」</p>
+
+  <h3>お金の流れ（1クライアントあたり）</h3>
+  <div class="flow">
+    <div class="flow-step">
+      <span class="fs-num">Step 1</span>
+      <div class="fs-label">クライアント<br>が払う</div>
+      <div class="fs-amount">70万円</div>
+      <div class="fs-note">「営業力拡張アプリ」<br>リスキリング形式で受講料として支払い</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step gov">
+      <span class="fs-num">Step 2</span>
+      <div class="fs-label">国が<br>補填する</div>
+      <div class="fs-amount">▲52.5万</div>
+      <div class="fs-note">人材開発支援助成金<br>（リスキリングコース）<br>中小企業: 最大75%</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step tkt">
+      <span class="fs-num">Step 3</span>
+      <div class="fs-label">TENOHIRAが<br>チケット買付</div>
+      <div class="fs-amount">17.5万円</div>
+      <div class="fs-note">エジプトの研修チケット<br>を相当額分購入。<br>クライアントに付与</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step zero">
+      <span class="fs-num">Result</span>
+      <div class="fs-label">クライアント<br>実質手出し</div>
+      <div class="fs-amount">0円</div>
+      <div class="fs-note">アプリ1本 ＋<br>エジプト研修チケット付き<br>で手に入る</div>
+    </div>
+  </div>
+
+  <div class="note">
+    <strong>補助金の根拠:</strong>
+    人材開発支援助成金「事業展開等リスキリング支援コース」。
+    中小企業の場合、訓練経費の<strong>75%・1人あたり上限30万/年</strong>が支給される。
+    アプリ開発を「AI活用業務改善カリキュラム（OJT＋演習）」として組み立てることで適用可能。
+  </div>
+</section>
+
+<!-- ─────── 2. 三者のWin ─────── -->
+<section id="wins">
+  <h2><span class="num">02</span>三者のWin</h2>
+  <p class="sub">誰も損をしない設計が持続性の源泉</p>
+
+  <table class="win-table">
+    <thead>
+      <tr>
+        <th>プレイヤー</th>
+        <th>直接的な収益・価値</th>
+        <th>長期的な価値</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="tag e">エジプト</span><br>HR・組織コンサル</td>
+        <td>
+          ・チケット販売収入 <strong>17.5万/件</strong>（未使用でも確定）<br>
+          ・チケット使用 → 研修売上追加<br>
+          ・有効期限による「緊急性」が自動発生
+        </td>
+        <td>
+          ・体感したクライアントの紹介連鎖が始まる<br>
+          ・TENOHIRAの営業網を間借りして新規開拓<br>
+          ・「いつかやろう」を「今やる」に変える仕組みが手に入る
+        </td>
+      </tr>
+      <tr>
+        <td><span class="tag t">TENOHIRA</span><br>アプリ開発</td>
+        <td>
+          ・開発売上 <strong>70万/件</strong>（受領後にチケット購入）<br>
+          ・エジプトとの共同営業で商談口が増える<br>
+          ・「AI研修＋アプリ」の実績が積み上がる
+        </td>
+        <td>
+          ・ストック収益（AI伴走月額）への入口が増える<br>
+          ・代理店依存から自社直営案件へのシフト<br>
+          ・スキームそのものをパッケージ化 → 他パートナーへも展開可能
+        </td>
+      </tr>
+      <tr>
+        <td><span class="tag c">クライアント</span><br>中小企業</td>
+        <td>
+          ・自社専用アプリが <strong>実質0円</strong> で手に入る<br>
+          ・エジプトの組織・採用コンサル体験チケット付き<br>
+          ・補助金申請を代行サポート
+        </td>
+        <td>
+          ・アプリで営業データが可視化 → PDCAが回る<br>
+          ・チケット行使 → 人事評価・採用・理念浸透が整う<br>
+          ・社員のリスキリング記録が対外的信用にもなる
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ─────── 3. チケットの設計 ─────── -->
+<section id="ticket">
+  <h2><span class="num">03</span>チケットの設計（緊急性のエンジン）</h2>
+  <p class="sub">エジプトの最大の弱点「緊急性のなさ」を構造的に解決する</p>
+
+  <div class="mech">
+    <div class="mech-head">
+      <span>チケット仕様</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--brass)">17.5万円相当 / 有効期限あり</span>
+    </div>
+    <div class="mech-body">
+      <div class="mech-row">
+        <span class="mech-n">01</span>
+        <div class="mech-text">
+          <strong>購入タイミング:</strong>
+          クライアントがTENOHIRAに70万円を支払った後、TENOHIRAがエジプトから<em>17.5万円分のチケットを買い付ける</em>。
+          クライアントへの引渡しはアプリ完成時。
+        </div>
+      </div>
+      <div class="mech-row">
+        <span class="mech-n">02</span>
+        <div class="mech-text">
+          <strong>有効期限:</strong>
+          発行から<em>6ヶ月</em>（要協議）。期限内にエジプトのコンサルメニューと交換できる。
+          残額は繰り越しなし。
+        </div>
+      </div>
+      <div class="mech-row">
+        <span class="mech-n">03</span>
+        <div class="mech-text">
+          <strong>未使用時のルール:</strong>
+          期限切れになってもエジプトへの支払いは<em>TENOHIRAが負担済み</em>（買い付けているため）。
+          クライアントへの返金なし。エジプトの収入は確定。
+        </div>
+      </div>
+      <div class="mech-row">
+        <span class="mech-n">04</span>
+        <div class="mech-text">
+          <strong>なぜ緊急性が生まれるか:</strong>
+          「タダでもらったチケット」は使わなくても損した気にならない。しかし「TENOHIRAが自分のために買ってくれたチケット」は
+          <em>使わないと申し訳ない</em>という心理が働く。有効期限のカウントダウンがアクションを促す。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="urgency">
+    <div class="urg-item">
+      <span class="urg-icon">⏱</span>
+      <div class="urg-text">
+        <strong>6ヶ月カウントダウン</strong>
+        アプリ完成後、担当者に「チケット有効期限まであと○ヶ月です」を定期フォロー。
+        エジプトの初回ヒアリング予約への導線をTENOHIRAが持つ。
+      </div>
+    </div>
+    <div class="urg-item">
+      <span class="urg-icon">🤝</span>
+      <div class="urg-text">
+        <strong>体感してから判断</strong>
+        エジプトのコンサルは"受けてみないとわからない"。チケットはその体感を強制的に発生させる装置。
+        一度体感すれば継続率・紹介率が大幅に上がる（エジプトの既存顧客が証明している）。
+      </div>
+    </div>
+    <div class="urg-item">
+      <span class="urg-icon">📊</span>
+      <div class="urg-text">
+        <strong>アプリデータがエジプトの提案根拠になる</strong>
+        TENOHIRAのアプリが蓄積した営業・組織データを見せながら、エジプトが「この数値だと○○の整備が先です」と
+        具体的に提案できる。データドリブンなコンサル導入。
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────── 4. 収益シミュレーション ─────── -->
+<section id="revenue">
+  <h2><span class="num">04</span>収益シミュレーション</h2>
+  <p class="sub">月5件成約の場合</p>
+
+  <div class="nums">
+    <div class="num-cell">
+      <div class="nc-v brs">月5件</div>
+      <div class="nc-l">目標成約数<br>（商談10件 → 成約率50%想定）</div>
+    </div>
+    <div class="num-cell">
+      <div class="nc-v pos">350万円</div>
+      <div class="nc-l">TENOHIRA 月間開発売上<br>（70万 × 5件）</div>
+    </div>
+    <div class="num-cell">
+      <div class="nc-v pos">87.5万円</div>
+      <div class="nc-l">エジプト チケット確定収入<br>（17.5万 × 5件）</div>
+    </div>
+    <div class="num-cell">
+      <div class="nc-v pos">+α万円</div>
+      <div class="nc-l">チケット行使による<br>エジプト研修追加売上</div>
+    </div>
+  </div>
+
+  <table class="rev-table">
+    <thead>
+      <tr>
+        <th>項目</th>
+        <th>単価</th>
+        <th>月5件</th>
+        <th>月10件</th>
+        <th>年換算(5件/月)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>TENOHIRA 開発売上</td>
+        <td>70万</td>
+        <td class="pos">350万</td>
+        <td class="pos">700万</td>
+        <td class="pos">4,200万</td>
+      </tr>
+      <tr>
+        <td>うちチケット購入（TENOHIRA支出）</td>
+        <td>▲17.5万</td>
+        <td class="neg">▲87.5万</td>
+        <td class="neg">▲175万</td>
+        <td class="neg">▲1,050万</td>
+      </tr>
+      <tr>
+        <td>TENOHIRA 開発粗利（原価50%）</td>
+        <td>35万</td>
+        <td class="pos">175万</td>
+        <td class="pos">350万</td>
+        <td class="pos">2,100万</td>
+      </tr>
+      <tr>
+        <td>チケット後の実質粗利</td>
+        <td>17.5万</td>
+        <td class="pos">87.5万</td>
+        <td class="pos">175万</td>
+        <td class="pos">1,050万</td>
+      </tr>
+      <tr>
+        <td>エジプト チケット確定収入</td>
+        <td>17.5万</td>
+        <td class="pos">87.5万</td>
+        <td class="pos">175万</td>
+        <td class="pos">1,050万</td>
+      </tr>
+      <tr>
+        <td>エジプト 研修追加（行使率50%）</td>
+        <td>〜30万</td>
+        <td class="pos">〜75万</td>
+        <td class="pos">〜150万</td>
+        <td class="pos">〜900万</td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr class="total">
+        <td>エジプト 合計収入（研修込み）</td>
+        <td>〜47.5万</td>
+        <td class="pos">〜162.5万</td>
+        <td class="pos">〜325万</td>
+        <td class="pos">〜1,950万</td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <div class="note warn">
+    <strong>注意:</strong>
+    上記はTENOHIRAのアプリ開発原価を50%と仮定。実際の粗利はプロジェクト構成による。
+    補助金はクライアントが申請・受給するため、TENOHIRA/エジプトの受取額には影響しない。
+  </div>
+</section>
+
+<!-- ─────── 5. アタック先の定義 ─────── -->
+<section id="targets">
+  <h2><span class="num">05</span>アタック先の定義</h2>
+  <p class="sub">TENOHIRA既存の攻撃リスト × エジプトの得意企業像の交差点を狙う</p>
+
+  <div class="target-grid">
+    <div class="tcard">
+      <span class="tc-tag">PRIORITY-S</span>
+      <div class="tc-head">創業30〜50年の建設・不動産</div>
+      <div class="tc-why">代替わり期で理念も評価制度も揺れている。アプリで営業見える化 → エジプトが制度整備。TENOHIRAの既存攻撃リストに大量在庫あり。</div>
+    </div>
+    <div class="tcard">
+      <span class="tc-tag">PRIORITY-S</span>
+      <div class="tc-head">採用強化フェーズの中小企業</div>
+      <div class="tc-why">採用ブランディングはエジプトの強み。「採用管理アプリ＋採用コンサル」をセット提案。SNSに求人出稿しているリストと高相性。</div>
+    </div>
+    <div class="tcard">
+      <span class="tc-tag">PRIORITY-A</span>
+      <div class="tc-head">周年記念（25・30・50年）の企業</div>
+      <div class="tc-why">理念映像とエジプトのMVV策定は相性抜群。TENOHIRAの「創業の魂プロジェクト」との三点セット展開も可能。</div>
+    </div>
+    <div class="tcard">
+      <span class="tc-tag">PRIORITY-A</span>
+      <div class="tc-head">観光・ホテル・レンタカー</div>
+      <div class="tc-why">TENOHIRAのポスマネ顧客と重複。スタッフ教育・接客ブランド統一のニーズが高い。エジプトの研修と直接つながる。</div>
+    </div>
+    <div class="tcard">
+      <span class="tc-tag">PRIORITY-B</span>
+      <div class="tc-head">リフォーム・塗装の中堅企業</div>
+      <div class="tc-why">属人的営業が多く、アプリで見える化ニーズが高い。SNSで積極的に求人出稿中の企業が多く採用系でもエジプトと相性あり。</div>
+    </div>
+    <div class="tcard">
+      <span class="tc-tag">PRIORITY-B</span>
+      <div class="tc-head">県内DX促進事業の採択経験あり企業</div>
+      <div class="tc-why">補助金申請に慣れているため、リスキリング補助の説明コストが低い。すでに外部支援を活用する文化がある。</div>
+    </div>
+  </div>
+
+  <div class="note">
+    <strong>TENOHIRA の攻撃リスト（attack_list_SA）との重複確認が最初のステップ。</strong>
+    エジプトからも「理想の顧客リスト」を共有してもらい、スコアリングを統合する。
+    月に10〜20社を共同訪問ターゲットとして選定する運用が現実的。
+  </div>
+</section>
+
+<!-- ─────── 6. 商談スクリプト ─────── -->
+<section id="pitch">
+  <h2><span class="num">06</span>初回アプローチのピッチ</h2>
+  <p class="sub">15分で「やってみようか」を引き出すための言葉</p>
+
+  <div class="pitch">
+    <pre>
+○○社長、突然のご連絡失礼します。
+TEENOHIRAの前平と申します。
+
+今日ご提案したいのは、御社の「営業が属人化している」か
+「採用で苦労している」かのどちらかに当てはまるなら、
+ぜひ聞いていただきたい話です。
+
+弊社で御社専用の業務管理アプリをご一緒に作らせていただき、
+その費用が実質0円になる国の制度があります。
+
+具体的には、開発費用70万円のうち75%は
+国の「リスキリング支援助成金」でそのまま戻ってきます。
+残り25%は弊社がエジプトさんの研修チケットとして
+御社に買い付けてお渡しします。
+
+つまり、御社の手出しはゼロで、
+・自社専用アプリ
+・組織コンサルティングのチケット（有効期限あり）
+が手に入ります。
+
+アプリも研修も「合わなかったら終わり」ではなく、
+まずアプリで御社の現状を可視化してから、
+チケットで「何を整えるか」を一緒に考える流れです。
+
+30分だけ、試算と事例をお見せできますか？
+    </pre>
+  </div>
+
+  <div class="note key">
+    <strong>ポイント:</strong>
+    「0円」を最初に言わない。まず「属人化」か「採用苦労」で問いかけて課題を引き出す。
+    0円の仕組みは課題が確認できてから出す。いきなりの0円訴求は詐欺っぽく聞こえる。
+  </div>
+</section>
+
+<!-- ─────── 7. 実装ロードマップ ─────── -->
+<section id="roadmap">
+  <h2><span class="num">07</span>立ち上げロードマップ</h2>
+  <p class="sub">合意から最初の案件クローズまで</p>
+
+  <ol class="timeline">
+    <li>
+      <div class="tl-dot">1</div>
+      <div class="tl-label">Week 1 ─ 合意と設計</div>
+      <div class="tl-desc">
+        エジプトとの契約/覚書を締結。チケット単価・有効期限・研修メニューを確定。
+        TENOHIRAはアプリの「標準パッケージ（70万）」の内容を固める。
+        補助金申請フローのチェックリストを共同作成。
+      </div>
+    </li>
+    <li>
+      <div class="tl-dot">2</div>
+      <div class="tl-label">Week 2〜3 ─ ターゲットリスト統合</div>
+      <div class="tl-desc">
+        TENOHIRA attack_list_SA × エジプト得意顧客リストを突き合わせ。
+        最初の共同アタック20社を選定。手紙の原稿を共同作成（TENOHIRAのスタイルを活用）。
+      </div>
+    </li>
+    <li>
+      <div class="tl-dot">3</div>
+      <div class="tl-label">Month 1 ─ 共同訪問・商談開始</div>
+      <div class="tl-desc">
+        月2〜3回の共同訪問日を設定。TENOHIRA（前平）が先に手紙＋追跡架電でアポを取り、
+        商談にエジプト（知念さん）も同席。補助金の説明はTENOHIRAが担当。
+      </div>
+    </li>
+    <li>
+      <div class="tl-dot">4</div>
+      <div class="tl-label">Month 2 ─ 初クローズ＆改善</div>
+      <div class="tl-desc">
+        最初の1件をクローズ。チケット発行・補助金申請サポートの実務を確認。
+        スクリプトとフローを現実に合わせてブラッシュアップ。
+        2件目からのテンプレ化を進める。
+      </div>
+    </li>
+    <li>
+      <div class="tl-dot">5</div>
+      <div class="tl-label">Month 3〜 ─ スケールと水平展開</div>
+      <div class="tl-desc">
+        月5件ペースを目指す。スキームを他のパートナー（社労士・税理士事務所等）へも展開可能な
+        フォーマットとして整備。TENOHIRAのアプリ内にエジプトのチケット管理機能を組み込む。
+      </div>
+    </li>
+  </ol>
+</section>
+
+<!-- ─────── 8. リスクと論点 ─────── -->
+<section id="risks">
+  <h2><span class="num">08</span>リスクと論点（正直に並べる）</h2>
+  <p class="sub">見えているリスクを事前に処理しておく</p>
+
+  <div class="mech">
+    <div class="mech-head">要確認事項</div>
+    <div class="mech-body">
+      <div class="mech-row">
+        <span class="mech-n">R1</span>
+        <div class="mech-text">
+          <strong>補助金の要件適合:</strong>
+          リスキリング補助金は「訓練計画届」の事前提出が必要。アプリ開発を「カリキュラム」として
+          組み立てるには<em>事前に社労士または都道府県労働局の確認が必要</em>。
+          これはスキーム設計の最初のハードル。
+        </div>
+      </div>
+      <div class="mech-row">
+        <span class="mech-n">R2</span>
+        <div class="mech-text">
+          <strong>70万円の根拠:</strong>
+          補助金の支給額は実際の経費から計算される。アプリの実費原価と補助金の対象経費が
+          一致しているか確認が必要。過大請求は不正受給になる。
+        </div>
+      </div>
+      <div class="mech-row">
+        <span class="mech-n">R3</span>
+        <div class="mech-text">
+          <strong>チケットの法的性格:</strong>
+          商品券・金券的な性格を持つ場合、特定商取引法や資金決済法の規制を受ける可能性がある。
+          「エジプトへの業務委託の前払い」という形式で整理するのが最もシンプル。
+        </div>
+      </div>
+      <div class="mech-row">
+        <span class="mech-n">R4</span>
+        <div class="mech-text">
+          <strong>TENOHIRA のキャッシュフロー:</strong>
+          70万円受領後、チケット17.5万円を即時支出する。開発完了前にクライアントの補助金が
+          戻ってくるわけではないため、月5件 × 17.5万 = <em>87.5万円/月の先出し</em>が発生する。
+          売掛金管理と入金サイクルの設計が必要。
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────── 9. 次のアクション ─────── -->
+<section id="next">
+  <h2><span class="num">09</span>次のアクション</h2>
+  <p class="sub">この資料を持って、まず「やってみよう」の一言をもらう</p>
+
+  <div class="mech">
+    <div class="mech-head">エジプトへのお願い</div>
+    <div class="mech-body">
+      <div class="mech-row">
+        <span class="mech-n">①</span>
+        <div class="mech-text">
+          <strong>チケットの設計に合意する</strong> ─
+          単価17.5万・有効期限6ヶ月・対象メニュー・未使用時の取り扱いを決める
+        </div>
+      </div>
+      <div class="mech-row">
+        <span class="mech-n">②</span>
+        <div class="mech-text">
+          <strong>「理想のクライアント像」を5〜10社分リストアップ</strong> ─
+          TENOHIRAのリストとマッチングして共同アタック先を決める
+        </div>
+      </div>
+      <div class="mech-row">
+        <span class="mech-n">③</span>
+        <div class="mech-text">
+          <strong>社労士ルートを確保する</strong> ─
+          補助金申請フローのサポートができる社労士に声をかけておく（エジプト側で既につながりがあるとベスト）
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note key">
+    まずパイロット1社で全部回してみる。補助金・チケット・アプリ・研修の流れを1件通すと
+    どこに詰まりがあるかが全部見える。「完璧なスキーム」を作ってから動くより、<em>動きながら直す</em>。
+  </div>
+</section>
+
+<hr>
+
+</div><!-- .shell -->
+
+<footer>
+  TENOHIRA × エジプト 販売協力スキーム提案書 ─ 2026/08/25 ─ Confidential
+</footer>
+
+</body>
+</html>

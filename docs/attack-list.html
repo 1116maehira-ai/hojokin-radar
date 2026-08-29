@@ -2,145 +2,633 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>営業リスト</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>営業CRMリスト</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--bg:#f1f5f9;--card:#fff;--border:#cbd5e1;--primary:#1e40af;--text:#0f172a;--muted:#64748b;--blue-light:#dbeafe;--green:#d1fae5;--green-text:#065f46}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f172a;--card:#1e293b;--border:#334155;--text:#f1f5f9;--muted:#94a3b8;--blue-light:#1e3a5f;--green:#064e3b;--green-text:#6ee7b7}}
-:root[data-theme="dark"]{--bg:#0f172a;--card:#1e293b;--border:#334155;--text:#f1f5f9;--muted:#94a3b8;--blue-light:#1e3a5f;--green:#064e3b;--green-text:#6ee7b7}
-:root[data-theme="light"]{--bg:#f1f5f9;--card:#fff;--border:#cbd5e1;--text:#0f172a;--muted:#64748b;--blue-light:#dbeafe;--green:#d1fae5;--green-text:#065f46}
+:root {
+  --bg: #f1f5f9;
+  --card: #ffffff;
+  --primary: #1e40af;
+  --primary-d: #1e3a8a;
+  --primary-l: #dbeafe;
+  --text: #0f172a;
+  --muted: #64748b;
+  --border: #e2e8f0;
+  --c-pending: #94a3b8;
+  --c-contacted: #3b82f6;
+  --c-callback: #f97316;
+  --c-mailed: #8b5cf6;
+  --c-won: #10b981;
+  --c-declined: #cbd5e1;
+  --won-bg: #f0fdf4;
+  --today-bg: #fff1f2;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f172a; --card: #1e293b; --text: #f1f5f9; --muted: #94a3b8;
+    --border: #334155; --primary-l: #1e3a5f; --won-bg: #052e16; --today-bg: #3f0d10;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f172a; --card: #1e293b; --text: #f1f5f9; --muted: #94a3b8;
+  --border: #334155; --primary-l: #1e3a5f; --won-bg: #052e16; --today-bg: #3f0d10;
+}
+
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);font-size:14px}
-header{background:var(--primary);color:#fff;padding:14px 20px;display:flex;align-items:center;gap:10px}
-header h1{font-size:18px;font-weight:700;letter-spacing:-.02em}
-.badge{background:rgba(255,255,255,.2);border-radius:10px;padding:2px 10px;font-size:12px}
-.controls{padding:12px 20px;display:flex;flex-wrap:wrap;gap:8px;background:var(--card);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10;box-shadow:0 1px 3px rgba(0,0,0,.08)}
-.controls input,.controls select{padding:7px 11px;border:1px solid var(--border);border-radius:6px;background:var(--card);color:var(--text);font-size:13px;font-family:inherit}
-.controls input{flex:1;min-width:200px}
-.stat-bar{padding:8px 20px;background:var(--blue-light);display:flex;gap:20px;font-size:12px;flex-wrap:wrap;border-bottom:1px solid var(--border)}
-.stat-bar span{color:var(--muted)}.stat-bar strong{color:var(--text);font-variant-numeric:tabular-nums}
-.table-wrap{overflow-x:auto}
-table{width:100%;border-collapse:collapse;min-width:700px}
-thead th{background:var(--card);border-bottom:2px solid var(--border);padding:9px 12px;text-align:left;font-size:11px;font-weight:600;color:var(--muted);white-space:nowrap;cursor:pointer;user-select:none;letter-spacing:.04em;text-transform:uppercase}
-thead th:hover{color:var(--primary)}
-tbody tr{border-bottom:1px solid var(--border)}
-tbody tr:hover{background:var(--blue-light)}
-td{padding:9px 12px;vertical-align:middle}
-.co-name{font-weight:600;font-size:13px;line-height:1.3}
-.phone{font-family:'SF Mono',Menlo,Consolas,monospace;font-size:12px;color:var(--primary);font-variant-numeric:tabular-nums}
-.tag{display:inline-block;border-radius:3px;padding:1px 6px;font-size:11px;font-weight:600;margin-right:2px}
-.tag-s{background:#dcfce7;color:#14532d;border:1px solid #86efac}
-.tag-a{background:#dbeafe;color:#1e3a8a;border:1px solid #93c5fd}
-.tag-b{background:#fef9c3;color:#713f12;border:1px solid #fde047}
-.tag-c{background:#fee2e2;color:#7f1d1d;border:1px solid #fca5a5}
-.tag-job{background:#f3e8ff;color:#581c87;border:1px solid #d8b4fe}
-.tag-sns{background:#fef3c7;color:#78350f;border:1px solid #fcd34d}
-.ceo{font-size:12px;color:var(--muted)}
-.website a{color:var(--primary);text-decoration:none;font-size:12px}
-.website a:hover{text-decoration:underline}
-.empty{text-align:center;padding:60px;color:var(--muted);font-size:15px}
-.sort-icon{font-size:9px;margin-left:2px;opacity:.6}
+body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI','Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);padding-bottom:40px}
+
+/* ── HEADER ── */
+.hdr{background:var(--primary);color:#fff;padding:13px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.hdr h1{font-size:16px;font-weight:800;flex:1;letter-spacing:-.01em}
+.hdr-sub{font-size:11px;opacity:.75}
+.btn-add{padding:6px 13px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
+.btn-add:hover{background:rgba(255,255,255,.28)}
+.btn-refresh{padding:6px 10px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:8px;font-size:13px;cursor:pointer}
+
+/* ── STATS ── */
+.stats{display:flex;gap:6px;padding:10px 12px;overflow-x:auto;background:var(--card);border-bottom:1px solid var(--border);scrollbar-width:none}
+.stats::-webkit-scrollbar{display:none}
+.sc{flex-shrink:0;text-align:center;padding:8px 12px;border-radius:10px;cursor:pointer;border:2px solid transparent;background:var(--bg);min-width:64px;transition:all .12s}
+.sc:hover{transform:translateY(-1px)}
+.sc.on{border-color:var(--primary);background:var(--primary-l)}
+.sc .n{font-size:20px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.sc .l{font-size:10px;color:var(--muted);margin-top:2px;line-height:1.3}
+.sc.st .n{color:#ef4444}
+.sc.sp .n{color:var(--c-pending)}
+.sc.sco .n{color:var(--c-contacted)}
+.sc.scb .n{color:var(--c-callback)}
+.sc.sm .n{color:var(--c-mailed)}
+.sc.sw .n{color:var(--c-won)}
+.sc.sd .n{color:var(--muted)}
+
+/* ── FILTER BAR ── */
+.fbar{padding:9px 12px;display:flex;gap:7px;flex-wrap:wrap;background:var(--card);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:20;box-shadow:0 2px 6px rgba(0,0,0,.06)}
+.fbar input,.fbar select{padding:7px 10px;border:1px solid var(--border);border-radius:7px;background:var(--bg);color:var(--text);font-size:13px;font-family:inherit}
+.fbar input{flex:1;min-width:160px}
+.fbar select{cursor:pointer}
+
+/* ── LIST ── */
+.lwrap{padding:10px 12px;display:flex;flex-direction:column;gap:7px}
+.card{background:var(--card);border-radius:11px;padding:12px 14px;border-left:4px solid var(--c-pending);cursor:pointer;transition:transform .1s,box-shadow .1s;display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}
+.card:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(0,0,0,.08)}
+.card.p-contacted{border-left-color:var(--c-contacted)}
+.card.p-pending_callback{border-left-color:var(--c-callback)}
+.card.p-mailed{border-left-color:var(--c-mailed)}
+.card.p-won{border-left-color:var(--c-won);background:var(--won-bg)}
+.card.p-declined{border-left-color:var(--c-declined);opacity:.65}
+.card.is-today{background:var(--today-bg)}
+.co-name{font-size:14px;font-weight:700;margin-bottom:4px;word-break:break-all}
+.co-meta{display:flex;gap:6px;flex-wrap:wrap;font-size:11px;color:var(--muted);align-items:center}
+.co-meta+.co-meta{margin-top:4px}
+.co-phone{font-family:'SF Mono',Menlo,Consolas,monospace;font-size:11px;color:var(--primary);font-variant-numeric:tabular-nums}
+
+/* rank badges */
+.rk{display:inline-block;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:800}
+.rk-S{background:#fee2e2;color:#b91c1c}
+.rk-A{background:#fef3c7;color:#92600b}
+.rk-B{background:#d1fae5;color:#065f46}
+.rk-C{background:#f1f5f9;color:#64748b}
+
+/* phase label */
+.pl{display:inline-block;padding:1px 7px;border-radius:6px;font-size:10px;font-weight:700}
+.pl-pending{background:#f3f4f6;color:#6b7280}
+.pl-contacted{background:#dbeafe;color:#1e40af}
+.pl-pending_callback{background:#fed7aa;color:#9a3412}
+.pl-mailed{background:#ede9fe;color:#5b21b6}
+.pl-won{background:#d1fae5;color:#065f46}
+.pl-declined{background:#f3f4f6;color:#9ca3af}
+
+.nt{font-size:10px;color:var(--muted)}
+.nt.past{color:#ef4444;font-weight:700}
+.nt.due{color:#f97316;font-weight:700}
+.log-cnt{font-size:10px;color:var(--muted)}
+
+/* ── MODAL ── */
+.ovl{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;display:none;align-items:flex-end;justify-content:center}
+.ovl.open{display:flex}
+.modal{background:var(--card);border-radius:18px 18px 0 0;width:100%;max-width:620px;max-height:92vh;display:flex;flex-direction:column;box-shadow:0 -4px 30px rgba(0,0,0,.2)}
+.mhd{padding:14px 16px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.mhd h2{font-size:15px;font-weight:800;flex:1;word-break:break-all;line-height:1.3}
+.mclose{width:28px;height:28px;border-radius:50%;border:none;background:var(--bg);color:var(--muted);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mtabs{display:flex;border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none}
+.mtabs::-webkit-scrollbar{display:none}
+.mtab{padding:9px 14px;font-size:12px;font-weight:700;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;color:var(--muted);transition:color .1s}
+.mtab.on{border-bottom-color:var(--primary);color:var(--primary)}
+.mbody{padding:14px;overflow-y:auto;flex:1}
+
+/* action grid */
+.agrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:14px}
+.abtn{padding:12px 8px;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;text-align:center;transition:opacity .1s,transform .1s;font-family:inherit}
+.abtn:hover{opacity:.85;transform:scale(.98)}
+.a-ok{background:#dbeafe;color:#1e40af}
+.a-ab{background:#fed7aa;color:#9a3412}
+.a-cb{background:#fef3c7;color:#92600b}
+.a-dm{background:#ede9fe;color:#5b21b6}
+.a-lt{background:#d1fae5;color:#065f46}
+.a-won{background:#bbf7d0;color:#14532d}
+.a-no{background:#fee2e2;color:#7f1d1d}
+
+/* log */
+.log-item{padding:9px 0;border-bottom:1px solid var(--border);font-size:13px}
+.log-item:last-child{border-bottom:none}
+.log-act{font-weight:700}
+.log-dt{color:var(--muted);font-size:11px;margin-top:1px}
+.log-note{color:var(--muted);font-size:12px;margin-top:3px;line-height:1.5}
+
+/* script */
+.script-box{background:var(--bg);border-radius:10px;padding:14px;font-size:13px;line-height:1.9;white-space:pre-wrap;border:1px solid var(--border)}
+
+/* info */
+.irow{display:flex;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.irow:last-of-type{border-bottom:none}
+.ilabel{color:var(--muted);width:72px;flex-shrink:0;font-size:12px;padding-top:1px}
+.ival{flex:1;word-break:break-all;line-height:1.5}
+.ival a{color:var(--primary);text-decoration:none}
+.ival a:hover{text-decoration:underline}
+.sns-wrap{display:flex;gap:5px;flex-wrap:wrap;margin-top:2px}
+.sl{display:inline-flex;align-items:center;gap:3px;padding:4px 10px;border-radius:6px;font-size:12px;font-weight:600;text-decoration:none}
+.sl-ig{background:#fce7f3;color:#9d174d}
+.sl-x{background:#f3f4f6;color:#111827}
+.sl-fb{background:#dbeafe;color:#1e3a8a}
+.sl-tt{background:#e0f2fe;color:#0c4a6e}
+.sl-job{background:#ede9fe;color:#4c1d95}
+
+/* form elements */
+.note-ta{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-size:13px;margin-top:6px;resize:vertical;min-height:60px;font-family:inherit}
+.note-ta:focus{outline:none;border-color:var(--primary)}
+.date-row{display:flex;gap:8px;align-items:center;margin-top:12px}
+.date-inp{padding:7px 10px;border:1px solid var(--border);border-radius:7px;background:var(--bg);color:var(--text);font-size:13px;font-family:inherit}
+.save-btn{padding:7px 13px;background:var(--primary);color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer}
+.save-btn:hover{background:var(--primary-d)}
+.section-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+
+/* add modal form */
+.add-form{display:flex;flex-direction:column;gap:9px}
+.add-inp{padding:9px 11px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-size:14px;font-family:inherit}
+.add-inp:focus{outline:none;border-color:var(--primary)}
+.add-submit{padding:12px;background:var(--primary);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit}
+.add-submit:hover{background:var(--primary-d)}
+
+/* toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;opacity:0;transition:opacity .25s;z-index:200;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}
+
+/* empty / loading */
+.empty{text-align:center;padding:60px 20px;color:var(--muted);font-size:14px}
 </style>
-<header><h1>&#x1F4CB; 営業リスト</h1><span class="badge" id="hdr-count">読込中...</span></header>
-<div class="controls">
-  <input type="text" id="q" placeholder="&#x4F1A;&#x793E;&#x540D;&#x30FB;&#x4EE3;&#x8868;&#x8005;&#x540D;&#x30FB;&#x96FB;&#x8A71;&#x756A;&#x53F7;&#x3067;&#x691C;&#x7D22;..." oninput="render()">
-  <select id="fi" onchange="render()"><option value="">&#x696D;&#x7A2E;: &#x5168;&#x3066;</option></select>
-  <select id="fc" onchange="render()"><option value="">&#x5E02;&#x533A;&#x753A;&#x6751;: &#x5168;&#x3066;</option></select>
-  <select id="fr" onchange="render()">
-    <option value="">&#x5468;&#x5E74;&#x30E9;&#x30F3;&#x30AF;: &#x5168;&#x3066;</option>
-    <option value="S">S (&#x6700;&#x512A;&#x5148;)</option>
-    <option value="A">A</option><option value="B">B</option><option value="C">C</option>
-  </select>
-  <select id="fj" onchange="render()">
-    <option value="">&#x6C42;&#x4EBA;: &#x5168;&#x3066;</option>
-    <option value="1">&#x6C42;&#x4EBA;&#x3042;&#x308A;</option>
-    <option value="0">&#x6C42;&#x4EBA;&#x306A;&#x3057;</option>
-  </select>
-  <select id="fs" onchange="render()">
-    <option value="">SNS: &#x5168;&#x3066;</option>
-    <option value="1">SNS&#x3042;&#x308A;</option>
-    <option value="0">SNS&#x306A;&#x3057;</option>
+</head>
+<body>
+
+<div class="hdr">
+  <div style="flex:1">
+    <h1>📋 営業CRMリスト</h1>
+  </div>
+  <button class="btn-refresh" onclick="loadData()" title="再読込">🔄</button>
+  <button class="btn-add" onclick="openAdd()">＋ 追加</button>
+</div>
+
+<div class="stats" id="stats"></div>
+
+<div class="fbar">
+  <input type="text" id="q" placeholder="会社名・代表者・電話番号で検索..." oninput="renderList()">
+  <select id="fi" onchange="renderList()"><option value="">業種: 全て</option></select>
+  <select id="fc" onchange="renderList()"><option value="">市区町村: 全て</option></select>
+  <select id="fr" onchange="renderList()">
+    <option value="">周年ランク: 全て</option>
+    <option value="S">S（最優先）</option>
+    <option value="A">A</option>
+    <option value="B">B</option>
+    <option value="C">C</option>
   </select>
 </div>
-<div class="stat-bar">
-  <span>&#x8868;&#x793A;: <strong id="cnt">-</strong>&#x4EF6;</span>
-  <span>&#x5168;&#x4F53;: <strong id="total">-</strong>&#x4EF6;</span>
-  <span>&#x5468;&#x5E74;S: <strong id="cnt-s">-</strong>&#x4EF6;</span>
-  <span>&#x96FB;&#x8A71;&#x3042;&#x308A;: <strong id="cnt-p">-</strong>&#x4EF6;</span>
+
+<div class="lwrap" id="lwrap"><div class="empty">読み込み中...</div></div>
+
+<!-- company modal -->
+<div class="ovl" id="ovl" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="mhd">
+      <h2 id="m-name">-</h2>
+      <button class="mclose" onclick="closeModal()">×</button>
+    </div>
+    <div class="mtabs" id="mtabs">
+      <div class="mtab on" onclick="switchTab('action')">📞 アクション</div>
+      <div class="mtab" onclick="switchTab('log')">📋 履歴</div>
+      <div class="mtab" onclick="switchTab('script')">📜 トークスクリプト</div>
+      <div class="mtab" onclick="switchTab('info')">ℹ️ 情報</div>
+    </div>
+    <div class="mbody" id="mbody"></div>
+  </div>
 </div>
-<div class="table-wrap"><table>
-<thead><tr>
-  <th onclick="sort('n')">&#x4F1A;&#x793E;&#x540D;<span class="sort-icon" id="sh-n"></span></th>
-  <th onclick="sort('i')">&#x696D;&#x7A2E;<span class="sort-icon" id="sh-i"></span></th>
-  <th onclick="sort('c')">&#x5E02;&#x533A;&#x753A;&#x6751;<span class="sort-icon" id="sh-c"></span></th>
-  <th onclick="sort('p')">&#x96FB;&#x8A71;&#x756A;&#x53F7;<span class="sort-icon" id="sh-p"></span></th>
-  <th>&#x4EE3;&#x8868;&#x8005;</th>
-  <th onclick="sort('ar')">&#x5468;&#x5E74;<span class="sort-icon" id="sh-ar"></span></th>
-  <th>HP</th><th>&#x5C5E;&#x6027;</th>
-</tr></thead>
-<tbody id="tbody"></tbody>
-</table></div>
+
+<!-- add modal -->
+<div class="ovl" id="add-ovl" onclick="closeAdd(event)">
+  <div class="modal">
+    <div class="mhd">
+      <h2>＋ 会社を追加</h2>
+      <button class="mclose" onclick="closeAdd()">×</button>
+    </div>
+    <div class="mbody">
+      <div class="add-form">
+        <input class="add-inp" id="an" placeholder="会社名 *">
+        <input class="add-inp" id="ap" placeholder="電話番号">
+        <input class="add-inp" id="aw" placeholder="ウェブサイト URL">
+        <input class="add-inp" id="ac" placeholder="代表者名">
+        <input class="add-inp" id="ai" placeholder="業種">
+        <input class="add-inp" id="acy" placeholder="市区町村">
+        <input class="add-inp" id="aig" placeholder="Instagram URL">
+        <input class="add-inp" id="ax" placeholder="X (Twitter) URL">
+        <input class="add-inp" id="aind" placeholder="Indeed URL">
+        <button class="add-submit" onclick="doAdd()">追加する</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
 <script>
-var DATA=[{"n":"（公社）沖縄県宅地建物取引業協会","p":"098-861-3402","w":"http://okinawa-takken.com/","i":"不動産・建設","c":"那覇市","ceo":"渡久地 政彦","ar":"S","ay":15,"job":1},{"n":"(名) 東洋測量","p":"098-832-0390","w":"https://www.toyosurv.tochigi.jp/","i":"不動産・建設","c":"那覇市","job":1},{"n":"(有) 建水 | 水彩工房浦添店","p":"098-879-2578","w":"http://www.kensui-okinawa.jp/","i":"リフォーム会社","c":"浦添市","ceo":"宮城 嗣尚","job":1},{"n":"(有) 沖縄磁探総業","p":"098-863-6063","w":"https://okijitan.com/","i":"不動産・建設","c":"那覇市","job":1},{"n":"(有)アクシス","p":"098-951-3792","w":"http://www.axis-naha.com/","i":"リフォーム会社","c":"那覇市","job":1},{"n":"（有）オーエン","p":"0078-60159-781783","w":"https://goohome.jp/fudousan/realtor/273/","i":"不動産・建設","c":"糸満市","ceo":"大城昇","job":1,"sns":1},{"n":"㈲カネマサ","p":"098-884-3030","w":"https://kanemasa-estate.com/","i":"リフォーム会社","c":"那覇市","job":1,"sns":1},{"n":"(有)スタプランニング 設計施工部","p":"098-833-5519","w":"https://www.stta-p.com/","i":"リフォーム会社","c":"那覇市","job":1,"sns":1},{"n":"(有)ソリッドワークス","p":"098-860-4717","w":"http://www.solidworks-okinawa.com/","i":"不動産・建設","c":"那覇市","job":1,"sns":1},{"n":"(有)たましろ建設","p":"098-992-3728","w":"https://tsukulink.net/","i":"不動産・建設","c":"糸満市","ceo":"玉城弘一","job":1,"sns":1},{"n":"(有)フィールドリンク","p":"098-859-8118","w":"https://fieldlink-okinawa.com/","i":"リフォーム会社","c":"那覇市","job":1,"sns":1},{"n":"(有)リード企画","p":"098-884-2651","w":"http://www.lead-planning.com/","i":"リフォーム会社","c":"那覇市","job":1,"sns":1},{"n":"㈲リフォーム施工","p":"098-988-3343","w":"http://www.reform-sekoh.co.jp/","i":"リフォーム会社","c":"宜野湾市","ceo":"國吉惠康","job":1,"sns":1},{"n":"（有）ワイドハウジング","p":"0078-60159-082716","w":"https://goohome.jp/fudousan/realtor/122/","i":"リフォーム会社","c":"那覇市","job":1,"sns":1},{"n":"（有）一銀サービス","p":"0120-886-441","w":"http://www.ichigin.co.jp/","i":"不動産・建設","c":"那覇市","ceo":"玉城秀也","job":1},{"n":"（有）上原測量","p":"098-994-3216","w":"https://tsukulink.net/","i":"不動産・建設","c":"糸満市","job":1,"sns":1},{"n":"（有）久茂地宅建","p":"098-867-9422","w":"http://www.kthousing.com/","i":"不動産・建設","c":"那覇市","job":1},{"n":"（有）仲西宅建","p":"098-874-5941","w":"http://www.rent-housing.jp/","i":"不動産・建設","c":"浦添市"},{"n":"(有)吉永","p":"098-851-7070","w":"http://yoshinaga.okinawa/","i":"塗装会社","c":"那覇市","job":1},{"n":"(有)國真住建","p":"098-862-2785","w":"https://www.kensetumap.com/","i":"不動産・建設","c":"那覇市","job":1},{"n":"(有)大喜商建","p":"098-995-2313","w":"https://www.big-advance.site/c/172/1363/","i":"不動産・建設","c":"糸満市","job":1,"sns":1},{"n":"(有)大栄土建","p":"098-994-6921","w":"https://www.kensetumap.com/","i":"不動産・建設","c":"糸満市","ceo":"大城由香","ar":"C","ay":35,"job":1},{"n":"（有）新居開発","p":"098-833-0874","w":"https://u-arai-k.main.jp/","i":"不動産・建設","c":"那覇市","job":1},{"n":"(有)昭和住建","p":"098-876-1343","w":"https://www.kensetumap.com/","i":"リフォーム会社","c":"浦添市","ceo":"玉城臣一","job":1},{"n":"（有）沖住設","p":"098-882-2033","w":"http://www.okijyusetu.com/","i":"リフォーム会社","c":"那覇市","job":1},{"n":"(有)沖塗工業","p":"098-988-1707","w":"https://tsukulink.net/","i":"塗装会社","c":"那覇市","ceo":"比嘉章博","job":1,"sns":1},{"n":"（有）沖縄タカラ住設","p":"098-877-1314","w":"http://www.otj.co.jp/company/","i":"リフォーム会社","c":"浦添市","ceo":"根路銘 安也","job":1},{"n":"（有）沖縄ニューハウスセンター","p":"098-867-8316","w":"http://www.onc1.co.jp/","i":"不動産・建設","c":"那覇市","job":1},{"n":"(有)沖縄建装工業","p":"098-887-6110","w":"https://www.okinawakensou.com/","i":"リフォーム会社","c":"那覇市","job":1,"sns":1},{"n":"(有)沖縄総合建設","p":"098-851-7166","w":"https://okinawa2012.com/","i":"不動産・建設","c":"糸満市","ar":"S","ay":25,"job":1},{"n":"（有）海邦住建","p":"098-934-6305","w":"https://kaihoujuken.studio.site/","i":"リフォーム会社","c":"沖縄市","job":1},{"n":"（有）牧志不動産","p":"098-863-5251","w":"https://goohome.jp/fudousan/realtor/70/","i":"不動産・建設","c":"那覇市","job":1},{"n":"(有)第一リフォーム沖縄","p":"098-836-5685","w":"https://www.dai1reform.com/","i":"リフォーム会社","c":"那覇市","sns":1},{"n":"（有）第一リフォーム沖縄 中部営業所","p":"098-983-4212","w":"https://www.daiichireform.com/","i":"リフォーム会社","c":"沖縄市","ceo":"友寄隆治","job":1},{"n":"(有)辰雄建設","p":"098-992-5247","w":"https://tatsuo-kensetsu.jp/","i":"不動産・建設","c":"糸満市","job":1},{"n":"(有)金城建設","p":"098-994-8567","w":"https://kinjoukensetsu.com/","i":"不動産・建設","c":"糸満市","job":1,"sns":1},{"n":"(株) LINK'S","p":"098-988-8071","w":"https://links-kk-okinawa.jp/","i":"リフォーム会社","c":"那覇市","ceo":"横山 純","job":1},{"n":"(株) ReBLU不動産（リブル）","p":"098-943-4123","w":"https://reblu-okinawa.studio.site/","i":"不動産・建設","c":"那覇市","sns":1},{"n":"(株) T.L.Cサービス","p":"098-864-2448","w":"https://www.tlc-service.com/","i":"リフォーム会社","c":"那覇市","job":1,"sns":1},{"n":"(株) エムスタイル","p":"098-943-5771","w":"https://mstyle-j.co.jp/","i":"リフォーム会社","c":"浦添市","sns":1},{"n":"(株) かりゆし","p":"090-3797-2674","w":"https://kariyushi-o.jp/","i":"リフォーム会社","c":"那覇市","job":1},{"n":"(株) ホーム２１","p":"098-833-8855","w":"https://home21.co.jp/","i":"不動産・建設","c":"那覇市","ceo":"玉城和広","job":1,"sns":1},{"n":"(株) レベルオキナワ","p":"080-9416-6408","w":"https://rebel-okinawa.jp/","i":"リフォーム会社","c":"那覇市","job":1},{"n":"(株) 国建","p":"098-862-1106","w":"https://www.kuniken.co.jp/","i":"不動産・建設","c":"那覇市","job":1,"sns":1},{"n":"(株) 成輝","p":"098-855-3611","w":"https://tsukulink.net/","i":"リフォーム会社","c":"那覇市","job":1,"sns":1},{"n":"(株) 琉信ハウジング","p":"098-868-1000","w":"https://ryuhau.co.jp/","i":"不動産・建設","c":"那覇市","ceo":"金城仁","job":1,"sns":1},{"n":"(株)IMI CORPORATION","p":"098-867-1149","w":"https://imi-cp.com/","i":"リフォーム会社","c":"那覇市","ar":"A","ay":35,"job":1},{"n":"（株）ＫＯＴＥＴＳＵ","p":"098-987-1775","w":"https://kotetsuokinawa.wixsite.com/kotetsu","i":"不動産・建設","c":"那覇市","job":1,"sns":1},{"n":"㈱Nice不動産","p":"098-877-0713","w":"https://www.nice-fudousan.com/","i":"不動産・建設","c":"浦添市","ar":"S","ay":5,"job":1,"sns":1},{"n":"（株）Ｗ．Ｓ．Ｃ","p":"098-988-8581","w":"http://www.w-s-c-okinawa.com/sp/","i":"リフォーム会社","c":"那覇市","ceo":"平良 仁志"},{"n":"（株）ＺＵＭＩホーム","p":"0078-60159-520621","w":"https://goohome.jp/fudousan/realtor/1386/","i":"リフォーム会社","c":"那覇市"},{"n":"（株）アイエー 那覇支店","p":"098-882-5300","w":"https://okinawa.aia-kaitori.com/","i":"不動産・建設","c":"那覇市","job":1,"sns":1},{"n":"（株）オキジツ船場","p":"098-867-1008","w":"http://okijitsu-semba.co.jp/","i":"リフォーム会社","c":"那覇市","job":1},{"n":"（株）オクト管理","p":"098-868-0910","w":"http://www.oct8.jp/","i":"不動産・建設","c":"那覇市","ceo":"渡久地 政彦"},{"n":"㈱コンセプション 空間デザインファーム∞パートナーズ","p":"098-868-8682","w":"https://conception.zone/","i":"リフォーム会社","c":"那覇市","ar":"A","ay":15,"job":1,"sns":1},{"n":"(株)さち屋／マチナトベース／スチールアーチ沖縄","p":"090-2969-8882","w":"https://ww.sa-chi-ya.com/%E3%83%9B%E3%83%BC%E3%83%A0","i":"リフォーム会社","c":"浦添市","job":1,"sns":1},{"n":"（株）サンニン","p":"098-930-6090","w":"https://tsukulink.net/","i":"リフォーム会社","c":"沖縄市","job":1,"sns":1},{"n":"（株）ジャストリフォーム","p":"098-989-7611","w":"http://justreform.main.jp/","i":"リフォーム会社","c":"沖縄市","ceo":"中村 憲","job":1,"sns":1},{"n":"（株）ツヅキ沖縄工場","p":"098-855-8972","w":"http://www.tsuzuki-y.co.jp/about04/","i":"リフォーム会社","c":"那覇市","job":1},{"n":"（株）てるまさリース","p":"098-943-4355","w":"https://terumasalease.jp/","i":"不動産・建設","c":"那覇市","job":1},{"n":"（株）トータルハウスプランニング","p":"098-894-3004","w":"https://www.totalhouseplanning.co.jp/","i":"リフォーム会社","c":"那覇市","ceo":"大城武史","job":1},{"n":"（株）パーフェクトＭ","p":"098-996-3869","w":"http://www.perfectm.co.jp/","i":"リフォーム会社","c":"那覇市","ar":"A","ay":15,"job":1},{"n":"（株）はなまるコーポレーション","p":"098-994-7775","w":"http://www.hanamarucorporation.co.jp/","i":"不動産・建設","c":"糸満市","ceo":"伊敷 賢","ar":"A","ay":15,"job":1,"sns":1},{"n":"（株）もろみ","p":"098-933-5685","w":"https://www.moromi-okinawa.com/","i":"リフォーム会社","c":"沖縄市","job":1},{"n":"㈱三二六工務店","p":"098-840-4569","w":"https://www.326koumuten.com/","i":"リフォーム会社","c":"那覇市","ceo":"宮城充"},{"n":"（株）不動テトラ 沖縄営業所","p":"098-862-7223","w":"https://www.fudotetra.co.jp/company/office/","i":"不動産・建設","c":"那覇市","ar":"S","ay":80,"job":1,"sns":1},{"n":"（株）不動企画","p":"098-836-2292","w":"https://www.fudoukikaku.com/","i":"不動産・建設","c":"那覇市","ceo":"照喜名公枝","job":1},{"n":"㈱不動産ステーション沖縄","p":"098-988-1180","w":"https://www.fs-okinawa.com/","i":"不動産・建設","c":"那覇市","ceo":"金城常義","job":1,"sns":1},{"n":"（株）与儀組","p":"098-866-7580","w":"http://www.yogigumi.co.jp/","i":"リフォーム会社","c":"那覇市","job":1,"sns":1},{"n":"（株）住太郎ホーム","p":"098-943-5077","w":"https://www.jyutaro.co.jp/","i":"不動産・建設","c":"那覇市","ceo":"高宮城 啓之","job":1,"sns":1},{"n":"（株）佐平建設","p":"098-851-8352","w":"https://www.sahira.jp/","i":"不動産・建設","c":"那覇市","ceo":"佐平 龍太","ar":"B","ay":70,"job":1},{"n":"（株）創信","p":"0078-60159-948648","w":"https://goohome.jp/fudousan/realtor/48/","i":"不動産・建設","c":"浦添市","job":1},{"n":"（株）創造社","p":"098-887-4792","w":"http://www.souzousha.net/","i":"リフォーム会社","c":"那覇市","job":1},{"n":"（株）協亜建設","p":"098-992-2079","w":"https://www.kyo-a.com/","i":"不動産・建設","c":"糸満市","ceo":"玉城勝二","ar":"C","ay":40,"job":1,"sns":1},{"n":"(株)呉屋組","p":"098-992-2722","w":"http://goyagumi.com/","i":"不動産・建設","c":"糸満市","ceo":"呉屋明","ar":"C","ay":60,"job":1,"sns":1},{"n":"(株)喜神サービス 宜野湾店","p":"098-897-8733","w":"https://ginowansite.wixsite.com/kishinservice","i":"リフォーム会社","c":"宜野湾市","ceo":"川満秀吉","sns":1},{"n":"（株）喜神サービス 本社","p":"0120-465-840","w":"https://www.kishinservice.co.jp/","i":"リフォーム会社","c":"うるま市","ceo":"川満秀吉","job":1},{"n":"（株）喜神サービス 那覇ショウルーム","p":"098-833-9420","w":"https://nahashowroom.wixsite.com/kishinservice","i":"リフォーム会社","c":"那覇市","job":1,"sns":1},{"n":"（株）四季彩建物 小禄本店","p":"098-840-1749","w":"http://www.shikisai-okinawa.com/","i":"リフォーム会社","c":"那覇市","ceo":"島袋篤"},{"n":"（株）大信開発","p":"098-866-1234","w":"http://www.daishin-kaihatu.co.jp/","i":"不動産・建設","c":"那覇市","ceo":"岸本 功","job":1,"sns":1},{"n":"（株）嶺建材","p":"098-851-9995","w":"http://www.minekenzai.co.jp/company/","i":"不動産・建設","c":"糸満市","ceo":"長嶺 単","job":1,"sns":1},{"n":"(株)幸健ホーム","p":"098-869-8923","w":"http://www.koukenhome.jp/","i":"リフォーム会社","c":"那覇市","ar":"S","ay":65,"job":1},{"n":"(株)新洋","p":"098-878-9442","w":"http://shinyo-housing.okinawa/","i":"リフォーム会社","c":"浦添市","ceo":"新垣守泰","job":1,"sns":1},{"n":"（株）日宅","p":"098-988-9231","w":"https://nittaku-hs.co.jp/","i":"不動産・建設","c":"那覇市","sns":1},{"n":"（株）星リフォーム 沖縄","p":"080-9140-6588","w":"https://www.hoshi-reform.com/","i":"リフォーム会社","c":"与那原町","job":1},{"n":"（株）東洋商会","p":"098-861-1040","w":"http://toyosok.com/about.php","i":"リフォーム会社","c":"那覇市","ceo":"能勢 平一郎","ar":"S","ay":65,"job":1},{"n":"（株）松樹 コザ支店","p":"098-983-8800","w":"https://www.e-uchina.net/fudosan_kaisha/5633","i":"リフォーム会社","c":"沖縄市","job":1},{"n":"(株)沖創建設","p":"098-866-1007","w":"https://www.okiso.co.jp/","i":"不動産・建設","c":"那覇市","ceo":"西平 典明","ar":"S","ay":45,"job":1,"sns":1},{"n":"(株)沖縄合人社","p":"098-869-4302","w":"https://www.gojin.co.jp/group/okinawa/","i":"不動産・建設","c":"那覇市","job":1},{"n":"（株）沖縄日興","p":"098-939-0733","w":"https://www.okinawa-nikkou.jp/","i":"リフォーム会社","c":"沖縄市","job":1,"sns":1},{"n":"(株)照屋土建","p":"098-992-5644","w":"http://www.teruya-doken.com/","i":"不動産・建設","c":"糸満市","ceo":"照屋正人","job":1,"sns":1},{"n":"（株）琉信ハウジング 浦添支店","p":"098-877-1000","w":"https://ryuhau.co.jp/tenpoannai/urasoe/","i":"不動産・建設","c":"浦添市","sns":1},{"n":"（株）西崎興業","p":"0120-046-313","w":"http://www.nishizaki-k.co.jp/","i":"不動産・建設","c":"糸満市","ceo":"金城和良","job":1,"sns":1},{"n":"（株）財全エステート","p":"0120-816-200","w":"https://zaizen-estate.co.jp/","i":"不動産・建設","c":"浦添市","job":1,"sns":1},{"n":"（株）金城キク建設","p":"098-863-6930","w":"https://www.kikukensetu.jp/","i":"リフォーム会社","c":"那覇市","ceo":"請舛充則","job":1},{"n":"（株）長谷工コミュニティ沖縄","p":"0120-009-226","w":"https://www.haseko.co.jp/cmo/","i":"不動産・建設","c":"那覇市","ceo":"唐真 武史"},{"n":"（資）ブラザー住設","p":"098-877-0185","w":"https://goohome.jp/fudousan/realtor/2318/","i":"リフォーム会社","c":"浦添市","ceo":"狩俣茂則","sns":1},{"n":"(資)浦添建材","p":"098-877-4647","w":"https://tsukulink.net/","i":"リフォーム会社","c":"浦添市","job":1,"sns":1},{"n":"[2026-05-25] AIリサーチ結果:","job":1},{"n":"[2026-05-25] 一括AIリサーチ:","job":1},{"n":"[2026-05-26] AIリサーチ結果:","job":1},{"n":"「防水塗装専門店」リフォーム沖縄株式会社","p":"098-943-1949","i":"リフォーム会社","c":"那覇市","job":1},{"n":"AHC株式会社","p":"098-992-5522","w":"https://www.ahc-map.jp/value/","i":"不動産・建設","c":"糸満市","ceo":"國仲秀喜","job":1,"sns":1},{"n":"ALAmaterial(株式会社KiCHi)","w":"https://kichi-okinawa.com/","i":"リフォーム会社","c":"浦添市","sns":1},{"n":"CENTURY 21 紹 （有限会社 紹）","p":"098-996-9360","w":"https://www.century21sho.com/","i":"不動産・建設","c":"糸満市","sns":1},{"n":"Cozyhome","p":"090-5027-4848","w":"https://www.cozyhome4848.com/","i":"リフォーム会社","c":"那覇市","job":1,"sns":1},{"n":"DESIGN WORKS株式会社","p":"098-943-1448","w":"https://www.designworks-okinawa.com/index.html","i":"リフォーム会社","c":"那覇市","job":1},{"n":"E'k設備","p":"090-6859-0515","w":"https://www.instagram.com/eksetsubi?igsh=ajFnNGYzZHRwZmJv&utm_source=qr","i":"リフォーム会社","c":"浦添市","job":1},{"n":"F ステージ牧志駅前","w":"https://www.tokyu-resort.co.jp/","i":"不動産・建設","c":"那覇市","job":1,"sns":1},{"n":"GLC株式会社 沖縄支社","p":"098-894-5041","w":"https://www.goodlife-c.jp/","i":"不動産・建設","c":"那覇市","ar":"B","ay":15,"job":1,"sns":1},{"n":"Ｇプランニング","p":"098-861-0292","i":"リフォーム会社","c":"那覇市","job":1},{"n":"Harmony Flats 那覇松山","w":"https://harmony-h.co.jp/","i":"不動産・建設","c":"那覇市","job":1},{"n":"HP取得不可・採用掲載0件・ニュース情報なし","job":1},{"n":"ＫＡＮサービス","p":"098-941-7773","w":"http://kan-okinawa.com/","i":"リフォーム会社","c":"那覇市","job":1,"sns":1},{"n":"KG","p":"098-987-8958","w":"https://kg.wphp.jp/","i":"リフォーム会社","c":"沖縄市","job":1},{"n":"NICS株式会社","w":"https://www.nics.okinawa/","i":"リフォーム会社","c":"那覇市","sns":1},{"n":"Panasonic shopトレンドとなみ首里店","p":"098-886-8676","w":"https://sites.google.com/trend-tonami.com/panasonic","i":"リフォーム会社","c":"那覇市","ceo":"西平明","job":1,"sns":1},{"n":"RCNEXT 糸満市糸満モデルハウス","p":"098-851-4826","w":"https://rc-next.com/","i":"不動産・建設","c":"糸満市"},{"n":"S.T.A不動産","p":"098-917-4540","w":"https://rapiakirisu.wordpress.com/?_gl=1*1jncxbh*_gcl_au*MTA5MTI0Mjk5Ni4xNzY2MTAzNzIw","i":"不動産・建設","c":"浦添市","job":1,"sns":1},{"n":"STAY沖縄株式会社","p":"090-6700-6145","w":"https://www.stayokinawa.co.jp/","i":"リフォーム会社","c":"那覇市","ceo":"江 信華","ar":"S","ay":10,"job":1,"sns":1},{"n":"TOTO水彩プラザ小禄店","p":"098-995-9246","w":"http://www.suisai-oroku.jp/","i":"リフォーム会社","c":"那覇市","job":1},{"n":"ＵＲ･コーポレーション株式会社","p":"098-943-1221","w":"https://www.hatomarksite.com/search/zentaku/agent/00074702648","i":"不動産・建設","c":"那覇市","ceo":"浦﨑太"},{"n":"VILLA IMG合同会社 (アイエムジー)","p":"098-869-3575","w":"https://www.villa-realty.com/","i":"不動産・建設","c":"那覇市","job":1,"sns":1},{"n":"アイル リノベーションショールーム By キャリアエステート","p":"098-917-5252","w":"https://okinawa-renove.jp/","i":"リフォーム会社","c":"浦添市","ceo":"中本貴士","job":1,"sns":1},{"n":"アスパル (株)","p":"098-851-4577","w":"https://www.asupal.co.jp/","i":"リフォーム会社","c":"那覇市","job":1},{"n":"エスティーヌ産業","p":"098-930-3232","w":"http://tomoyuki225.ti-da.net/","i":"リフォーム会社","c":"沖縄市","job":1},{"n":"エルビーハウジング （ＬＢハウジング株式会社）","p":"050-5469-5664","w":"https://www.e-uchina.net/fudosan_kaisha/7304","i":"不動産・建設","c":"那覇市"},{"n":"カネヨシ工務店","w":"http://www.kaneyoshi-k.com/","i":"リフォーム会社","c":"那覇市","job":1},{"n":"キッチンリフォーム専門店 クックホーム（泡瀬店）","p":"098-989-6217","w":"https://kitchen.okinawa/","i":"リフォーム会社","c":"沖縄市","ceo":"田場大介"},{"n":"クロス・床施工専門 金城内装","p":"090-1365-4293","w":"https://sites.google.com/view/kinjo-naiso/","i":"リフォーム会社","c":"浦添市"},{"n":"シティホテルズ＆リゾーツ (株式会社シティホテルズ＆リゾーツ)","p":"098-868-1122","w":"https://city-homes-okinawa.jp/","i":"不動産・建設","c":"那覇市","ceo":"須田俊之"},{"n":"シティホテルズ＆リゾーツは関連会社として名前のみ記載、住所・電話番号は同一だが事業内容・代表者等の詳細情報なし。","w":"https://city-hotels-resorts.jp/"},{"n":"スタイルホープ","p":"098-952-6578","w":"https://stylehope.jp/","i":"リフォーム会社","c":"浦添市","job":1,"sns":1},{"n":"センチュリー 21 南風 ／株式会社 南風","p":"098-854-6006","w":"https://www.e-nanpu.com/","i":"不動産・建設","c":"那覇市","ceo":"長山宏","ar":"S","ay":20,"sns":1},{"n":"タカラハウス","p":"098-834-7300","w":"https://www.takarahouse4718.jp/","i":"不動産・建設","c":"那覇市","ceo":"高良みどり","ar":"S","ay":40,"sns":1},{"n":"タマキハウジング株式会社","p":"098-831-9296","w":"https://tamaki-housing.co.jp/","i":"不動産・建設","c":"那覇市","ceo":"玉城英之","job":1,"sns":1},{"n":"タマキホーム株式会社","p":"098-831-9285","w":"http://tamaki-home.co.jp/","i":"不動産・建設","c":"那覇市","ceo":"玉城 公之","ar":"B","ay":30,"job":1,"sns":1},{"n":"ちゅら建装","p":"098-835-9592","w":"https://churaken.com/","i":"リフォーム会社","c":"那覇市","job":1},{"n":"ディ･スペック (株)","p":"050-5434-2733","w":"https://www.dspec.jp/","i":"不動産・建設","c":"那覇市","ceo":"古謝淳也","job":1,"sns":1},{"n":"ティ・マックス不動産","p":"098-860-4340","w":"http://www.tmax-okinawa.com/","i":"不動産・建設","c":"那覇市","ceo":"砂川 智哉","job":1,"sns":1},{"n":"ティダ・テラス沖縄","p":"098-943-9865","w":"https://tida-terrace.wixsite.com/tidaterrace-okinawa","i":"リフォーム会社","c":"那覇市","sns":1},{"n":"てだこリフォーム お住いの事なら 外壁塗装/遮熱防水/修繕専門","p":"0120-524-533","w":"https://tedakoreform.com/","i":"リフォーム会社","c":"浦添市"},{"n":"テン·リフォーム","p":"0120-358-895","w":"https://ten-rm.jp/","i":"リフォーム会社","c":"沖縄市","job":1,"sns":1},{"n":"デンセンドウ","p":"098-884-6140","w":"https://www.densendou.jp/","i":"リフォーム会社","c":"那覇市","job":1},{"n":"トータルホーム","p":"098-867-0130","w":"https://www.ielove.co.jp/","i":"リフォーム会社","c":"那覇市"},{"n":"とくとくハウス (㈱德松産業)","p":"098-851-3291","w":"https://tokutokuhouse.jp/?utm_source=GBP&utm_medium=GBP&utm_term=GBP&utm_content=GBP&utm_campaign=GBP","i":"不動産・建設","c":"糸満市","job":1,"sns":1},{"n":"とまとハウジング","p":"098-876-7380","w":"https://www.tomato-okinawa.com/","i":"不動産・建設","c":"浦添市","job":1,"sns":1},{"n":"ドリームハウス沖縄","p":"0120-217-302","w":"http://www.dream-okinawa.net/","i":"リフォーム会社","c":"那覇市","job":1},{"n":"トリアエズ株式会社","p":"0120-984-271","w":"https://toriaezu.co.jp/","i":"リフォーム会社","c":"浦添市","ceo":"嘉手川秀徳","job":1},{"n":"ニッシンあっとリフォーム一日橋ショールーム","p":"0120-243-583","w":"https://nissin-reform.net/","i":"リフォーム会社","c":"那覇市","job":1,"sns":1},{"n":"ニッシンあっとリフォーム小禄ショールーム","p":"098-836-0345","w":"https://nissin-reform.net/","i":"リフォーム会社","c":"那覇市","job":1,"sns":1},{"n":"パーフェクトメンテナンス","p":"098-988-6068","w":"https://www.perfectm.co.jp/","i":"リフォーム会社","c":"那覇市","job":1},{"n":"ハウズイング合人社沖縄（株）","p":"098-860-8590","w":"https://www.gojin.co.jp/group/housing/","i":"不動産・建設","c":"那覇市","ceo":"小出哲平","ar":"A","ay":25,"job":1},{"n":"ハウスドゥ サンパーク通り浦添","p":"098-876-5454","w":"https://sunparkdoriurasoe-housedo.com/","i":"不動産・建設","c":"浦添市","job":1},{"n":"ハウスドゥ 家・不動産買取専門店 糸満","p":"0120-168-063","w":"https://itoman-housedo.com/","i":"不動産・建設","c":"糸満市","ceo":"市田真也","sns":1},{"n":"ハウスドゥ 沖縄上地","p":"098-932-8088","w":"https://okinawauechi-housedo.com/sp/","i":"リフォーム会社","c":"沖縄市","ceo":"照屋健斗","job":1},{"n":"パナソニック ショウルーム 沖縄","p":"0570-087-118","w":"http://sumai.panasonic.jp/sr/okinawa/","i":"リフォーム会社","c":"浦添市","sns":1},{"n":"パナソニック ホームズ 那覇新都心展示場","p":"098-941-2980","w":"https://homes.panasonic.com/kyoten/detail/E00189?utm_source=gmb&utm_medium=organic&utm_content=E00189","i":"リフォーム会社","c":"那覇市","job":1,"sns":1},{"n":"パナソニック ホームズ株式会社 沖縄支社","p":"098-870-8711","w":"https://homes.panasonic.com/","i":"リフォーム会社","c":"浦添市","job":1,"sns":1},{"n":"パナソニックリフォーム株式会社 西部支社・九州営業部・沖縄営業所","p":"098-870-8714","w":"https://map.yahoo.co.jp/","i":"リフォーム会社","c":"浦添市","sns":1},{"n":"ビー・ゼイ工事（株）","p":"098-863-2164","w":"https://bj-kouzi.com/","i":"塗装会社","c":"那覇市","ceo":"佐久本 嘉光","job":1,"sns":1},{"n":"ビセイル沖縄 (ＢＥＳＡＩＬ沖縄株式会社)","p":"098-943-9518","w":"https://besail.jp/","i":"不動産・建設","c":"那覇市","ar":"S","ay":10,"sns":1},{"n":"ピタットハウス 那覇店","p":"098-866-9310","w":"https://www.pitat.com/shopDetail/naha.html","i":"不動産・建設","c":"那覇市"},{"n":"ファースト（１ｓｔ）リフォーム（合同会社）","p":"098-933-1011","w":"https://www.instagram.com/1st.reform/","i":"リフォーム会社","c":"沖縄市","job":1,"sns":1},{"n":"フェニックス産業コーポレーション","p":"0078-60159-924534","w":"https://goohome.jp/fudousan/realtor/807/","i":"リフォーム会社","c":"那覇市","job":1},{"n":"ふそうビルディング","p":"098-867-3176","w":"https://www.okinawa-fuso.jp/fusobuilding/","i":"不動産・建設","c":"那覇市","job":1,"sns":1},{"n":"プラスOne","p":"098-989-3274","w":"https://www.plusone-renovation.com/company","i":"リフォーム会社","c":"沖縄市","ceo":"桃原 聖二"},{"n":"フレスコアマンションギャラリー","p":"098-868-3955","w":"https://frescore.jp/","i":"不動産・建設","c":"那覇市","job":1,"sns":1},{"n":"プレミスト牧志タワー国際通り","w":"https://www.daiwahouse.co.jp/mansion/search/","i":"不動産・建設","c":"那覇市","sns":1},{"n":"ふろいち沖縄","p":"098-942-5588","w":"https://www.furoichi.com/kyushu-okinawa/okinawa/","i":"リフォーム会社","c":"浦添市","job":1},{"n":"ホームメイトFC浦添店 有限会社大吉宅建","p":"098-879-1160","w":"http://www.daikiti-takuken.co.jp/","i":"不動産・建設","c":"浦添市"},{"n":"ホカマホーム ショールーム北谷店","p":"0120-947-629","w":"http://www.hokama-reform.com/","i":"リフォーム会社","c":"北谷町","ceo":"外間 慎也","job":1,"sns":1},{"n":"ホワイトリスト内の公式サイト・公式SNS・公式採用ページが見つからないため全項目N/A","job":1},{"n":"ホワイトリスト内の公式サイトが存在せず、提供URL・公式SNS・公式採用ページとも確認できないため全項目N/A"},{"n":"まるなか建設","p":"090-2518-4619","w":"https://marunaka-kensetsu.jp/?utm_source=GBP&utm_medium=GBP&utm_term=GBP&utm_content=GBP&utm_campaign=GBP","i":"リフォーム会社","c":"沖縄市","job":1},{"n":"ミズト建設（株）","p":"098-932-9524","w":"https://okikankyo.or.jp/","i":"リフォーム会社","c":"沖縄市","ceo":"與那嶺利奈"},{"n":"やました工務店","p":"098-996-3493","w":"https://okinawareform.com/","i":"リフォーム会社","c":"那覇市","job":1,"sns":1},{"n":"ユーアイホーム","p":"098-894-4041","w":"https://www.yu-aihome.com/","i":"リフォーム会社","c":"南風原町","job":1},{"n":"ライフワークス沖縄","p":"090-8291-8968","w":"https://lifeworksoka.com/","i":"リフォーム会社","c":"沖縄市","job":1},{"n":"リード・アーキテクト沖縄株式会社","p":"098-894-8027","w":"http://lead-a.co.jp/","i":"リフォーム会社","c":"那覇市","job":1,"sns":1},{"n":"リードハピネス株式会社","p":"098-917-0996","w":"https://leadhappiness.jp/","i":"不動産・建設","c":"浦添市","ar":"C","ay":15,"job":1},{"n":"リスト サザビーズ インターナショナル リアルティ 沖縄支店","p":"0120-030-588","w":"https://list-sir.jp/branch/okinawa/","i":"不動産・建設","c":"那覇市","ceo":"北見尚之","sns":1},{"n":"リノベる。沖縄 西町ショールーム","p":"0120-684-224","w":"https://www.renoveru.jp/showrooms/nishimachi","i":"リフォーム会社","c":"那覇市","job":1,"sns":1},{"n":"リフォーム・増改築丸惣那覇","p":"098-831-8828","w":"https://www.marusonaha.com/","i":"リフォーム会社","c":"那覇市","job":1},{"n":"リフォーム・株式会社Next Form徹","i":"リフォーム会社","c":"那覇市"},{"n":"リフォームサイエンス（株）","p":"098-899-2222","w":"http://www.rs-reform.co.jp/","i":"リフォーム会社","c":"宜野湾市","ceo":"知花 順子","job":1,"sns":1},{"n":"リフォームドクター（teamブルーオーシャンズ株式会社）","p":"098-989-8277","w":"https://teamblueoceans.com/","i":"リフォーム会社","c":"北中城村","ceo":"恩納 基","sns":1},{"n":"リフォームのHAPPY 那覇支店","p":"098-988-9428","w":"http://www.houyuu-kensetsu.com/cgi-bin/houyuu-kensetsu/siteup.cgi?category=5&page=0","i":"リフォーム会社","c":"那覇市","job":1},{"n":"リフォームの図書館 知花本店","p":"0800-919-0114","w":"https://www.big-advance.site/c/172/2982","i":"リフォーム会社","c":"沖縄市"},{"n":"リフォームの図書館浦添店","p":"098-943-4653","w":"https://reformurasoe.ti-da.net/","i":"リフォーム会社","c":"浦添市","job":1,"sns":1},{"n":"リフォーム中央","p":"098-937-7903","i":"リフォーム会社","c":"沖縄市","job":1},{"n":"リフォーム光信","p":"098-921-4333","w":"https://www.reform-kosin.com/","i":"リフォーム会社","c":"沖縄市","job":1,"sns":1},{"n":"リフォーム専門 タイホウ建設","p":"080-6441-8754","w":"https://taihou55.com/","i":"不動産・建設","c":"那覇市","ceo":"嘉手苅 豊","job":1},{"n":"リフォった","p":"098-987-6305","w":"https://refotta.com/","i":"リフォーム会社","c":"浦添市","job":1},{"n":"リブマックス新都心店","p":"098-867-0065","w":"http://www.livemax.net/","i":"不動産・建設","c":"那覇市","job":1,"sns":1},{"n":"リブマックス那覇店","p":"098-868-0170","w":"http://www.livemax.net/","i":"不動産・建設","c":"那覇市","job":1,"sns":1},{"n":"リライト株式会社","p":"098-996-2033","w":"http://relight-co.jp/","i":"リフォーム会社","c":"那覇市","job":1},{"n":"リンクスリフォーム","p":"098-988-0940","w":"https://links-reform.com/","i":"リフォーム会社","c":"浦添市","ceo":"佐渡山 貴大"},{"n":"レキオデザイン合同会社","p":"098-894-8085","w":"https://www.chocomintreform.com/","i":"リフォーム会社","c":"浦添市","job":1,"sns":1},{"n":"ワールド産業（株）","p":"098-868-7566","w":"http://g-world.co.jp/","i":"塗装会社","c":"那覇市","ceo":"砂川英昭","sns":1},{"n":"わたんじ","p":"098-861-8753","w":"https://f346612.gorp.jp/","i":"リフォーム会社","c":"那覇市"},{"n":"三栄リビング","p":"098-863-1261","w":"https://goohome.jp/fudousan/realtor/260/","i":"不動産・建設","c":"那覇市","sns":1},{"n":"三葉ハウス","p":"098-851-7530","w":"https://sanyo-house.com/","i":"リフォーム会社","c":"那覇市","job":1,"sns":1},{"n":"上雅装工","p":"098-937-1700","w":"https://上雅装工.com/","i":"リフォーム会社","c":"沖縄市","job":1,"sns":1},{"n":"中部修繕センター","p":"098-893-1199","w":"http://www.chubu-shuzen.com/","i":"リフォーム会社","c":"宜野湾市","job":1,"sns":1},{"n":"事業内容・代表者・従業員数等すべて確認できず","job":1},{"n":"井上工務店","p":"098-943-5891","w":"http://inoue-ca.com/","i":"リフォーム会社","c":"那覇市","job":1,"sns":1},{"n":"介護リフォームｍａｐ","p":"090-1942-4238","w":"https://kaigoreform-map.jimdosite.com/","i":"リフォーム会社","c":"浦添市","ceo":"比嘉直臣","job":1},{"n":"企業実態・事業内容・規模等の確認不可","job":1},{"n":"企業実態・規模・サービス内容が一切確認できず情報極小","job":1},{"n":"優建装","p":"080-2713-7020","w":"https://www.yuukensou0303.com/","i":"リフォーム会社","c":"那覇市","job":1,"sns":1},{"n":"先嶋建設株式会社","p":"098-868-1079","w":"https://sakishimakensetsu.jp/","i":"不動産・建設","c":"那覇市","ceo":"黒島 一洋","ar":"C","ay":60},{"n":"光建設株式会社","p":"098-994-5635","w":"http://www.hikarikensetu.okinawa/","i":"不動産・建設","c":"糸満市","ceo":"徳元 猛","job":1,"sns":1},{"n":"公式HP取得不可・採用掲載0件・ニュースなし","job":1},{"n":"協心リノベーション","p":"098-988-7587","w":"https://www.kyoshinrenovation.com/","i":"リフォーム会社","c":"沖縄市","ceo":"惣慶 翼"},{"n":"南山開発","p":"098-992-5511","w":"http://nanzan.ti-da.net/e2945776.html","i":"不動産・建設","c":"糸満市","job":1},{"n":"合同会社 ここはれて","p":"098-943-1291","w":"https://kokoharete-k.jp/","i":"リフォーム会社","c":"浦添市","job":1,"sns":1},{"n":"合同会社 和田工業","p":"090-5947-4636","w":"https://kaisharesearch.com/","i":"リフォーム会社","c":"那覇市","job":1},{"n":"合同会社MEKARU","p":"098-877-3399","w":"https://www.mekaru.llc/","i":"リフォーム会社","c":"浦添市","job":1,"sns":1},{"n":"合同会社ポスト工務店","p":"098-851-4142","w":"http://www.postkoumuten.sakura.ne.jp/","i":"リフォーム会社","c":"那覇市","job":1,"sns":1},{"n":"合資会社沖縄実業 本社","p":"098-867-0145","w":"https://okijitsu.co.jp/","i":"不動産・建設","c":"那覇市","ceo":"宮里 幸雄","job":1},{"n":"喜屋武アパート","i":"不動産・建設","c":"那覇市","job":1},{"n":"四季彩ペイント","p":"0120-952-843","w":"https://www.shikisaipaint.jp/","i":"リフォーム会社","c":"那覇市","job":1},{"n":"國幸興發株式会社","p":"098-861-3777","w":"http://kunisachi.jp/","i":"塗装会社","c":"那覇市","ceo":"國場 幸博","job":1},{"n":"城健建装","p":"098-876-2580","w":"https://shirokenkensou.com/","i":"リフォーム会社","c":"浦添市","job":1,"sns":1},{"n":"大京穴吹不動産 沖縄店","p":"098-953-2080","w":"https://www.daikyo-anabuki.co.jp/office/okinawa/?utm_source=GMB&utm_campaign=map&utm_term=office&argument=jHMKTWvJ&dmai=a5f74689b954e5","i":"不動産・建設","c":"那覇市","job":1},{"n":"大和ハウス工業(株) 沖縄支店","p":"098-941-7117","w":"https://navioki.com/","i":"不動産・建設","c":"那覇市","ceo":"石田誠","job":1,"sns":1},{"n":"大和住宅産業","p":"098-876-1232","w":"https://daiwa-j.net/","i":"不動産・建設","c":"浦添市","ar":"S","ay":55,"job":1},{"n":"太陽光・リフォームの達企画","p":"098-989-1194","w":"https://tatsukikaku.co.jp/?utm_source=GBP&utm_medium=GBP&utm_term=GBP&utm_content=GBP&utm_campaign=GBP","i":"リフォーム会社","c":"沖縄市","job":1},{"n":"守礼エンジニアサービス株式会社","p":"080-6497-5737","w":"https://sp8770holumon.wixsite.com/shurei","i":"塗装会社","c":"那覇市","ceo":"保良可菜子","job":1,"sns":1},{"n":"実態確認が必要な状態。","job":1},{"n":"宮里商店","p":"090-3792-0131","w":"https://miyazato.org/","i":"リフォーム会社","c":"那覇市","job":1},{"n":"家づくり相談室 運営会社アーキテクトプラスジョイ （合同会社アーキテクトＰＬＵＳ ＪＯＹ）","p":"098-943-1751","w":"https://www.o-architect.co.jp/","i":"リフォーム会社","c":"那覇市","sns":1},{"n":"山城内装","p":"098-975-9522","w":"https://yamashironaisou.com/","i":"リフォーム会社","c":"浦添市","job":1},{"n":"建築工舎 花 株式会社","p":"098-937-7668","w":"https://hana-okinawa.com/","i":"リフォーム会社","c":"沖縄市"},{"n":"恒和ペイント株式会社","p":"098-941-1430","w":"http://www.kowapaint.com/","i":"塗装会社","c":"那覇市","ceo":"大見謝 恒裕","sns":1},{"n":"愛ランドホーム株式会社","p":"098-894-4944","w":"http://ailandhome.jp/","i":"不動産・建設","c":"糸満市","ceo":"上地那智子","ar":"B","ay":15,"job":1,"sns":1},{"n":"採用掲載0件・ニュースなし・代表者・設立年・事業内容の明記情報なし","job":1},{"n":"日本ジタン (株) 沖縄営業所","p":"098-831-5612","w":"http://www.zitan.co.jp/","i":"不動産・建設","c":"那覇市","ceo":"日野祐一郎","job":1},{"n":"旭橋都市再開発株式会社","p":"098-834-9050","w":"https://www.kafuna.jp/","i":"不動産・建設","c":"那覇市","ceo":"大城博","job":1,"sns":1},{"n":"昭和ドア（有）","p":"098-857-2609","w":"https://showa-dr.com/","i":"リフォーム会社","c":"那覇市","ceo":"上原勇","job":1},{"n":"有限会社 アシステート","p":"098-864-1219","w":"http://www.assistate.jp/","i":"不動産・建設","c":"那覇市","ceo":"金城 厚"},{"n":"有限会社 かりー沖縄","p":"090-4980-8834","w":"https://kari-okinawa.net/","i":"リフォーム会社","c":"那覇市","ceo":"藤江由記夫","job":1},{"n":"有限会社 デュース","p":"098-951-0661","w":"http://www.duce.co.jp/","i":"不動産・建設","c":"那覇市","ceo":"仲村 喜秋","ar":"C","ay":30,"sns":1},{"n":"有限会社 大建不動産商事","p":"098-862-2639","w":"http://www.daiken.okinawa/","i":"不動産・建設","c":"那覇市"},{"n":"有限会社 室内装飾みやぎ","p":"098-879-4506","w":"https://ssm-okinawa.jp/","i":"リフォーム会社","c":"浦添市","ceo":"宮城加代子","job":1},{"n":"有限会社LIBERO HOME","p":"098-880-6013","w":"http://libero-home.com/","i":"リフォーム会社","c":"浦添市","job":1,"sns":1},{"n":"有限会社アイ・ホーム","p":"098-994-5988","w":"https://www.aihome-net.co.jp/","i":"不動産・建設","c":"糸満市","ceo":"喜納 弘治","job":1,"sns":1},{"n":"有限会社ウイテック","p":"098-988-0497","w":"https://www.wetech.co.jp/","i":"不動産・建設","c":"那覇市","ceo":"玉城道矢","job":1,"sns":1},{"n":"有限会社エバ","p":"098-943-4611","w":"http://www.evah-d.com/","i":"リフォーム会社","c":"浦添市","job":1,"sns":1},{"n":"有限会社リケンオキナワ","p":"098-941-5650","w":"http://rikenokinawa.co.jp/","i":"不動産・建設","c":"那覇市","job":1,"sns":1},{"n":"有限会社大仁工務店","p":"098-866-7784","w":"https://tsukulink.net/","i":"リフォーム会社","c":"那覇市","job":1,"sns":1},{"n":"未来開発","p":"098-887-6669","w":"https://www.miraikaihatsu.co.jp/","i":"不動産・建設","c":"那覇市","ceo":"金城祥純","job":1},{"n":"本気でペイント","p":"0800-200-0486","w":"http://honkidepaint-tno.com/","i":"リフォーム会社","c":"那覇市","ar":"C","ay":20,"job":1,"sns":1},{"n":"東建コーポレーション 那覇支店 (ホームメイト)","p":"098-941-5100","w":"https://www.token-naha.com/","i":"不動産・建設","c":"那覇市","job":1},{"n":"松尾不動産","p":"098-943-4480","w":"https://matsuo-real-estate.com/","i":"不動産・建設","c":"那覇市","ceo":"宮國桂光"},{"n":"株式会社 ASAKA","p":"098-866-6636","w":"http://www.asakajs.com/","i":"不動産・建設","c":"那覇市","ar":"A","ay":60,"job":1},{"n":"株式会社 Light plan","p":"098-959-4332","w":"https://www.light-plan2022.com/","i":"リフォーム会社","c":"沖縄市","job":1,"sns":1},{"n":"株式会社 R.D-STYLE","p":"080-6487-9237","w":"http://rdstyle.webnode.jp/","i":"リフォーム会社","c":"那覇市"},{"n":"株式会社 Re,メイク","p":"090-1179-7750","w":"https://re-make.okinawa/","i":"リフォーム会社","c":"浦添市","ceo":"比嘉寛太"},{"n":"株式会社 オリジン建設","p":"098-854-6001","w":"https://www.origin-okinawa.co.jp/","i":"不動産・建設","c":"那覇市","ceo":"長山宏","job":1,"sns":1},{"n":"株式会社 カーサプラス","p":"098-943-6733","w":"https://www.casaplus.jp/","i":"リフォーム会社","c":"那覇市","job":1},{"n":"株式会社 きくはら工務店","p":"098-965-6515","w":"https://kikuhara-koumuten.com/","i":"リフォーム会社","c":"うるま市","ceo":"原田 菊典","sns":1},{"n":"株式会社 タイムス住宅新聞社","p":"098-862-1155","w":"https://jpress.okinawatimes.co.jp/","i":"リフォーム会社","c":"那覇市","ceo":"石川達也","job":1,"sns":1},{"n":"株式会社 ハウステラ 沖縄本店","p":"098-932-0001","w":"https://houseterra.jp/","i":"リフォーム会社","c":"沖縄市","sns":1},{"n":"株式会社 ファンスタイル","p":"098-941-3718","w":"https://www.fanstyle.co.jp/","i":"不動産・建設","c":"那覇市","ceo":"自見信也","ar":"B","ay":20,"job":1,"sns":1},{"n":"株式会社 ライフステージ","p":"098-975-5317","w":"https://www.ls-r.co.jp/","i":"リフォーム会社","c":"那覇市","job":1},{"n":"株式会社 利興土建","p":"098-894-6355","w":"https://www.rikoudoken.okinawa/","i":"不動産・建設","c":"糸満市","job":1},{"n":"株式会社 勇設計","p":"098-878-8555","w":"http://isamusekkei.co.jp/","i":"リフォーム会社","c":"浦添市","job":1},{"n":"株式会社 大成ホーム","p":"098-877-7756","w":"https://www.taiseihome.jp/corp/","i":"リフォーム会社","c":"浦添市","ceo":"喜名景秀","job":1},{"n":"株式会社 孝","p":"098-943-8970","i":"リフォーム会社","c":"宜野湾市","job":1},{"n":"株式会社 巧建オキナワ","p":"098-911-9976","w":"https://kouken-okinawa.co.jp/","i":"リフォーム会社","c":"浦添市","job":1},{"n":"株式会社 建全","p":"098-988-9012","w":"https://ken-zen.com/","i":"不動産・建設","c":"那覇市","ceo":"伊良部 正","ar":"A","ay":15,"job":1,"sns":1},{"n":"株式会社 新喜","p":"098-953-1849","w":"https://www.okinawa-shinki.com/","i":"リフォーム会社","c":"沖縄市","job":1,"sns":1},{"n":"株式会社 日虹","p":"098-988-1825","w":"http://teamnikko2525.com/","i":"リフォーム会社","c":"浦添市","job":1},{"n":"株式会社 日章工業","p":"098-917-1848","w":"http://nissyou-oki.com/","i":"リフォーム会社","c":"浦添市","job":1,"sns":1},{"n":"株式会社 東都企画","p":"098-951-3737","w":"https://tsukulink.net/","i":"リフォーム会社","c":"那覇市","ar":"S","ay":20,"job":1,"sns":1},{"n":"株式会社 松山産業","p":"098-868-1875","w":"https://www.matsuyamasangyo.com/","i":"不動産・建設","c":"那覇市","ceo":"伊差川 武","job":1},{"n":"株式会社 沖令リフォーム","p":"098-863-8356","i":"リフォーム会社","c":"那覇市","job":1},{"n":"株式会社 沖縄不動産販売","p":"098-894-3206","w":"https://www.okinawa-realestate.com/","i":"不動産・建設","c":"那覇市","ceo":"米須 博光","job":1,"sns":1},{"n":"株式会社 琉繕（りゅうぜん）","p":"098-979-7025","w":"https://ryuzen-okinawa.com/","i":"リフォーム会社","c":"沖縄市","job":1,"sns":1},{"n":"株式会社 美々ハウジング","p":"0078-60159-621137","w":"https://goohome.jp/fudousan/realtor/367/","i":"不動産・建設","c":"糸満市","sns":1},{"n":"株式会社 選家","p":"098-996-4430","w":"https://www.senka-okinawa.com/","i":"不動産・建設","c":"那覇市","ceo":"福本隼人","sns":1},{"n":"株式会社ＡＲＣＨＩＳＳ（アーキス）","p":"098-870-0595","w":"http://archiss.co.jp/","i":"リフォーム会社","c":"浦添市","job":1},{"n":"株式会社CLAX 那覇オフィス","p":"098-963-6240","w":"https://okinawa.clax.co.jp/","i":"不動産・建設","c":"那覇市","ceo":"稲川いずみ","ar":"A","ay":5,"job":1,"sns":1},{"n":"株式会社ＮＥＸＴ","p":"098-911-1362","w":"https://www.okinawa-next.com/","i":"リフォーム会社","c":"沖縄市","ceo":"上間守","job":1,"sns":1},{"n":"株式会社NST","p":"080-6460-2002","w":"https://sites.google.com/view/ni-ssyou-trust-nst/%E3%83%9B%E3%83%BC%E3%83%A0","i":"リフォーム会社","c":"浦添市","job":1},{"n":"株式会社OKISHIN","p":"098-917-0252","w":"http://renovation-okishin.com/","i":"リフォーム会社","c":"与那原町","ceo":"小橋川翼","job":1,"sns":1},{"n":"株式会社OREX(オーレックス)","p":"098-975-5325","w":"https://orex.okinawa/","i":"不動産・建設","c":"那覇市"},{"n":"株式会社Ｗｉｔｈ‐Ｈｏｍｅ","p":"098-987-8230","i":"リフォーム会社","c":"那覇市","job":1},{"n":"株式会社あうん工房","p":"0120-724-152","w":"http://aunkoubou.com/","i":"リフォーム会社","c":"那覇市","job":1,"sns":1},{"n":"株式会社アルファ・リノ","p":"090-9786-0153","w":"https://www.alpha-renovation.com/","i":"リフォーム会社","c":"那覇市","sns":1},{"n":"株式会社アレックス","p":"098-863-3155","w":"https://www.alex-okinawa.com/","i":"リフォーム会社","c":"那覇市","job":1,"sns":1},{"n":"株式会社いえくぼ不動産","p":"098-954-3964","w":"https://iekubofudousan.wixsite.com/site","i":"不動産・建設","c":"糸満市","sns":1},{"n":"株式会社エージェント沖縄","p":"098-800-2780","w":"http://agent.okinawa/","i":"リフォーム会社","c":"那覇市","job":1},{"n":"株式会社エコ・ピース","p":"098-934-2071","w":"https://ecopeace-okinawa.com/service/aircon_sale/","i":"リフォーム会社","c":"沖縄市","job":1},{"n":"株式会社エン・エンタープライズ","p":"098-988-8880","w":"https://www.yenn.jp/","i":"不動産・建設","c":"那覇市","ceo":"山城純次","job":1},{"n":"株式会社おもろハウジング","p":"098-869-2208","w":"http://www.omorohousing.co.jp/","i":"不動産・建設","c":"那覇市","ceo":"天久学","ar":"S","ay":25,"job":1},{"n":"株式会社キャリアエステート","p":"098-863-2231","w":"https://careerestate.jp/","i":"不動産・建設","c":"那覇市","ceo":"中本貴士","job":1,"sns":1},{"n":"株式会社きよしン家不動産","p":"090-1346-4770","w":"https://kiyoshinchi.okinawa/","i":"不動産・建設","c":"那覇市","ceo":"新垣 清","job":1,"sns":1},{"n":"株式会社グーリフォーム","p":"070-8375-5973","w":"https://www.goooreform.com/","i":"リフォーム会社","c":"浦添市","job":1,"sns":1},{"n":"株式会社グランプログレス","p":"098-917-0333","w":"https://granprogress.co.jp/","i":"リフォーム会社","c":"那覇市","job":1},{"n":"株式会社クリーンワークスカンパニー","p":"080-6491-9965","w":"https://cleanworks.okinawa/","i":"リフォーム会社","c":"豊見城市","ceo":"新垣雄太","job":1},{"n":"株式会社ここちホーム","p":"098-975-9033","w":"http://cocochi-home.com/","i":"不動産・建設","c":"浦添市","ar":"A","ay":10,"job":1,"sns":1},{"n":"株式会社ここハウス","p":"098-894-2652","w":"https://www.co-co-house.co.jp/","i":"不動産・建設","c":"浦添市","ar":"C","ay":15,"job":1},{"n":"株式会社サイオン不動産","p":"098-988-4002","w":"https://instagram.com/scion.okinawa?igshid=OGQ5ZDc2ODk2ZA==","i":"不動産・建設","c":"那覇市"},{"n":"株式会社しき 《沖縄営業所》","p":"0120-951-800","w":"http://www.shikitosou.com/","i":"リフォーム会社","c":"那覇市","ceo":"道又雄司","job":1,"sns":1},{"n":"株式会社シンコウ 本店","p":"098-992-2555","w":"http://shinko555.co.jp/","i":"不動産・建設","c":"糸満市","ceo":"小林真一","job":1,"sns":1},{"n":"株式会社スプレッドワークス沖縄","p":"098-988-9408","w":"https://www.instagram.com/spread_works_okinawa/","i":"リフォーム会社","c":"浦添市"},{"n":"株式会社デライトハウジング","p":"098-975-7355","w":"https://www.delight.okinawa/","i":"不動産・建設","c":"浦添市","ar":"B","ay":10,"job":1,"sns":1},{"n":"株式会社ニッセンホーム","p":"050-1871-1428","w":"https://nissen657954.studio.site/","i":"不動産・建設","c":"浦添市","sns":1},{"n":"株式会社ファミリアホーム","p":"098-894-2208","w":"https://www.okifami.com/","i":"不動産・建設","c":"糸満市","ceo":"屋良亨","sns":1},{"n":"株式会社ファンスタイルリゾート (旧名称：株式会社ファンスタイルエスディー,星南建設株式会社)","p":"098-866-4100","w":"https://www.fanstyle.co.jp/chukai","i":"不動産・建設","c":"那覇市","ceo":"自見信也","job":1,"sns":1},{"n":"株式会社ブレオ都市開発","p":"098-862-3322","w":"https://breo-rd.co.jp/","i":"不動産・建設","c":"那覇市","ceo":"宮平尚也","job":1,"sns":1},{"n":"株式会社フロントライン那覇支店","p":"098-988-8105","w":"https://frontline-inc.jp/","i":"リフォーム会社","c":"那覇市","job":1},{"n":"株式会社ペイントマン","p":"098-878-1835","w":"https://paintman-okinawa.com/","i":"リフォーム会社","c":"浦添市"},{"n":"株式会社ベストライフ","p":"098-996-5138","w":"http://bestlife.okinawa.jp/","i":"リフォーム会社","c":"浦添市","ceo":"平良 安裕","job":1,"sns":1},{"n":"株式会社ホームペイント","p":"098-917-1844","w":"https://www.home-paint.jp/","i":"リフォーム会社","c":"那覇市","job":1},{"n":"株式会社ミヤビホーム","p":"090-1517-5187","w":"https://www.miyabi-home.net/","i":"リフォーム会社","c":"那覇市","ceo":"大城雅史"},{"n":"株式会社モダンプロジェ 沖縄ログ店（沖縄オフィス）","p":"098-869-8622","w":"https://modern-projet.com/","i":"不動産・建設","c":"那覇市","ar":"S","ay":15,"job":1,"sns":1},{"n":"株式会社ヤマト不動産","p":"098-862-6869","w":"https://www.e-uchina.net/","i":"不動産・建設","c":"那覇市"},{"n":"株式会社ライアホーム","p":"098-963-9444","w":"https://www.raia-home.com/","i":"不動産・建設","c":"浦添市","job":1,"sns":1},{"n":"株式会社ライフワークス","p":"098-943-2904","w":"https://www.lw-okinawa.co.jp/","i":"リフォーム会社","c":"沖縄市","ceo":"東江裕矢","job":1,"sns":1},{"n":"株式会社リオール","p":"080-9857-2568","w":"https://reouru.com/","i":"リフォーム会社","c":"那覇市"},{"n":"株式会社リノプラス不動産","p":"098-996-5007","w":"https://reno-plus.site/","i":"不動産・建設","c":"糸満市"},{"n":"株式会社リノベース","p":"098-917-4205","w":"https://campage.jp/fukuchigumi/renove_lp","i":"リフォーム会社","c":"那覇市","ceo":"福地一仁","ar":"A","ay":5,"sns":1},{"n":"株式会社ワンクラップ","w":"https://www.one-clap.jp/","i":"不動産・建設","c":"那覇市","ceo":"上原一志","job":1,"sns":1},{"n":"株式会社上地商店","p":"098-800-2680","i":"リフォーム会社","c":"宜野湾市","job":1},{"n":"株式会社大内工務店","p":"098-959-6545","w":"https://oouchi-koumuten.com/","i":"リフォーム会社","c":"浦添市","ceo":"大内隆志","sns":1},{"n":"株式会社大原宅建","p":"098-878-0212","w":"http://oohara-t.com/","i":"不動産・建設","c":"浦添市","job":1,"sns":1},{"n":"株式会社大豊住建","p":"098-927-5110","w":"https://tsukulink.net/","i":"リフォーム会社","c":"那覇市","sns":1},{"n":"株式会社成家","p":"098-860-2139","w":"https://www.sumaino-seika.com/","i":"不動産・建設","c":"那覇市","ceo":"林魯赫","ar":"B","ay":10,"job":1,"sns":1},{"n":"株式会社東栄住宅 那覇営業所","p":"098-860-2201","w":"https://www.e-blooming.com/location/branch.html?s=882","i":"不動産・建設","c":"那覇市","ceo":"下鳥聡"},{"n":"株式会社比嘉塗装RE・HOME","p":"098-960-2026","w":"https://higatoso2020.jp/?utm_source=GBP&utm_medium=GBP&utm_term=GBP&utm_content=GBP&utm_campaign=GBP","i":"リフォーム会社","c":"那覇市","job":1,"sns":1},{"n":"株式会社琉創住建","p":"098-996-2400","w":"https://www.instagram.com/ryuso_juken?igsh=c2d4cHF1OHlxYjB2&utm_source=qr","i":"不動産・建設","c":"那覇市","job":1,"sns":1},{"n":"株式会社眞住","p":"098-863-7007","w":"https://masumi-okinawa.jp/?utm_source=GBP&utm_medium=GBP&utm_term=GBP&utm_content=GBP&utm_campaign=GBP","i":"リフォーム会社","c":"那覇市","sns":1},{"n":"業種ヒント「不動産・建設」のみ提供、企業実態不明。","job":1},{"n":"永南ホーム","p":"098-862-6611","w":"https://tsukulink.net/","i":"リフォーム会社","c":"那覇市","job":1,"sns":1},{"n":"沖縄の正直なリフォーム屋株式会社かなえ","p":"090-3792-3229","w":"https://kanae-reform.jimdosite.com/","i":"リフォーム会社","c":"浦添市","job":1},{"n":"沖縄ペイント","p":"098-862-7721","w":"http://www.okipen.com/","i":"塗装会社","c":"那覇市","job":1},{"n":"沖縄リフォーム 合同会社スパ","p":"098-943-6075","w":"https://okinawa-reform.jimdosite.com/","i":"リフォーム会社","c":"浦添市","job":1,"sns":1},{"n":"沖縄リフォームスタジオ 株式会社プラニング・K","p":"0120-272-552","w":"https://www.reform-okinawa.net/","i":"リフォーム会社","c":"宜野湾市","ceo":"車口 和寿"},{"n":"沖縄リフォームセンター","p":"098-988-8360","w":"https://orcg.net/","i":"リフォーム会社","c":"浦添市","job":1},{"n":"沖縄ルーフサービス","p":"098-862-8043","w":"https://okinawa-roof-service.com/","i":"リフォーム会社","c":"那覇市","job":1},{"n":"沖縄塗装工業","p":"098-854-1015","w":"https://www.nagaminetosou.com/","i":"塗装会社","c":"那覇市","ceo":"長嶺 直樹","job":1},{"n":"沖縄塗装株式会社","p":"098-996-3124","w":"https://www.renovation-okinawa.com/","i":"塗装会社","c":"那覇市","job":1,"sns":1},{"n":"沖縄支店合同会社知多ホームズ","i":"リフォーム会社","c":"那覇市","job":1},{"n":"沖縄県のオフィス空間創り ｜ 株式会社マルゼン","p":"098-863-6111","w":"https://okinawa-office-navi.com/","i":"リフォーム会社","c":"那覇市","ar":"A","ay":60,"job":1},{"n":"沖縄県不動産流通機構","p":"098-861-3584","w":"http://okinawa-takken.com/member/ryutukiko_about/","i":"不動産・建設","c":"那覇市","job":1},{"n":"沖縄第一不動産(株)","p":"098-860-3033","w":"https://goohome.jp/fudousan/realtor/2541/","i":"不動産・建設","c":"那覇市","ceo":"平安寺勇","job":1},{"n":"沖縄表装 Okinawa Hyoso shop","p":"098-884-5149","w":"https://www.rakuten.co.jp/okinawahyoso/","i":"リフォーム会社","c":"那覇市","job":1},{"n":"津堅事務用品店","p":"098-866-4900","w":"http://www.tsukenjim.com/","i":"リフォーム会社","c":"那覇市","job":1},{"n":"浦テックリフォーム","p":"098-874-5889","w":"http://www.uratec-reform.com/","i":"リフォーム会社","c":"浦添市","job":1},{"n":"浦添ホーム","p":"098-875-1019","w":"https://www.urasoehome.com/","i":"リフォーム会社","c":"浦添市","job":1,"sns":1},{"n":"浦添市 リフォーム工事·外壁塗装·建設工事 (有)大牧開発","p":"098-877-6356","w":"https://oomakikaihatsu.com/","i":"リフォーム会社","c":"浦添市","sns":1},{"n":"琉球ゴーレックス株式会社","p":"098-988-0121","w":"http://www.goalx.co.jp/","i":"リフォーム会社","c":"那覇市","ceo":"知念礼子","job":1,"sns":1},{"n":"琉球ストーク(株)","p":"098-863-8643","w":"https://mokuzookinawa.com/","i":"リフォーム会社","c":"那覇市","job":1,"sns":1},{"n":"琉球不動産コンサルティング株式会社","p":"098-914-4626","w":"https://www.ryukyu-rc.com/","i":"不動産・建設","c":"那覇市","job":1,"sns":1},{"n":"琉装苑（沖縄琉装苑）久茂地店","p":"090-8775-5091","w":"https://www.ryusoen.net/","i":"リフォーム会社","c":"那覇市","sns":1},{"n":"環ハウス（株）","p":"098-831-9293","w":"https://www.tamaki-house.jp/","i":"不動産・建設","c":"那覇市","ceo":"玉城貴之","job":1,"sns":1},{"n":"社名から測量業の可能性があるが明記情報なし。","job":1},{"n":"福maruの庭株式会社","p":"098-917-2555","w":"https://www.fukumaru-estate.com/","i":"不動産・建設","c":"那覇市","ceo":"福岡 徹祐","ar":"S","ay":5,"job":1,"sns":1},{"n":"福山建設 株式会社","p":"098-943-6671","w":"https://www.fukukencorp.jp/","i":"リフォーム会社","c":"浦添市","ar":"B","ay":5},{"n":"穴吹興産 リゾート開発推進室","p":"098-918-4921","w":"https://duallife.anabuki-style.com/","i":"不動産・建設","c":"那覇市","job":1,"sns":1},{"n":"窓・ドアの1DAYリフォーム『マドアーズ!』沖縄支店（株式会社オンコード）","p":"0120-010-551","w":"https://madoorss-okinawa.com/","i":"リフォーム会社","c":"那覇市","sns":1},{"n":"第一三興西崎プラント","p":"098-995-0360","i":"不動産・建設","c":"糸満市","job":1},{"n":"糸満市西崎2丁目７番５号","w":"https://mapfan.com/","i":"不動産・建設","c":"糸満市","job":1,"sns":1},{"n":"総合リフォーム（株）","p":"098-898-6622","w":"https://sougou-reform.jp/","i":"リフォーム会社","c":"宜野湾市"},{"n":"総合建設業リノプラ Renovation Plus","p":"098-879-4804","w":"http://renopla.net/","i":"リフォーム会社","c":"浦添市","ceo":"野原金一","sns":1},{"n":"美里工務店","p":"098-923-0500","w":"https://tsukulink.net/","i":"リフォーム会社","c":"沖縄市","sns":1},{"n":"興産アメニティ株式会社","p":"098-882-1717","w":"http://kosanamenity.com/","i":"リフォーム会社","c":"那覇市","ar":"B","ay":20,"job":1},{"n":"若狭サービス社べんり大工","p":"098-884-5771","w":"http://wakasa-s.jp/","i":"リフォーム会社","c":"那覇市","job":1},{"n":"藤和ハウス 沖縄店","p":"0120-899-108","w":"https://www.towa-house.co.jp/okinawa/","i":"不動産・建設","c":"那覇市","job":1},{"n":"西工業","p":"090-3790-7970","w":"https://www.nishikogyo.jp/","i":"リフォーム会社","c":"沖縄市","job":1},{"n":"託一建設株式会社","p":"050-1871-1567","w":"https://takuichi.co.jp/","i":"不動産・建設","c":"那覇市","ceo":"石川貞則","job":1,"sns":1},{"n":"赤嶺土地建物","p":"098-866-1230","w":"https://www.athome.co.jp/ahks/akaminetochi.html","i":"不動産・建設","c":"那覇市"},{"n":"那覇市牧志所在、電話番号のみ確認可能。","job":1},{"n":"那覇新都心（株）","p":"098-869-2551","w":"http://www.nahashintoshin.co.jp/","i":"不動産・建設","c":"那覇市","job":1,"sns":1},{"n":"雨漏り・ひび割れ補修・外壁塗装リフォームプラス株式会社","p":"098-955-8033","w":"https://www.reformplus.co.jp/","i":"リフォーム会社","c":"那覇市","sns":1},{"n":"高倉コーポレーション","p":"098-864-1611","i":"不動産・建設","c":"那覇市","job":1,"sns":1},{"n":"鶴亀不動産 CRASOL(クラソル)株式会社","p":"098-894-6028","w":"https://tsurukame.i-e.jp/","i":"不動産・建設","c":"糸満市","ceo":"新城 昌寿","sns":1}];
-var sK='ar',sA=false;
-var rO={S:0,A:1,B:2,C:3,'':4};
-function e(s){if(s==null)return'';return(''+s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function rT(r){if(!r)return'';return'<span class="tag tag-'+r.toLowerCase()+'">'+r+'</span>';}
-function initFilters(){
-  var inds=[...new Set(DATA.map(r=>r.i).filter(Boolean))].sort();
-  var cities=[...new Set(DATA.map(r=>r.c).filter(Boolean))].sort();
-  var fi=document.getElementById('fi'),fc=document.getElementById('fc');
-  inds.forEach(v=>{var o=document.createElement('option');o.value=v;o.textContent=v;fi.appendChild(o);});
-  cities.forEach(v=>{var o=document.createElement('option');o.value=v;o.textContent=v;fc.appendChild(o);});
-  document.getElementById('total').textContent=DATA.length;
-  document.getElementById('cnt-s').textContent=DATA.filter(r=>r.ar==='S').length;
-  document.getElementById('cnt-p').textContent=DATA.filter(r=>r.p).length;
-  document.getElementById('hdr-count').textContent=DATA.length+'社';
+const SB_URL = 'https://osipzwbsfbgbegjowydm.supabase.co';
+const SB_KEY = 'sb_publishable_yO0lVlOP_r-qhnwjxqq0UQ_qjxSrlnC';
+const sb = window.supabase.createClient(SB_URL, SB_KEY);
+
+let cos = [], cur = null, curTab = 'action', curF = 'all';
+const today = new Date().toISOString().slice(0,10);
+
+const PHASES = {
+  pending:          {lab:'未対応',      cls:'pl-pending'},
+  contacted:        {lab:'電話済み',    cls:'pl-contacted'},
+  pending_callback: {lab:'折り返し待ち',cls:'pl-pending_callback'},
+  mailed:           {lab:'DM/手紙済み', cls:'pl-mailed'},
+  won:              {lab:'商談獲得',    cls:'pl-won'},
+  declined:         {lab:'お断り',      cls:'pl-declined'},
+};
+
+const ACTS = [
+  {k:'tel_ok',  lab:'📞 電話→担当者OK',  cls:'a-ok',  phase:'contacted',        nd:false},
+  {k:'tel_ab',  lab:'📵 電話→不在',       cls:'a-ab',  phase:'pending_callback', nd:true,  days:1},
+  {k:'tel_cb',  lab:'📅 電話→かけ直し',  cls:'a-cb',  phase:'pending_callback', nd:true,  days:3},
+  {k:'dm',      lab:'💬 DM送付',          cls:'a-dm',  phase:'mailed',           nd:true,  days:3},
+  {k:'letter',  lab:'✉️ 手紙・ハガキ',   cls:'a-lt',  phase:'mailed',           nd:true,  days:7},
+  {k:'won',     lab:'🎯 商談獲得！',      cls:'a-won', phase:'won',              nd:true,  days:7},
+  {k:'declined',lab:'❌ お断り',          cls:'a-no',  phase:'declined',         nd:false},
+];
+
+const ACT_LABS = Object.fromEntries(ACTS.map(a=>[a.k, a.lab]));
+
+const DEFAULT_SCRIPT = `【オープニング】
+「はじめまして、○○の（名前）と申します。
+御社の周年をお祝いする記念映像のご提案でご連絡しました。
+少々お時間よろしいでしょうか？」
+
+【本題】
+「御社は今年で○○周年とのことで、
+記念式典や社内イベントのご予定はございますか？
+
+弊社では周年記念映像の制作を専門としており、
+多くの企業様の式典でご活用いただいております。」
+
+【反応別対応】
+・担当者OK → 詳細ヒアリングへ
+・「忙しい」→「では改めて。来週はいかがでしょうか？」
+・「必要ない」→「かしこまりました。もしご検討の際はいつでもどうぞ。」
+・不在 → 会社名・名前を伝言して次回架電日を設定
+
+【クロージング】
+「一度、御社に合ったご提案資料をお送りできればと思います。
+担当の方のお名前とメールアドレスをお伺いできますか？」`;
+
+// ── DATA ──────────────────────────────────────────────
+async function loadData() {
+  document.getElementById('lwrap').innerHTML = '<div class="empty">読み込み中...</div>';
+  const {data, error} = await sb.from('ceremony_attacks').select('*');
+  if (error) { document.getElementById('lwrap').innerHTML = '<div class="empty">❌ 読み込みエラー: '+esc(error.message)+'</div>'; return; }
+  cos = data || [];
+  buildFilters();
+  renderStats();
+  renderList();
 }
-function sort(k){
-  if(sK===k)sA=!sA;else{sK=k;sA=(k!=='ar');}
-  document.querySelectorAll('[id^=sh-]').forEach(el=>el.textContent='');
-  var el=document.getElementById('sh-'+k);if(el)el.textContent=sA?'▲':'▼';
-  render();
+
+function buildFilters() {
+  const fi = document.getElementById('fi'), fc = document.getElementById('fc');
+  // clear old options except first
+  while (fi.options.length > 1) fi.remove(1);
+  while (fc.options.length > 1) fc.remove(1);
+  [...new Set(cos.map(c=>c.industry||c.i).filter(Boolean))].sort().forEach(v=>{
+    const o=document.createElement('option'); o.value=o.textContent=v; fi.appendChild(o);
+  });
+  [...new Set(cos.map(c=>c.city||c.c).filter(Boolean))].sort().forEach(v=>{
+    const o=document.createElement('option'); o.value=o.textContent=v; fc.appendChild(o);
+  });
 }
-function render(){
-  var q=document.getElementById('q').value.toLowerCase();
-  var fi=document.getElementById('fi').value,fc=document.getElementById('fc').value;
-  var fr=document.getElementById('fr').value,fj=document.getElementById('fj').value;
-  var fs=document.getElementById('fs').value;
-  var rows=DATA.filter(r=>{
-    if(fi&&r.i!==fi)return false;if(fc&&r.c!==fc)return false;
-    if(fr&&r.ar!==fr)return false;
-    if(fj==='1'&&!r.job)return false;
-    if(fj==='0'&&r.job)return false;
-    if(fs==='1'&&!r.sns)return false;
-    if(fs==='0'&&r.sns)return false;
-    if(q){var h=((r.n||'')+' '+(r.ceo||'')+' '+(r.p||'')+' '+(r.c||'')).toLowerCase();if(h.indexOf(q)===-1)return false;}
+
+// ── STATS ─────────────────────────────────────────────
+function renderStats() {
+  const cnt = {
+    all: cos.length,
+    today: cos.filter(c=>c.next_date&&c.next_date<=today&&c.phase!=='declined'&&c.phase!=='won').length,
+    pending: cos.filter(c=>c.phase==='pending').length,
+    contacted: cos.filter(c=>c.phase==='contacted').length,
+    cb: cos.filter(c=>c.phase==='pending_callback').length,
+    mailed: cos.filter(c=>c.phase==='mailed').length,
+    won: cos.filter(c=>c.phase==='won').length,
+    declined: cos.filter(c=>c.phase==='declined').length,
+  };
+  const chips = [
+    {f:'all',      cls:'',    n:cnt.all,      l:'全て'},
+    {f:'today',    cls:'st',  n:cnt.today,    l:'今日'},
+    {f:'pending',  cls:'sp',  n:cnt.pending,  l:'未対応'},
+    {f:'contacted',cls:'sco', n:cnt.contacted,l:'電話済み'},
+    {f:'pending_callback',cls:'scb',n:cnt.cb, l:'折り返し'},
+    {f:'mailed',   cls:'sm',  n:cnt.mailed,   l:'DM/手紙'},
+    {f:'won',      cls:'sw',  n:cnt.won,      l:'商談獲得'},
+    {f:'declined', cls:'sd',  n:cnt.declined, l:'お断り'},
+  ];
+  document.getElementById('stats').innerHTML = chips.map(c=>
+    `<div class="sc ${c.cls} ${curF===c.f?'on':''}" onclick="setF('${c.f}')">
+      <div class="n">${c.n}</div><div class="l">${c.l}</div>
+    </div>`
+  ).join('');
+}
+
+function setF(f){ curF=f; renderStats(); renderList(); }
+
+// ── LIST ──────────────────────────────────────────────
+function getRows() {
+  const q  = document.getElementById('q').value.toLowerCase();
+  const fi = document.getElementById('fi').value;
+  const fc = document.getElementById('fc').value;
+  const fr = document.getElementById('fr').value;
+  let rows = cos.filter(c=>{
+    const industry = c.industry||c.i||'';
+    const city     = c.city||c.c||'';
+    const rank     = c.anniversary_rank||c.ar||'';
+    if (fi && industry!==fi) return false;
+    if (fc && city!==fc) return false;
+    if (fr && rank!==fr) return false;
+    if (curF==='today') {
+      if (!c.next_date||c.next_date>today||c.phase==='declined'||c.phase==='won') return false;
+    } else if (curF!=='all') {
+      if (c.phase!==curF) return false;
+    }
+    if (q) {
+      const h = ((c.company_name||'')+' '+(c.ceo_name||'')+' '+(c.phone||'')+' '+(c.city||'')).toLowerCase();
+      if (!h.includes(q)) return false;
+    }
     return true;
   });
+  const ro={S:0,A:1,B:2,C:3,'':4};
+  const po={pending_callback:0,contacted:1,mailed:2,pending:3,won:4,declined:5};
   rows.sort((a,b)=>{
-    var av=a[sK]||'',bv=b[sK]||'';
-    if(sK==='ar'){var ao=rO[av]!==undefined?rO[av]:4,bo=rO[bv]!==undefined?rO[bv]:4;return sA?ao-bo:bo-ao;}
-    if(typeof av==='number')return sA?av-bv:bv-av;
-    return sA?(''+av).localeCompare(''+bv,'ja'):(''+bv).localeCompare(''+av,'ja');
+    const at=(a.next_date&&a.next_date<=today&&a.phase!=='declined'&&a.phase!=='won')?0:1;
+    const bt=(b.next_date&&b.next_date<=today&&b.phase!=='declined'&&b.phase!=='won')?0:1;
+    if (at!==bt) return at-bt;
+    const pa=po[a.phase]??99, pb=po[b.phase]??99;
+    if (pa!==pb) return pa-pb;
+    const ra=ro[a.anniversary_rank||a.ar]??99, rb=ro[b.anniversary_rank||b.ar]??99;
+    return ra-rb;
   });
-  document.getElementById('cnt').textContent=rows.length;
-  var html='';
-  if(!rows.length){html='<tr><td colspan="8" class="empty">条件に合うデータがありません</td></tr>';}
-  else{rows.forEach(r=>{
-    var attrs='';
-    if(r.job)attrs+='<span class="tag tag-job">求人</span>';
-    if(r.sns)attrs+='<span class="tag tag-sns">SNS</span>';
-    var hp=r.w?'<a href="'+e(r.w)+'" target="_blank" rel="noopener">HP</a>':'';
-    html+='<tr><td><div class="co-name">'+e(r.n)+'</div></td>'
-      +'<td>'+e(r.i)+'</td><td>'+e(r.c)+'</td>'
-      +'<td><span class="phone">'+e(r.p)+'</span></td>'
-      +'<td><span class="ceo">'+e(r.ceo)+'</span></td>'
-      +'<td>'+rT(r.ar)+(r.ay?' <small>'+r.ay+'周年</small>':'')+'</td>'
-      +'<td class="website">'+hp+'</td>'
-      +'<td>'+attrs+'</td></tr>';
-  });}
-  document.getElementById('tbody').innerHTML=html;
+  return rows;
 }
-initFilters();sort('ar');
+
+function renderList() {
+  const rows = getRows();
+  const w = document.getElementById('lwrap');
+  if (!rows.length) { w.innerHTML='<div class="empty">条件に合う会社がありません</div>'; return; }
+  w.innerHTML = rows.map(c=>{
+    const phase   = c.phase||'pending';
+    const ph      = PHASES[phase]||PHASES.pending;
+    const rank    = c.anniversary_rank||c.ar||'';
+    const years   = c.anniversary_years||c.ay||'';
+    const city    = c.city||c.c||'';
+    const ind     = c.industry||c.i||'';
+    const ceo     = c.ceo_name||c.ceo||'';
+    const phone   = c.phone||c.p||'';
+    const isToday = c.next_date&&c.next_date<=today&&phase!=='declined'&&phase!=='won';
+    const logs    = (c.source_data||{}).contact_log||[];
+    const hasSns  = c.instagram_url||c.x_url||c.facebook_url||c.tiktok_url;
+    const hasJob  = c.indeed_url||c.own_recruit_url||c.job_antenna_url;
+
+    let ntHtml='';
+    if (c.next_date) {
+      const nc = c.next_date<today?'past':(c.next_date===today?'due':'');
+      ntHtml=`<span class="nt ${nc}">📅${c.next_date}</span>`;
+    }
+    return `<div class="card p-${phase} ${isToday?'is-today':''}" onclick="openModal('${esc(c.id)}')">
+      <div>
+        <div class="co-name">${esc(c.company_name)}</div>
+        <div class="co-meta">
+          ${rank?`<span class="rk rk-${rank}">${rank}</span>`:''}
+          ${years?`<span>${years}周年</span>`:''}
+          ${city?`<span>📍${esc(city)}</span>`:''}
+          ${ind?`<span>${esc(ind)}</span>`:''}
+          ${ceo?`<span>👤${esc(ceo)}</span>`:''}
+          ${phone?`<span class="co-phone">📞${esc(phone)}</span>`:''}
+        </div>
+        <div class="co-meta">
+          <span class="pl ${ph.cls}">${ph.lab}</span>
+          ${ntHtml}
+          ${logs.length?`<span class="log-cnt">📝${logs.length}件</span>`:''}
+          ${hasSns?'<span style="color:#8b5cf6;font-size:10px;">SNS</span>':''}
+          ${hasJob?'<span style="color:#3730a3;font-size:10px;">求人</span>':''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── MODAL ─────────────────────────────────────────────
+function openModal(id) {
+  cur = cos.find(c=>String(c.id)===String(id));
+  if (!cur) return;
+  curTab='action';
+  document.getElementById('m-name').textContent = cur.company_name;
+  document.getElementById('ovl').classList.add('open');
+  document.querySelectorAll('.mtab').forEach((el,i)=>el.classList.toggle('on',i===0));
+  renderTab();
+}
+
+function closeModal(e) {
+  if (e && e.target!==document.getElementById('ovl')) return;
+  document.getElementById('ovl').classList.remove('open');
+  cur=null;
+}
+
+function switchTab(t) {
+  curTab=t;
+  const order=['action','log','script','info'];
+  document.querySelectorAll('.mtab').forEach((el,i)=>el.classList.toggle('on',order[i]===t));
+  renderTab();
+}
+
+function renderTab() {
+  const c   = cur;
+  const src = c.source_data||{};
+  const logs= src.contact_log||[];
+  const b   = document.getElementById('mbody');
+
+  if (curTab==='action') {
+    b.innerHTML = `
+      <div class="agrid">${ACTS.map(a=>`<button class="abtn ${a.cls}" onclick="doAct('${a.k}')">${a.lab}</button>`).join('')}</div>
+      <div class="section-label">メモ（任意）</div>
+      <textarea class="note-ta" id="act-note" placeholder="例：担当者名・伝言内容など..."></textarea>
+      <div class="date-row">
+        <span style="font-size:12px;color:var(--muted)">次回フォロー日:</span>
+        <input type="date" class="date-inp" id="nd-inp" value="${c.next_date||''}">
+        <button class="save-btn" onclick="saveNd()">保存</button>
+      </div>`;
+
+  } else if (curTab==='log') {
+    if (!logs.length) { b.innerHTML='<div class="empty">連絡記録がまだありません</div>'; return; }
+    b.innerHTML = [...logs].reverse().map(l=>`
+      <div class="log-item">
+        <div class="log-act">${ACT_LABS[l.action]||l.action||'-'}</div>
+        <div class="log-dt">${l.date||''}${l.time?' '+l.time:''}</div>
+        ${l.note?`<div class="log-note">${esc(l.note)}</div>`:''}
+      </div>`).join('');
+
+  } else if (curTab==='script') {
+    b.innerHTML = `<div class="script-box">${esc(DEFAULT_SCRIPT)}</div>`;
+
+  } else if (curTab==='info') {
+    const rank  = c.anniversary_rank||c.ar||'';
+    const years = c.anniversary_years||c.ay||'';
+    const phone = c.phone||c.p||'';
+    const web   = c.website||c.w||'';
+    const ceo   = c.ceo_name||c.ceo||'';
+    const city  = c.city||c.c||'';
+    const ind   = c.industry||c.i||'';
+
+    const snsHtml = [
+      c.instagram_url?`<a class="sl sl-ig" href="${esc(c.instagram_url)}" target="_blank" rel="noopener">📸 Instagram</a>`:'',
+      c.x_url?`<a class="sl sl-x" href="${esc(c.x_url)}" target="_blank" rel="noopener">✕ X</a>`:'',
+      c.facebook_url?`<a class="sl sl-fb" href="${esc(c.facebook_url)}" target="_blank" rel="noopener">📘 Facebook</a>`:'',
+      c.tiktok_url?`<a class="sl sl-tt" href="${esc(c.tiktok_url)}" target="_blank" rel="noopener">🎵 TikTok</a>`:'',
+    ].filter(Boolean).join('');
+
+    const jobHtml = [
+      c.indeed_url?`<a class="sl sl-job" href="${esc(c.indeed_url)}" target="_blank" rel="noopener">Indeed</a>`:'',
+      c.own_recruit_url?`<a class="sl sl-job" href="${esc(c.own_recruit_url)}" target="_blank" rel="noopener">自社求人</a>`:'',
+      c.job_antenna_url?`<a class="sl sl-job" href="${esc(c.job_antenna_url)}" target="_blank" rel="noopener">求人アンテナ</a>`:'',
+    ].filter(Boolean).join('');
+
+    const rows = [
+      ['電話番号', phone?`<a href="tel:${esc(phone)}">${esc(phone)}</a>`:'-'],
+      ['代表者',   esc(ceo)||'-'],
+      ['業種',     esc(ind)||'-'],
+      ['所在地',   esc(city)||'-'],
+      ['周年',     rank?`<span class="rk rk-${rank}">${rank}</span>${years?' '+years+'周年':''}`:'-'],
+      ['HP',       web?`<a href="${esc(web)}" target="_blank" rel="noopener">ウェブサイトを開く →</a>`:'-'],
+      ['SNS',      snsHtml?`<div class="sns-wrap">${snsHtml}</div>`:'-'],
+      ['求人',     jobHtml?`<div class="sns-wrap">${jobHtml}</div>`:'-'],
+    ];
+
+    b.innerHTML = rows.map(([l,v])=>`
+      <div class="irow"><div class="ilabel">${l}</div><div class="ival">${v}</div></div>
+    `).join('') + `
+      <div style="margin-top:14px;">
+        <div class="section-label">メモ</div>
+        <textarea class="note-ta" id="info-memo" placeholder="メモを入力...">${esc(src.memo||'')}</textarea>
+        <button class="save-btn" style="margin-top:8px;" onclick="saveMemo()">メモを保存</button>
+      </div>`;
+  }
+}
+
+// ── ACTIONS ───────────────────────────────────────────
+async function doAct(key) {
+  const c   = cur;
+  const act = ACTS.find(a=>a.k===key);
+  if (!act) return;
+  const note = document.getElementById('act-note')?.value.trim()||'';
+  const now  = new Date();
+  const src  = {...(c.source_data||{})};
+  const log  = [...(src.contact_log||[])];
+  log.push({action:key, date:now.toISOString().slice(0,10), time:now.toTimeString().slice(0,5), note});
+  src.contact_log = log;
+
+  let nd = c.next_date||null;
+  if (act.nd) {
+    const d = new Date(); d.setDate(d.getDate()+act.days);
+    nd = d.toISOString().slice(0,10);
+  }
+
+  const upd = {phase:act.phase, source_data:src, next_date:nd};
+  const {error} = await sb.from('ceremony_attacks').update(upd).eq('id',c.id);
+  if (error) { toast('❌ 保存失敗: '+error.message); return; }
+  Object.assign(c, upd);
+  const idx=cos.findIndex(x=>x.id===c.id); if (idx>=0) Object.assign(cos[idx],upd);
+  const el=document.getElementById('act-note'); if (el) el.value='';
+  if (document.getElementById('nd-inp')) document.getElementById('nd-inp').value=nd||'';
+  renderStats(); renderList();
+  toast('✅ '+act.lab+' を記録しました');
+}
+
+async function saveNd() {
+  const nd = document.getElementById('nd-inp')?.value||null;
+  const {error} = await sb.from('ceremony_attacks').update({next_date:nd}).eq('id',cur.id);
+  if (error) { toast('❌ 保存失敗'); return; }
+  cur.next_date=nd;
+  const idx=cos.findIndex(x=>x.id===cur.id); if (idx>=0) cos[idx].next_date=nd;
+  renderStats(); renderList();
+  toast('📅 次回フォロー日を保存しました');
+}
+
+async function saveMemo() {
+  const memo = document.getElementById('info-memo')?.value||'';
+  const src  = {...(cur.source_data||{}), memo};
+  const {error} = await sb.from('ceremony_attacks').update({source_data:src}).eq('id',cur.id);
+  if (error) { toast('❌ 保存失敗'); return; }
+  cur.source_data=src;
+  const idx=cos.findIndex(x=>x.id===cur.id); if (idx>=0) cos[idx].source_data=src;
+  toast('✅ メモを保存しました');
+}
+
+// ── ADD COMPANY ───────────────────────────────────────
+function openAdd() { document.getElementById('add-ovl').classList.add('open'); }
+function closeAdd(e) {
+  if (e && e.target!==document.getElementById('add-ovl')) return;
+  document.getElementById('add-ovl').classList.remove('open');
+}
+
+async function doAdd() {
+  const name = document.getElementById('an').value.trim();
+  if (!name) { toast('❌ 会社名は必須です'); return; }
+  const row = {
+    company_name: name,
+    phone:        document.getElementById('ap').value.trim()||null,
+    website:      document.getElementById('aw').value.trim()||null,
+    ceo_name:     document.getElementById('ac').value.trim()||null,
+    industry:     document.getElementById('ai').value.trim()||null,
+    city:         document.getElementById('acy').value.trim()||null,
+    instagram_url:document.getElementById('aig').value.trim()||null,
+    x_url:        document.getElementById('ax').value.trim()||null,
+    indeed_url:   document.getElementById('aind').value.trim()||null,
+    phase:        'pending',
+  };
+  const {data,error} = await sb.from('ceremony_attacks').insert(row).select().single();
+  if (error) { toast('❌ 追加失敗: '+error.message); return; }
+  cos.push(data);
+  buildFilters(); renderStats(); renderList();
+  document.getElementById('add-ovl').classList.remove('open');
+  ['an','ap','aw','ac','ai','acy','aig','ax','aind'].forEach(id=>{ document.getElementById(id).value=''; });
+  toast('✅ '+name+' を追加しました');
+}
+
+// ── UTILS ─────────────────────────────────────────────
+function esc(s) {
+  if (s==null) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),2600);
+}
+
+// ── INIT ──────────────────────────────────────────────
+loadData();
 </script>
+</body>
 </html>

@@ -176,6 +176,55 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
 
 /* empty / loading */
 .empty{text-align:center;padding:60px 20px;color:var(--muted);font-size:14px}
+
+/* ── SCRIPT TABS ── */
+.stabs{display:flex;gap:5px;margin-bottom:10px}
+.stab{padding:6px 18px;border:1px solid var(--border);border-radius:7px;background:var(--bg);color:var(--muted);font-size:13px;font-weight:700;cursor:pointer;transition:all .12s}
+.stab.on{background:var(--primary);color:#fff;border-color:var(--primary)}
+.script-name-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.sname{font-size:12px;font-weight:700;color:var(--muted);flex:1}
+.edit-btn{padding:4px 10px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--muted);font-size:12px;cursor:pointer}
+.edit-btn:hover{background:var(--border)}
+.script-edit-ta{width:100%;padding:10px 12px;border:1px solid var(--primary);border-radius:8px;background:var(--bg);color:var(--text);font-size:13px;line-height:1.9;min-height:260px;resize:vertical;font-family:inherit}
+.script-name-inp{width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:7px;background:var(--bg);color:var(--text);font-size:13px;font-family:inherit;margin-bottom:8px}
+.script-name-inp:focus,.script-edit-ta:focus{outline:none;border-color:var(--primary)}
+.edit-actions{display:flex;gap:7px;margin-top:8px;align-items:center}
+.save-scr-btn{padding:8px 16px;background:var(--primary);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer}
+.cancel-scr-btn{padding:8px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--muted);cursor:pointer}
+.reset-scr-btn{padding:8px 12px;background:var(--bg);border:1px solid #fca5a5;border-radius:8px;font-size:11px;color:#dc2626;cursor:pointer;margin-left:auto}
+
+/* ── IMPORT ── */
+.imp-hint{font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.8;background:var(--bg);padding:10px 12px;border-radius:8px;border:1px solid var(--border)}
+.imp-hint code{font-family:'SF Mono',Menlo,Consolas,monospace;background:var(--border);padding:1px 4px;border-radius:3px}
+.imp-csv-ta{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-size:12px;line-height:1.6;min-height:130px;resize:vertical;font-family:'SF Mono',Menlo,Consolas,monospace}
+.imp-csv-ta:focus{outline:none;border-color:var(--primary)}
+.file-lbl{display:block;margin:8px 0;font-size:12px;color:var(--muted)}
+.imp-parse-btn{padding:11px;background:var(--primary);color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;width:100%;font-family:inherit;margin-top:6px}
+.imp-summary{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.ichip{padding:7px 14px;border-radius:8px;font-size:13px;font-weight:700}
+.ichip-n{background:#d1fae5;color:#065f46}
+.ichip-d{background:#fed7aa;color:#9a3412}
+.ichip-s{background:#f3f4f6;color:#6b7280}
+.imp-sec{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin:12px 0 6px}
+.new-list{border:1px solid var(--border);border-radius:8px;overflow:hidden;max-height:160px;overflow-y:auto;margin-bottom:8px}
+.new-item{padding:8px 12px;border-bottom:1px solid var(--border);font-size:13px;display:flex;gap:8px;align-items:center}
+.new-item:last-child{border-bottom:none}
+.conflict-card{border:1px solid var(--c-callback);border-radius:9px;margin-bottom:10px;overflow:hidden}
+.conflict-hd{display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--bg);border-bottom:1px solid var(--border);font-size:13px;font-weight:700}
+.cbadge{padding:2px 7px;border-radius:5px;font-size:10px;font-weight:700;background:#fed7aa;color:#9a3412}
+.cfield{display:grid;grid-template-columns:68px 1fr 1fr;gap:5px;padding:7px 12px;border-bottom:1px solid var(--border);align-items:start;font-size:12px}
+.cfield:last-child{border-bottom:none}
+.cfield-lbl{color:var(--muted);font-size:11px;padding-top:5px}
+.cfield-head{font-size:10px;font-weight:700;color:var(--muted);text-align:center;margin-bottom:3px}
+.cv{padding:5px 8px;border-radius:6px;border:2px solid var(--border);cursor:pointer;background:var(--bg);line-height:1.4;word-break:break-all;transition:all .1s}
+.cv.sel{border-color:var(--primary);background:var(--primary-l)}
+.cv-same{padding:5px 8px;border-radius:6px;background:var(--bg);line-height:1.4;word-break:break-all;color:var(--muted);font-size:11px}
+.imp-acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;padding-top:14px;border-top:1px solid var(--border)}
+.iact{padding:10px 16px;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
+.iact-new{background:#d1fae5;color:#065f46}
+.iact-all{background:var(--primary);color:#fff}
+.iact-can{background:var(--bg);border:1px solid var(--border);color:var(--muted)}
+.imp-back{padding:5px 12px;background:var(--bg);border:1px solid var(--border);border-radius:7px;font-size:12px;color:var(--muted);cursor:pointer;margin-bottom:12px}
 </style>
 </head>
 <body>
@@ -185,6 +234,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
     <h1>📋 営業CRMリスト</h1>
   </div>
   <button class="btn-refresh" onclick="loadData()" title="再読込">🔄</button>
+  <button class="btn-add" onclick="openImp()" style="background:rgba(255,255,255,.12);">📥 インポート</button>
   <button class="btn-add" onclick="openAdd()">＋ 追加</button>
 </div>
 
@@ -246,6 +296,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
   </div>
 </div>
 
+<!-- import modal -->
+<div class="ovl" id="imp-ovl" onclick="closeImp(event)">
+  <div class="modal">
+    <div class="mhd">
+      <h2>📥 リストをインポート</h2>
+      <button class="mclose" onclick="closeImp()">×</button>
+    </div>
+    <div class="mbody" id="imp-body">
+      <!-- step 1 injected by openImp() -->
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -277,7 +340,11 @@ const ACTS = [
 
 const ACT_LABS = Object.fromEntries(ACTS.map(a=>[a.k, a.lab]));
 
-const DEFAULT_SCRIPT = `【オープニング】
+// ── SCRIPTS (localStorage) ────────────────────────────
+const SCR_KEY = 'crm_scripts_v1';
+const SCR_DEFAULTS = {
+  A: { name: 'A: 基本スクリプト', body:
+`【オープニング】
 「はじめまして、○○の（名前）と申します。
 御社の周年をお祝いする記念映像のご提案でご連絡しました。
 少々お時間よろしいでしょうか？」
@@ -297,7 +364,334 @@ const DEFAULT_SCRIPT = `【オープニング】
 
 【クロージング】
 「一度、御社に合ったご提案資料をお送りできればと思います。
-担当の方のお名前とメールアドレスをお伺いできますか？」`;
+担当の方のお名前とメールアドレスをお伺いできますか？」` },
+  B: { name: 'B: カジュアル版', body:
+`【オープニング（フレンドリー）】
+「こんにちは〜！○○の（名前）といいます。
+お忙しいところすみません、1分だけよろしいですか？」
+
+【本題】
+「実は御社が今年で○○周年って伺って！
+お祝いの気持ちでご連絡したんですが、
+式典とか記念イベントって何か考えてらっしゃいますか？」
+
+【反応別対応】
+・興味あり → 「ちょっとだけ詳しく聞かせてもらえますか？」
+・「忙しい」→「あ、そうですよね〜！また改めます。いつ頃だとご都合よさそうですか？」
+・「特に予定ない」→「そうなんですね。もし何かあった時に思い出してもらえたら嬉しいです！」
+
+【クロージング】
+「もしよければ、事例とか簡単な資料をお送りしてもいいですか？
+メールかLINEどっちがご都合いいですか？」` },
+  C: { name: 'C: DM・手紙版', body:
+`【DM・手紙用テンプレート】
+
+件名：○○周年、おめでとうございます 🎉
+
+はじめまして、周年記念映像の制作を専門とする
+○○（会社名）の（名前）と申します。
+
+貴社がこの度、創業○○周年を迎えられると伺い、
+心よりお慶び申し上げます。
+
+◆ ご提案内容
+貴社の歩みとこれからのビジョンを映像にまとめた
+「周年記念映像」の制作をご提案させていただきます。
+
+◆ 活用シーン
+・記念式典・社員総会での上映
+・ホームページ・採用サイトへの掲載
+・お取引先へのご挨拶
+
+制作実績や費用のご案内は、お気軽にご連絡ください。
+
+（名前）/ （電話番号）/ （メール）
+
+P.S. まずはお電話でお話しできれば嬉しいです。` },
+};
+
+let curScr = 'A', scrEditing = false;
+function getScripts() {
+  try { const s=localStorage.getItem(SCR_KEY); return s?JSON.parse(s):{...SCR_DEFAULTS}; } catch { return {...SCR_DEFAULTS}; }
+}
+function putScripts(obj) {
+  try { localStorage.setItem(SCR_KEY, JSON.stringify(obj)); } catch {}
+}
+
+// ── SCRIPT TAB ────────────────────────────────────────
+function renderScriptTab() {
+  const scrs = getScripts();
+  const s = scrs[curScr] || SCR_DEFAULTS[curScr];
+  scrEditing = false;
+  const tabs = ['A','B','C'].map(k=>
+    `<button class="stab ${k===curScr?'on':''}" onclick="setScrTab('${k}')">${scrs[k]?.name||SCR_DEFAULTS[k].name}</button>`
+  ).join('');
+  document.getElementById('mbody').innerHTML = `
+    <div class="stabs">${tabs}</div>
+    <div class="script-name-row">
+      <span class="sname" id="cur-sname">${esc(s.name)}</span>
+      <button class="edit-btn" onclick="startEditScript()">✏️ 編集</button>
+    </div>
+    <div id="scr-view"><div class="script-box">${esc(s.body)}</div></div>
+    <div id="scr-edit" style="display:none">
+      <input class="script-name-inp" id="sn-inp" value="${esc(s.name)}" placeholder="スクリプト名">
+      <textarea class="script-edit-ta" id="sb-inp">${esc(s.body)}</textarea>
+      <div class="edit-actions">
+        <button class="save-scr-btn" onclick="saveScript()">💾 保存</button>
+        <button class="cancel-scr-btn" onclick="cancelEditScript()">キャンセル</button>
+        <button class="reset-scr-btn" onclick="resetScript()">デフォルトに戻す</button>
+      </div>
+    </div>`;
+}
+
+function setScrTab(k) { curScr=k; renderScriptTab(); }
+
+function startEditScript() {
+  scrEditing=true;
+  document.getElementById('scr-view').style.display='none';
+  document.getElementById('scr-edit').style.display='';
+}
+
+function cancelEditScript() {
+  scrEditing=false;
+  document.getElementById('scr-view').style.display='';
+  document.getElementById('scr-edit').style.display='none';
+}
+
+function saveScript() {
+  const name = document.getElementById('sn-inp')?.value.trim();
+  const body = document.getElementById('sb-inp')?.value;
+  if (!name||body===undefined) return;
+  const scrs = getScripts();
+  scrs[curScr] = {name, body};
+  putScripts(scrs);
+  toast('✅ スクリプトを保存しました');
+  renderScriptTab();
+}
+
+function resetScript() {
+  if (!confirm(curScr+'スクリプトをデフォルトに戻しますか？')) return;
+  const scrs = getScripts();
+  scrs[curScr] = {...SCR_DEFAULTS[curScr]};
+  putScripts(scrs);
+  toast('🔄 デフォルトに戻しました');
+  renderScriptTab();
+}
+
+// ── IMPORT ────────────────────────────────────────────
+let impParsed = {news:[], conflicts:[]};
+const IMP_COLS = ['company_name','phone','website','ceo_name','industry','city','anniversary_rank','anniversary_years'];
+const IMP_LABS = {company_name:'会社名',phone:'電話番号',website:'ウェブサイト',ceo_name:'代表者名',industry:'業種',city:'市区町村',anniversary_rank:'周年ランク',anniversary_years:'周年年数'};
+
+function openImp() {
+  impParsed = {news:[], conflicts:[]};
+  document.getElementById('imp-body').innerHTML = renderImpStep1();
+  document.getElementById('imp-ovl').classList.add('open');
+}
+function closeImp(e) {
+  if (e && e.target!==document.getElementById('imp-ovl')) return;
+  document.getElementById('imp-ovl').classList.remove('open');
+}
+
+function renderImpStep1() {
+  return `
+    <div class="imp-hint">
+      <strong>CSV形式でリストを貼り付けるか、ファイルを選択してください。</strong><br>
+      列順: <code>会社名</code>, <code>電話番号</code>, <code>ウェブサイト</code>, <code>代表者名</code>, <code>業種</code>, <code>市区町村</code>, <code>周年ランク(S/A/B/C)</code>, <code>周年年数</code><br>
+      ※ 1行目がヘッダーの場合は自動でスキップします。重複は会社名または電話番号で検出します。
+    </div>
+    <textarea class="imp-csv-ta" id="imp-csv" placeholder="例:
+株式会社ABC,098-000-0001,https://example.com,山田太郎,建設業,那覇市,A,30
+株式会社DEF,098-000-0002,,,,沖縄市,B,20"></textarea>
+    <label class="file-lbl">またはCSVファイルを選択: <input type="file" id="imp-file" accept=".csv,.txt" onchange="onImpFile(this)"></label>
+    <button class="imp-parse-btn" onclick="parseImport()">🔍 解析する</button>`;
+}
+
+function onImpFile(input) {
+  const f = input.files?.[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = e => { document.getElementById('imp-csv').value = e.target.result; };
+  r.readAsText(f, 'utf-8');
+}
+
+function parseCSVLine(line) {
+  const res=[]; let cur='', inQ=false;
+  for (let i=0;i<line.length;i++) {
+    const ch=line[i];
+    if (ch==='"') { inQ=!inQ; }
+    else if (ch===','&&!inQ) { res.push(cur.trim()); cur=''; }
+    else { cur+=ch; }
+  }
+  res.push(cur.trim());
+  return res;
+}
+
+function isHeaderRow(row) {
+  const first=(row[0]||'').toLowerCase();
+  return first.includes('会社')||first.includes('company')||first==='名前'||first==='name';
+}
+
+function parseImport() {
+  const raw = (document.getElementById('imp-csv')?.value||'').trim();
+  if (!raw) { toast('❌ CSVを入力してください'); return; }
+  const lines = raw.split(/\r?\n/).filter(l=>l.trim());
+  let startIdx = 0;
+  const firstRow = parseCSVLine(lines[0]);
+  if (isHeaderRow(firstRow)) startIdx = 1;
+
+  const news=[], conflicts=[];
+  for (let i=startIdx;i<lines.length;i++) {
+    const cols = parseCSVLine(lines[i]);
+    if (!cols[0]) continue;
+    const row = {};
+    IMP_COLS.forEach((k,j)=>{ const v=cols[j]||''; if (v) row[k]=v; });
+
+    const existing = cos.find(c=>{
+      if (row.company_name && c.company_name===row.company_name) return true;
+      if (row.phone && c.phone && c.phone===row.phone) return true;
+      return false;
+    });
+
+    if (!existing) {
+      news.push(row);
+    } else {
+      const diffs = IMP_COLS.filter(k=>{
+        const nv=(row[k]||'').trim();
+        const ov=(existing[k]||'').toString().trim();
+        return nv && nv!==ov;
+      });
+      conflicts.push({existing, incoming:row, diffs, chosen:{}});
+    }
+  }
+
+  impParsed = {news, conflicts};
+  conflicts.forEach(cf=>{
+    cf.diffs.forEach(k=>{ cf.chosen[k]='new'; });
+  });
+  renderImpStep2();
+}
+
+function renderImpStep2() {
+  const {news, conflicts} = impParsed;
+  const total = news.length + conflicts.length;
+  if (!total) { toast('❌ 新規・重複ともに0件でした'); return; }
+
+  let html = `
+    <button class="imp-back" onclick="document.getElementById('imp-body').innerHTML=renderImpStep1()">← 戻る</button>
+    <div class="imp-summary">
+      <div class="ichip ichip-n">✅ 新規 ${news.length}件</div>
+      <div class="ichip ichip-d">⚠️ 重複 ${conflicts.length}件</div>
+    </div>`;
+
+  if (news.length) {
+    html += `<div class="imp-sec">新規追加（${news.length}件）</div>
+    <div class="new-list">
+      ${news.map(r=>`<div class="new-item">
+        <span>${esc(r.company_name)}</span>
+        ${r.phone?`<span style="color:var(--muted);font-size:11px;">${esc(r.phone)}</span>`:''}
+        ${r.industry?`<span style="color:var(--muted);font-size:11px;">${esc(r.industry)}</span>`:''}
+      </div>`).join('')}
+    </div>`;
+  }
+
+  if (conflicts.length) {
+    html += `<div class="imp-sec">重複（差分あり）— どちらの情報を使うか選択してください（${conflicts.length}件）</div>`;
+    html += conflicts.map((cf,idx)=>{
+      const fields = cf.diffs.map(k=>{
+        const ov=esc(cf.existing[k]||'-');
+        const nv=esc(cf.incoming[k]||'-');
+        const selE=cf.chosen[k]==='existing'?'sel':'';
+        const selN=cf.chosen[k]==='new'?'sel':'';
+        return `<div class="cfield">
+          <div class="cfield-lbl">${IMP_LABS[k]||k}</div>
+          <div>
+            <div class="cfield-head">現在の値</div>
+            <div class="cv ${selE}" onclick="pickField(${idx},'${k}','existing')">${ov}</div>
+          </div>
+          <div>
+            <div class="cfield-head">新しい値</div>
+            <div class="cv ${selN}" onclick="pickField(${idx},'${k}','new')">${nv}</div>
+          </div>
+        </div>`;
+      }).join('');
+      const sameFields = IMP_COLS.filter(k=>!cf.diffs.includes(k)&&cf.existing[k]);
+      const sameHtml = sameFields.length ? sameFields.map(k=>`<div class="cfield">
+        <div class="cfield-lbl">${IMP_LABS[k]||k}</div>
+        <div class="cv-same" style="grid-column:2/4">同じ: ${esc(cf.existing[k])}</div>
+      </div>`).join('') : '';
+      return `<div class="conflict-card" id="ccf-${idx}">
+        <div class="conflict-hd">
+          <span>${esc(cf.existing.company_name)}</span>
+          <span class="cbadge">${cf.diffs.length}項目差分</span>
+        </div>
+        ${fields}${sameHtml}
+      </div>`;
+    }).join('');
+  }
+
+  html += `<div class="imp-acts">
+    ${news.length?`<button class="iact iact-new" onclick="doImpNew()">✅ 新規${news.length}件だけ追加</button>`:''}
+    ${conflicts.length?`<button class="iact iact-all" onclick="doImpAll()">💾 新規＋重複を反映</button>`:''}
+    <button class="iact iact-can" onclick="closeImp()">キャンセル</button>
+  </div>`;
+
+  document.getElementById('imp-body').innerHTML = html;
+}
+
+function pickField(idx, key, side) {
+  impParsed.conflicts[idx].chosen[key] = side;
+  const card = document.getElementById('ccf-'+idx);
+  if (!card) return;
+  card.querySelectorAll('.cfield').forEach(row=>{
+    const lbl = row.querySelector('.cfield-lbl');
+    if (!lbl) return;
+    const k = Object.entries(IMP_LABS).find(([,v])=>v===lbl.textContent)?.[0];
+    if (!k) return;
+    const [leftEl, rightEl] = [...row.querySelectorAll('.cv')];
+    if (leftEl) leftEl.classList.toggle('sel', impParsed.conflicts[idx].chosen[k]==='existing');
+    if (rightEl) rightEl.classList.toggle('sel', impParsed.conflicts[idx].chosen[k]==='new');
+  });
+}
+
+async function doImpNew() {
+  const {news} = impParsed;
+  if (!news.length) return;
+  const rows = news.map(r=>({...r, phase:'pending'}));
+  const {data,error} = await sb.from('ceremony_attacks').insert(rows).select();
+  if (error) { toast('❌ 追加失敗: '+error.message); return; }
+  if (data) data.forEach(d=>cos.push(d));
+  buildFilters(); renderStats(); renderList();
+  toast(`✅ ${news.length}件を追加しました`);
+  closeImp();
+}
+
+async function doImpAll() {
+  const {news, conflicts} = impParsed;
+  let added=0, updated=0, errs=[];
+
+  if (news.length) {
+    const rows = news.map(r=>({...r, phase:'pending'}));
+    const {data,error} = await sb.from('ceremony_attacks').insert(rows).select();
+    if (error) errs.push(error.message);
+    else { data.forEach(d=>cos.push(d)); added=data.length; }
+  }
+
+  for (const cf of conflicts) {
+    const upd = {};
+    cf.diffs.forEach(k=>{
+      if (cf.chosen[k]==='new') upd[k] = cf.incoming[k]||null;
+    });
+    if (!Object.keys(upd).length) continue;
+    const {error} = await sb.from('ceremony_attacks').update(upd).eq('id',cf.existing.id);
+    if (error) errs.push(error.message);
+    else { Object.assign(cf.existing, upd); updated++; }
+  }
+
+  buildFilters(); renderStats(); renderList();
+  if (errs.length) { toast('⚠️ 一部エラー: '+errs[0]); }
+  else { toast(`✅ 追加${added}件、更新${updated}件 完了`); }
+  closeImp();
+}
 
 // ── DATA ──────────────────────────────────────────────
 async function loadData() {
@@ -489,7 +883,7 @@ function renderTab() {
       </div>`).join('');
 
   } else if (curTab==='script') {
-    b.innerHTML = `<div class="script-box">${esc(DEFAULT_SCRIPT)}</div>`;
+    renderScriptTab();
 
   } else if (curTab==='info') {
     const rank  = c.anniversary_rank||c.ar||'';

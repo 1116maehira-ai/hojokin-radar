@@ -1,1908 +1,634 @@
-<title>沖縄の攻め先211社</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@700;900&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>営業CRMリスト</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--bg:#fff;--panel:#f2f5f8;--panel2:#e7edf3;--line:#dbe3ec;--ink:#16202b;--ink2:#5a6b7c;
- --fire:#d94a1f;--fire-bg:#fdece6;--sea:#0d7c72;--sea-bg:#e2f2f0;--sun:#b57708;--sun-bg:#fdf1da;
- --sky:#2560a8;--sky-bg:#e6eefa;--warn:#c0392b;--warn-bg:#fdecea}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
- --bg:#10151b;--panel:#1a222c;--panel2:#232d39;--line:#2e3a48;--ink:#e8eef4;--ink2:#95a6b8;
- --fire:#ff8158;--fire-bg:#2c1a14;--sea:#43c3b6;--sea-bg:#0f2724;--sun:#f5bb4a;--sun-bg:#2a2113;
- --sky:#74aae8;--sky-bg:#141f2e;--warn:#ff7a68;--warn-bg:#2d1614}}
-:root[data-theme="dark"]{--bg:#10151b;--panel:#1a222c;--panel2:#232d39;--line:#2e3a48;--ink:#e8eef4;--ink2:#95a6b8;
- --fire:#ff8158;--fire-bg:#2c1a14;--sea:#43c3b6;--sea-bg:#0f2724;--sun:#f5bb4a;--sun-bg:#2a2113;
- --sky:#74aae8;--sky-bg:#141f2e;--warn:#ff7a68;--warn-bg:#2d1614}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);
- font-family:"Zen Kaku Gothic New",-apple-system,"Hiragino Kaku Gothic ProN",sans-serif;
- font-size:16px;line-height:1.8;-webkit-font-smoothing:antialiased}
-.wrap{max-width:1180px;margin:0 auto;padding:0 18px}
-.mono{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
-header{padding:52px 0 28px}
-.kick{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.2em;color:var(--fire);font-weight:600;margin:0 0 14px}
-h1{font-family:"Zen Maru Gothic",sans-serif;font-weight:900;font-size:clamp(26px,5vw,42px);line-height:1.32;margin:0 0 16px;text-wrap:balance}
-.lede{color:var(--ink2);max-width:40em;margin:0 0 26px}
-.lede b{color:var(--ink)}
-.kpis{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px}
-.kpi{background:var(--panel);border-radius:12px;padding:11px 17px;min-width:104px}
-.kpi.hot{background:var(--fire-bg)}
-.kpi .k{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.12em;color:var(--ink2);text-transform:uppercase}
-.kpi .v{font-family:"IBM Plex Mono",monospace;font-size:23px;font-weight:600;margin-top:2px}
-.kpi.hot .v{color:var(--fire)}
-.kpi .v small{font-size:12.5px;font-weight:400;color:var(--ink2);font-family:"Zen Kaku Gothic New",sans-serif}
-h2{font-family:"Zen Maru Gothic",sans-serif;font-weight:900;font-size:clamp(19px,3.2vw,25px);margin:44px 0 8px;text-wrap:balance}
-.sub{color:var(--ink2);font-size:14.5px;margin:0 0 20px}
-p{margin:0 0 14px;max-width:42em}
-ul{margin:0 0 14px;padding-left:1.35em;max-width:42em}li{margin-bottom:5px}
-.note{border:1px solid var(--line);border-left:4px solid var(--sun);background:var(--panel);
- border-radius:0 12px 12px 0;padding:16px 20px;margin:0 0 20px;font-size:14.5px}
-.note.warn{border-left-color:var(--warn)}.note.ok{border-left-color:var(--sea)}
-.note p{max-width:none;margin:0 0 10px}.note p:last-child{margin:0}
-.note .tag{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.14em;font-weight:700;color:var(--sun);display:block;margin-bottom:6px}
-.note.warn .tag{color:var(--warn)}.note.ok .tag{color:var(--sea)}
-.cards{display:grid;gap:12px;grid-template-columns:1fr;margin-bottom:22px}
-@media(min-width:700px){.cards{grid-template-columns:1fr 1fr 1fr}}
-.card{background:var(--panel);border-radius:14px;padding:16px 18px}
-.card h4{font-family:"Zen Maru Gothic",sans-serif;font-size:15.5px;font-weight:700;margin:0 0 6px}
-.card p{margin:0;font-size:14px;color:var(--ink2);line-height:1.75}
-.card .big{font-family:"IBM Plex Mono",monospace;font-size:24px;font-weight:600;color:var(--ink);display:block;margin:2px 0 4px}
-.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 14px;position:sticky;top:0;
- background:color-mix(in srgb,var(--bg) 93%,transparent);backdrop-filter:blur(8px);padding:12px 0;z-index:5;border-bottom:1px solid var(--line)}
-.bar label{font-size:13px;color:var(--ink2);font-weight:700}
-.bar button{font-family:"Zen Kaku Gothic New",sans-serif;font-size:13px;font-weight:700;padding:6px 14px;
- border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--ink2);cursor:pointer}
-.bar button[aria-pressed="true"]{background:var(--fire);border-color:var(--fire);color:#fff}
-.bar button:focus-visible{outline:2px solid var(--fire);outline-offset:2px}
-.bar .cnt{margin-left:auto;font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--ink2)}
-.tw{overflow-x:auto;border:1px solid var(--line);border-radius:14px}
-table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:1080px}
-th,td{padding:9px 11px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
-thead th{position:sticky;top:57px;background:var(--panel2);font-size:11px;letter-spacing:.06em;color:var(--ink2);
- font-family:"IBM Plex Mono",monospace;font-weight:700;white-space:nowrap;z-index:4}
-tbody tr:last-child td{border-bottom:none}
-tbody tr.s td{background:var(--fire-bg)}
-tbody tr.warn td{background:var(--warn-bg)}
-td.n{text-align:right;font-family:"IBM Plex Mono",monospace;color:var(--ink2)}
-td.mono{font-family:"IBM Plex Mono",monospace;white-space:nowrap}
-td.co{font-weight:700;min-width:190px}
-td.sm{font-size:12.5px;color:var(--ink2);white-space:nowrap}
-td.mk{min-width:150px}td.lk{white-space:nowrap}
-.wn{font-size:11.5px;font-weight:400;color:var(--warn);margin-top:2px;line-height:1.5}
-.tier{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:700;
- width:22px;text-align:center;border-radius:5px;padding:1px 0}
-.tS{background:var(--fire);color:#fff}.tA{background:var(--panel2);color:var(--ink2)}
-.m{display:inline-block;font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:999px;margin:1px 3px 1px 0;white-space:nowrap;
- font-family:"IBM Plex Mono",monospace}
-.m.suc{background:var(--fire-bg);color:var(--fire)}.m.ann{background:var(--sun-bg);color:var(--sun)}
-.m.job{background:var(--sea-bg);color:var(--sea)}.m.nosns{background:var(--sky-bg);color:var(--sky)}
-.m.ng{background:var(--panel2);color:var(--ink2);font-weight:400}
-td.lk a{color:var(--sky);text-decoration:none;font-weight:700;margin-right:8px}
-footer{border-top:1px solid var(--line);margin-top:44px;padding:24px 0 56px;font-size:13px;color:var(--ink2)}
-@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+:root {
+  --bg: #f1f5f9;
+  --card: #ffffff;
+  --primary: #1e40af;
+  --primary-d: #1e3a8a;
+  --primary-l: #dbeafe;
+  --text: #0f172a;
+  --muted: #64748b;
+  --border: #e2e8f0;
+  --c-pending: #94a3b8;
+  --c-contacted: #3b82f6;
+  --c-callback: #f97316;
+  --c-mailed: #8b5cf6;
+  --c-won: #10b981;
+  --c-declined: #cbd5e1;
+  --won-bg: #f0fdf4;
+  --today-bg: #fff1f2;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f172a; --card: #1e293b; --text: #f1f5f9; --muted: #94a3b8;
+    --border: #334155; --primary-l: #1e3a5f; --won-bg: #052e16; --today-bg: #3f0d10;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f172a; --card: #1e293b; --text: #f1f5f9; --muted: #94a3b8;
+  --border: #334155; --primary-l: #1e3a5f; --won-bg: #052e16; --today-bg: #3f0d10;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI','Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);padding-bottom:40px}
+
+/* ── HEADER ── */
+.hdr{background:var(--primary);color:#fff;padding:13px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.hdr h1{font-size:16px;font-weight:800;flex:1;letter-spacing:-.01em}
+.hdr-sub{font-size:11px;opacity:.75}
+.btn-add{padding:6px 13px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
+.btn-add:hover{background:rgba(255,255,255,.28)}
+.btn-refresh{padding:6px 10px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:8px;font-size:13px;cursor:pointer}
+
+/* ── STATS ── */
+.stats{display:flex;gap:6px;padding:10px 12px;overflow-x:auto;background:var(--card);border-bottom:1px solid var(--border);scrollbar-width:none}
+.stats::-webkit-scrollbar{display:none}
+.sc{flex-shrink:0;text-align:center;padding:8px 12px;border-radius:10px;cursor:pointer;border:2px solid transparent;background:var(--bg);min-width:64px;transition:all .12s}
+.sc:hover{transform:translateY(-1px)}
+.sc.on{border-color:var(--primary);background:var(--primary-l)}
+.sc .n{font-size:20px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.sc .l{font-size:10px;color:var(--muted);margin-top:2px;line-height:1.3}
+.sc.st .n{color:#ef4444}
+.sc.sp .n{color:var(--c-pending)}
+.sc.sco .n{color:var(--c-contacted)}
+.sc.scb .n{color:var(--c-callback)}
+.sc.sm .n{color:var(--c-mailed)}
+.sc.sw .n{color:var(--c-won)}
+.sc.sd .n{color:var(--muted)}
+
+/* ── FILTER BAR ── */
+.fbar{padding:9px 12px;display:flex;gap:7px;flex-wrap:wrap;background:var(--card);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:20;box-shadow:0 2px 6px rgba(0,0,0,.06)}
+.fbar input,.fbar select{padding:7px 10px;border:1px solid var(--border);border-radius:7px;background:var(--bg);color:var(--text);font-size:13px;font-family:inherit}
+.fbar input{flex:1;min-width:160px}
+.fbar select{cursor:pointer}
+
+/* ── LIST ── */
+.lwrap{padding:10px 12px;display:flex;flex-direction:column;gap:7px}
+.card{background:var(--card);border-radius:11px;padding:12px 14px;border-left:4px solid var(--c-pending);cursor:pointer;transition:transform .1s,box-shadow .1s;display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}
+.card:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(0,0,0,.08)}
+.card.p-contacted{border-left-color:var(--c-contacted)}
+.card.p-pending_callback{border-left-color:var(--c-callback)}
+.card.p-mailed{border-left-color:var(--c-mailed)}
+.card.p-won{border-left-color:var(--c-won);background:var(--won-bg)}
+.card.p-declined{border-left-color:var(--c-declined);opacity:.65}
+.card.is-today{background:var(--today-bg)}
+.co-name{font-size:14px;font-weight:700;margin-bottom:4px;word-break:break-all}
+.co-meta{display:flex;gap:6px;flex-wrap:wrap;font-size:11px;color:var(--muted);align-items:center}
+.co-meta+.co-meta{margin-top:4px}
+.co-phone{font-family:'SF Mono',Menlo,Consolas,monospace;font-size:11px;color:var(--primary);font-variant-numeric:tabular-nums}
+
+/* rank badges */
+.rk{display:inline-block;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:800}
+.rk-S{background:#fee2e2;color:#b91c1c}
+.rk-A{background:#fef3c7;color:#92600b}
+.rk-B{background:#d1fae5;color:#065f46}
+.rk-C{background:#f1f5f9;color:#64748b}
+
+/* phase label */
+.pl{display:inline-block;padding:1px 7px;border-radius:6px;font-size:10px;font-weight:700}
+.pl-pending{background:#f3f4f6;color:#6b7280}
+.pl-contacted{background:#dbeafe;color:#1e40af}
+.pl-pending_callback{background:#fed7aa;color:#9a3412}
+.pl-mailed{background:#ede9fe;color:#5b21b6}
+.pl-won{background:#d1fae5;color:#065f46}
+.pl-declined{background:#f3f4f6;color:#9ca3af}
+
+.nt{font-size:10px;color:var(--muted)}
+.nt.past{color:#ef4444;font-weight:700}
+.nt.due{color:#f97316;font-weight:700}
+.log-cnt{font-size:10px;color:var(--muted)}
+
+/* ── MODAL ── */
+.ovl{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;display:none;align-items:flex-end;justify-content:center}
+.ovl.open{display:flex}
+.modal{background:var(--card);border-radius:18px 18px 0 0;width:100%;max-width:620px;max-height:92vh;display:flex;flex-direction:column;box-shadow:0 -4px 30px rgba(0,0,0,.2)}
+.mhd{padding:14px 16px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.mhd h2{font-size:15px;font-weight:800;flex:1;word-break:break-all;line-height:1.3}
+.mclose{width:28px;height:28px;border-radius:50%;border:none;background:var(--bg);color:var(--muted);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mtabs{display:flex;border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none}
+.mtabs::-webkit-scrollbar{display:none}
+.mtab{padding:9px 14px;font-size:12px;font-weight:700;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;color:var(--muted);transition:color .1s}
+.mtab.on{border-bottom-color:var(--primary);color:var(--primary)}
+.mbody{padding:14px;overflow-y:auto;flex:1}
+
+/* action grid */
+.agrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:14px}
+.abtn{padding:12px 8px;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;text-align:center;transition:opacity .1s,transform .1s;font-family:inherit}
+.abtn:hover{opacity:.85;transform:scale(.98)}
+.a-ok{background:#dbeafe;color:#1e40af}
+.a-ab{background:#fed7aa;color:#9a3412}
+.a-cb{background:#fef3c7;color:#92600b}
+.a-dm{background:#ede9fe;color:#5b21b6}
+.a-lt{background:#d1fae5;color:#065f46}
+.a-won{background:#bbf7d0;color:#14532d}
+.a-no{background:#fee2e2;color:#7f1d1d}
+
+/* log */
+.log-item{padding:9px 0;border-bottom:1px solid var(--border);font-size:13px}
+.log-item:last-child{border-bottom:none}
+.log-act{font-weight:700}
+.log-dt{color:var(--muted);font-size:11px;margin-top:1px}
+.log-note{color:var(--muted);font-size:12px;margin-top:3px;line-height:1.5}
+
+/* script */
+.script-box{background:var(--bg);border-radius:10px;padding:14px;font-size:13px;line-height:1.9;white-space:pre-wrap;border:1px solid var(--border)}
+
+/* info */
+.irow{display:flex;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.irow:last-of-type{border-bottom:none}
+.ilabel{color:var(--muted);width:72px;flex-shrink:0;font-size:12px;padding-top:1px}
+.ival{flex:1;word-break:break-all;line-height:1.5}
+.ival a{color:var(--primary);text-decoration:none}
+.ival a:hover{text-decoration:underline}
+.sns-wrap{display:flex;gap:5px;flex-wrap:wrap;margin-top:2px}
+.sl{display:inline-flex;align-items:center;gap:3px;padding:4px 10px;border-radius:6px;font-size:12px;font-weight:600;text-decoration:none}
+.sl-ig{background:#fce7f3;color:#9d174d}
+.sl-x{background:#f3f4f6;color:#111827}
+.sl-fb{background:#dbeafe;color:#1e3a8a}
+.sl-tt{background:#e0f2fe;color:#0c4a6e}
+.sl-job{background:#ede9fe;color:#4c1d95}
+
+/* form elements */
+.note-ta{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-size:13px;margin-top:6px;resize:vertical;min-height:60px;font-family:inherit}
+.note-ta:focus{outline:none;border-color:var(--primary)}
+.date-row{display:flex;gap:8px;align-items:center;margin-top:12px}
+.date-inp{padding:7px 10px;border:1px solid var(--border);border-radius:7px;background:var(--bg);color:var(--text);font-size:13px;font-family:inherit}
+.save-btn{padding:7px 13px;background:var(--primary);color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer}
+.save-btn:hover{background:var(--primary-d)}
+.section-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+
+/* add modal form */
+.add-form{display:flex;flex-direction:column;gap:9px}
+.add-inp{padding:9px 11px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-size:14px;font-family:inherit}
+.add-inp:focus{outline:none;border-color:var(--primary)}
+.add-submit{padding:12px;background:var(--primary);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit}
+.add-submit:hover{background:var(--primary-d)}
+
+/* toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;opacity:0;transition:opacity .25s;z-index:200;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}
+
+/* empty / loading */
+.empty{text-align:center;padding:60px 20px;color:var(--muted);font-size:14px}
 </style>
+</head>
+<body>
 
-<header><div class="wrap">
-  <p class="kick">株式会社TENOHIRA 販売営業部 ／ アタックリスト S・Aランク</p>
-  <h1>いま、手紙を出すべき<br>沖縄の211社。</h1>
-  <p class="lede">
-    データベースにあった<b>1,287件</b>から、営業お断り・重複・電話番号なしを除き、
-    <b>建設・不動産・リフォーム × 沖縄県 × 承継期または周年 × 求人出稿</b>で絞り込んだ結果です。<br>
-    <b>代表者名と設立年は「仮」です。</b>そのまま手紙に書かず、出す直前に必ず確認してください。
-  </p>
-  <div class="kpis">
-    <div class="kpi hot"><div class="k">S 最優先</div><div class="v">91<small>社</small></div></div>
-    <div class="kpi"><div class="k">A</div><div class="v">120<small>社</small></div></div>
-    <div class="kpi"><div class="k">承継期</div><div class="v">62<small>社</small></div></div>
-    <div class="kpi"><div class="k">周年間近</div><div class="v">75<small>社</small></div></div>
-    <div class="kpi"><div class="k">月30通なら</div><div class="v">7<small>ヶ月分</small></div></div>
+<div class="hdr">
+  <div style="flex:1">
+    <h1>📋 営業CRMリスト</h1>
   </div>
-</div></header>
-
-<div class="wrap">
-<h2>どう絞ったか</h2>
-<p class="sub">4つのデータベース（ceremony / indeedhack / centercall / posmane_client）を統合して、重複を消しました。</p>
-<div class="cards">
-  <div class="card"><h4>元データ</h4><span class="big">1,287件</span>
-    <p>4テーブルの合計。うち沖縄県が1,189件</p></div>
-  <div class="card"><h4>ここまで除いた</h4><span class="big">−1,076件</span>
-    <p>営業お断り13件／電話番号なし／同一企業の重複／スコア6未満</p></div>
-  <div class="card"><h4>残った</h4><span class="big">211社</span>
-    <p>S 91社・A 120社。すべて沖縄県内</p></div>
+  <button class="btn-refresh" onclick="loadData()" title="再読込">🔄</button>
+  <button class="btn-add" onclick="openAdd()">＋ 追加</button>
 </div>
 
-<div class="tw" style="margin-bottom:22px">
-<table style="min-width:520px">
-  <thead><tr><th>条件</th><th>点</th><th>該当</th></tr></thead>
-  <tbody>
-    <tr><td>承継期（設立30〜55年）</td><td class="mono">+3</td><td>62社 ─ 周年と世代交代が同時に刺さる、最強のグループ</td></tr>
-    <tr><td>対象業種（建設・不動産・リフォーム・塗装）</td><td class="mono">+2</td><td>ほぼ全件</td></tr>
-    <tr><td>周年が近い（5の倍数が今年か来年）</td><td class="mono">+2</td><td>75社</td></tr>
-    <tr><td>求人を出している</td><td class="mono">+2</td><td>200社 ─ 採用課題あり。AI研修Phase3が刺さる</td></tr>
-    <tr><td>法人番号がある／代表者名がある／メールがある</td><td class="mono">各+1</td><td>情報が揃っているほど手紙が書きやすい</td></tr>
-    <tr><td>SNSをやっていない</td><td class="mono">+1</td><td>発信の課題あり</td></tr>
-  </tbody>
-</table>
+<div class="stats" id="stats"></div>
+
+<div class="fbar">
+  <input type="text" id="q" placeholder="会社名・代表者・電話番号で検索..." oninput="renderList()">
+  <select id="fi" onchange="renderList()"><option value="">業種: 全て</option></select>
+  <select id="fc" onchange="renderList()"><option value="">市区町村: 全て</option></select>
+  <select id="fr" onchange="renderList()">
+    <option value="">周年ランク: 全て</option>
+    <option value="S">S（最優先）</option>
+    <option value="A">A</option>
+    <option value="B">B</option>
+    <option value="C">C</option>
+  </select>
 </div>
 
-<div class="note warn">
-  <span class="tag">⚠ 使う前に必ず読んでください</span>
-  <p><b>代表者名（109社が空欄・残りも未検証）と設立年（60社が空欄・残りも未検証）は、すべて「仮」です。</b>
-  データベースの <code>founding_verified</code> は<b>全件 false</b>。一次情報での裏取りが1件も終わっていません。</p>
-  <p><b>手紙に「◯◯社長様」「昭和◯◯年の創業と拝見しました」と書くのは、確認してからにしてください。</b>
-  ここを間違えた手紙は、届いた瞬間に信用を失います。逆に正確だと、それだけで読まれます。</p>
-  <p><b>確認のしかた（1社3分）</b>：法人番号があるものは国税庁の法人番号公表サイトで商号・所在地・設立年月日が確認できます。
-  代表者名はHPの会社概要が確実。両方ないものは、電話で「代表者様のお名前を教えていただけますか」と聞くのが早いです。</p>
+<div class="lwrap" id="lwrap"><div class="empty">読み込み中...</div></div>
+
+<!-- company modal -->
+<div class="ovl" id="ovl" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="mhd">
+      <h2 id="m-name">-</h2>
+      <button class="mclose" onclick="closeModal()">×</button>
+    </div>
+    <div class="mtabs" id="mtabs">
+      <div class="mtab on" onclick="switchTab('action')">📞 アクション</div>
+      <div class="mtab" onclick="switchTab('log')">📋 履歴</div>
+      <div class="mtab" onclick="switchTab('script')">📜 トークスクリプト</div>
+      <div class="mtab" onclick="switchTab('info')">ℹ️ 情報</div>
+    </div>
+    <div class="mbody" id="mbody"></div>
+  </div>
 </div>
 
-<div class="note ok">
-  <span class="tag">おすすめの進め方</span>
-  <p><b>①「全部そろい」の62社から始める。</b>法人番号・代表者名・設立年がすべて埋まっている行です。裏取りが速く、そのまま手紙が書けます。</p>
-  <p><b>② 承継期62社を優先。</b>「◯◯年、この沖縄で続けてこられた」という書き出しがそのまま使えます（手紙パターンA）。</p>
-  <p><b>③ 那覇市146社・浦添市31社・糸満市19社に集中している。</b>訪問ルートが組みやすい。<b>1日10社の手渡しが現実的にこなせます。</b></p>
+<!-- add modal -->
+<div class="ovl" id="add-ovl" onclick="closeAdd(event)">
+  <div class="modal">
+    <div class="mhd">
+      <h2>＋ 会社を追加</h2>
+      <button class="mclose" onclick="closeAdd()">×</button>
+    </div>
+    <div class="mbody">
+      <div class="add-form">
+        <input class="add-inp" id="an" placeholder="会社名 *">
+        <input class="add-inp" id="ap" placeholder="電話番号">
+        <input class="add-inp" id="aw" placeholder="ウェブサイト URL">
+        <input class="add-inp" id="ac" placeholder="代表者名">
+        <input class="add-inp" id="ai" placeholder="業種">
+        <input class="add-inp" id="acy" placeholder="市区町村">
+        <input class="add-inp" id="aig" placeholder="Instagram URL">
+        <input class="add-inp" id="ax" placeholder="X (Twitter) URL">
+        <input class="add-inp" id="aind" placeholder="Indeed URL">
+        <button class="add-submit" onclick="doAdd()">追加する</button>
+      </div>
+    </div>
+  </div>
 </div>
 
-<h2>211社のリスト</h2>
-<p class="sub">S＝オレンジの行が最優先。「手紙の型」は <a href="./sales-toolkit.html#s1">営業の四つ道具</a> のパターンA／Bに対応しています。</p>
-
-<div class="bar">
-  <label>絞り込み</label>
-  <button type="button" data-f="all" aria-pressed="true">すべて</button>
-  <button type="button" data-f="S" aria-pressed="false">S だけ</button>
-  <button type="button" data-f="suc" aria-pressed="false">承継期</button>
-  <button type="button" data-f="ann" aria-pressed="false">周年間近</button>
-  <button type="button" data-f="naha" aria-pressed="false">那覇市</button>
-  <span class="cnt" id="cnt">211社</span>
-</div>
-
-<div class="tw">
-<table>
-  <thead><tr>
-    <th></th><th>ランク</th><th>会社名</th><th>市町村</th><th>業種</th><th>電話</th>
-    <th>代表者名<span style="color:var(--warn)">※仮</span></th><th>設立<span style="color:var(--warn)">※仮</span></th><th>社歴</th>
-    <th>シグナル</th><th>要確認</th><th>リンク</th>
-  </tr></thead>
-  <tbody id="tb">
-<tr class="s" data-tier="S" data-suc="1" data-ann="1" data-city="那覇市">
-<td class="n">1</td><td><span class="tier tS">S</span></td>
-<td class="co">デンセンドウ</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-884-6140</td><td>大城 充</td>
-<td class="n mono">1992</td><td class="n mono">34年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m ann">周年</span><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"></td>
-<td class="lk"><a href="https://www.densendou.jp/" target="_blank" rel="noopener">HP</a><a href="mailto:info@densendou.co.jp">✉</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="1" data-city="浦添市">
-<td class="n">2</td><td><span class="tier tS">S</span></td>
-<td class="co">大和住宅産業</td>
-<td>浦添市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-876-1232</td><td>大城 和則</td>
-<td class="n mono">1971</td><td class="n mono">55年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m ann">周年</span><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"></td>
-<td class="lk"><a href="https://daiwa-j.net/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="1" data-city="浦添市">
-<td class="n">3</td><td><span class="tier tS">S</span></td>
-<td class="co">ホームメイトFC浦添店 有限会社大吉宅建</td>
-<td>浦添市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-879-1160</td><td>名嘉真 秀</td>
-<td class="n mono">1987</td><td class="n mono">39年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m ann">周年</span><span class="m job">求人</span></td><td class="mk"></td>
-<td class="lk"><a href="http://www.daikiti-takuken.co.jp/" target="_blank" rel="noopener">HP</a><a href="mailto:info@daikiti-takuken.co.jp">✉</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="1" data-city="那覇市">
-<td class="n">4</td><td><span class="tier tS">S</span></td>
-<td class="co">(有)スタプランニング 設計施工部</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-833-5519</td><td>赤嶺 剛</td>
-<td class="n mono">1996</td><td class="n mono">30年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m ann">周年</span><span class="m job">求人</span></td><td class="mk"></td>
-<td class="lk"><a href="https://www.stta-p.com/" target="_blank" rel="noopener">HP</a><a href="mailto:info@stta-p.com">✉</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="1" data-city="那覇市">
-<td class="n">5</td><td><span class="tier tS">S</span></td>
-<td class="co">ちゅら建装</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-835-9592</td><td>大城一志</td>
-<td class="n mono">1996</td><td class="n mono">30年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m ann">周年</span><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">法人番号なし</span></td>
-<td class="lk"><a href="https://churaken.com/" target="_blank" rel="noopener">HP</a><a href="mailto:info@churaken.com">✉</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="0" data-city="那覇市">
-<td class="n">6</td><td><span class="tier tS">S</span></td>
-<td class="co">津堅事務用品店</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-866-4900</td><td>津堅直樹</td>
-<td class="n mono">1980</td><td class="n mono">46年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"></td>
-<td class="lk"><a href="http://www.tsukenjim.com/" target="_blank" rel="noopener">HP</a><a href="mailto:info@tsukenjim.com">✉</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="0" data-city="那覇市">
-<td class="n">7</td><td><span class="tier tS">S</span></td>
-<td class="co">（有）久茂地宅建</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-867-9422</td><td>奥間 久子</td>
-<td class="n mono">1983</td><td class="n mono">43年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"></td>
-<td class="lk"><a href="http://www.kthousing.com/" target="_blank" rel="noopener">HP</a><a href="mailto:info@kthousing.com">✉</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="1" data-city="糸満市">
-<td class="n">8</td><td><span class="tier tS">S</span></td>
-<td class="co">(有)辰雄建設</td>
-<td>糸満市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-992-5247</td><td></td>
-<td class="n mono">1987</td><td class="n mono">39年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m ann">周年</span><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://tatsuo-kensetsu.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="1" data-city="糸満市">
-<td class="n">9</td><td><span class="tier tS">S</span></td>
-<td class="co">(有)大栄土建</td>
-<td>糸満市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-994-6921</td><td></td>
-<td class="n mono">1991</td><td class="n mono">35年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m ann">周年</span><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://www.kensetumap.com/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="1" data-city="那覇市">
-<td class="n">10</td><td><span class="tier tS">S</span></td>
-<td class="co">（一財）沖縄観光コンベンションビューロー</td>
-<td>那覇市</td><td class="sm">観光施設・レジャー</td>
-<td class="mono">098-859-6123</td><td>浜田 京介</td>
-<td class="n mono">1972</td><td class="n mono">54年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m ann">周年</span><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"></td>
-<td class="lk"><a href="http://www.ocvb.or.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="0" data-city="糸満市">
-<td class="n">11</td><td><span class="tier tS">S</span></td>
-<td class="co">南山開発</td>
-<td>糸満市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-992-5511</td><td>浦崎 ひとみ</td>
-<td class="n mono">1973</td><td class="n mono">53年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"></td>
-<td class="lk"><a href="http://nanzan.ti-da.net/e2945776.html" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="0" data-city="那覇市">
-<td class="n">12</td><td><span class="tier tS">S</span></td>
-<td class="co">（有）新居開発</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-833-0874</td><td>大濱 設力</td>
-<td class="n mono">1979</td><td class="n mono">47年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"></td>
-<td class="lk"><a href="https://u-arai-k.main.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="0" data-city="那覇市">
-<td class="n">13</td><td><span class="tier tS">S</span></td>
-<td class="co">株式会社アレックス</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-863-3155</td><td>外間 俊</td>
-<td class="n mono">1979</td><td class="n mono">47年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m job">求人</span></td><td class="mk"></td>
-<td class="lk"><a href="https://www.alex-okinawa.com/" target="_blank" rel="noopener">HP</a><a href="mailto:alex@alex-okinawa.com">✉</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="1" data-city="那覇市">
-<td class="n">14</td><td><span class="tier tS">S</span></td>
-<td class="co">(株)沖創建設</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-866-1007</td><td></td>
-<td class="n mono">1982</td><td class="n mono">44年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m ann">周年</span><span class="m job">求人</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://www.okiso.co.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="0" data-city="那覇市">
-<td class="n">15</td><td><span class="tier tS">S</span></td>
-<td class="co">若狭サービス社べんり大工</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-884-5771</td><td>謝敷 竜平</td>
-<td class="n mono">1983</td><td class="n mono">43年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">法人番号なし</span></td>
-<td class="lk"><a href="http://wakasa-s.jp/" target="_blank" rel="noopener">HP</a><a href="mailto:info@wakasa-s.jp">✉</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="0" data-city="那覇市">
-<td class="n">16</td><td><span class="tier tS">S</span></td>
-<td class="co">（有）沖縄ニューハウスセンター</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-867-8316</td><td>饒平名 久美子</td>
-<td class="n mono">1985</td><td class="n mono">41年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"></td>
-<td class="lk"><a href="http://www.onc1.co.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="1" data-city="糸満市">
-<td class="n">17</td><td><span class="tier tS">S</span></td>
-<td class="co">（株）協亜建設</td>
-<td>糸満市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-992-2079</td><td></td>
-<td class="n mono">1986</td><td class="n mono">40年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m ann">周年</span><span class="m job">求人</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://www.kyo-a.com/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="1" data-city="糸満市">
-<td class="n">18</td><td><span class="tier tS">S</span></td>
-<td class="co">(有)たましろ建設</td>
-<td>糸満市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-992-3728</td><td></td>
-<td class="n mono">1991</td><td class="n mono">35年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m ann">周年</span><span class="m job">求人</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://tsukulink.net/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="1" data-city="那覇市">
-<td class="n">19</td><td><span class="tier tS">S</span></td>
-<td class="co">ＫＡＮサービス</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-941-7773</td><td>安里 寛栄</td>
-<td class="n mono">1991</td><td class="n mono">35年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m ann">周年</span><span class="m job">求人</span></td><td class="mk"><span class="m ng">法人番号なし</span></td>
-<td class="lk"><a href="http://kan-okinawa.com/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="0" data-city="那覇市">
-<td class="n">20</td><td><span class="tier tS">S</span></td>
-<td class="co">沖縄ペイント</td>
-<td>那覇市</td><td class="sm">塗装会社</td>
-<td class="mono">098-862-7721</td><td>與那嶺 毅</td>
-<td class="n mono">1995</td><td class="n mono">31年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"></td>
-<td class="lk"><a href="http://www.okipen.com/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="0" data-ann="1" data-city="那覇市">
-<td class="n">21</td><td><span class="tier tS">S</span></td>
-<td class="co">興産アメニティ株式会社</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-882-1717</td><td>比嘉 優貴</td>
-<td class="n mono">2007</td><td class="n mono">19年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"></td>
-<td class="lk"><a href="http://kosanamenity.com/" target="_blank" rel="noopener">HP</a><a href="mailto:info@suminchu.ne.jp">✉</a></td></tr>
-<tr class="s" data-tier="S" data-suc="0" data-ann="1" data-city="那覇市">
-<td class="n">22</td><td><span class="tier tS">S</span></td>
-<td class="co">リフォームのHAPPY 那覇支店</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-988-9428</td><td>馬場 順一</td>
-<td class="n mono">1956</td><td class="n mono">70年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">法人番号なし</span></td>
-<td class="lk"><a href="http://www.houyuu-kensetsu.com/cgi-bin/houyuu-kensetsu/siteup.cgi?category=5&amp;page=0" target="_blank" rel="noopener">HP</a><a href="mailto:contact@houyuu-kensetsu.com">✉</a></td></tr>
-<tr class="s" data-tier="S" data-suc="0" data-ann="1" data-city="那覇市">
-<td class="n">23</td><td><span class="tier tS">S</span></td>
-<td class="co">(株)幸健ホーム</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-869-8923</td><td>玉城 順一</td>
-<td class="n mono">1962</td><td class="n mono">64年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"></td>
-<td class="lk"><a href="http://www.koukenhome.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="0" data-ann="1" data-city="那覇市">
-<td class="n">24</td><td><span class="tier tS">S</span></td>
-<td class="co">(株) かりゆし</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">090-3797-2674</td><td>本田 賢紀</td>
-<td class="n mono">1962</td><td class="n mono">64年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"></td>
-<td class="lk"><a href="https://kariyushi-o.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="0" data-ann="1" data-city="那覇市">
-<td class="n">25</td><td><span class="tier tS">S</span></td>
-<td class="co">沖縄県のオフィス空間創り ｜ 株式会社マルゼン</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-863-6111</td><td>比嘉 基</td>
-<td class="n mono">1966</td><td class="n mono">60年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"></td>
-<td class="lk"><a href="https://okinawa-office-navi.com/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="0" data-ann="1" data-city="那覇市">
-<td class="n">26</td><td><span class="tier tS">S</span></td>
-<td class="co">株式会社 ASAKA</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-866-6636</td><td>浅香 友之</td>
-<td class="n mono">1966</td><td class="n mono">60年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"></td>
-<td class="lk"><a href="http://www.asakajs.com/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="0" data-city="那覇市">
-<td class="n">27</td><td><span class="tier tS">S</span></td>
-<td class="co">(名) 東洋測量</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-832-0390</td><td></td>
-<td class="n mono">1973</td><td class="n mono">53年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://www.toyosurv.tochigi.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="0" data-city="那覇市">
-<td class="n">28</td><td><span class="tier tS">S</span></td>
-<td class="co">沖縄第一不動産(株)</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-860-3033</td><td></td>
-<td class="n mono">1974</td><td class="n mono">52年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://goohome.jp/fudousan/realtor/2541/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="0" data-city="那覇市">
-<td class="n">29</td><td><span class="tier tS">S</span></td>
-<td class="co">（有）牧志不動産</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-863-5251</td><td></td>
-<td class="n mono">1974</td><td class="n mono">52年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://goohome.jp/fudousan/realtor/70/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="0" data-city="那覇市">
-<td class="n">30</td><td><span class="tier tS">S</span></td>
-<td class="co">（株）大信開発</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-866-1234</td><td></td>
-<td class="n mono">1978</td><td class="n mono">48年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m job">求人</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="http://www.daishin-kaihatu.co.jp/" target="_blank" rel="noopener">HP</a><a href="mailto:info@daishin-kaihatu.co.jp">✉</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="0" data-city="浦添市">
-<td class="n">31</td><td><span class="tier tS">S</span></td>
-<td class="co">株式会社大原宅建</td>
-<td>浦添市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-878-0212</td><td>大原 栄和</td>
-<td class="n mono">1980</td><td class="n mono">46年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m job">求人</span></td><td class="mk"></td>
-<td class="lk"><a href="http://oohara-t.com/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="0" data-city="那覇市">
-<td class="n">32</td><td><span class="tier tS">S</span></td>
-<td class="co">（株）オキジツ船場</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-867-1008</td><td>宮里 亮</td>
-<td class="n mono">1983</td><td class="n mono">43年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m job">求人</span></td><td class="mk"></td>
-<td class="lk"><a href="http://okijitsu-semba.co.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="0" data-city="糸満市">
-<td class="n">33</td><td><span class="tier tS">S</span></td>
-<td class="co">株式会社 利興土建</td>
-<td>糸満市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-894-6355</td><td></td>
-<td class="n mono">1984</td><td class="n mono">42年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://www.rikoudoken.okinawa/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="0" data-city="那覇市">
-<td class="n">34</td><td><span class="tier tS">S</span></td>
-<td class="co">（有）沖住設</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-882-2033</td><td>福嶺 博安</td>
-<td class="n mono">1988</td><td class="n mono">38年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m job">求人</span></td><td class="mk"></td>
-<td class="lk"><a href="http://www.okijyusetu.com/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="0" data-city="那覇市">
-<td class="n">35</td><td><span class="tier tS">S</span></td>
-<td class="co">大京穴吹不動産 沖縄店</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-953-2080</td><td>落合 英信</td>
-<td class="n mono">1988</td><td class="n mono">38年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">法人番号なし</span></td>
-<td class="lk"><a href="https://www.daikyo-anabuki.co.jp/office/okinawa/?utm_source=GMB&amp;utm_campaign=map&amp;utm_term=office&amp;argument=jHMKTWvJ&amp;dmai=a5f74689b954e5" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="0" data-city="那覇市">
-<td class="n">36</td><td><span class="tier tS">S</span></td>
-<td class="co">未来開発</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-887-6669</td><td></td>
-<td class="n mono">1988</td><td class="n mono">38年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://www.miraikaihatsu.co.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="0" data-city="那覇市">
-<td class="n">37</td><td><span class="tier tS">S</span></td>
-<td class="co">(有)國真住建</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-862-2785</td><td></td>
-<td class="n mono">1990</td><td class="n mono">36年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://www.kensetumap.com/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="0" data-city="那覇市">
-<td class="n">38</td><td><span class="tier tS">S</span></td>
-<td class="co">(株)沖縄合人社</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-869-4302</td><td></td>
-<td class="n mono">1990</td><td class="n mono">36年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://www.gojin.co.jp/group/okinawa/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="0" data-city="那覇市">
-<td class="n">39</td><td><span class="tier tS">S</span></td>
-<td class="co">(有)沖縄建装工業</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-887-6110</td><td>向井 芳治</td>
-<td class="n mono">1990</td><td class="n mono">36年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m job">求人</span></td><td class="mk"></td>
-<td class="lk"><a href="https://www.okinawakensou.com/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="0" data-city="浦添市">
-<td class="n">40</td><td><span class="tier tS">S</span></td>
-<td class="co">（株）財全エステート</td>
-<td>浦添市</td><td class="sm">不動産・建設</td>
-<td class="mono">0120-816-200</td><td>池田 盛作</td>
-<td class="n mono">1993</td><td class="n mono">33年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m job">求人</span></td><td class="mk"></td>
-<td class="lk"><a href="https://zaizen-estate.co.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="0" data-city="那覇市">
-<td class="n">41</td><td><span class="tier tS">S</span></td>
-<td class="co">沖縄県不動産流通機構</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-861-3584</td><td></td>
-<td class="n mono">1994</td><td class="n mono">32年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="http://okinawa-takken.com/member/ryutukiko_about/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="1" data-city="那覇市">
-<td class="n">42</td><td><span class="tier tS">S</span></td>
-<td class="co">有限会社 デュース</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-951-0661</td><td></td>
-<td class="n mono">1996</td><td class="n mono">30年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m ann">周年</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="http://www.duce.co.jp/" target="_blank" rel="noopener">HP</a><a href="mailto:info@duce.co.jp">✉</a></td></tr>
-<tr class="s" data-tier="S" data-suc="0" data-ann="1" data-city="那覇市">
-<td class="n">43</td><td><span class="tier tS">S</span></td>
-<td class="co">株式会社あうん工房</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">0120-724-152</td><td>森本健</td>
-<td class="n mono">2007</td><td class="n mono">19年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span></td><td class="mk"></td>
-<td class="lk"><a href="http://aunkoubou.com/" target="_blank" rel="noopener">HP</a><a href="mailto:info@aunkoubou.com">✉</a></td></tr>
-<tr class="s" data-tier="S" data-suc="0" data-ann="1" data-city="浦添市">
-<td class="n">44</td><td><span class="tier tS">S</span></td>
-<td class="co">リードハピネス株式会社</td>
-<td>浦添市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-917-0996</td><td>赤嶺 直毅</td>
-<td class="n mono">2011</td><td class="n mono">15年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"></td>
-<td class="lk"><a href="https://leadhappiness.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="0" data-ann="1" data-city="那覇市">
-<td class="n">45</td><td><span class="tier tS">S</span></td>
-<td class="co">（株）パーフェクトＭ</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-996-3869</td><td>内間 安邦</td>
-<td class="n mono">2011</td><td class="n mono">15年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"></td>
-<td class="lk"><a href="http://www.perfectm.co.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="0" data-ann="1" data-city="浦添市">
-<td class="n">46</td><td><span class="tier tS">S</span></td>
-<td class="co">株式会社ここハウス</td>
-<td>浦添市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-894-2652</td><td>小野瀬 雅樹</td>
-<td class="n mono">2011</td><td class="n mono">15年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"></td>
-<td class="lk"><a href="https://www.co-co-house.co.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="0" data-ann="1" data-city="浦添市">
-<td class="n">47</td><td><span class="tier tS">S</span></td>
-<td class="co">株式会社デライトハウジング</td>
-<td>浦添市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-975-7355</td><td>松村 宜裕</td>
-<td class="n mono">2017</td><td class="n mono">9年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span></td><td class="mk"></td>
-<td class="lk"><a href="https://www.delight.okinawa/" target="_blank" rel="noopener">HP</a><a href="mailto:info@delight.okinawa">✉</a></td></tr>
-<tr class="s" data-tier="S" data-suc="0" data-ann="1" data-city="浦添市">
-<td class="n">48</td><td><span class="tier tS">S</span></td>
-<td class="co">㈱Nice不動産</td>
-<td>浦添市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-877-0713</td><td>普久原 聖</td>
-<td class="n mono">2021</td><td class="n mono">5年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span></td><td class="mk"></td>
-<td class="lk"><a href="https://www.nice-fudousan.com/" target="_blank" rel="noopener">HP</a><a href="mailto:contact@nice2021.co.jp">✉</a></td></tr>
-<tr class="s" data-tier="S" data-suc="0" data-ann="1" data-city="那覇市">
-<td class="n">49</td><td><span class="tier tS">S</span></td>
-<td class="co">株式会社グランプログレス</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-917-0333</td><td>波平 眞明</td>
-<td class="n mono">2021</td><td class="n mono">5年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span></td><td class="mk"></td>
-<td class="lk"><a href="https://granprogress.co.jp/" target="_blank" rel="noopener">HP</a><a href="mailto:info@granprogress.jp">✉</a></td></tr>
-<tr class="s" data-tier="S" data-suc="0" data-ann="1" data-city="那覇市">
-<td class="n">50</td><td><span class="tier tS">S</span></td>
-<td class="co">（株）佐平建設</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-851-8352</td><td></td>
-<td class="n mono">1957</td><td class="n mono">69年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://www.sahira.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="0" data-ann="1" data-city="那覇市">
-<td class="n">51</td><td><span class="tier tS">S</span></td>
-<td class="co">（株）東洋商会</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-861-1040</td><td></td>
-<td class="n mono">1962</td><td class="n mono">64年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="http://toyosok.com/about.php" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="0" data-ann="1" data-city="那覇市">
-<td class="n">52</td><td><span class="tier tS">S</span></td>
-<td class="co">（株）高橋土建 本社</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-862-5188</td><td>新垣 隆行</td>
-<td class="n mono">1962</td><td class="n mono">64年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span></td><td class="mk"></td>
-<td class="lk"><a href="http://takahashidoken.com/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="1" data-city="石垣市">
-<td class="n">53</td><td><span class="tier tS">S</span></td>
-<td class="co">平田観光</td>
-<td>石垣市</td><td class="sm">観光施設・レジャー</td>
-<td class="mono">0980-82-6711</td><td></td>
-<td class="n mono">1972</td><td class="n mono">54年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m ann">周年</span><span class="m job">求人</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://hirata-group.co.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="0" data-city="糸満市">
-<td class="n">54</td><td><span class="tier tS">S</span></td>
-<td class="co">光建設株式会社</td>
-<td>糸満市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-994-5635</td><td></td>
-<td class="n mono">1973</td><td class="n mono">53年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m job">求人</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="http://www.hikarikensetu.okinawa/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="0" data-city="糸満市">
-<td class="n">55</td><td><span class="tier tS">S</span></td>
-<td class="co">(株)照屋土建</td>
-<td>糸満市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-992-5644</td><td></td>
-<td class="n mono">1973</td><td class="n mono">53年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m job">求人</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="http://www.teruya-doken.com/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="0" data-city="那覇市">
-<td class="n">56</td><td><span class="tier tS">S</span></td>
-<td class="co">日本ジタン (株) 沖縄営業所</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-831-5612</td><td></td>
-<td class="n mono">1973</td><td class="n mono">53年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">法人番号なし</span> <span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="http://www.zitan.co.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="0" data-city="糸満市">
-<td class="n">57</td><td><span class="tier tS">S</span></td>
-<td class="co">（株）嶺建材</td>
-<td>糸満市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-851-9995</td><td></td>
-<td class="n mono">1973</td><td class="n mono">53年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m job">求人</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="http://www.minekenzai.co.jp/company/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="0" data-city="糸満市">
-<td class="n">58</td><td><span class="tier tS">S</span></td>
-<td class="co">（株）西崎興業</td>
-<td>糸満市</td><td class="sm">不動産・建設</td>
-<td class="mono">0120-046-313</td><td></td>
-<td class="n mono">1974</td><td class="n mono">52年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m job">求人</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="http://www.nishizaki-k.co.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="0" data-city="那覇市">
-<td class="n">59</td><td><span class="tier tS">S</span></td>
-<td class="co">東建コーポレーション 那覇支店 (ホームメイト)</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-941-5100</td><td></td>
-<td class="n mono">1974</td><td class="n mono">52年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">法人番号なし</span> <span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://www.token-naha.com/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="0" data-city="那覇市">
-<td class="n">60</td><td><span class="tier tS">S</span></td>
-<td class="co">(有) 沖縄磁探総業</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-863-6063</td><td></td>
-<td class="n mono">1978</td><td class="n mono">48年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">法人番号なし</span> <span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://okijitan.com/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="0" data-city="那覇市">
-<td class="n">61</td><td><span class="tier tS">S</span></td>
-<td class="co">リフォーム専門 タイホウ建設</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">080-6441-8754</td><td></td>
-<td class="n mono">1978</td><td class="n mono">48年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">法人番号なし</span> <span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://taihou55.com/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="0" data-city="那覇市">
-<td class="n">62</td><td><span class="tier tS">S</span></td>
-<td class="co">環ハウス（株）</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-831-9293</td><td></td>
-<td class="n mono">1980</td><td class="n mono">46年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m job">求人</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://www.tamaki-house.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="0" data-city="那覇市">
-<td class="n">63</td><td><span class="tier tS">S</span></td>
-<td class="co">株式会社 タイムス住宅新聞社</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-862-1155</td><td></td>
-<td class="n mono">1983</td><td class="n mono">43年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m job">求人</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://jpress.okinawatimes.co.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="0" data-city="浦添市">
-<td class="n">64</td><td><span class="tier tS">S</span></td>
-<td class="co">（有）仲西宅建</td>
-<td>浦添市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-874-5941</td><td>仲西 浩之</td>
-<td class="n mono">1983</td><td class="n mono">43年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m nosns">SNS無</span></td><td class="mk"></td>
-<td class="lk"><a href="http://www.rent-housing.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="1" data-city="那覇市">
-<td class="n">65</td><td><span class="tier tS">S</span></td>
-<td class="co">タカラハウス</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-834-7300</td><td></td>
-<td class="n mono">1986</td><td class="n mono">40年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m ann">周年</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://www.takarahouse4718.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="0" data-city="那覇市">
-<td class="n">66</td><td><span class="tier tS">S</span></td>
-<td class="co">(株) 琉信ハウジング</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-868-1000</td><td></td>
-<td class="n mono">1988</td><td class="n mono">38年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m job">求人</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://ryuhau.co.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="0" data-city="那覇市">
-<td class="n">67</td><td><span class="tier tS">S</span></td>
-<td class="co">（株）住太郎ホーム</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-943-5077</td><td></td>
-<td class="n mono">1989</td><td class="n mono">37年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m job">求人</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://www.jyutaro.co.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="0" data-city="糸満市">
-<td class="n">68</td><td><span class="tier tS">S</span></td>
-<td class="co">AHC株式会社</td>
-<td>糸満市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-992-5522</td><td></td>
-<td class="n mono">1990</td><td class="n mono">36年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m job">求人</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://www.ahc-map.jp/value/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="0" data-city="那覇市">
-<td class="n">69</td><td><span class="tier tS">S</span></td>
-<td class="co">(株)みつわ産業 壺川店</td>
-<td>那覇市</td><td class="sm">飲食・食品</td>
-<td class="mono">098-836-5353</td><td>與那嶺 達啓</td>
-<td class="n mono">1990</td><td class="n mono">36年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"></td>
-<td class="lk"><a href="https://mitsuwa-ind.jp/branch_ja/shop_tsubogawa" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="0" data-city="那覇市">
-<td class="n">70</td><td><span class="tier tS">S</span></td>
-<td class="co">(株)ホット沖縄</td>
-<td>那覇市</td><td class="sm">IT・メディア</td>
-<td class="mono">098-863-2828</td><td>白石 武博</td>
-<td class="n mono">1990</td><td class="n mono">36年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m job">求人</span></td><td class="mk"></td>
-<td class="lk"><a href="hot-okinawa.co.jp" target="_blank" rel="noopener">HP</a><a href="mailto:hot-info@hot-okinawa.co.jp">✉</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="0" data-city="那覇市">
-<td class="n">71</td><td><span class="tier tS">S</span></td>
-<td class="co">託一建設株式会社</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">050-1871-1567</td><td></td>
-<td class="n mono">1993</td><td class="n mono">33年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m job">求人</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://takuichi.co.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="1" data-ann="0" data-city="那覇市">
-<td class="n">72</td><td><span class="tier tS">S</span></td>
-<td class="co">株式会社 オリジン建設</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-854-6001</td><td></td>
-<td class="n mono">1994</td><td class="n mono">32年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m job">求人</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://www.origin-okinawa.co.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="0" data-ann="1" data-city="那覇市">
-<td class="n">73</td><td><span class="tier tS">S</span></td>
-<td class="co">ハウズイング合人社沖縄（株）</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-860-8590</td><td></td>
-<td class="n mono">2001</td><td class="n mono">25年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://www.gojin.co.jp/group/housing/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="0" data-ann="1" data-city="那覇市">
-<td class="n">74</td><td><span class="tier tS">S</span></td>
-<td class="co">高倉コーポレーション</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-864-1611</td><td>高倉 幸一</td>
-<td class="n mono">2001</td><td class="n mono">25年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span></td><td class="mk"></td>
-<td class="lk"></td></tr>
-<tr class="s" data-tier="S" data-suc="0" data-ann="1" data-city="糸満市">
-<td class="n">75</td><td><span class="tier tS">S</span></td>
-<td class="co">(有)沖縄総合建設</td>
-<td>糸満市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-851-7166</td><td></td>
-<td class="n mono">2002</td><td class="n mono">24年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://okinawa2012.com/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="0" data-ann="1" data-city="那覇市">
-<td class="n">76</td><td><span class="tier tS">S</span></td>
-<td class="co">本気でペイント</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">0800-200-0486</td><td>玉城 惠美子</td>
-<td class="n mono">2006</td><td class="n mono">20年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span></td><td class="mk"><span class="m ng">法人番号なし</span></td>
-<td class="lk"><a href="http://honkidepaint-tno.com/" target="_blank" rel="noopener">HP</a><a href="mailto:info@honkidepaint.com">✉</a></td></tr>
-<tr class="s" data-tier="S" data-suc="0" data-ann="1" data-city="那覇市">
-<td class="n">77</td><td><span class="tier tS">S</span></td>
-<td class="co">本気でペイント</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-860-8739</td><td>玉城 惠美子</td>
-<td class="n mono">2006</td><td class="n mono">20年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span></td><td class="mk"><span class="m ng">法人番号なし</span></td>
-<td class="lk"><a href="http://honkidepaint-tno.com/" target="_blank" rel="noopener">HP</a><a href="mailto:info@honkidepaint.com">✉</a></td></tr>
-<tr class="s" data-tier="S" data-suc="0" data-ann="1" data-city="那覇市">
-<td class="n">78</td><td><span class="tier tS">S</span></td>
-<td class="co">株式会社 東都企画</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-951-3737</td><td>安里 豊</td>
-<td class="n mono">2007</td><td class="n mono">19年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span></td><td class="mk"></td>
-<td class="lk"><a href="https://tsukulink.net/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="0" data-ann="1" data-city="那覇市">
-<td class="n">79</td><td><span class="tier tS">S</span></td>
-<td class="co">株式会社ブレオ都市開発</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-862-3322</td><td></td>
-<td class="n mono">2011</td><td class="n mono">15年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://breo-rd.co.jp/" target="_blank" rel="noopener">HP</a><a href="mailto:info@breo.okinawa">✉</a></td></tr>
-<tr class="s" data-tier="S" data-suc="0" data-ann="1" data-city="那覇市">
-<td class="n">80</td><td><span class="tier tS">S</span></td>
-<td class="co">㈱コンセプション 空間デザインファーム∞パートナーズ</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-868-8682</td><td>平識 伸二郎</td>
-<td class="n mono">2011</td><td class="n mono">15年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span></td><td class="mk"></td>
-<td class="lk"><a href="https://conception.zone/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="0" data-ann="1" data-city="那覇市">
-<td class="n">81</td><td><span class="tier tS">S</span></td>
-<td class="co">四季彩ペイント</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">0120-952-843</td><td>島袋 篤</td>
-<td class="n mono">2011</td><td class="n mono">15年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span></td><td class="mk"></td>
-<td class="lk"><a href="https://www.shikisaipaint.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="0" data-ann="1" data-city="那覇市">
-<td class="n">82</td><td><span class="tier tS">S</span></td>
-<td class="co">（公社）沖縄県宅地建物取引業協会</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-861-3402</td><td></td>
-<td class="n mono">2012</td><td class="n mono">14年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="http://okinawa-takken.com/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="0" data-ann="1" data-city="糸満市">
-<td class="n">83</td><td><span class="tier tS">S</span></td>
-<td class="co">愛ランドホーム株式会社</td>
-<td>糸満市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-894-4944</td><td></td>
-<td class="n mono">2012</td><td class="n mono">14年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="http://ailandhome.jp/" target="_blank" rel="noopener">HP</a><a href="mailto:info@ailandhome.jp">✉</a></td></tr>
-<tr class="s" data-tier="S" data-suc="0" data-ann="1" data-city="浦添市">
-<td class="n">84</td><td><span class="tier tS">S</span></td>
-<td class="co">株式会社ここちホーム</td>
-<td>浦添市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-975-9033</td><td>又吉 拓馬</td>
-<td class="n mono">2016</td><td class="n mono">10年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span></td><td class="mk"></td>
-<td class="lk"><a href="http://cocochi-home.com/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="0" data-ann="1" data-city="那覇市">
-<td class="n">85</td><td><span class="tier tS">S</span></td>
-<td class="co">合同会社ポスト工務店</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-851-4142</td><td>伊礼 龍也</td>
-<td class="n mono">2021</td><td class="n mono">5年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span></td><td class="mk"></td>
-<td class="lk"><a href="http://www.postkoumuten.sakura.ne.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="0" data-ann="1" data-city="那覇市">
-<td class="n">86</td><td><span class="tier tS">S</span></td>
-<td class="co">（株）喜神サービス 那覇ショウルーム</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-833-9420</td><td>川満 秀吉</td>
-<td class="n mono">2021</td><td class="n mono">5年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span></td><td class="mk"></td>
-<td class="lk"><a href="https://nahashowroom.wixsite.com/kishinservice" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="s" data-tier="S" data-suc="0" data-ann="1" data-city="那覇市">
-<td class="n">87</td><td><span class="tier tS">S</span></td>
-<td class="co">福maruの庭株式会社</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-917-2555</td><td></td>
-<td class="n mono">2022</td><td class="n mono">4年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://www.fukumaru-estate.com/" target="_blank" rel="noopener">HP</a><a href="mailto:info@brilliantport.com">✉</a></td></tr>
-<tr class="s" data-tier="S" data-suc="0" data-ann="0" data-city="沖縄市">
-<td class="n">88</td><td><span class="tier tS">S</span></td>
-<td class="co">（株）サンニン</td>
-<td>沖縄市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-930-6090</td><td>田中</td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="mailto:contact@sannin.com">✉</a></td></tr>
-<tr class="s" data-tier="S" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">89</td><td><span class="tier tS">S</span></td>
-<td class="co">（株）不動企画</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-836-2292</td><td>照喜名 公枝</td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="https://www.fudoukikaku.com/" target="_blank" rel="noopener">HP</a><a href="mailto:fudou@at.au-hikari.ne.jp">✉</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="1" data-city="那覇市">
-<td class="n">90</td><td><span class="tier tA">A</span></td>
-<td class="co">（株）不動テトラ 沖縄営業所</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-862-7223</td><td>奥田 真次</td>
-<td class="n mono">1947</td><td class="n mono">79年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span></td><td class="mk"><span class="m ng">法人番号なし</span></td>
-<td class="lk"><a href="https://www.fudotetra.co.jp/company/office/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="1" data-city="糸満市">
-<td class="n">91</td><td><span class="tier tA">A</span></td>
-<td class="co">(株)呉屋組</td>
-<td>糸満市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-992-2722</td><td></td>
-<td class="n mono">1966</td><td class="n mono">60年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="http://goyagumi.com/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="1" data-ann="0" data-city="糸満市">
-<td class="n">92</td><td><span class="tier tA">A</span></td>
-<td class="co">とくとくハウス (㈱德松産業)</td>
-<td>糸満市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-851-3291</td><td></td>
-<td class="n mono">1974</td><td class="n mono">52年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m job">求人</span></td><td class="mk"><span class="m ng">法人番号なし</span> <span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://tokutokuhouse.jp/?utm_source=GBP&amp;utm_medium=GBP&amp;utm_term=GBP&amp;utm_content=GBP&amp;utm_campaign=GBP" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="1" data-ann="1" data-city="那覇市">
-<td class="n">93</td><td><span class="tier tA">A</span></td>
-<td class="co">HIP-HOP BUS（ジャンボツアーズ）</td>
-<td>那覇市</td><td class="sm">観光バスツアー</td>
-<td class="mono">098-863-6677</td><td>谷村 勝己</td>
-<td class="n mono">1981</td><td class="n mono">45年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m ann">周年</span></td><td class="mk"></td>
-<td class="lk"><a href="https://hiphopbus.jumbotours.co.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="1" data-ann="0" data-city="那覇市">
-<td class="n">94</td><td><span class="tier tA">A</span></td>
-<td class="co">有限会社 大建不動産商事</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-862-2639</td><td></td>
-<td class="n mono">1983</td><td class="n mono">43年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="http://www.daiken.okinawa/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="1" data-ann="0" data-city="那覇市">
-<td class="n">95</td><td><span class="tier tA">A</span></td>
-<td class="co">フレスコアマンションギャラリー</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-868-3955</td><td></td>
-<td class="n mono">1988</td><td class="n mono">38年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m job">求人</span></td><td class="mk"><span class="m ng">法人番号なし</span> <span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://frescore.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="1" data-ann="0" data-city="那覇市">
-<td class="n">96</td><td><span class="tier tA">A</span></td>
-<td class="co">（株）オクト管理</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-868-0910</td><td></td>
-<td class="n mono">1988</td><td class="n mono">38年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="http://www.oct8.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="1" data-city="那覇市">
-<td class="n">97</td><td><span class="tier tA">A</span></td>
-<td class="co">タマキホーム株式会社</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-831-9285</td><td></td>
-<td class="n mono">1997</td><td class="n mono">29年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="http://tamaki-home.co.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">98</td><td><span class="tier tA">A</span></td>
-<td class="co">(有)リード企画</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-884-2651</td><td>金城 明</td>
-<td class="n mono">1998</td><td class="n mono">28年</td>
-<td class="mk"><span class="m job">求人</span></td><td class="mk"></td>
-<td class="lk"><a href="http://www.lead-planning.com/" target="_blank" rel="noopener">HP</a><a href="mailto:info@lead-planning.com">✉</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">99</td><td><span class="tier tA">A</span></td>
-<td class="co">(有)ソリッドワークス</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-860-4717</td><td>上原真二</td>
-<td class="n mono">2000</td><td class="n mono">26年</td>
-<td class="mk"><span class="m job">求人</span></td><td class="mk"></td>
-<td class="lk"><a href="http://www.solidworks-okinawa.com/" target="_blank" rel="noopener">HP</a><a href="mailto:info@solidworks-okinawa.com">✉</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="1" data-city="糸満市">
-<td class="n">100</td><td><span class="tier tA">A</span></td>
-<td class="co">(有)大喜商建</td>
-<td>糸満市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-995-2313</td><td></td>
-<td class="n mono">2002</td><td class="n mono">24年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://www.big-advance.site/c/172/1363/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">101</td><td><span class="tier tA">A</span></td>
-<td class="co">アスパル (株)</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-851-4577</td><td>本間敏文</td>
-<td class="n mono">2004</td><td class="n mono">22年</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"></td>
-<td class="lk"><a href="https://www.asupal.co.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">102</td><td><span class="tier tA">A</span></td>
-<td class="co">（株）てるまさリース</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-943-4355</td><td>照屋圭太</td>
-<td class="n mono">2005</td><td class="n mono">21年</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"></td>
-<td class="lk"><a href="https://terumasalease.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="南風原町">
-<td class="n">103</td><td><span class="tier tA">A</span></td>
-<td class="co">ユーアイホーム</td>
-<td>南風原町</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-894-4041</td><td>高良 盛幸</td>
-<td class="n mono">2005</td><td class="n mono">21年</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">法人番号なし</span></td>
-<td class="lk"><a href="https://www.yu-aihome.com/" target="_blank" rel="noopener">HP</a><a href="mailto:info@yu-aihome.com">✉</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="1" data-city="那覇市">
-<td class="n">104</td><td><span class="tier tA">A</span></td>
-<td class="co">株式会社 ファンスタイル</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-941-3718</td><td></td>
-<td class="n mono">2007</td><td class="n mono">19年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://www.fanstyle.co.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="1" data-city="那覇市">
-<td class="n">105</td><td><span class="tier tA">A</span></td>
-<td class="co">(株)セルリアンブルー</td>
-<td>那覇市</td><td class="sm">IT・メディア</td>
-<td class="mono">098-941-6828</td><td>砂川 盛潤</td>
-<td class="n mono">2007</td><td class="n mono">19年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span></td><td class="mk"></td>
-<td class="lk"><a href="https://www.cerulean-blue.co.jp/" target="_blank" rel="noopener">HP</a><a href="mailto:info@cerulean-blue.co.jp">✉</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="浦添市">
-<td class="n">106</td><td><span class="tier tA">A</span></td>
-<td class="co">（株）創信</td>
-<td>浦添市</td><td class="sm">不動産・建設</td>
-<td class="mono">0078-60159-948648</td><td>安里 英起</td>
-<td class="n mono">2008</td><td class="n mono">18年</td>
-<td class="mk"><span class="m job">求人</span></td><td class="mk"></td>
-<td class="lk"><a href="https://goohome.jp/fudousan/realtor/48/" target="_blank" rel="noopener">HP</a><a href="mailto:sohshin2688@outlook.com">✉</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="1" data-city="那覇市">
-<td class="n">107</td><td><span class="tier tA">A</span></td>
-<td class="co">パーフェクトメンテナンス</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-988-6068</td><td>内間 安邦</td>
-<td class="n mono">2011</td><td class="n mono">15年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span></td><td class="mk"><span class="m ng">法人番号なし</span></td>
-<td class="lk"><a href="https://www.perfectm.co.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="1" data-city="那覇市">
-<td class="n">108</td><td><span class="tier tA">A</span></td>
-<td class="co">株式会社 建全</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-988-9012</td><td></td>
-<td class="n mono">2011</td><td class="n mono">15年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://ken-zen.com/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="1" data-city="糸満市">
-<td class="n">109</td><td><span class="tier tA">A</span></td>
-<td class="co">（株）はなまるコーポレーション</td>
-<td>糸満市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-994-7775</td><td></td>
-<td class="n mono">2011</td><td class="n mono">15年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="http://www.hanamarucorporation.co.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">110</td><td><span class="tier tA">A</span></td>
-<td class="co">株式会社ホームペイント</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-917-1844</td><td>前里 拳人</td>
-<td class="n mono">2014</td><td class="n mono">12年</td>
-<td class="mk"><span class="m job">求人</span></td><td class="mk"></td>
-<td class="lk"><a href="https://www.home-paint.jp/" target="_blank" rel="noopener">HP</a><a href="mailto:peinto1844@gmail.com">✉</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="1" data-city="那覇市">
-<td class="n">111</td><td><span class="tier tA">A</span></td>
-<td class="co">STAY沖縄株式会社</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">090-6700-6145</td><td></td>
-<td class="n mono">2017</td><td class="n mono">9年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://www.stayokinawa.co.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">112</td><td><span class="tier tA">A</span></td>
-<td class="co">(株) レベルオキナワ</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-943-2297</td><td>奥村 翼</td>
-<td class="n mono">2018</td><td class="n mono">8年</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"></td>
-<td class="lk"><a href="https://rebel-okinawa.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="1" data-city="那覇市">
-<td class="n">113</td><td><span class="tier tA">A</span></td>
-<td class="co">株式会社エージェント沖縄</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-800-2780</td><td></td>
-<td class="n mono">2021</td><td class="n mono">5年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="http://agent.okinawa/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="1" data-city="那覇市">
-<td class="n">114</td><td><span class="tier tA">A</span></td>
-<td class="co">株式会社琉創住建</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-996-2400</td><td></td>
-<td class="n mono">2021</td><td class="n mono">5年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://www.instagram.com/ryuso_juken?igsh=c2d4cHF1OHlxYjB2&amp;utm_source=qr" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="1" data-city="那覇市">
-<td class="n">115</td><td><span class="tier tA">A</span></td>
-<td class="co">株式会社きよしン家不動産</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">090-1346-4770</td><td></td>
-<td class="n mono">2021</td><td class="n mono">5年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://kiyoshinchi.okinawa/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="1" data-city="那覇市">
-<td class="n">116</td><td><span class="tier tA">A</span></td>
-<td class="co">株式会社リノベース</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-917-4205</td><td></td>
-<td class="n mono">2021</td><td class="n mono">5年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://campage.jp/fukuchigumi/renove_lp" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="1" data-city="浦添市">
-<td class="n">117</td><td><span class="tier tA">A</span></td>
-<td class="co">福山建設 株式会社</td>
-<td>浦添市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-943-6671</td><td>湧川 博正</td>
-<td class="n mono">2022</td><td class="n mono">4年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m nosns">SNS無</span></td><td class="mk"></td>
-<td class="lk"><a href="https://www.fukukencorp.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="浦添市">
-<td class="n">118</td><td><span class="tier tA">A</span></td>
-<td class="co">トリアエズ株式会社</td>
-<td>浦添市</td><td class="sm">リフォーム会社</td>
-<td class="mono">0120-984-271</td><td></td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span> <span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="https://toriaezu.co.jp/" target="_blank" rel="noopener">HP</a><a href="mailto:info@toriaezu.co.jp">✉</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="沖縄市">
-<td class="n">119</td><td><span class="tier tA">A</span></td>
-<td class="co">まるなか建設</td>
-<td>沖縄市</td><td class="sm">リフォーム会社</td>
-<td class="mono">090-2518-4619</td><td>仲宗根 茂</td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="https://marunaka-kensetsu.jp/?utm_source=GBP&amp;utm_medium=GBP&amp;utm_term=GBP&amp;utm_content=GBP&amp;utm_campaign=GBP" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">120</td><td><span class="tier tA">A</span></td>
-<td class="co">株式会社 ライフステージ</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-975-5317</td><td>本間裕子</td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="https://www.ls-r.co.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">121</td><td><span class="tier tA">A</span></td>
-<td class="co">（有）一銀サービス</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">0120-886-441</td><td></td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span> <span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="http://www.ichigin.co.jp/" target="_blank" rel="noopener">HP</a><a href="mailto:info@ichigin.co.jp">✉</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">122</td><td><span class="tier tA">A</span></td>
-<td class="co">DESIGN WORKS株式会社</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-943-1448</td><td>菊地真一郎</td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="https://www.designworks-okinawa.com/index.html" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="宜野湾市">
-<td class="n">123</td><td><span class="tier tA">A</span></td>
-<td class="co">㈲リフォーム施工</td>
-<td>宜野湾市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-988-3343</td><td></td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span> <span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="http://www.reform-sekoh.co.jp/" target="_blank" rel="noopener">HP</a><a href="mailto:office@reform-sekoh.co.jp">✉</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="沖縄市">
-<td class="n">124</td><td><span class="tier tA">A</span></td>
-<td class="co">西工業</td>
-<td>沖縄市</td><td class="sm">リフォーム会社</td>
-<td class="mono">090-3790-7970</td><td>西村 大志</td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="https://www.nishikogyo.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="浦添市">
-<td class="n">125</td><td><span class="tier tA">A</span></td>
-<td class="co">株式会社 巧建オキナワ</td>
-<td>浦添市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-911-9976</td><td>外間 洋平</td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="https://kouken-okinawa.co.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">126</td><td><span class="tier tA">A</span></td>
-<td class="co">（株）創造社</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-887-4792</td><td>森根 清充</td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="http://www.souzousha.net/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">127</td><td><span class="tier tA">A</span></td>
-<td class="co">株式会社フロントライン那覇支店</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-988-8105</td><td></td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span> <span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="https://frontline-inc.jp/" target="_blank" rel="noopener">HP</a><a href="mailto:contact@frontline-inc.jp">✉</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="浦添市">
-<td class="n">128</td><td><span class="tier tA">A</span></td>
-<td class="co">株式会社ベストライフ</td>
-<td>浦添市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-996-5138</td><td></td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span> <span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="http://bestlife.okinawa.jp/" target="_blank" rel="noopener">HP</a><a href="mailto:info@bestlife.okinawa.jp">✉</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">129</td><td><span class="tier tA">A</span></td>
-<td class="co">ティダ・テラス沖縄</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-943-9865</td><td>狩俣 啓</td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span></td><td class="mk"><span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="https://tida-terrace.wixsite.com/tidaterrace-okinawa" target="_blank" rel="noopener">HP</a><a href="mailto:tida-terrace@apricot.ocn.ne.jp">✉</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">130</td><td><span class="tier tA">A</span></td>
-<td class="co">株式会社 カーサプラス</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-943-6733</td><td>本間敏文</td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="https://www.casaplus.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="浦添市">
-<td class="n">131</td><td><span class="tier tA">A</span></td>
-<td class="co">株式会社ＡＲＣＨＩＳＳ（アーキス）</td>
-<td>浦添市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-870-0595</td><td></td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span> <span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="http://archiss.co.jp/" target="_blank" rel="noopener">HP</a><a href="mailto:info@archiss.co.jp">✉</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">132</td><td><span class="tier tA">A</span></td>
-<td class="co">宮里商店</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">090-3792-0131</td><td>宮里 充由</td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="https://miyazato.org/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="沖縄市">
-<td class="n">133</td><td><span class="tier tA">A</span></td>
-<td class="co">（株）もろみ</td>
-<td>沖縄市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-933-5685</td><td>仲尾 勝成</td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="https://www.moromi-okinawa.com/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">134</td><td><span class="tier tA">A</span></td>
-<td class="co">琉球不動産コンサルティング株式会社</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-914-4626</td><td>輿石 竜馬</td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span></td><td class="mk"><span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="https://www.ryukyu-rc.com/" target="_blank" rel="noopener">HP</a><a href="mailto:info@ryukyu-rc.com">✉</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">135</td><td><span class="tier tA">A</span></td>
-<td class="co">井上工務店</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-943-5891</td><td>井上 健大</td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span></td><td class="mk"><span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="http://inoue-ca.com/" target="_blank" rel="noopener">HP</a><a href="mailto:inoue@inoue-ca.com">✉</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">136</td><td><span class="tier tA">A</span></td>
-<td class="co">大晋建設 株式会社</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-831-7777</td><td>大城 壮司</td>
-<td class="n mono">1950</td><td class="n mono">76年</td>
-<td class="mk"><span class="m job">求人</span></td><td class="mk"></td>
-<td class="lk"><a href="https://www.taishinkensetsu.co.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">137</td><td><span class="tier tA">A</span></td>
-<td class="co">(株) 国建</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-862-1106</td><td>石嶺 一</td>
-<td class="n mono">1960</td><td class="n mono">66年</td>
-<td class="mk"><span class="m job">求人</span></td><td class="mk"></td>
-<td class="lk"><a href="https://www.kuniken.co.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">138</td><td><span class="tier tA">A</span></td>
-<td class="co">合資会社沖縄実業 本社</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-867-0145</td><td></td>
-<td class="n mono">1963</td><td class="n mono">63年</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://okijitsu.co.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">139</td><td><span class="tier tA">A</span></td>
-<td class="co">（株）ツヅキ沖縄工場</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-855-8972</td><td>都築 宏一郎</td>
-<td class="n mono">1965</td><td class="n mono">61年</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">法人番号なし</span></td>
-<td class="lk"><a href="http://www.tsuzuki-y.co.jp/about04/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="1" data-city="那覇市">
-<td class="n">140</td><td><span class="tier tA">A</span></td>
-<td class="co">先嶋建設株式会社</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-868-1079</td><td></td>
-<td class="n mono">1966</td><td class="n mono">60年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://sakishimakensetsu.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">141</td><td><span class="tier tA">A</span></td>
-<td class="co">（株）与儀組</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-866-7580</td><td>淺沼 義功</td>
-<td class="n mono">1969</td><td class="n mono">57年</td>
-<td class="mk"><span class="m job">求人</span></td><td class="mk"></td>
-<td class="lk"><a href="http://www.yogigumi.co.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">142</td><td><span class="tier tA">A</span></td>
-<td class="co">株式会社 松山産業</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-868-1875</td><td></td>
-<td class="n mono">1969</td><td class="n mono">57年</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://www.matsuyamasangyo.com/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">143</td><td><span class="tier tA">A</span></td>
-<td class="co">株式会社おもろハウジング</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-869-2208</td><td></td>
-<td class="n mono">1999</td><td class="n mono">27年</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="http://www.omorohousing.co.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">144</td><td><span class="tier tA">A</span></td>
-<td class="co">ドリームハウス沖縄</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">0120-217-302</td><td>城間 照文</td>
-<td class="n mono">1999</td><td class="n mono">27年</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">法人番号なし</span></td>
-<td class="lk"><a href="http://www.dream-okinawa.net/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="浦添市">
-<td class="n">145</td><td><span class="tier tA">A</span></td>
-<td class="co">とまとハウジング</td>
-<td>浦添市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-876-7380</td><td>川端ゆかり</td>
-<td class="n mono">1999</td><td class="n mono">27年</td>
-<td class="mk"><span class="m job">求人</span></td><td class="mk"></td>
-<td class="lk"><a href="https://www.tomato-okinawa.com/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="糸満市">
-<td class="n">146</td><td><span class="tier tA">A</span></td>
-<td class="co">（有）オーエン</td>
-<td>糸満市</td><td class="sm">不動産・建設</td>
-<td class="mono">0078-60159-781783</td><td></td>
-<td class="n mono">2000</td><td class="n mono">26年</td>
-<td class="mk"><span class="m job">求人</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://goohome.jp/fudousan/realtor/273/" target="_blank" rel="noopener">HP</a><a href="mailto:contact@oen-itoman.com">✉</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="1" data-city="糸満市">
-<td class="n">147</td><td><span class="tier tA">A</span></td>
-<td class="co">(有)金城建設</td>
-<td>糸満市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-994-8567</td><td></td>
-<td class="n mono">2002</td><td class="n mono">24年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span></td><td class="mk"><span class="m ng">法人番号なし</span> <span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://kinjoukensetsu.com/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">148</td><td><span class="tier tA">A</span></td>
-<td class="co">有限会社リケンオキナワ</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-941-5650</td><td></td>
-<td class="n mono">2004</td><td class="n mono">22年</td>
-<td class="mk"><span class="m job">求人</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="http://rikenokinawa.co.jp/" target="_blank" rel="noopener">HP</a><a href="mailto:info@rikenokinawa.co.jp">✉</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">149</td><td><span class="tier tA">A</span></td>
-<td class="co">(株) ホーム２１</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-833-8855</td><td></td>
-<td class="n mono">2004</td><td class="n mono">22年</td>
-<td class="mk"><span class="m job">求人</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://home21.co.jp/" target="_blank" rel="noopener">HP</a><a href="mailto:info@home21.co.jp">✉</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">150</td><td><span class="tier tA">A</span></td>
-<td class="co">(株) LINK&#x27;S</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-988-8071</td><td>横山 純</td>
-<td class="n mono">2005</td><td class="n mono">21年</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">法人番号なし</span></td>
-<td class="lk"><a href="https://links-kk-okinawa.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="1" data-city="那覇市">
-<td class="n">151</td><td><span class="tier tA">A</span></td>
-<td class="co">大京穴吹不動産沖縄賃貸営業課</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-867-7400</td><td></td>
-<td class="n mono">2006</td><td class="n mono">20年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span></td><td class="mk"><span class="m ng">法人番号なし</span> <span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://www.daikyo-anabuki.co.jp/office/okinawa_chintai/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="1" data-city="那覇市">
-<td class="n">152</td><td><span class="tier tA">A</span></td>
-<td class="co">ピタットハウス 那覇店</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-866-9310</td><td>（運営：株式会社ティー・オー・エス）</td>
-<td class="n mono">2006</td><td class="n mono">20年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">法人番号なし</span></td>
-<td class="lk"><a href="https://www.pitat.com/shopDetail/naha.html" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">153</td><td><span class="tier tA">A</span></td>
-<td class="co">株式会社エン・エンタープライズ</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-988-8880</td><td></td>
-<td class="n mono">2008</td><td class="n mono">18年</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://www.yenn.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">154</td><td><span class="tier tA">A</span></td>
-<td class="co">琉球ストーク(株)</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-863-8643</td><td>川口 幸治</td>
-<td class="n mono">2009</td><td class="n mono">17年</td>
-<td class="mk"><span class="m job">求人</span></td><td class="mk"></td>
-<td class="lk"><a href="https://mokuzookinawa.com/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="1" data-city="那覇市">
-<td class="n">155</td><td><span class="tier tA">A</span></td>
-<td class="co">シティホテルズ＆リゾーツ (株式会社シティホテルズ＆リゾーツ)</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-868-1122</td><td></td>
-<td class="n mono">2011</td><td class="n mono">15年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://city-homes-okinawa.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="1" data-city="那覇市">
-<td class="n">156</td><td><span class="tier tA">A</span></td>
-<td class="co">GLC株式会社 沖縄支社</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-894-5041</td><td></td>
-<td class="n mono">2012</td><td class="n mono">14年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span></td><td class="mk"><span class="m ng">法人番号なし</span> <span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://www.goodlife-c.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="1" data-city="那覇市">
-<td class="n">157</td><td><span class="tier tA">A</span></td>
-<td class="co">株式会社モダンプロジェ 沖縄ログ店（沖縄オフィス）</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-869-8622</td><td></td>
-<td class="n mono">2012</td><td class="n mono">14年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span></td><td class="mk"><span class="m ng">法人番号なし</span> <span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://modern-projet.com/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="浦添市">
-<td class="n">158</td><td><span class="tier tA">A</span></td>
-<td class="co">ハウスドゥ サンパーク通り浦添</td>
-<td>浦添市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-876-5454</td><td>（運営：株式会社サン・リフォーム）</td>
-<td class="n mono">2013</td><td class="n mono">13年</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">法人番号なし</span></td>
-<td class="lk"><a href="https://sunparkdoriurasoe-housedo.com/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">159</td><td><span class="tier tA">A</span></td>
-<td class="co">リライト株式会社</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-996-2033</td><td></td>
-<td class="n mono">2013</td><td class="n mono">13年</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="http://relight-co.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="浦添市">
-<td class="n">160</td><td><span class="tier tA">A</span></td>
-<td class="co">株式会社ライアホーム</td>
-<td>浦添市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-963-9444</td><td>大城 健</td>
-<td class="n mono">2014</td><td class="n mono">12年</td>
-<td class="mk"><span class="m job">求人</span></td><td class="mk"></td>
-<td class="lk"><a href="https://www.raia-home.com/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">161</td><td><span class="tier tA">A</span></td>
-<td class="co">（株）ＫＯＴＥＴＳＵ</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-987-1775</td><td></td>
-<td class="n mono">2014</td><td class="n mono">12年</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://kotetsuokinawa.wixsite.com/kotetsu" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="1" data-city="那覇市">
-<td class="n">162</td><td><span class="tier tA">A</span></td>
-<td class="co">エルビーハウジング （ＬＢハウジング株式会社）</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">050-5469-5664</td><td></td>
-<td class="n mono">2016</td><td class="n mono">10年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://www.e-uchina.net/fudosan_kaisha/7304" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="1" data-city="那覇市">
-<td class="n">163</td><td><span class="tier tA">A</span></td>
-<td class="co">株式会社成家</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-860-2139</td><td></td>
-<td class="n mono">2017</td><td class="n mono">9年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span></td><td class="mk"><span class="m ng">法人番号なし</span> <span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://www.sumaino-seika.com/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">164</td><td><span class="tier tA">A</span></td>
-<td class="co">（株）ＺＵＭＩホーム</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">0078-60159-520621</td><td>池間 貞浩</td>
-<td class="n mono">2018</td><td class="n mono">8年</td>
-<td class="mk"><span class="m job">求人</span></td><td class="mk"></td>
-<td class="lk"><a href="https://goohome.jp/fudousan/realtor/1386/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="沖縄市">
-<td class="n">165</td><td><span class="tier tA">A</span></td>
-<td class="co">株式会社 新喜</td>
-<td>沖縄市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-953-1849</td><td>喜屋武 文也</td>
-<td class="n mono">2019</td><td class="n mono">7年</td>
-<td class="mk"><span class="m job">求人</span></td><td class="mk"></td>
-<td class="lk"><a href="https://www.okinawa-shinki.com/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="浦添市">
-<td class="n">166</td><td><span class="tier tA">A</span></td>
-<td class="co">(株)さち屋／マチナトベース／スチールアーチ沖縄</td>
-<td>浦添市</td><td class="sm">リフォーム会社</td>
-<td class="mono">090-2969-8882</td><td>大城祥太</td>
-<td class="n mono">2020</td><td class="n mono">6年</td>
-<td class="mk"><span class="m job">求人</span></td><td class="mk"><span class="m ng">法人番号なし</span></td>
-<td class="lk"><a href="https://ww.sa-chi-ya.com/%E3%83%9B%E3%83%BC%E3%83%A0" target="_blank" rel="noopener">HP</a><a href="mailto:info@sa-chi-ya.com">✉</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">167</td><td><span class="tier tA">A</span></td>
-<td class="co">株式会社アルファ・リノ</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">090-9786-0153</td><td>屋嘉部 将弥</td>
-<td class="n mono">2020</td><td class="n mono">6年</td>
-<td class="mk"><span class="m job">求人</span></td><td class="mk"></td>
-<td class="lk"><a href="https://www.alpha-renovation.com/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="1" data-city="那覇市">
-<td class="n">168</td><td><span class="tier tA">A</span></td>
-<td class="co">株式会社CLAX 那覇オフィス</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-963-6240</td><td></td>
-<td class="n mono">2021</td><td class="n mono">5年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span></td><td class="mk"><span class="m ng">法人番号なし</span> <span class="m ng">代表者名なし</span></td>
-<td class="lk"><a href="https://okinawa.clax.co.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="1" data-city="那覇市">
-<td class="n">169</td><td><span class="tier tA">A</span></td>
-<td class="co">(株)KAFLIX CLOUD</td>
-<td>那覇市</td><td class="sm">IT・メディア</td>
-<td class="mono">098-963-7120</td><td>辛 正民</td>
-<td class="n mono">2022</td><td class="n mono">4年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span></td><td class="mk"></td>
-<td class="lk"></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="浦添市">
-<td class="n">170</td><td><span class="tier tA">A</span></td>
-<td class="co">株式会社NST</td>
-<td>浦添市</td><td class="sm">リフォーム会社</td>
-<td class="mono">080-6460-2002</td><td></td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span> <span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="https://sites.google.com/view/ni-ssyou-trust-nst/%E3%83%9B%E3%83%BC%E3%83%A0" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">171</td><td><span class="tier tA">A</span></td>
-<td class="co">(有)第一リフォーム沖縄</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-836-5685</td><td>友寄 隆治</td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span></td><td class="mk"><span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="https://www.dai1reform.com/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">172</td><td><span class="tier tA">A</span></td>
-<td class="co">（有）ワイドハウジング</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">0078-60159-082716</td><td></td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span> <span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="https://goohome.jp/fudousan/realtor/122/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="沖縄市">
-<td class="n">173</td><td><span class="tier tA">A</span></td>
-<td class="co">（株）松樹 コザ支店</td>
-<td>沖縄市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-983-8800</td><td></td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span> <span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="https://www.e-uchina.net/fudosan_kaisha/5633" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="浦添市">
-<td class="n">174</td><td><span class="tier tA">A</span></td>
-<td class="co">株式会社 大成ホーム</td>
-<td>浦添市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-877-7756</td><td></td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span> <span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="https://www.taiseihome.jp/corp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="浦添市">
-<td class="n">175</td><td><span class="tier tA">A</span></td>
-<td class="co">株式会社 日虹</td>
-<td>浦添市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-988-1825</td><td></td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span> <span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="http://teamnikko2525.com/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">176</td><td><span class="tier tA">A</span></td>
-<td class="co">株式会社眞住</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-863-7007</td><td>谷津 敬介</td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span></td><td class="mk"><span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="https://masumi-okinawa.jp/?utm_source=GBP&amp;utm_medium=GBP&amp;utm_term=GBP&amp;utm_content=GBP&amp;utm_campaign=GBP" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">177</td><td><span class="tier tA">A</span></td>
-<td class="co">（株）ジョイントハウス</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-868-9393</td><td>仲里 司</td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span></td><td class="mk"><span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="http://www.jointhouse.co.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">178</td><td><span class="tier tA">A</span></td>
-<td class="co">(有)アクシス</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-951-3792</td><td></td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span> <span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="http://www.axis-naha.com/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">179</td><td><span class="tier tA">A</span></td>
-<td class="co">株式会社 沖令リフォーム</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-863-8356</td><td></td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span> <span class="m ng">創業年なし</span></td>
-<td class="lk"></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="沖縄市">
-<td class="n">180</td><td><span class="tier tA">A</span></td>
-<td class="co">株式会社ライフワークス</td>
-<td>沖縄市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-943-2904</td><td></td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span></td><td class="mk"><span class="m ng">代表者名なし</span> <span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="https://www.lw-okinawa.co.jp/" target="_blank" rel="noopener">HP</a><a href="mailto:info@lw-okinawa.co.jp">✉</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">181</td><td><span class="tier tA">A</span></td>
-<td class="co">(株) T.L.Cサービス</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-864-2448</td><td>国吉 智明</td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span></td><td class="mk"><span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="https://www.tlc-service.com/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">182</td><td><span class="tier tA">A</span></td>
-<td class="co">合同会社 和田工業</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">090-5947-4636</td><td></td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span> <span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="https://kaisharesearch.com/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="浦添市">
-<td class="n">183</td><td><span class="tier tA">A</span></td>
-<td class="co">スタイルホープ</td>
-<td>浦添市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-952-6578</td><td>山口純希</td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span></td><td class="mk"><span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="https://stylehope.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="浦添市">
-<td class="n">184</td><td><span class="tier tA">A</span></td>
-<td class="co">合同会社MEKARU</td>
-<td>浦添市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-877-3399</td><td></td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span> <span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="https://www.mekaru.llc/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">185</td><td><span class="tier tA">A</span></td>
-<td class="co">那覇新都心（株）</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-869-2551</td><td>大嶺 隆</td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span></td><td class="mk"><span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="http://www.nahashintoshin.co.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">186</td><td><span class="tier tA">A</span></td>
-<td class="co">（株）金城キク建設</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-863-6930</td><td></td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span> <span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="https://www.kikukensetu.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="浦添市">
-<td class="n">187</td><td><span class="tier tA">A</span></td>
-<td class="co">株式会社ニッセンホーム</td>
-<td>浦添市</td><td class="sm">不動産・建設</td>
-<td class="mono">050-1871-1428</td><td>比嘉 健悟</td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span></td><td class="mk"><span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="https://nissen657954.studio.site/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">188</td><td><span class="tier tA">A</span></td>
-<td class="co">有限会社 かりー沖縄</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">090-4980-8834</td><td></td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span> <span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="https://kari-okinawa.net/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="浦添市">
-<td class="n">189</td><td><span class="tier tA">A</span></td>
-<td class="co">（有）沖縄タカラ住設</td>
-<td>浦添市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-877-1314</td><td></td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span> <span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="http://www.otj.co.jp/company/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">190</td><td><span class="tier tA">A</span></td>
-<td class="co">國幸興發株式会社</td>
-<td>那覇市</td><td class="sm">塗装会社</td>
-<td class="mono">098-861-3777</td><td></td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span> <span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="http://kunisachi.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">191</td><td><span class="tier tA">A</span></td>
-<td class="co">ティ・マックス不動産</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-860-4340</td><td>砂川 智哉</td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span></td><td class="mk"><span class="m ng">法人番号なし</span> <span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="http://www.tmax-okinawa.com/" target="_blank" rel="noopener">HP</a><a href="mailto:t-max@gol.com">✉</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="宜野湾市">
-<td class="n">192</td><td><span class="tier tA">A</span></td>
-<td class="co">株式会社上地商店</td>
-<td>宜野湾市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-800-2680</td><td></td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span> <span class="m ng">創業年なし</span></td>
-<td class="lk"></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="浦添市">
-<td class="n">193</td><td><span class="tier tA">A</span></td>
-<td class="co">山城内装</td>
-<td>浦添市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-975-9522</td><td></td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span> <span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="https://yamashironaisou.com/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="沖縄市">
-<td class="n">194</td><td><span class="tier tA">A</span></td>
-<td class="co">株式会社エコ・ピース</td>
-<td>沖縄市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-934-2071</td><td></td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span> <span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="https://ecopeace-okinawa.com/service/aircon_sale/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">195</td><td><span class="tier tA">A</span></td>
-<td class="co">株式会社 沖縄不動産販売</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-894-3206</td><td></td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span></td><td class="mk"><span class="m ng">代表者名なし</span> <span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="https://www.okinawa-realestate.com/" target="_blank" rel="noopener">HP</a><a href="mailto:info@okinawa-realestate.com">✉</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">196</td><td><span class="tier tA">A</span></td>
-<td class="co">㈱不動産ステーション沖縄</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-988-1180</td><td></td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span> <span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="https://www.fs-okinawa.com/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">197</td><td><span class="tier tA">A</span></td>
-<td class="co">（株）明商事</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-867-7873</td><td>金城 明</td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span></td><td class="mk"><span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="https://goohome.jp/fudousan/realtor/102/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="与那原町">
-<td class="n">198</td><td><span class="tier tA">A</span></td>
-<td class="co">（株）星リフォーム 沖縄</td>
-<td>与那原町</td><td class="sm">リフォーム会社</td>
-<td class="mono">080-9140-6588</td><td></td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span> <span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="https://www.hoshi-reform.com/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">199</td><td><span class="tier tA">A</span></td>
-<td class="co">昭和ドア（有）</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-857-2609</td><td></td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span> <span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="https://showa-dr.com/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">200</td><td><span class="tier tA">A</span></td>
-<td class="co">沖縄塗装工業</td>
-<td>那覇市</td><td class="sm">塗装会社</td>
-<td class="mono">098-854-1015</td><td></td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">法人番号なし</span> <span class="m ng">代表者名なし</span> <span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="https://www.nagaminetosou.com/" target="_blank" rel="noopener">HP</a><a href="mailto:info@nagaminetosou.com">✉</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="浦添市">
-<td class="n">201</td><td><span class="tier tA">A</span></td>
-<td class="co">(有)昭和住建</td>
-<td>浦添市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-876-1343</td><td></td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span> <span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="https://www.kensetumap.com/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="浦添市">
-<td class="n">202</td><td><span class="tier tA">A</span></td>
-<td class="co">有限会社エバ</td>
-<td>浦添市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-943-4611</td><td></td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span></td><td class="mk"><span class="m ng">代表者名なし</span> <span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="http://www.evah-d.com/" target="_blank" rel="noopener">HP</a><a href="mailto:info@evah-d.com">✉</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">203</td><td><span class="tier tA">A</span></td>
-<td class="co">家づくり相談室 運営会社アーキテクトプラスジョイ （合同会社アーキテクトＰＬＵＳ ＪＯＹ）</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-943-1751</td><td>西平 奨矢</td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span></td><td class="mk"><span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="https://www.o-architect.co.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="浦添市">
-<td class="n">204</td><td><span class="tier tA">A</span></td>
-<td class="co">有限会社 室内装飾みやぎ</td>
-<td>浦添市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-879-4506</td><td></td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span> <span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="https://ssm-okinawa.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">205</td><td><span class="tier tA">A</span></td>
-<td class="co">VILLA IMG合同会社 (アイエムジー)</td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-869-3575</td><td></td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span></td><td class="mk"><span class="m ng">代表者名なし</span> <span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="https://www.villa-realty.com/" target="_blank" rel="noopener">HP</a><a href="mailto:infovilla@villa-realty.com">✉</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="豊見城市">
-<td class="n">206</td><td><span class="tier tA">A</span></td>
-<td class="co">株式会社クリーンワークスカンパニー</td>
-<td>豊見城市</td><td class="sm">リフォーム会社</td>
-<td class="mono">080-6491-9965</td><td></td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span> <span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="https://cleanworks.okinawa/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="沖縄市">
-<td class="n">207</td><td><span class="tier tA">A</span></td>
-<td class="co">（有）海邦住建</td>
-<td>沖縄市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-934-6305</td><td></td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span> <span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="https://kaihoujuken.studio.site/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">208</td><td><span class="tier tA">A</span></td>
-<td class="co">(有)吉永</td>
-<td>那覇市</td><td class="sm">塗装会社</td>
-<td class="mono">098-851-7070</td><td></td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span> <span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="http://yoshinaga.okinawa/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr data-tier="A" data-suc="0" data-ann="0" data-city="那覇市">
-<td class="n">209</td><td><span class="tier tA">A</span></td>
-<td class="co">（株）トータルハウスプランニング</td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-894-3004</td><td></td>
-<td class="n mono">—</td><td class="n mono">—</td>
-<td class="mk"><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"><span class="m ng">代表者名なし</span> <span class="m ng">創業年なし</span></td>
-<td class="lk"><a href="https://www.totalhouseplanning.co.jp/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="warn" data-tier="S" data-suc="1" data-ann="1" data-city="那覇市">
-<td class="n">210</td><td><span class="tier tS">S</span></td>
-<td class="co">(株)IMI CORPORATION<div class="wn">既存顧客（LPのCASE03・35周年 制作中）→ 新規アタック対象外</div></td>
-<td>那覇市</td><td class="sm">リフォーム会社</td>
-<td class="mono">098-867-1149</td><td>池田 雅人</td>
-<td class="n mono">1991</td><td class="n mono">35年</td>
-<td class="mk"><span class="m suc">承継期</span><span class="m ann">周年</span><span class="m job">求人</span><span class="m nosns">SNS無</span></td><td class="mk"></td>
-<td class="lk"><a href="https://imi-cp.com/" target="_blank" rel="noopener">HP</a></td></tr>
-<tr class="warn" data-tier="S" data-suc="0" data-ann="1" data-city="那覇市">
-<td class="n">211</td><td><span class="tier tS">S</span></td>
-<td class="co">金秀建設株式会社<div class="wn">関連会社に取引あり（金秀鉄工）→ 紹介経由で狙う</div></td>
-<td>那覇市</td><td class="sm">不動産・建設</td>
-<td class="mono">098-869-1350</td><td>山内 昌茂</td>
-<td class="n mono">1947</td><td class="n mono">79年</td>
-<td class="mk"><span class="m ann">周年</span><span class="m job">求人</span></td><td class="mk"></td>
-<td class="lk"><a href="https://kanehide.co.jp/group/#kanehide-steel" target="_blank" rel="noopener">HP</a></td></tr>  </tbody>
-</table>
-</div>
-
-<h2>この211社を、どう使い切るか</h2>
-<div class="cards">
-  <div class="card"><h4>手紙（月30通）</h4><span class="big">7ヶ月</span>
-    <p>S 91社 → A 120社の順に。AIで原稿を下書きすれば月60通になり、3.5ヶ月で一巡します</p></div>
-  <div class="card"><h4>架電（月720件）</h4><span class="big">3.5ヶ月</span>
-    <p>外注チームに渡す。入口はAI研修＋助成金の一本。<b>手紙とは別の会社にかけてください</b>（同じ会社に両方だと重い）</p></div>
-  <div class="card"><h4>一巡したあと</h4><span class="big">Bランク147社</span>
-    <p>その下にまだ147社（Bランク）と308社（C）が控えています。合計666社</p></div>
-</div>
-
-<div class="note">
-  <span class="tag">Q0でやること</span>
-  <p><b>① 「全部そろい」62社の裏取りを終わらせる。</b>法人番号公表サイトとHPで、代表者名と設立年を確定させる。1社3分×62社＝約3時間。<b>これが終われば、最初の2ヶ月分の手紙が書けます。</b></p>
-  <p><b>② IMI CORPORATION を対象から外す。</b>LPのCASE 03（35周年・制作中）の既存顧客です。金秀建設は関連会社（金秀鉄工）に取引があるので、コールドではなく紹介経由で。</p>
-  <p><b>③ 業種の穴を埋める。</b>製造業が0件でした。研修LPは「建設・不動産・製造業」を謳っているので、製造業のリストがまだ作られていません。<b>ここを足せば母数が増えます。</b></p>
-</div>
-
-</div>
-
-<footer><div class="wrap">
-  株式会社TENOHIRA 販売営業部 ／ アタックリスト ／ 2026年8月23日 抽出<br>
-  抽出元：Supabase <code>fieldwork</code> の ceremony / indeedhack / centercall / posmane_client の4テーブル。<br>
-  CSV：<code>plan/attacklist/attack_list_SA.csv</code>（Excelでそのまま開けます）<br>
-  関連：<a href="./index-map.html">全体図</a>　<a href="./business-plan.html">事業計画書</a>　<a href="./sales-toolkit.html">営業の四つ道具</a>
-</div></footer>
+<div class="toast" id="toast"></div>
 
 <script>
-(function(){
-  var tb=document.getElementById('tb'), cnt=document.getElementById('cnt');
-  var btns=document.querySelectorAll('.bar button');
-  function apply(f){
-    var n=0;
-    Array.prototype.forEach.call(tb.rows,function(r){
-      var ok = f==='all'
-        || (f==='S'   && r.dataset.tier==='S')
-        || (f==='suc' && r.dataset.suc==='1')
-        || (f==='ann' && r.dataset.ann==='1')
-        || (f==='naha'&& r.dataset.city==='那覇市');
-      r.style.display = ok ? '' : 'none';
-      if(ok) n++;
-    });
-    cnt.textContent = n + '社';
-  }
-  Array.prototype.forEach.call(btns,function(b){
-    b.addEventListener('click',function(){
-      Array.prototype.forEach.call(btns,function(x){x.setAttribute('aria-pressed','false');});
-      b.setAttribute('aria-pressed','true');
-      apply(b.dataset.f);
-    });
+const SB_URL = 'https://osipzwbsfbgbegjowydm.supabase.co';
+const SB_KEY = 'sb_publishable_yO0lVlOP_r-qhnwjxqq0UQ_qjxSrlnC';
+const sb = window.supabase.createClient(SB_URL, SB_KEY);
+
+let cos = [], cur = null, curTab = 'action', curF = 'all';
+const today = new Date().toISOString().slice(0,10);
+
+const PHASES = {
+  pending:          {lab:'未対応',      cls:'pl-pending'},
+  contacted:        {lab:'電話済み',    cls:'pl-contacted'},
+  pending_callback: {lab:'折り返し待ち',cls:'pl-pending_callback'},
+  mailed:           {lab:'DM/手紙済み', cls:'pl-mailed'},
+  won:              {lab:'商談獲得',    cls:'pl-won'},
+  declined:         {lab:'お断り',      cls:'pl-declined'},
+};
+
+const ACTS = [
+  {k:'tel_ok',  lab:'📞 電話→担当者OK',  cls:'a-ok',  phase:'contacted',        nd:false},
+  {k:'tel_ab',  lab:'📵 電話→不在',       cls:'a-ab',  phase:'pending_callback', nd:true,  days:1},
+  {k:'tel_cb',  lab:'📅 電話→かけ直し',  cls:'a-cb',  phase:'pending_callback', nd:true,  days:3},
+  {k:'dm',      lab:'💬 DM送付',          cls:'a-dm',  phase:'mailed',           nd:true,  days:3},
+  {k:'letter',  lab:'✉️ 手紙・ハガキ',   cls:'a-lt',  phase:'mailed',           nd:true,  days:7},
+  {k:'won',     lab:'🎯 商談獲得！',      cls:'a-won', phase:'won',              nd:true,  days:7},
+  {k:'declined',lab:'❌ お断り',          cls:'a-no',  phase:'declined',         nd:false},
+];
+
+const ACT_LABS = Object.fromEntries(ACTS.map(a=>[a.k, a.lab]));
+
+const DEFAULT_SCRIPT = `【オープニング】
+「はじめまして、○○の（名前）と申します。
+御社の周年をお祝いする記念映像のご提案でご連絡しました。
+少々お時間よろしいでしょうか？」
+
+【本題】
+「御社は今年で○○周年とのことで、
+記念式典や社内イベントのご予定はございますか？
+
+弊社では周年記念映像の制作を専門としており、
+多くの企業様の式典でご活用いただいております。」
+
+【反応別対応】
+・担当者OK → 詳細ヒアリングへ
+・「忙しい」→「では改めて。来週はいかがでしょうか？」
+・「必要ない」→「かしこまりました。もしご検討の際はいつでもどうぞ。」
+・不在 → 会社名・名前を伝言して次回架電日を設定
+
+【クロージング】
+「一度、御社に合ったご提案資料をお送りできればと思います。
+担当の方のお名前とメールアドレスをお伺いできますか？」`;
+
+// ── DATA ──────────────────────────────────────────────
+async function loadData() {
+  document.getElementById('lwrap').innerHTML = '<div class="empty">読み込み中...</div>';
+  const {data, error} = await sb.from('ceremony_attacks').select('*');
+  if (error) { document.getElementById('lwrap').innerHTML = '<div class="empty">❌ 読み込みエラー: '+esc(error.message)+'</div>'; return; }
+  cos = data || [];
+  buildFilters();
+  renderStats();
+  renderList();
+}
+
+function buildFilters() {
+  const fi = document.getElementById('fi'), fc = document.getElementById('fc');
+  // clear old options except first
+  while (fi.options.length > 1) fi.remove(1);
+  while (fc.options.length > 1) fc.remove(1);
+  [...new Set(cos.map(c=>c.industry||c.i).filter(Boolean))].sort().forEach(v=>{
+    const o=document.createElement('option'); o.value=o.textContent=v; fi.appendChild(o);
   });
-})();
+  [...new Set(cos.map(c=>c.city||c.c).filter(Boolean))].sort().forEach(v=>{
+    const o=document.createElement('option'); o.value=o.textContent=v; fc.appendChild(o);
+  });
+}
+
+// ── STATS ─────────────────────────────────────────────
+function renderStats() {
+  const cnt = {
+    all: cos.length,
+    today: cos.filter(c=>c.next_date&&c.next_date<=today&&c.phase!=='declined'&&c.phase!=='won').length,
+    pending: cos.filter(c=>c.phase==='pending').length,
+    contacted: cos.filter(c=>c.phase==='contacted').length,
+    cb: cos.filter(c=>c.phase==='pending_callback').length,
+    mailed: cos.filter(c=>c.phase==='mailed').length,
+    won: cos.filter(c=>c.phase==='won').length,
+    declined: cos.filter(c=>c.phase==='declined').length,
+  };
+  const chips = [
+    {f:'all',      cls:'',    n:cnt.all,      l:'全て'},
+    {f:'today',    cls:'st',  n:cnt.today,    l:'今日'},
+    {f:'pending',  cls:'sp',  n:cnt.pending,  l:'未対応'},
+    {f:'contacted',cls:'sco', n:cnt.contacted,l:'電話済み'},
+    {f:'pending_callback',cls:'scb',n:cnt.cb, l:'折り返し'},
+    {f:'mailed',   cls:'sm',  n:cnt.mailed,   l:'DM/手紙'},
+    {f:'won',      cls:'sw',  n:cnt.won,      l:'商談獲得'},
+    {f:'declined', cls:'sd',  n:cnt.declined, l:'お断り'},
+  ];
+  document.getElementById('stats').innerHTML = chips.map(c=>
+    `<div class="sc ${c.cls} ${curF===c.f?'on':''}" onclick="setF('${c.f}')">
+      <div class="n">${c.n}</div><div class="l">${c.l}</div>
+    </div>`
+  ).join('');
+}
+
+function setF(f){ curF=f; renderStats(); renderList(); }
+
+// ── LIST ──────────────────────────────────────────────
+function getRows() {
+  const q  = document.getElementById('q').value.toLowerCase();
+  const fi = document.getElementById('fi').value;
+  const fc = document.getElementById('fc').value;
+  const fr = document.getElementById('fr').value;
+  let rows = cos.filter(c=>{
+    const industry = c.industry||c.i||'';
+    const city     = c.city||c.c||'';
+    const rank     = c.anniversary_rank||c.ar||'';
+    if (fi && industry!==fi) return false;
+    if (fc && city!==fc) return false;
+    if (fr && rank!==fr) return false;
+    if (curF==='today') {
+      if (!c.next_date||c.next_date>today||c.phase==='declined'||c.phase==='won') return false;
+    } else if (curF!=='all') {
+      if (c.phase!==curF) return false;
+    }
+    if (q) {
+      const h = ((c.company_name||'')+' '+(c.ceo_name||'')+' '+(c.phone||'')+' '+(c.city||'')).toLowerCase();
+      if (!h.includes(q)) return false;
+    }
+    return true;
+  });
+  const ro={S:0,A:1,B:2,C:3,'':4};
+  const po={pending_callback:0,contacted:1,mailed:2,pending:3,won:4,declined:5};
+  rows.sort((a,b)=>{
+    const at=(a.next_date&&a.next_date<=today&&a.phase!=='declined'&&a.phase!=='won')?0:1;
+    const bt=(b.next_date&&b.next_date<=today&&b.phase!=='declined'&&b.phase!=='won')?0:1;
+    if (at!==bt) return at-bt;
+    const pa=po[a.phase]??99, pb=po[b.phase]??99;
+    if (pa!==pb) return pa-pb;
+    const ra=ro[a.anniversary_rank||a.ar]??99, rb=ro[b.anniversary_rank||b.ar]??99;
+    return ra-rb;
+  });
+  return rows;
+}
+
+function renderList() {
+  const rows = getRows();
+  const w = document.getElementById('lwrap');
+  if (!rows.length) { w.innerHTML='<div class="empty">条件に合う会社がありません</div>'; return; }
+  w.innerHTML = rows.map(c=>{
+    const phase   = c.phase||'pending';
+    const ph      = PHASES[phase]||PHASES.pending;
+    const rank    = c.anniversary_rank||c.ar||'';
+    const years   = c.anniversary_years||c.ay||'';
+    const city    = c.city||c.c||'';
+    const ind     = c.industry||c.i||'';
+    const ceo     = c.ceo_name||c.ceo||'';
+    const phone   = c.phone||c.p||'';
+    const isToday = c.next_date&&c.next_date<=today&&phase!=='declined'&&phase!=='won';
+    const logs    = (c.source_data||{}).contact_log||[];
+    const hasSns  = c.instagram_url||c.x_url||c.facebook_url||c.tiktok_url;
+    const hasJob  = c.indeed_url||c.own_recruit_url||c.job_antenna_url;
+
+    let ntHtml='';
+    if (c.next_date) {
+      const nc = c.next_date<today?'past':(c.next_date===today?'due':'');
+      ntHtml=`<span class="nt ${nc}">📅${c.next_date}</span>`;
+    }
+    return `<div class="card p-${phase} ${isToday?'is-today':''}" onclick="openModal('${esc(c.id)}')">
+      <div>
+        <div class="co-name">${esc(c.company_name)}</div>
+        <div class="co-meta">
+          ${rank?`<span class="rk rk-${rank}">${rank}</span>`:''}
+          ${years?`<span>${years}周年</span>`:''}
+          ${city?`<span>📍${esc(city)}</span>`:''}
+          ${ind?`<span>${esc(ind)}</span>`:''}
+          ${ceo?`<span>👤${esc(ceo)}</span>`:''}
+          ${phone?`<span class="co-phone">📞${esc(phone)}</span>`:''}
+        </div>
+        <div class="co-meta">
+          <span class="pl ${ph.cls}">${ph.lab}</span>
+          ${ntHtml}
+          ${logs.length?`<span class="log-cnt">📝${logs.length}件</span>`:''}
+          ${hasSns?'<span style="color:#8b5cf6;font-size:10px;">SNS</span>':''}
+          ${hasJob?'<span style="color:#3730a3;font-size:10px;">求人</span>':''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── MODAL ─────────────────────────────────────────────
+function openModal(id) {
+  cur = cos.find(c=>String(c.id)===String(id));
+  if (!cur) return;
+  curTab='action';
+  document.getElementById('m-name').textContent = cur.company_name;
+  document.getElementById('ovl').classList.add('open');
+  document.querySelectorAll('.mtab').forEach((el,i)=>el.classList.toggle('on',i===0));
+  renderTab();
+}
+
+function closeModal(e) {
+  if (e && e.target!==document.getElementById('ovl')) return;
+  document.getElementById('ovl').classList.remove('open');
+  cur=null;
+}
+
+function switchTab(t) {
+  curTab=t;
+  const order=['action','log','script','info'];
+  document.querySelectorAll('.mtab').forEach((el,i)=>el.classList.toggle('on',order[i]===t));
+  renderTab();
+}
+
+function renderTab() {
+  const c   = cur;
+  const src = c.source_data||{};
+  const logs= src.contact_log||[];
+  const b   = document.getElementById('mbody');
+
+  if (curTab==='action') {
+    b.innerHTML = `
+      <div class="agrid">${ACTS.map(a=>`<button class="abtn ${a.cls}" onclick="doAct('${a.k}')">${a.lab}</button>`).join('')}</div>
+      <div class="section-label">メモ（任意）</div>
+      <textarea class="note-ta" id="act-note" placeholder="例：担当者名・伝言内容など..."></textarea>
+      <div class="date-row">
+        <span style="font-size:12px;color:var(--muted)">次回フォロー日:</span>
+        <input type="date" class="date-inp" id="nd-inp" value="${c.next_date||''}">
+        <button class="save-btn" onclick="saveNd()">保存</button>
+      </div>`;
+
+  } else if (curTab==='log') {
+    if (!logs.length) { b.innerHTML='<div class="empty">連絡記録がまだありません</div>'; return; }
+    b.innerHTML = [...logs].reverse().map(l=>`
+      <div class="log-item">
+        <div class="log-act">${ACT_LABS[l.action]||l.action||'-'}</div>
+        <div class="log-dt">${l.date||''}${l.time?' '+l.time:''}</div>
+        ${l.note?`<div class="log-note">${esc(l.note)}</div>`:''}
+      </div>`).join('');
+
+  } else if (curTab==='script') {
+    b.innerHTML = `<div class="script-box">${esc(DEFAULT_SCRIPT)}</div>`;
+
+  } else if (curTab==='info') {
+    const rank  = c.anniversary_rank||c.ar||'';
+    const years = c.anniversary_years||c.ay||'';
+    const phone = c.phone||c.p||'';
+    const web   = c.website||c.w||'';
+    const ceo   = c.ceo_name||c.ceo||'';
+    const city  = c.city||c.c||'';
+    const ind   = c.industry||c.i||'';
+
+    const snsHtml = [
+      c.instagram_url?`<a class="sl sl-ig" href="${esc(c.instagram_url)}" target="_blank" rel="noopener">📸 Instagram</a>`:'',
+      c.x_url?`<a class="sl sl-x" href="${esc(c.x_url)}" target="_blank" rel="noopener">✕ X</a>`:'',
+      c.facebook_url?`<a class="sl sl-fb" href="${esc(c.facebook_url)}" target="_blank" rel="noopener">📘 Facebook</a>`:'',
+      c.tiktok_url?`<a class="sl sl-tt" href="${esc(c.tiktok_url)}" target="_blank" rel="noopener">🎵 TikTok</a>`:'',
+    ].filter(Boolean).join('');
+
+    const jobHtml = [
+      c.indeed_url?`<a class="sl sl-job" href="${esc(c.indeed_url)}" target="_blank" rel="noopener">Indeed</a>`:'',
+      c.own_recruit_url?`<a class="sl sl-job" href="${esc(c.own_recruit_url)}" target="_blank" rel="noopener">自社求人</a>`:'',
+      c.job_antenna_url?`<a class="sl sl-job" href="${esc(c.job_antenna_url)}" target="_blank" rel="noopener">求人アンテナ</a>`:'',
+    ].filter(Boolean).join('');
+
+    const rows = [
+      ['電話番号', phone?`<a href="tel:${esc(phone)}">${esc(phone)}</a>`:'-'],
+      ['代表者',   esc(ceo)||'-'],
+      ['業種',     esc(ind)||'-'],
+      ['所在地',   esc(city)||'-'],
+      ['周年',     rank?`<span class="rk rk-${rank}">${rank}</span>${years?' '+years+'周年':''}`:'-'],
+      ['HP',       web?`<a href="${esc(web)}" target="_blank" rel="noopener">ウェブサイトを開く →</a>`:'-'],
+      ['SNS',      snsHtml?`<div class="sns-wrap">${snsHtml}</div>`:'-'],
+      ['求人',     jobHtml?`<div class="sns-wrap">${jobHtml}</div>`:'-'],
+    ];
+
+    b.innerHTML = rows.map(([l,v])=>`
+      <div class="irow"><div class="ilabel">${l}</div><div class="ival">${v}</div></div>
+    `).join('') + `
+      <div style="margin-top:14px;">
+        <div class="section-label">メモ</div>
+        <textarea class="note-ta" id="info-memo" placeholder="メモを入力...">${esc(src.memo||'')}</textarea>
+        <button class="save-btn" style="margin-top:8px;" onclick="saveMemo()">メモを保存</button>
+      </div>`;
+  }
+}
+
+// ── ACTIONS ───────────────────────────────────────────
+async function doAct(key) {
+  const c   = cur;
+  const act = ACTS.find(a=>a.k===key);
+  if (!act) return;
+  const note = document.getElementById('act-note')?.value.trim()||'';
+  const now  = new Date();
+  const src  = {...(c.source_data||{})};
+  const log  = [...(src.contact_log||[])];
+  log.push({action:key, date:now.toISOString().slice(0,10), time:now.toTimeString().slice(0,5), note});
+  src.contact_log = log;
+
+  let nd = c.next_date||null;
+  if (act.nd) {
+    const d = new Date(); d.setDate(d.getDate()+act.days);
+    nd = d.toISOString().slice(0,10);
+  }
+
+  const upd = {phase:act.phase, source_data:src, next_date:nd};
+  const {error} = await sb.from('ceremony_attacks').update(upd).eq('id',c.id);
+  if (error) { toast('❌ 保存失敗: '+error.message); return; }
+  Object.assign(c, upd);
+  const idx=cos.findIndex(x=>x.id===c.id); if (idx>=0) Object.assign(cos[idx],upd);
+  const el=document.getElementById('act-note'); if (el) el.value='';
+  if (document.getElementById('nd-inp')) document.getElementById('nd-inp').value=nd||'';
+  renderStats(); renderList();
+  toast('✅ '+act.lab+' を記録しました');
+}
+
+async function saveNd() {
+  const nd = document.getElementById('nd-inp')?.value||null;
+  const {error} = await sb.from('ceremony_attacks').update({next_date:nd}).eq('id',cur.id);
+  if (error) { toast('❌ 保存失敗'); return; }
+  cur.next_date=nd;
+  const idx=cos.findIndex(x=>x.id===cur.id); if (idx>=0) cos[idx].next_date=nd;
+  renderStats(); renderList();
+  toast('📅 次回フォロー日を保存しました');
+}
+
+async function saveMemo() {
+  const memo = document.getElementById('info-memo')?.value||'';
+  const src  = {...(cur.source_data||{}), memo};
+  const {error} = await sb.from('ceremony_attacks').update({source_data:src}).eq('id',cur.id);
+  if (error) { toast('❌ 保存失敗'); return; }
+  cur.source_data=src;
+  const idx=cos.findIndex(x=>x.id===cur.id); if (idx>=0) cos[idx].source_data=src;
+  toast('✅ メモを保存しました');
+}
+
+// ── ADD COMPANY ───────────────────────────────────────
+function openAdd() { document.getElementById('add-ovl').classList.add('open'); }
+function closeAdd(e) {
+  if (e && e.target!==document.getElementById('add-ovl')) return;
+  document.getElementById('add-ovl').classList.remove('open');
+}
+
+async function doAdd() {
+  const name = document.getElementById('an').value.trim();
+  if (!name) { toast('❌ 会社名は必須です'); return; }
+  const row = {
+    company_name: name,
+    phone:        document.getElementById('ap').value.trim()||null,
+    website:      document.getElementById('aw').value.trim()||null,
+    ceo_name:     document.getElementById('ac').value.trim()||null,
+    industry:     document.getElementById('ai').value.trim()||null,
+    city:         document.getElementById('acy').value.trim()||null,
+    instagram_url:document.getElementById('aig').value.trim()||null,
+    x_url:        document.getElementById('ax').value.trim()||null,
+    indeed_url:   document.getElementById('aind').value.trim()||null,
+    phase:        'pending',
+  };
+  const {data,error} = await sb.from('ceremony_attacks').insert(row).select().single();
+  if (error) { toast('❌ 追加失敗: '+error.message); return; }
+  cos.push(data);
+  buildFilters(); renderStats(); renderList();
+  document.getElementById('add-ovl').classList.remove('open');
+  ['an','ap','aw','ac','ai','acy','aig','ax','aind'].forEach(id=>{ document.getElementById(id).value=''; });
+  toast('✅ '+name+' を追加しました');
+}
+
+// ── UTILS ─────────────────────────────────────────────
+function esc(s) {
+  if (s==null) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),2600);
+}
+
+// ── INIT ──────────────────────────────────────────────
+loadData();
 </script>
+</body>
+</html>

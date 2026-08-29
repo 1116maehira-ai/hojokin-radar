@@ -212,8 +212,8 @@ async function load(){
     var res = await client
       .from('ceremony_attacks')
       .select('company_name,phone,website,email,industry,city,ceo_name,founding_date,established_date,age_floor,anniversary_rank,anniversary_years,indeed_url,job_antenna_url,agre_url,mynavi_url,own_recruit_url,hellowork_url,instagram_url,facebook_url,x_url,tiktok_url,youtube_url,no_solicitation')
-      .neq('no_solicitation', true)
-      .order('age_floor', {ascending: false, nullsFirst: false});
+      .or('no_solicitation.is.null,no_solicitation.eq.false')
+      .order('company_name', {ascending: true});
 
     if(res.error) throw res.error;
 

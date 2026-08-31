@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第3回 カリキュラム</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600&family=Noto+Sans+JP:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F2F5F4;--s:#FFF;--t1:#1B2228;--t2:#4A5862;--t3:#8A97A1;--a:#1A6658;--ap:#EBF5F2;--am:#3A9E8A;--bor:#DDE4EA;--code-bg:#141F19;--code-t:#7DD3C0;--warn:#92400E;--warn-p:#FEF3C7;--warn-b:#F59E0B;--done-p:#F0FDF4;--done-b:#86EFAC;--done-t:#15803D}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0C1318;--s:#131D25;--t1:#DCE8EE;--t2:#8DA0AE;--t3:#4E6070;--a:#3EB8A0;--ap:#0D2824;--am:#3EB8A0;--bor:#1E3040;--code-bg:#080F0C;--code-t:#5DD9B8;--warn:#B45309;--warn-p:#1C1007;--warn-b:#D97706;--done-p:#0A1F0F;--done-b:#166534;--done-t:#86EFAC}}
+:root[data-theme="dark"]{--bg:#0C1318;--s:#131D25;--t1:#DCE8EE;--t2:#8DA0AE;--t3:#4E6070;--a:#3EB8A0;--ap:#0D2824;--am:#3EB8A0;--bor:#1E3040;--code-bg:#080F0C;--code-t:#5DD9B8;--warn:#B45309;--warn-p:#1C1007;--warn-b:#D97706;--done-p:#0A1F0F;--done-b:#166534;--done-t:#86EFAC}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:15px}
+body{font-family:'Noto Sans JP','Hiragino Kaku Gothic ProN',sans-serif;line-height:1.7;background:var(--bg);color:var(--t1)}
+.wrap{max-width:860px;margin:0 auto;padding:24px 20px 60px}
+.doc-head{padding:28px 0 20px;border-bottom:2px solid var(--a);margin-bottom:24px}
+.eyebrow{font-size:.62rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--am);margin-bottom:6px}
+.title{font-family:'Noto Serif JP',serif;font-size:1.55rem;font-weight:600;color:var(--t1);line-height:1.3}
+.subtitle{font-size:.8rem;color:var(--t3);margin-top:4px}
+.goal-box{background:var(--a);border-radius:8px;padding:16px 20px;margin-bottom:24px}
+.goal-label{font-size:.62rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.65);margin-bottom:5px}
+.goal-text{font-family:'Noto Serif JP',serif;font-size:1.05rem;font-weight:600;color:#fff;line-height:1.55}
+.tl-overview{background:var(--s);border:1px solid var(--bor);border-radius:8px;overflow:hidden;margin-bottom:32px}
+.tl-head{background:var(--ap);border-bottom:1px solid var(--bor);padding:8px 14px;font-size:.62rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--a)}
+.tl-row{display:grid;grid-template-columns:96px 1fr;border-bottom:1px solid var(--bor)}
+.tl-row:last-child{border-bottom:none}
+.tl-t{padding:9px 12px;font-size:.75rem;font-weight:700;color:var(--a);font-variant-numeric:tabular-nums;background:var(--ap);border-right:1px solid var(--bor);display:flex;align-items:center}
+.tl-d{padding:9px 14px;font-size:.83rem;color:var(--t1);display:flex;align-items:center}
+.tl-row.break .tl-t{background:var(--bg);color:var(--t3)}
+.tl-row.break .tl-d{color:var(--t3)}
+.section-label{font-size:.62rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--a);margin-bottom:10px;margin-top:32px}
+.block{background:var(--s);border:1px solid var(--bor);border-radius:8px;overflow:hidden;margin-bottom:18px}
+.block-head{background:var(--ap);border-bottom:1px solid var(--bor);padding:10px 16px;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.block-time{font-size:.7rem;font-weight:700;color:var(--am);font-variant-numeric:tabular-nums;flex-shrink:0}
+.block-title{font-family:'Noto Serif JP',serif;font-size:1rem;font-weight:600;color:var(--a)}
+.block-sub{font-size:.73rem;color:var(--t2);margin-top:1px;width:100%}
+.block-body{padding:14px 18px}
+.step-group{margin-bottom:14px}
+.step-group:last-child{margin-bottom:0}
+.step{display:flex;gap:10px;margin-bottom:10px;align-items:flex-start}
+.step:last-child{margin-bottom:0}
+.step-num{width:22px;height:22px;border-radius:50%;background:var(--a);color:#fff;font-size:.68rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:3px}
+.step-inner{flex:1;min-width:0}
+.step-title{font-size:.86rem;font-weight:600;color:var(--t1);margin-bottom:1px}
+.step-desc{font-size:.76rem;color:var(--t2);line-height:1.55}
+hr.step-div{border:none;border-top:1px solid var(--bor);margin:12px 0}
+.prompt-wrap{margin:10px 0}
+.prompt-label{font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--am);margin-bottom:5px}
+.prompt-box{background:var(--code-bg);border-radius:6px;padding:12px 14px;font-size:.77rem;font-family:'Courier New',monospace;color:var(--code-t);line-height:1.7;white-space:pre-wrap;word-break:break-all;overflow-x:auto}
+.prompt-hint{font-size:.7rem;color:var(--t3);margin-top:4px}
+.done-box{background:var(--done-p);border:1px solid var(--done-b);border-radius:6px;padding:10px 14px;margin-top:12px}
+.done-label{font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--done-t);margin-bottom:5px}
+.done-list{list-style:none;padding:0}
+.done-list li{font-size:.78rem;color:var(--t1);padding-left:1.4em;position:relative;margin-bottom:2px}
+.done-list li::before{content:'✓';position:absolute;left:0;color:var(--done-t);font-weight:700}
+.note{background:var(--warn-p);border:1px solid var(--warn-b);border-radius:6px;padding:9px 13px;font-size:.76rem;color:var(--warn);margin:10px 0;line-height:1.55}
+.assign-wrap{margin:10px 0}
+.assign-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+@media(max-width:500px){.assign-grid{grid-template-columns:1fr}}
+.assign-card{background:var(--bg);border:1px solid var(--bor);border-radius:6px;padding:10px 13px}
+.assign-name{font-size:.8rem;font-weight:600;color:var(--a);margin-bottom:4px}
+.assign-tags{display:flex;flex-wrap:wrap;gap:4px}
+.assign-tag{font-size:.68rem;background:var(--ap);border:1px solid var(--am);border-radius:4px;padding:1px 8px;color:var(--a)}
+.info-box{background:var(--bg);border:1px solid var(--bor);border-radius:6px;padding:10px 14px;margin:10px 0;font-size:.78rem;color:var(--t2);line-height:1.55}
+.info-box strong{color:var(--t1)}
+.block.break{opacity:.7}
+.block.break .block-head{background:var(--bg)}
+.block.break .block-title{color:var(--t3)}
+.block.break .block-time{color:var(--t3)}
+strong{font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="doc-head">
+  <div class="eyebrow">設備技研 AIリスキリング研修 第3回 ／ 参加者向け手順書</div>
+  <div class="title">採用サイトを完成・公開しよう</div>
+  <div class="subtitle">分業制作 → 統合 → CMS連携。今日の終わりに、本物のURLが手元に届きます。</div>
+</header>
+
+<div class="goal-box">
+  <div class="goal-label">今日のゴール</div>
+  <div class="goal-text">設備技研の採用サイトが、<br>インターネット上に公開された状態になる。</div>
+</div>
+
+<div class="tl-overview">
+  <div class="tl-head">本日のタイムライン</div>
+  <div class="tl-row"><span class="tl-t">10:00–10:30</span><span class="tl-d">第2回振り返り・本日の流れ説明</span></div>
+  <div class="tl-row"><span class="tl-t">10:30–11:00</span><span class="tl-d">デザイン投票・1本に絞る</span></div>
+  <div class="tl-row"><span class="tl-t">11:00–12:00</span><span class="tl-d">分業制作（担当セクションを各自で作る）</span></div>
+  <div class="tl-row break"><span class="tl-t">12:00–13:00</span><span class="tl-d">昼休憩</span></div>
+  <div class="tl-row"><span class="tl-t">13:00–14:00</span><span class="tl-d">全セクション統合 → 1つのHTMLに</span></div>
+  <div class="tl-row"><span class="tl-t">14:00–14:45</span><span class="tl-d">Supabase CMS連携（管理画面で文字を変える）</span></div>
+  <div class="tl-row"><span class="tl-t">14:45–15:00</span><span class="tl-d">完成確認・まとめ・次回予告</span></div>
+</div>
+
+<div class="section-label">各ブロックの手順</div>
+
+<!-- BLOCK 1 -->
+<div class="block">
+  <div class="block-head">
+    <span class="block-time">10:00–10:30</span>
+    <span class="block-title">第2回振り返り</span>
+    <div class="block-sub">前回やったことを確認して、今日のスタートラインをそろえます。</div>
+  </div>
+  <div class="block-body">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-inner">
+        <div class="step-title">自分のGitHub Pagesのサイトを開く</div>
+        <div class="step-desc">スマホかPCで前回作ったURLにアクセスしてください。<br><strong>https://[自分のGitHubユーザー名].github.io/</strong><br>前回のURLがわからない場合は前平さんに確認してください。</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-inner">
+        <div class="step-title">全員のサイトURLを確認する</div>
+        <div class="step-desc">前平さんが5つのサイトを並べて表示します。デザインの特徴を覚えておきましょう。</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-inner">
+        <div class="step-title">今日の担当セクションを確認する</div>
+        <div class="step-desc">前平さんから担当セクションが発表されます。メモしておいてください。</div>
+      </div>
+    </div>
+    <div class="done-box">
+      <div class="done-label">このブロックの終わり</div>
+      <ul class="done-list">
+        <li>自分のサイトが開けている</li>
+        <li>今日の担当セクションがわかっている</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- BLOCK 2 -->
+<div class="block">
+  <div class="block-head">
+    <span class="block-time">10:30–11:00</span>
+    <span class="block-title">デザイン投票・1本に絞る</span>
+    <div class="block-sub">5つのデザインの中から、採用サイトのベースになる1つを選びます。</div>
+  </div>
+  <div class="block-body">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-inner">
+        <div class="step-title">5つのデザインを並べて見る</div>
+        <div class="step-desc">前平さんが全員のサイトを表示します。気に入ったポイントをメモしておいてください。</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-inner">
+        <div class="step-title">評価ポイントを発言する</div>
+        <div class="step-desc">「このデザインの〇〇が好き」「スマホで見やすい」などの意見を出しましょう。正解はありません。</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-inner">
+        <div class="step-title">1つのデザインに決める</div>
+        <div class="step-desc">多数決または合議で決めます。選ばれたデザインのHTMLをベースに今日の統合作業を行います。</div>
+      </div>
+    </div>
+    <div class="prompt-wrap">
+      <div class="prompt-label">🤖 Claudeへのプロンプト（参考）</div>
+      <div class="prompt-box">採用サイトのデザインを選ぶとき、どんな点を比較すればいいですか？
+スマホで見るユーザーを想定して、5つのデザインを比較する視点を3つ教えてください。</div>
+      <div class="prompt-hint">※ 迷ったときにClaudeに聞いてみましょう。</div>
+    </div>
+    <div class="done-box">
+      <div class="done-label">このブロックの終わり</div>
+      <ul class="done-list">
+        <li>全員が合意した1つのデザインが決まっている</li>
+        <li>前平さんがそのHTMLをコピーして統合準備を開始している</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- BLOCK 3 -->
+<div class="block">
+  <div class="block-head">
+    <span class="block-time">11:00–12:00</span>
+    <span class="block-title">分業制作</span>
+    <div class="block-sub">担当セクションのHTMLをClaudeで作ります。文言はGoogleドキュメントから取ります。</div>
+  </div>
+  <div class="block-body">
+
+    <div class="assign-wrap">
+      <div class="assign-grid">
+        <div class="assign-card">
+          <div class="assign-name">仲本 政滋さん</div>
+          <div class="assign-tags">
+            <span class="assign-tag">ファーストビュー</span>
+            <span class="assign-tag">おすすめ</span>
+          </div>
+        </div>
+        <div class="assign-card">
+          <div class="assign-name">佐久本 樹里さん</div>
+          <div class="assign-tags">
+            <span class="assign-tag">選ばれる理由</span>
+            <span class="assign-tag">仕事紹介</span>
+          </div>
+        </div>
+        <div class="assign-card">
+          <div class="assign-name">宜保 有輝さん</div>
+          <div class="assign-tags">
+            <span class="assign-tag">1日の流れ</span>
+            <span class="assign-tag">先輩の声</span>
+          </div>
+        </div>
+        <div class="assign-card">
+          <div class="assign-name">平良 健さん</div>
+          <div class="assign-tags">
+            <span class="assign-tag">求人情報</span>
+            <span class="assign-tag">会社の歩み</span>
+          </div>
+        </div>
+        <div class="assign-card">
+          <div class="assign-name">前平（統合担当）</div>
+          <div class="assign-tags">
+            <span class="assign-tag">代表メッセージ</span>
+            <span class="assign-tag">統合・調整</span>
+          </div>
+        </div>
+      </div>
+      <div class="prompt-hint" style="margin-top:6px">※ 担当が変わる場合は前平さんの指示に従ってください。</div>
+    </div>
+
+    <hr class="step-div">
+
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-inner">
+        <div class="step-title">Googleドキュメントを開く</div>
+        <div class="step-desc">前平さんが共有しているGoogleドキュメント「WEB文言競技」を開きます。自分の担当セクションの文章をコピーしてください。</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-inner">
+        <div class="step-title">claude.ai を開く</div>
+        <div class="step-desc">ブラウザで <strong>claude.ai</strong> にアクセスし、新しい会話を開始します。</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-inner">
+        <div class="step-title">下のプロンプトを貼り付ける</div>
+        <div class="step-desc">「■ 使う文言」の部分に、Googleドキュメントからコピーした文章を貼り付けてから送信してください。</div>
+      </div>
+    </div>
+
+    <div class="prompt-wrap">
+      <div class="prompt-label">🤖 Claudeへのプロンプト（分業制作用）</div>
+      <div class="prompt-box">設備技研株式会社の採用サイト用の、HTMLセクションを1つ作ってください。
+
+■ セクション名：
+[ここに担当のセクション名を書いてください]
+例：ファーストビュー / 選ばれる理由 / 先輩の声 など
+
+■ 使う文言（Googleドキュメントからコピーしてここに貼ってください）：
+[ここに文言を貼る]
+
+■ 条件：
+・白ベースのシンプルなデザイン
+・スマホで読みやすいこと（レスポンシブ）
+・Google FontsのNoto Sans JPを使う
+・&lt;section&gt;タグで囲んだHTMLのみ出力（&lt;html&gt;&lt;head&gt;は不要）
+・JavaScriptは使わない
+・CSSはsectionタグ内の&lt;style&gt;タグに書く</div>
+      <div class="prompt-hint">※ 文言が長くても大丈夫です。全部貼ってください。AIが整理します。</div>
+    </div>
+
+    <div class="step" style="margin-top:12px">
+      <div class="step-num">4</div>
+      <div class="step-inner">
+        <div class="step-title">生成されたHTMLをコピーしてメモ帳に保存</div>
+        <div class="step-desc">Claudeが出力したHTMLコード（<code style="font-size:.78rem;background:var(--bg);padding:0 3px;border-radius:3px">&lt;section&gt;〜&lt;/section&gt;</code>）を全部コピーして、メモ帳やスマホのメモアプリに貼り付けておきます。あとで前平さんに送ります。</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-inner">
+        <div class="step-title">デザインが気に入らない場合はClaudeに修正を依頼する</div>
+        <div class="step-desc">「もっとシンプルに」「文字を大きくして」など日本語で指示すれば修正してくれます。遠慮せず何度でも頼みましょう。</div>
+      </div>
+    </div>
+    <div class="note">2つ目のセクションも同じ手順で作ってください。完成したら前平さんにLINEかSlackで送ります。</div>
+    <div class="done-box">
+      <div class="done-label">このブロックの終わり</div>
+      <ul class="done-list">
+        <li>担当セクション（2つ）のHTMLが手元にある</li>
+        <li>前平さんにHTMLを送信済み</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- BREAK -->
+<div class="block break">
+  <div class="block-head">
+    <span class="block-time">12:00–13:00</span>
+    <span class="block-title">昼休憩</span>
+  </div>
+  <div class="block-body">
+    <div class="step-desc" style="font-size:.83rem;color:var(--t3)">午後は13:00に再開します。少し早めに戻っていただけると助かります。</div>
+  </div>
+</div>
+
+<!-- BLOCK 5 -->
+<div class="block">
+  <div class="block-head">
+    <span class="block-time">13:00–14:00</span>
+    <span class="block-title">全セクション統合</span>
+    <div class="block-sub">全員のセクションを1つのHTMLファイルに結合します。前平さんがClaudeを使って進めます。</div>
+  </div>
+  <div class="block-body">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-inner">
+        <div class="step-title">全員のセクションHTMLが揃っているか確認</div>
+        <div class="step-desc">前平さんが9セクション分のHTMLを受け取っているか確認します。足りていれば統合に進みます。</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-inner">
+        <div class="step-title">Claudeに統合を依頼する（前平さんが実施）</div>
+        <div class="step-desc">下のプロンプトを使って、9セクションを1本のindex.htmlにまとめます。</div>
+      </div>
+    </div>
+
+    <div class="prompt-wrap">
+      <div class="prompt-label">🤖 Claudeへのプロンプト（統合用・前平さんが使います）</div>
+      <div class="prompt-box">以下の採用サイト用HTMLセクションを、1つの完成したindex.htmlにまとめてください。
+
+■ セクションの順番（この順で結合）：
+1. ファーストビュー
+[HTML貼る]
+
+2. おすすめ
+[HTML貼る]
+
+3. 選ばれる理由
+[HTML貼る]
+
+4. 仕事紹介
+[HTML貼る]
+
+5. 1日の流れ
+[HTML貼る]
+
+6. 先輩の声
+[HTML貼る]
+
+7. 求人情報
+[HTML貼る]
+
+8. 会社の歩み
+[HTML貼る]
+
+9. 代表メッセージ
+[HTML貼る]
+
+■ 統合の条件：
+・全体の配色とフォントを統一してください（白ベース、Noto Sans JP）
+・ページ上部にナビゲーションバーを追加（会社名「設備技研株式会社」を左上に）
+・各セクションへスクロールできるアンカーリンクをナビに設定
+・スマホ対応（レスポンシブ）
+・ページ下部にシンプルなフッターを追加（会社名・著作権表記のみ）
+・GitHub PagesでそのままつかえるHTMLとして1ファイルで出力
+・CSSは&lt;style&gt;タグにまとめる（外部CSSファイルは使わない）</div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-inner">
+        <div class="step-title">完成したHTMLをGitHubにプッシュする</div>
+        <div class="step-desc">Claudeが出力したHTMLをコピーし、前平さんのGitHubリポジトリの <strong>index.html</strong> を更新してプッシュします。</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-inner">
+        <div class="step-title">全員でブラウザから確認する</div>
+        <div class="step-desc">GitHub Pagesに反映されるまで1〜2分かかります。URLを開いて全セクションが表示されているか確認しましょう。</div>
+      </div>
+    </div>
+    <div class="note">表示が崩れた部分があればClaudeに「〇〇セクションのデザインが崩れています。修正してください」と伝えて直してもらいます。</div>
+    <div class="done-box">
+      <div class="done-label">このブロックの終わり</div>
+      <ul class="done-list">
+        <li>9セクション全部が入った採用サイトがURLで確認できる</li>
+        <li>スマホで開いても崩れていない</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- BLOCK 6 -->
+<div class="block">
+  <div class="block-head">
+    <span class="block-time">14:00–14:45</span>
+    <span class="block-title">Supabase CMS連携</span>
+    <div class="block-sub">管理画面（Supabase）で文字を変えると、サイトが自動で更新される仕組みを作ります。</div>
+  </div>
+  <div class="block-body">
+
+    <div class="info-box">
+      <strong>Supabaseとは？</strong><br>
+      Googleスプレッドシートのような管理画面で、採用サイトの文字を変えられる仕組みです。HTMLをまた触らなくても、セルを編集するだけでサイトに反映されます。<br>
+      今日の連携が終わると、「文章を直したい」と思ったときにHTMLを触らずに済みます。
+    </div>
+
+    <hr class="step-div">
+
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-inner">
+        <div class="step-title">接続情報を受け取る</div>
+        <div class="step-desc">前平さんから以下の2つの情報を受け取ります。メモしておいてください。</div>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <strong>Supabase URL：</strong><br>
+      <code style="font-size:.78rem">https://fernmckqdrzemfyfbdvc.supabase.co</code><br><br>
+      <strong>Publishable Key（公開用キー）：</strong><br>
+      <span style="color:var(--t3)">→ 前平さんが当日チャットで共有します</span>
+    </div>
+
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-inner">
+        <div class="step-title">ClaudeにSupabase連携コードの追加を依頼する</div>
+        <div class="step-desc">統合済みのindex.htmlをClaudeに貼り、下のプロンプトで連携コードを追加してもらいます。</div>
+      </div>
+    </div>
+
+    <div class="prompt-wrap">
+      <div class="prompt-label">🤖 Claudeへのプロンプト（Supabase連携用）</div>
+      <div class="prompt-box">このHTMLにSupabaseからコンテンツを読み込む機能を追加してください。
+
+■ Supabase接続情報：
+URL: https://fernmckqdrzemfyfbdvc.supabase.co
+Publishable Key: [前平さんから受け取ったキーを貼る]
+
+■ テーブル情報：
+テーブル名: saiyou_content
+カラム: section（TEXT）、content（TEXT）、display_order（INT）
+
+■ やりたいこと：
+・ページ読み込み時に、Supabaseのsaiyou_contentテーブルからデータを取得する
+・各セクションのテキストを、テーブルのcontentで上書きして表示する
+・sectionカラムの値でどのセクションのテキストか判断する
+・Supabaseの@supabase/supabase-jsをCDNで読み込む（npmは使わない）
+
+■ 注意：
+・HTMLの見た目やデザインは変えないでください
+・データが読み込めない場合は、現在のテキストをそのまま表示するフォールバックを入れてください</div>
+      <div class="prompt-hint">※ HTMLが長い場合は、2回に分けてClaudeに貼っても大丈夫です。「続きです」と伝えてください。</div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-inner">
+        <div class="step-title">更新したHTMLをGitHubにプッシュする</div>
+        <div class="step-desc">Claudeが出力したHTMLをコピーし、GitHubのindex.htmlを更新してプッシュします。1〜2分待つとサイトに反映されます。</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-inner">
+        <div class="step-title">Supabaseの管理画面で文字を書き換えてみる ← ここが体験のハイライトです！</div>
+        <div class="step-desc">
+          <strong>① </strong><a href="https://supabase.com" style="color:var(--am)">supabase.com</a> にアクセスしてサインイン<br>
+          <strong>② </strong>プロジェクト「hojokin-saiyou」を開く<br>
+          <strong>③ </strong>左メニュー「Table Editor」→「saiyou_content」テーブルを開く<br>
+          <strong>④ </strong>任意の行の <strong>content</strong> セルをダブルクリックして文字を変える（例：「テスト！」）<br>
+          <strong>⑤ </strong>「Save」をクリック<br>
+          <strong>⑥ </strong>採用サイトをリロードして、変わっているか確認！
+        </div>
+      </div>
+    </div>
+    <div class="done-box">
+      <div class="done-label">このブロックの終わり</div>
+      <ul class="done-list">
+        <li>Supabaseの管理画面で文字を変えると、サイトに反映されることが確認できた</li>
+        <li>HTMLを触らずに文字が変えられる状態になっている</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- BLOCK 7 -->
+<div class="block">
+  <div class="block-head">
+    <span class="block-time">14:45–15:00</span>
+    <span class="block-title">完成確認・まとめ・次回予告</span>
+    <div class="block-sub">今日やったことを振り返り、完成した採用サイトのURLを全員で確認します。</div>
+  </div>
+  <div class="block-body">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-inner">
+        <div class="step-title">完成した採用サイトのURLを確認する</div>
+        <div class="step-desc">スマホで採用サイトを開いてください。全セクションが表示されていれば完成です。</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-inner">
+        <div class="step-title">感想を一言ずつ発表する</div>
+        <div class="step-desc">「今日一番驚いたこと」「やってみてわかったこと」を一言でいいので共有しましょう。</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-inner">
+        <div class="step-title">次回（第4回）の予告を聞く</div>
+        <div class="step-desc">前平さんから次回の内容と日程が告知されます。</div>
+      </div>
+    </div>
+    <div class="done-box">
+      <div class="done-label">今日の終わりにできていること</div>
+      <ul class="done-list">
+        <li>設備技研の採用サイト（9セクション）がインターネットに公開されている</li>
+        <li>Supabaseの管理画面から文字を変えられる状態になっている</li>
+        <li>採用サイトのURLが手元にある</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

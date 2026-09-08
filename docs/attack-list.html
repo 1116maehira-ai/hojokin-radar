@@ -363,7 +363,8 @@ function segsOf(c) {
   const rank = c.anniversary_rank||c.ar||'';
   const emp = empNum(c);
   if ((age!==null && age>=10 && (age%5===0 || (age+1)%5===0)) || ['S','A','B'].includes(rank)) out.push('shiki');
-  if (age!==null && age>=20) out.push('rinen');
+  // 創業年が不明でも、建設業許可番号などから「少なくともN年」が分かれば理念リストに入れる（age_floor）
+  if ((age!==null && age>=20) || (age===null && (parseInt(c.age_floor,10)||0)>=20)) out.push('rinen');
   if (emp!==null && emp>=15) out.push('ai');
   return out;
 }

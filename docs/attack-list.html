@@ -89,6 +89,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
 .rk-A{background:#fef3c7;color:#92600b}
 .rk-B{background:#d1fae5;color:#065f46}
 .rk-C{background:#f1f5f9;color:#64748b}
+.seg{display:inline-block;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:700;white-space:nowrap}
+.seg-shiki{background:#fee2e2;color:#b91c1c}
+.seg-rinen{background:#e0e7ff;color:#3730a3}
+.seg-ai{background:#dcfce7;color:#166534}
+.segbar{display:flex;gap:6px;padding:8px 12px;flex-wrap:wrap;background:var(--card);border-bottom:1px solid var(--border);align-items:center}
+.segbar .lbl{font-size:11px;color:var(--muted);margin-right:2px}
+.segbtn{padding:4px 11px;border-radius:14px;border:1px solid var(--border);background:var(--bg);color:var(--text);cursor:pointer;font-size:12px;font-weight:700;font-family:inherit;font-variant-numeric:tabular-nums}
+.segbtn.on{border-color:var(--primary);background:var(--primary-l)}
+.segbtn small{font-weight:400;color:var(--muted);margin-left:3px}
+.info-edit{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.info-edit input{padding:7px 10px;border:1px solid var(--border);border-radius:7px;background:var(--bg);color:var(--text);font-size:13px;font-family:inherit;min-width:0}
+.info-edit input.full{grid-column:1/-1}
 
 /* phase label */
 .pl{display:inline-block;padding:1px 7px;border-radius:6px;font-size:10px;font-weight:700}
@@ -193,6 +205,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
 .cancel-scr-btn{padding:8px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--muted);cursor:pointer}
 .reset-scr-btn{padding:8px 12px;background:var(--bg);border:1px solid #fca5a5;border-radius:8px;font-size:11px;color:#dc2626;cursor:pointer;margin-left:auto}
 
+/* ── LETTER TAB ── */
+.letter-ta{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-size:13px;line-height:1.8;min-height:280px;resize:vertical;font-family:inherit}
+.letter-ta:focus{outline:none;border-color:var(--primary)}
+.letter-checks{display:flex;gap:20px;margin:12px 0;padding:12px 16px;background:var(--bg);border-radius:9px;border:1px solid var(--border);flex-wrap:wrap}
+.lchk{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px;font-weight:700;user-select:none}
+.lchk input[type=checkbox]{width:20px;height:20px;cursor:pointer;accent-color:var(--primary);flex-shrink:0}
+.lchk-made{color:#059669}
+.lchk-sent{color:#7c3aed}
+.ls{display:inline-block;padding:1px 6px;border-radius:5px;font-size:10px;font-weight:800}
+.ls-made{background:#d1fae5;color:#065f46}
+.ls-sent{background:#ede9fe;color:#5b21b6}
+
 /* ── IMPORT ── */
 .imp-hint{font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.8;background:var(--bg);padding:10px 12px;border-radius:8px;border:1px solid var(--border)}
 .imp-hint code{font-family:'SF Mono',Menlo,Consolas,monospace;background:var(--border);padding:1px 4px;border-radius:3px}
@@ -235,10 +259,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
   </div>
   <button class="btn-refresh" onclick="loadData()" title="再読込">🔄</button>
   <button class="btn-add" onclick="openImp()" style="background:rgba(255,255,255,.12);">📥 インポート</button>
+  <button class="btn-add" onclick="exportDmCsv()" style="background:rgba(255,255,255,.12);" title="今の絞り込み結果をDM発送用CSVで保存">📤 DM用CSV</button>
   <button class="btn-add" onclick="openAdd()">＋ 追加</button>
 </div>
 
 <div class="stats" id="stats"></div>
+<div class="segbar" id="segbar"></div>
 
 <div class="fbar">
   <input type="text" id="q" placeholder="会社名・代表者・電話番号で検索..." oninput="renderList()">
@@ -267,6 +293,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
       <div class="mtab" onclick="switchTab('log')">📋 履歴</div>
       <div class="mtab" onclick="switchTab('script')">📜 トークスクリプト</div>
       <div class="mtab" onclick="switchTab('info')">ℹ️ 情報</div>
+      <div class="mtab" onclick="switchTab('letter')">✉️ 手紙</div>
     </div>
     <div class="mbody" id="mbody"></div>
   </div>
@@ -287,6 +314,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
         <input class="add-inp" id="ac" placeholder="代表者名">
         <input class="add-inp" id="ai" placeholder="業種">
         <input class="add-inp" id="acy" placeholder="市区町村">
+        <input class="add-inp" id="apc" placeholder="郵便番号（例 900-0015）">
+        <input class="add-inp" id="aad" placeholder="住所（DM宛先。沖縄県から）">
+        <input class="add-inp" id="afd" placeholder="創業年（例 1985）">
+        <input class="add-inp" id="aem" placeholder="従業員数（例 25）">
         <input class="add-inp" id="aig" placeholder="Instagram URL">
         <input class="add-inp" id="ax" placeholder="X (Twitter) URL">
         <input class="add-inp" id="aind" placeholder="Indeed URL">
@@ -316,8 +347,44 @@ const SB_URL = 'https://osipzwbsfbgbegjowydm.supabase.co';
 const SB_KEY = 'sb_publishable_yO0lVlOP_r-qhnwjxqq0UQ_qjxSrlnC';
 const sb = window.supabase.createClient(SB_URL, SB_KEY);
 
-let cos = [], cur = null, curTab = 'action', curF = 'all';
+let cos = [], cur = null, curTab = 'action', curF = 'all', curSeg = 'all';
 const today = new Date().toISOString().slice(0,10);
+const THIS_YEAR = new Date().getFullYear();
+
+// ── 3リスト振り分け（式典 / 理念映像 / AIリスキリング）──
+// 式典  : 創業10年以上で、今年か来年が5年刻みの周年（または周年ランクS/A/B付き）
+// 理念  : 創業20年以上（周年に関係なく「創業の魂」を残す提案ができる）
+// AI    : 従業員15人以上（業種問わず）
+const SEGS = {
+  shiki: {lab:'🎬 式典',   cls:'seg-shiki', desc:'今年・来年に5年刻みの周年'},
+  rinen: {lab:'🎥 理念映像', cls:'seg-rinen', desc:'創業20年以上'},
+  ai:    {lab:'🤖 AI研修',  cls:'seg-ai',    desc:'従業員15人以上'},
+};
+function foundYear(c) {
+  const s = (c.founding_date||'') + ' ' + (c.established_date||'');
+  const m = s.match(/(19|20)\d{2}/);
+  return m ? parseInt(m[0],10) : null;
+}
+function empNum(c) {
+  const s = String(c.employees||'').replace(/[０-９]/g, d=>String.fromCharCode(d.charCodeAt(0)-0xFEE0));
+  const m = s.match(/\d+/);
+  return m ? parseInt(m[0],10) : null;
+}
+function segsOf(c) {
+  const out = [];
+  const fy = foundYear(c), age = fy ? THIS_YEAR - fy : null;
+  const rank = c.anniversary_rank||c.ar||'';
+  const emp = empNum(c);
+  if ((age!==null && age>=10 && (age%5===0 || (age+1)%5===0)) || ['S','A','B'].includes(rank)) out.push('shiki');
+  // 創業年が不明でも、建設業許可番号などから「少なくともN年」が分かれば理念リストに入れる（age_floor）
+  if ((age!==null && age>=20) || (age===null && (parseInt(c.age_floor,10)||0)>=20)) out.push('rinen');
+  if (emp!==null && emp>=15) out.push('ai');
+  return out;
+}
+function cityFromAddress(addr) {
+  const m = String(addr||'').replace(/^沖縄県/,'').match(/^(.+?市|.+?郡.+?[町村]|.+?[町村])/);
+  return m ? m[1].replace(/^.+?郡/,'') : '';
+}
 
 const PHASES = {
   pending:          {lab:'未対応',      cls:'pl-pending'},
@@ -478,10 +545,55 @@ function resetScript() {
   renderScriptTab();
 }
 
+// ── LETTER (localStorage) ─────────────────────────────
+const LTR_PFX = 'letter_v1_';
+function getLetter(id) {
+  try { const s=localStorage.getItem(LTR_PFX+id); return s?JSON.parse(s):{}; } catch { return {}; }
+}
+function putLetter(id, obj) {
+  try { localStorage.setItem(LTR_PFX+id, JSON.stringify(obj)); } catch {}
+}
+function saveLetter() {
+  if (!cur) return;
+  const body = document.getElementById('letter-body')?.value||'';
+  const made = document.getElementById('lchk-made')?.checked||false;
+  const sent = document.getElementById('lchk-sent')?.checked||false;
+  const now  = new Date().toLocaleString('ja-JP');
+  putLetter(cur.id, {body, made, sent, saved_at:now});
+  renderList();
+  toast('✅ 手紙を保存しました');
+}
+
 // ── IMPORT ────────────────────────────────────────────
 let impParsed = {news:[], conflicts:[]};
-const IMP_COLS = ['company_name','phone','website','ceo_name','industry','city','anniversary_rank','anniversary_years'];
-const IMP_LABS = {company_name:'会社名',phone:'電話番号',website:'ウェブサイト',ceo_name:'代表者名',industry:'業種',city:'市区町村',anniversary_rank:'周年ランク',anniversary_years:'周年年数'};
+const IMP_COLS = ['company_name','phone','website','ceo_name','industry','city','anniversary_rank','anniversary_years','postal_code','address','founding_date','employees','email'];
+const IMP_LABS = {company_name:'会社名',phone:'電話番号',website:'ウェブサイト',ceo_name:'代表者名',industry:'業種',city:'市区町村',anniversary_rank:'周年ランク',anniversary_years:'周年年数',postal_code:'郵便番号',address:'住所',founding_date:'創業年',employees:'従業員数',email:'メール'};
+// ヘッダー行があれば列名で自動対応（県の建設業許可業者名簿などをそのまま貼れる）
+const IMP_ALIASES = [
+  ['company_name', /会社名|商号|名称|company|name/i],
+  ['phone',        /電話|tel|phone/i],
+  ['website',      /web|url|ホームページ|hp|サイト/i],
+  ['ceo_name',     /代表者|代表|社長|ceo/i],
+  ['industry',     /業種|許可業種|業態|industry/i],
+  ['city',         /市区町村|市町村|city/i],
+  ['anniversary_rank',  /ランク|rank/i],
+  ['anniversary_years', /周年年数|周年|years/i],
+  ['postal_code',  /郵便番号|〒|zip|postal/i],
+  ['address',      /住所|所在地|address/i],
+  ['founding_date',/創業|設立|許可年月日|founded|established/i],
+  ['employees',    /従業員|社員数|人数|employees/i],
+  ['email',        /メール|mail/i],
+];
+function mapHeader(row) {
+  const map = [];
+  const used = new Set();
+  row.forEach((h,i)=>{
+    const hit = IMP_ALIASES.find(([k,re])=>!used.has(k) && re.test(h||''));
+    map[i] = hit ? hit[0] : null;
+    if (hit) used.add(hit[0]);
+  });
+  return map;
+}
 
 function openImp() {
   impParsed = {news:[], conflicts:[]};
@@ -497,8 +609,8 @@ function renderImpStep1() {
   return `
     <div class="imp-hint">
       <strong>CSV形式でリストを貼り付けるか、ファイルを選択してください。</strong><br>
-      列順: <code>会社名</code>, <code>電話番号</code>, <code>ウェブサイト</code>, <code>代表者名</code>, <code>業種</code>, <code>市区町村</code>, <code>周年ランク(S/A/B/C)</code>, <code>周年年数</code><br>
-      ※ 1行目がヘッダーの場合は自動でスキップします。重複は会社名または電話番号で検出します。
+      列順: <code>会社名</code>, <code>電話番号</code>, <code>ウェブサイト</code>, <code>代表者名</code>, <code>業種</code>, <code>市区町村</code>, <code>周年ランク(S/A/B/C)</code>, <code>周年年数</code>, <code>郵便番号</code>, <code>住所</code>, <code>創業年</code>, <code>従業員数</code>, <code>メール</code><br>
+      ※ 1行目がヘッダーなら列名（商号・代表者・所在地・許可年月日 など）で自動対応します。列順が違っても大丈夫。重複は会社名または電話番号で検出します。
     </div>
     <textarea class="imp-csv-ta" id="imp-csv" placeholder="例:
 株式会社ABC,098-000-0001,https://example.com,山田太郎,建設業,那覇市,A,30
@@ -528,23 +640,31 @@ function parseCSVLine(line) {
 
 function isHeaderRow(row) {
   const first=(row[0]||'').toLowerCase();
-  return first.includes('会社')||first.includes('company')||first==='名前'||first==='name';
+  // 「株式会社〇〇」を見出し行と誤認しないよう、完全一致に近い判定にする
+  if (['会社名','商号','名称','company','company_name','名前','name'].includes(first)) return true;
+  // 半分以上のセルが列名っぽければヘッダー扱い
+  const hits = row.filter(h=>IMP_ALIASES.some(([,re])=>re.test(h||''))).length;
+  return row.length>=2 && hits>=Math.ceil(row.length/2);
 }
 
 function parseImport() {
   const raw = (document.getElementById('imp-csv')?.value||'').trim();
   if (!raw) { toast('❌ CSVを入力してください'); return; }
   const lines = raw.split(/\r?\n/).filter(l=>l.trim());
-  let startIdx = 0;
+  let startIdx = 0, hmap = null;
   const firstRow = parseCSVLine(lines[0]);
-  if (isHeaderRow(firstRow)) startIdx = 1;
+  if (isHeaderRow(firstRow)) { startIdx = 1; hmap = mapHeader(firstRow); }
+  if (hmap && !hmap.includes('company_name')) { toast('❌ ヘッダーに「会社名/商号/名称」の列が見つかりません'); return; }
 
   const news=[], conflicts=[];
   for (let i=startIdx;i<lines.length;i++) {
     const cols = parseCSVLine(lines[i]);
-    if (!cols[0]) continue;
     const row = {};
-    IMP_COLS.forEach((k,j)=>{ const v=cols[j]||''; if (v) row[k]=v; });
+    if (hmap) hmap.forEach((k,j)=>{ const v=(cols[j]||'').trim(); if (k && v) row[k]=v; });
+    else IMP_COLS.forEach((k,j)=>{ const v=cols[j]||''; if (v) row[k]=v; });
+    if (!row.company_name) continue;
+    if (row.postal_code) row.postal_code = row.postal_code.replace(/[〒\s]/g,'').replace(/^(\d{3})(\d{4})$/,'$1-$2');
+    if (!row.city && row.address) { const cty=cityFromAddress(row.address); if (cty) row.city=cty; }
 
     const existing = cos.find(c=>{
       if (row.company_name && c.company_name===row.company_name) return true;
@@ -704,6 +824,43 @@ async function loadData() {
   renderList();
 }
 
+// ── 3リスト バー ─────────────────────────────────────
+function renderSegBar() {
+  const live = cos.filter(c=>c.phase!=='declined');
+  const cnt = {all: live.length, shiki:0, rinen:0, ai:0, none:0};
+  live.forEach(c=>{ const s=segsOf(c); if (!s.length) cnt.none++; s.forEach(k=>cnt[k]++); });
+  const btn = (k,lab,n,title)=>`<button class="segbtn ${curSeg===k?'on':''}" onclick="setSeg('${k}')" title="${esc(title||'')}">${lab}<small>${n}</small></button>`;
+  document.getElementById('segbar').innerHTML =
+    `<span class="lbl">リスト:</span>` +
+    btn('all','全て',cnt.all,'お断り以外の全社') +
+    btn('shiki',SEGS.shiki.lab,cnt.shiki,SEGS.shiki.desc) +
+    btn('rinen',SEGS.rinen.lab,cnt.rinen,SEGS.rinen.desc) +
+    btn('ai',SEGS.ai.lab,cnt.ai,SEGS.ai.desc) +
+    btn('none','❓ 情報不足',cnt.none,'創業年も従業員数も不明。調べれば振り分けられる');
+}
+function setSeg(k){ curSeg=k; renderSegBar(); renderList(); }
+
+// ── DM用CSV 書き出し（アクセア／ラクスルの宛名リスト用）──
+function exportDmCsv() {
+  const rows = getRows();
+  const ok = rows.filter(c=>(c.address||'').trim());
+  if (!ok.length) { toast('❌ 住所が入っている会社がありません'); return; }
+  const q = s => '"' + String(s==null?'':s).replace(/"/g,'""') + '"';
+  const head = ['会社名','郵便番号','住所','代表者名','敬称','電話番号','リスト','創業年','従業員数'];
+  const lines = [head.map(q).join(',')];
+  ok.forEach(c=>{
+    const segs = segsOf(c).map(k=>SEGS[k].lab.replace(/^\S+\s/,'')).join('/');
+    lines.push([c.company_name, c.postal_code||'', c.address||'', c.ceo_name||'', c.ceo_name?'様':'御中', c.phone||'', segs, foundYear(c)||'', empNum(c)||''].map(q).join(','));
+  });
+  const csv = '\uFEFF' + lines.join('\r\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8'}));
+  a.download = `DM_${curSeg}_${today}.csv`;
+  document.body.appendChild(a); a.click(); a.remove();
+  const noZip = ok.filter(c=>!(c.postal_code||'').trim()).length;
+  toast(`📤 ${ok.length}件を書き出し${rows.length-ok.length?`（住所なし${rows.length-ok.length}件は除外）`:''}${noZip?` ／ 郵便番号なし${noZip}件`:''}`);
+}
+
 function buildFilters() {
   const fi = document.getElementById('fi'), fc = document.getElementById('fc');
   // clear old options except first
@@ -744,6 +901,7 @@ function renderStats() {
       <div class="n">${c.n}</div><div class="l">${c.l}</div>
     </div>`
   ).join('');
+  renderSegBar();
 }
 
 function setF(f){ curF=f; renderStats(); renderList(); }
@@ -761,6 +919,11 @@ function getRows() {
     if (fi && industry!==fi) return false;
     if (fc && city!==fc) return false;
     if (fr && rank!==fr) return false;
+    if (curSeg!=='all') {
+      const s = segsOf(c);
+      if (curSeg==='none') { if (s.length) return false; }
+      else if (!s.includes(curSeg)) return false;
+    }
     if (curF==='today') {
       if (!c.next_date||c.next_date>today||c.phase==='declined'||c.phase==='won') return false;
     } else if (curF!=='all') {
@@ -803,6 +966,8 @@ function renderList() {
     const logs    = (c.source_data||{}).contact_log||[];
     const hasSns  = c.instagram_url||c.x_url||c.facebook_url||c.tiktok_url;
     const hasJob  = c.indeed_url||c.own_recruit_url||c.job_antenna_url;
+    const ltr     = getLetter(c.id);
+    const ltrBadge= ltr.sent?'<span class="ls ls-sent">📬お渡し済</span>':ltr.made?'<span class="ls ls-made">✅制作済</span>':'';
 
     let ntHtml='';
     if (c.next_date) {
@@ -814,6 +979,7 @@ function renderList() {
         <div class="co-name">${esc(c.company_name)}</div>
         <div class="co-meta">
           ${rank?`<span class="rk rk-${rank}">${rank}</span>`:''}
+          ${segsOf(c).map(k=>`<span class="seg ${SEGS[k].cls}">${SEGS[k].lab}</span>`).join('')}
           ${years?`<span>${years}周年</span>`:''}
           ${city?`<span>📍${esc(city)}</span>`:''}
           ${ind?`<span>${esc(ind)}</span>`:''}
@@ -824,6 +990,7 @@ function renderList() {
           <span class="pl ${ph.cls}">${ph.lab}</span>
           ${ntHtml}
           ${logs.length?`<span class="log-cnt">📝${logs.length}件</span>`:''}
+          ${ltrBadge}
           ${hasSns?'<span style="color:#8b5cf6;font-size:10px;">SNS</span>':''}
           ${hasJob?'<span style="color:#3730a3;font-size:10px;">求人</span>':''}
         </div>
@@ -851,7 +1018,7 @@ function closeModal(e) {
 
 function switchTab(t) {
   curTab=t;
-  const order=['action','log','script','info'];
+  const order=['action','log','script','info','letter'];
   document.querySelectorAll('.mtab').forEach((el,i)=>el.classList.toggle('on',order[i]===t));
   renderTab();
 }
@@ -885,6 +1052,24 @@ function renderTab() {
   } else if (curTab==='script') {
     renderScriptTab();
 
+  } else if (curTab==='letter') {
+    const ltr = getLetter(c.id);
+    b.innerHTML = `
+      <div class="section-label">手紙・はがきの内容</div>
+      <textarea class="letter-ta" id="letter-body" placeholder="ここに手紙の文面を書いてください...">${esc(ltr.body||'')}</textarea>
+      <div class="letter-checks">
+        <label class="lchk lchk-made">
+          <input type="checkbox" id="lchk-made" ${ltr.made?'checked':''}> ✅ 制作済
+        </label>
+        <label class="lchk lchk-sent">
+          <input type="checkbox" id="lchk-sent" ${ltr.sent?'checked':''}> 📬 お渡し済
+        </label>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;margin-top:4px;">
+        <button class="save-btn" style="padding:9px 22px;font-size:13px;" onclick="saveLetter()">💾 保存</button>
+        ${ltr.saved_at?`<span style="font-size:11px;color:var(--muted)">最終保存: ${esc(ltr.saved_at)}</span>`:''}
+      </div>`;
+
   } else if (curTab==='info') {
     const rank  = c.anniversary_rank||c.ar||'';
     const years = c.anniversary_years||c.ay||'';
@@ -913,6 +1098,7 @@ function renderTab() {
       ['業種',     esc(ind)||'-'],
       ['所在地',   esc(city)||'-'],
       ['周年',     rank?`<span class="rk rk-${rank}">${rank}</span>${years?' '+years+'周年':''}`:'-'],
+      ['リスト',   segsOf(c).length?segsOf(c).map(k=>`<span class="seg ${SEGS[k].cls}">${SEGS[k].lab}</span>`).join(' '):'<span style="color:var(--muted)">情報不足（創業年・従業員数を入れると振り分け）</span>'],
       ['HP',       web?`<a href="${esc(web)}" target="_blank" rel="noopener">ウェブサイトを開く →</a>`:'-'],
       ['SNS',      snsHtml?`<div class="sns-wrap">${snsHtml}</div>`:'-'],
       ['求人',     jobHtml?`<div class="sns-wrap">${jobHtml}</div>`:'-'],
@@ -921,6 +1107,17 @@ function renderTab() {
     b.innerHTML = rows.map(([l,v])=>`
       <div class="irow"><div class="ilabel">${l}</div><div class="ival">${v}</div></div>
     `).join('') + `
+      <div style="margin-top:14px;">
+        <div class="section-label">DM宛先・振り分け情報</div>
+        <div class="info-edit">
+          <input id="ie-pc" placeholder="郵便番号" value="${esc(c.postal_code||'')}">
+          <input id="ie-fd" placeholder="創業年（例 1985）" value="${esc(c.founding_date||'')}">
+          <input id="ie-ad" class="full" placeholder="住所（DM宛先）" value="${esc(c.address||'')}">
+          <input id="ie-em" placeholder="従業員数" value="${esc(c.employees||'')}">
+          <input id="ie-ceo" placeholder="代表者名" value="${esc(ceo)}">
+        </div>
+        <button class="save-btn" style="margin-top:8px;" onclick="saveInfoFields()">宛先・情報を保存</button>
+      </div>
       <div style="margin-top:14px;">
         <div class="section-label">メモ</div>
         <textarea class="note-ta" id="info-memo" placeholder="メモを入力...">${esc(src.memo||'')}</textarea>
@@ -968,6 +1165,25 @@ async function saveNd() {
   toast('📅 次回フォロー日を保存しました');
 }
 
+async function saveInfoFields() {
+  const g = id => (document.getElementById(id)?.value||'').trim();
+  let pc = g('ie-pc').replace(/[〒\s]/g,'').replace(/^(\d{3})(\d{4})$/,'$1-$2');
+  const upd = {
+    postal_code:   pc||null,
+    address:       g('ie-ad')||null,
+    founding_date: g('ie-fd')||null,
+    employees:     g('ie-em')||null,
+    ceo_name:      g('ie-ceo')||null,
+  };
+  if (!cur.city && upd.address) { const cty=cityFromAddress(upd.address); if (cty) upd.city=cty; }
+  const {error} = await sb.from('ceremony_attacks').update(upd).eq('id',cur.id);
+  if (error) { toast('❌ 保存失敗: '+error.message); return; }
+  Object.assign(cur, upd);
+  const idx=cos.findIndex(x=>x.id===cur.id); if (idx>=0) Object.assign(cos[idx],upd);
+  buildFilters(); renderSegBar(); renderList(); renderTab();
+  toast('✅ 宛先・情報を保存しました');
+}
+
 async function saveMemo() {
   const memo = document.getElementById('info-memo')?.value||'';
   const src  = {...(cur.source_data||{}), memo};
@@ -995,6 +1211,10 @@ async function doAdd() {
     ceo_name:     document.getElementById('ac').value.trim()||null,
     industry:     document.getElementById('ai').value.trim()||null,
     city:         document.getElementById('acy').value.trim()||null,
+    postal_code:  document.getElementById('apc').value.trim().replace(/[〒\s]/g,'').replace(/^(\d{3})(\d{4})$/,'$1-$2')||null,
+    address:      document.getElementById('aad').value.trim()||null,
+    founding_date:document.getElementById('afd').value.trim()||null,
+    employees:    document.getElementById('aem').value.trim()||null,
     instagram_url:document.getElementById('aig').value.trim()||null,
     x_url:        document.getElementById('ax').value.trim()||null,
     indeed_url:   document.getElementById('aind').value.trim()||null,
@@ -1005,7 +1225,8 @@ async function doAdd() {
   cos.push(data);
   buildFilters(); renderStats(); renderList();
   document.getElementById('add-ovl').classList.remove('open');
-  ['an','ap','aw','ac','ai','acy','aig','ax','aind'].forEach(id=>{ document.getElementById(id).value=''; });
+  if (!row.city && row.address) { const cty=cityFromAddress(row.address); if (cty) { data.city=cty; sb.from('ceremony_attacks').update({city:cty}).eq('id',data.id); } }
+  ['an','ap','aw','ac','ai','acy','apc','aad','afd','aem','aig','ax','aind'].forEach(id=>{ document.getElementById(id).value=''; });
   toast('✅ '+name+' を追加しました');
 }
 

@@ -225,6 +225,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
 .ls-written{background:#fef3c7;color:#92400e}
 .ls-made{background:#d1fae5;color:#065f46}
 .ls-sent{background:#ede9fe;color:#5b21b6}
+.ls-dm{background:#dbeafe;color:#1e40af}
 
 /* ── IMPORT ── */
 .imp-hint{font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.8;background:var(--bg);padding:10px 12px;border-radius:8px;border:1px solid var(--border)}
@@ -285,6 +286,22 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
     <option value="A">A</option>
     <option value="B">B</option>
     <option value="C">C</option>
+  </select>
+  <select id="flt" onchange="renderList()">
+    <option value="">手紙/DM: 全て</option>
+    <option value="written">✏️ 作文済</option>
+    <option value="made">✅ 制作済</option>
+    <option value="ltr_sent">📬 お渡し済</option>
+    <option value="dm">📮 DM郵送済</option>
+    <option value="none">未着手</option>
+  </select>
+  <select id="fs" onchange="renderList()">
+    <option value="">並べ替え: デフォルト</option>
+    <option value="rank">ランク順</option>
+    <option value="years_asc">周年年数（少→多）</option>
+    <option value="years_desc">周年年数（多→少）</option>
+    <option value="name">会社名順</option>
+    <option value="nextdate">次回フォロー日順</option>
   </select>
 </div>
 
@@ -927,10 +944,12 @@ function setF(f){ curF=f; renderStats(); renderList(); }
 
 // ── LIST ──────────────────────────────────────────────
 function getRows() {
-  const q  = document.getElementById('q').value.toLowerCase();
-  const fi = document.getElementById('fi').value;
-  const fc = document.getElementById('fc').value;
-  const fr = document.getElementById('fr').value;
+  const q   = document.getElementById('q').value.toLowerCase();
+  const fi  = document.getElementById('fi').value;
+  const fc  = document.getElementById('fc').value;
+  const fr  = document.getElementById('fr').value;
+  const flt = document.getElementById('flt')?.value||'';
+  const fs  = document.getElementById('fs')?.value||'';
   let rows = cos.filter(c=>{
     const industry = c.industry||c.i||'';
     const city     = c.city||c.c||'';
@@ -948,6 +967,15 @@ function getRows() {
     } else if (curF!=='all') {
       if (c.phase!==curF) return false;
     }
+    if (flt) {
+      const ltr = getLetter(c.id);
+      const dm  = (c.source_data||{}).dm_mailed;
+      if (flt==='written'  && !ltr.written) return false;
+      if (flt==='made'     && !ltr.made)    return false;
+      if (flt==='ltr_sent' && !ltr.sent)    return false;
+      if (flt==='dm'       && !dm)          return false;
+      if (flt==='none'     && (ltr.written||ltr.made||ltr.sent||dm)) return false;
+    }
     if (q) {
       const h = ((c.company_name||'')+' '+(c.ceo_name||'')+' '+(c.phone||'')+' '+(c.city||'')).toLowerCase();
       if (!h.includes(q)) return false;
@@ -956,15 +984,33 @@ function getRows() {
   });
   const ro={S:0,A:1,B:2,C:3,'':4};
   const po={pending_callback:0,contacted:1,mailed:2,pending:3,won:4,declined:5};
-  rows.sort((a,b)=>{
-    const at=(a.next_date&&a.next_date<=today&&a.phase!=='declined'&&a.phase!=='won')?0:1;
-    const bt=(b.next_date&&b.next_date<=today&&b.phase!=='declined'&&b.phase!=='won')?0:1;
-    if (at!==bt) return at-bt;
-    const pa=po[a.phase]??99, pb=po[b.phase]??99;
-    if (pa!==pb) return pa-pb;
-    const ra=ro[a.anniversary_rank||a.ar]??99, rb=ro[b.anniversary_rank||b.ar]??99;
-    return ra-rb;
-  });
+  if (fs==='rank') {
+    rows.sort((a,b)=>{
+      const ra=ro[a.anniversary_rank||a.ar]??99, rb=ro[b.anniversary_rank||b.ar]??99;
+      return ra-rb || (a.company_name||'').localeCompare(b.company_name||'','ja');
+    });
+  } else if (fs==='years_asc') {
+    rows.sort((a,b)=>(a.anniversary_years||a.ay||9999)-(b.anniversary_years||b.ay||9999));
+  } else if (fs==='years_desc') {
+    rows.sort((a,b)=>(b.anniversary_years||b.ay||0)-(a.anniversary_years||a.ay||0));
+  } else if (fs==='name') {
+    rows.sort((a,b)=>(a.company_name||'').localeCompare(b.company_name||'','ja'));
+  } else if (fs==='nextdate') {
+    rows.sort((a,b)=>{
+      const da=a.next_date||'9999', db=b.next_date||'9999';
+      return da<db?-1:da>db?1:0;
+    });
+  } else {
+    rows.sort((a,b)=>{
+      const at=(a.next_date&&a.next_date<=today&&a.phase!=='declined'&&a.phase!=='won')?0:1;
+      const bt=(b.next_date&&b.next_date<=today&&b.phase!=='declined'&&b.phase!=='won')?0:1;
+      if (at!==bt) return at-bt;
+      const pa=po[a.phase]??99, pb=po[b.phase]??99;
+      if (pa!==pb) return pa-pb;
+      const ra=ro[a.anniversary_rank||a.ar]??99, rb=ro[b.anniversary_rank||b.ar]??99;
+      return ra-rb;
+    });
+  }
   return rows;
 }
 
@@ -986,7 +1032,8 @@ function renderList() {
     const hasSns  = c.instagram_url||c.x_url||c.facebook_url||c.tiktok_url;
     const hasJob  = c.indeed_url||c.own_recruit_url||c.job_antenna_url;
     const ltr     = getLetter(c.id);
-    const ltrBadge= ltr.sent?'<span class="ls ls-sent">📬お渡し済</span>':ltr.made?'<span class="ls ls-made">✅制作済</span>':ltr.written?'<span class="ls ls-written">✏️作文済</span>':'';
+    const dmMailed= (c.source_data||{}).dm_mailed;
+    const ltrBadge= (dmMailed?'<span class="ls ls-dm">📮DM済</span>':'')+(ltr.sent?'<span class="ls ls-sent">📬お渡し済</span>':ltr.made?'<span class="ls ls-made">✅制作済</span>':ltr.written?'<span class="ls ls-written">✏️作文済</span>':'');
 
     let ntHtml='';
     if (c.next_date) {
@@ -1051,6 +1098,12 @@ function renderTab() {
   if (curTab==='action') {
     b.innerHTML = `
       <div class="agrid">${ACTS.map(a=>`<button class="abtn ${a.cls}" onclick="doAct('${a.k}')">${a.lab}</button>`).join('')}</div>
+      <div style="margin-bottom:12px;">
+        ${(cur&&(cur.source_data||{}).dm_mailed)
+          ?`<button class="abtn" style="width:100%;background:#bfdbfe;color:#1e3a8a;font-size:12px;" onclick="markDmMailed(false)">📮 DM郵送済（取消）</button>`
+          :`<button class="abtn" style="width:100%;background:#dbeafe;color:#1e40af;" onclick="markDmMailed(true)">📮 DM郵送済にマーク</button>`
+        }
+      </div>
       <div class="section-label">メモ（任意）</div>
       <textarea class="note-ta" id="act-note" placeholder="例：担当者名・伝言内容など..."></textarea>
       <div class="date-row">
@@ -1156,7 +1209,10 @@ function renderTab() {
       <div style="margin-top:14px;">
         <div class="section-label">周年情報</div>
         <div class="info-edit">
-          <input id="ie-ay" placeholder="周年年数（例 30）" value="${esc(c.anniversary_years||'')}" type="number" min="1">
+          <input id="ie-by" placeholder="基準年（例 1985）" type="number" min="1900" max="2025"
+            oninput="const y=parseInt(this.value);if(y>=1900&&y<=2025){document.getElementById('ie-ay').value=2027-y;}"
+            style="grid-column:span 1">
+          <input id="ie-ay" placeholder="2027年時の周年数（自動算出）" value="${esc(c.anniversary_years||'')}" type="number" min="1">
           <input id="ie-ab" placeholder="周年基準（例 創業・設立）" value="${esc(c.anniversary_basis||'')}">
           <select id="ie-ar" style="padding:7px 10px;border:1px solid var(--border);border-radius:7px;background:var(--bg);color:var(--text);font-size:13px;font-family:inherit;cursor:pointer;">
             <option value="">ランク: 未設定</option>
@@ -1166,6 +1222,7 @@ function renderTab() {
             <option value="C" ${(c.anniversary_rank||'')==='C'?'selected':''}>C</option>
           </select>
         </div>
+        <div style="font-size:11px;color:var(--muted);margin:2px 0 4px;">※ 基準年を入力すると「2027年時の周年数」が自動計算されます</div>
         <div class="section-label" style="margin-top:12px;">DM宛先・振り分け情報</div>
         <div class="info-edit">
           <input id="ie-pc" placeholder="郵便番号" value="${esc(c.postal_code||'')}">
@@ -1245,6 +1302,19 @@ async function saveInfoFields() {
   const idx=cos.findIndex(x=>x.id===cur.id); if (idx>=0) Object.assign(cos[idx],upd);
   buildFilters(); renderSegBar(); renderList(); renderTab();
   toast('✅ 宛先・情報を保存しました');
+}
+
+async function markDmMailed(flag) {
+  if (!cur) return;
+  const src = {...(cur.source_data||{})};
+  if (flag) { src.dm_mailed = true; src.dm_mailed_at = new Date().toISOString(); }
+  else { delete src.dm_mailed; delete src.dm_mailed_at; }
+  const {error} = await sb.from('ceremony_attacks').update({source_data:src}).eq('id',cur.id);
+  if (error) { toast('❌ 保存失敗: '+error.message); return; }
+  cur.source_data = src;
+  const idx=cos.findIndex(x=>x.id===cur.id); if (idx>=0) cos[idx].source_data=src;
+  renderList(); renderTab();
+  toast(flag?'📮 DM郵送済を記録しました':'🔄 DM郵送済を取消しました');
 }
 
 async function saveMemo() {

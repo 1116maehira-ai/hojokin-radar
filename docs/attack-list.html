@@ -227,6 +227,35 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
 .ls-sent{background:#ede9fe;color:#5b21b6}
 .ls-dm{background:#dbeafe;color:#1e40af}
 
+/* ── LOGIN ── */
+.login-ovl{position:fixed;inset:0;background:#0f172a;z-index:999;display:flex;align-items:center;justify-content:center;padding:20px}
+.login-box{background:#1e293b;border-radius:18px;padding:32px 28px;width:100%;max-width:360px;box-shadow:0 8px 40px rgba(0,0,0,.5)}
+.login-box h2{color:#f1f5f9;text-align:center;margin-bottom:6px;font-size:20px}
+.login-sub{color:#94a3b8;text-align:center;font-size:13px;margin-bottom:22px}
+.l-inp{width:100%;padding:11px 14px;border:1px solid #334155;border-radius:9px;background:#0f172a;color:#f1f5f9;font-size:15px;font-family:inherit;margin-bottom:12px;outline:none;box-sizing:border-box}
+.l-inp:focus{border-color:#3b82f6}
+.l-btn{width:100%;padding:12px;background:#1d4ed8;color:#fff;border:none;border-radius:9px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit}
+.l-btn:hover{background:#1e40af}
+.l-err{color:#f87171;font-size:13px;text-align:center;margin-top:10px;display:none}
+.u-chip{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;background:rgba(255,255,255,.15);border-radius:8px;font-size:12px;cursor:pointer;white-space:nowrap}
+.u-chip:hover{background:rgba(255,255,255,.25)}
+
+/* ── FILTER TOGGLES ── */
+.flt-grp{display:flex;gap:5px;flex-wrap:wrap;align-items:center;padding-top:4px;width:100%;border-top:1px solid var(--border);margin-top:3px}
+.flt-grp .lbl{font-size:11px;color:var(--muted);white-space:nowrap;margin-right:1px}
+.ftgl{padding:4px 11px;border-radius:14px;border:1px solid var(--border);background:var(--bg);color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;line-height:1.4;transition:all .12s}
+.ftgl:hover{border-color:var(--primary)}
+.ftgl.on{border-color:var(--primary);background:var(--primary-l);color:var(--primary)}
+.ftgl[data-flt="dm_ready"].on{border-color:#7c3aed;background:#ede9fe;color:#5b21b6}
+.ftgl[data-flt="dm"].on{border-color:#1d4ed8;background:#dbeafe;color:#1e40af}
+.ftgl[data-flt="none"].on{border-color:#94a3b8;background:#f1f5f9;color:#374151}
+
+/* ── BULK BAR ── */
+.bulk-bar{position:fixed;bottom:0;left:0;right:0;padding:10px 16px;background:#1e40af;color:#fff;display:none;align-items:center;gap:10px;z-index:50;box-shadow:0 -3px 20px rgba(0,0,0,.3);flex-wrap:wrap}
+.bulk-btn{padding:8px 18px;background:#fff;color:#1e40af;border:none;border-radius:8px;font-weight:800;cursor:pointer;font-size:13px;font-family:inherit}
+.bulk-btn:hover{background:#dbeafe}
+.bulk-clr{padding:7px 12px;background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:8px;font-weight:600;cursor:pointer;font-size:12px;font-family:inherit}
+.ls-ready{background:#ede9fe;color:#5b21b6}
 /* ── IMPORT ── */
 .imp-hint{font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.8;background:var(--bg);padding:10px 12px;border-radius:8px;border:1px solid var(--border)}
 .imp-hint code{font-family:'SF Mono',Menlo,Consolas,monospace;background:var(--border);padding:1px 4px;border-radius:3px}
@@ -271,6 +300,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
   <button class="btn-add" onclick="openImp()" style="background:rgba(255,255,255,.12);">📥 インポート</button>
   <button class="btn-add" onclick="exportDmCsv()" style="background:rgba(255,255,255,.12);" title="今の絞り込み結果をDM発送用CSVで保存">📤 DM用CSV</button>
   <button class="btn-add" onclick="openAdd()">＋ 追加</button>
+  <span class="u-chip" id="u-chip" onclick="doLogout()" title="クリックでログアウト"></span>
 </div>
 
 <div class="stats" id="stats"></div>
@@ -287,15 +317,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
     <option value="B">B</option>
     <option value="C">C</option>
   </select>
-  <select id="flt" onchange="renderList()">
-    <option value="">手紙/DM: 全て</option>
-    <option value="written">✏️ 作文済</option>
-    <option value="made">✅ 制作済</option>
-    <option value="ltr_sent">📬 お渡し済</option>
-    <option value="dm">📮 DM郵送済</option>
-    <option value="none">未着手</option>
-  </select>
-  <select id="fs" onchange="renderList()">
+  <div class="flt-grp">
+    <span class="lbl">状態:</span>
+    <button class="ftgl" data-flt="written"  onclick="toggleFlt('written')">✏️ 作文済</button>
+    <button class="ftgl" data-flt="made"     onclick="toggleFlt('made')">✅ 制作済</button>
+    <button class="ftgl" data-flt="ltr_sent" onclick="toggleFlt('ltr_sent')">📬 お渡し済</button>
+    <button class="ftgl" data-flt="dm_ready" onclick="toggleFlt('dm_ready')">📋 DM準備済</button>
+    <button class="ftgl" data-flt="dm"       onclick="toggleFlt('dm')">📮 DM郵送済</button>
+    <button class="ftgl" data-flt="none"     onclick="toggleFlt('none')">未着手</button>
+  </div>  <select id="fs" onchange="renderList()">
     <option value="">並べ替え: デフォルト</option>
     <option value="rank">ランク順</option>
     <option value="years_asc">周年年数（少→多）</option>
@@ -306,6 +336,25 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
 </div>
 
 <div class="lwrap" id="lwrap"><div class="empty">読み込み中...</div></div>
+
+<!-- login overlay -->
+<div class="login-ovl" id="login-ovl" style="display:none">
+  <div class="login-box">
+    <h2>📋 CRMログイン</h2>
+    <p class="login-sub">ユーザー名とパスワードを入力してください</p>
+    <input class="l-inp" id="l-name" placeholder="ユーザー名" autocomplete="username" onkeydown="if(event.key==='Enter')document.getElementById('l-pass').focus()">
+    <input class="l-inp" id="l-pass" placeholder="パスワード" type="password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="l-btn" onclick="doLogin()">ログイン</button>
+    <div class="l-err" id="l-err">ユーザー名またはパスワードが違います</div>
+  </div>
+</div>
+
+<!-- bulk action bar -->
+<div class="bulk-bar" id="bulk-bar">
+  <span>📋 DM準備済 <strong id="bulk-cnt">0</strong> 社が郵送待ち</span>
+  <button class="bulk-btn" onclick="bulkMarkDmMailed()">📮 一括DM郵送済にする</button>
+  <button class="bulk-clr" onclick="bulkClearDmReady()">準備済を全解除</button>
+</div>
 
 <!-- company modal -->
 <div class="ovl" id="ovl" onclick="closeModal(event)">
@@ -372,6 +421,92 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
 const SB_URL = 'https://osipzwbsfbgbegjowydm.supabase.co';
 const SB_KEY = 'sb_publishable_yO0lVlOP_r-qhnwjxqq0UQ_qjxSrlnC';
 const sb = window.supabase.createClient(SB_URL, SB_KEY);
+
+// ── AUTH ──────────────────────────────────────────────
+const USERS = {
+  mage:   { pass: '07051116', role: 'admin' },
+  hibiki: { pass: '6666',     role: 'maker' },
+  megu:   { pass: '0528',     role: 'action' },
+};
+let currentUser = null;
+
+function getSession() {
+  try { const s=sessionStorage.getItem('crm_sess_v1'); return s?JSON.parse(s):null; } catch { return null; }
+}
+function setSession(u) {
+  try { sessionStorage.setItem('crm_sess_v1',JSON.stringify(u)); } catch {}
+}
+function clearSession() {
+  try { sessionStorage.removeItem('crm_sess_v1'); } catch {}
+}
+function can(perm) {
+  if (!currentUser) return false;
+  const r = currentUser.role;
+  if (r === 'admin')  return true;
+  if (perm === 'action' && r === 'action') return true;
+  if (perm === 'made'   && r === 'maker')  return true;
+  if (perm === 'dm_ready' && (r === 'action' || r === 'maker')) return true;
+  return false;
+}
+function showLogin() {
+  document.getElementById('login-ovl').style.display='flex';
+  document.getElementById('bulk-bar').style.display='none';
+}
+function hideLogin() {
+  document.getElementById('login-ovl').style.display='none';
+}
+function doLogin() {
+  const name = (document.getElementById('l-name')?.value||'').trim().toLowerCase();
+  const pass  = document.getElementById('l-pass')?.value||'';
+  const u = USERS[name];
+  const errEl = document.getElementById('l-err');
+  if (!u || u.pass !== pass) {
+    if (errEl) errEl.style.display='block';
+    return;
+  }
+  if (errEl) errEl.style.display='none';
+  currentUser = {name, role: u.role};
+  setSession(currentUser);
+  hideLogin();
+  updateUserChip();
+  loadData();
+}
+function doLogout() {
+  if (!confirm('ログアウトしますか？')) return;
+  currentUser = null;
+  clearSession();
+  cos = []; cur = null;
+  document.getElementById('lwrap').innerHTML='<div class="empty">ログインしてください</div>';
+  document.getElementById('stats').innerHTML='';
+  document.getElementById('segbar').innerHTML='';
+  document.getElementById('u-chip').textContent='';
+  document.getElementById('bulk-bar').style.display='none';
+  showLogin();
+  setTimeout(()=>document.getElementById('l-name')?.focus(), 50);
+}
+function updateUserChip() {
+  const chip = document.getElementById('u-chip');
+  if (!chip || !currentUser) return;
+  const lab = {admin:'管理者',maker:'制作担当',action:'営業担当'}[currentUser.role]||currentUser.role;
+  chip.textContent = '👤 '+currentUser.name+' ('+lab+') → ログアウト';
+}
+
+// ── MULTI FILTER ──────────────────────────────────────
+let activeFlt = new Set();
+function toggleFlt(key) {
+  if (key === 'none') {
+    if (activeFlt.has('none')) activeFlt.clear();
+    else { activeFlt.clear(); activeFlt.add('none'); }
+  } else {
+    activeFlt.delete('none');
+    if (activeFlt.has(key)) activeFlt.delete(key);
+    else activeFlt.add(key);
+  }
+  document.querySelectorAll('.ftgl').forEach(el=>{
+    el.classList.toggle('on', activeFlt.has(el.dataset.flt));
+  });
+  renderList();
+}
 
 let cos = [], cur = null, curTab = 'action', curF = 'all', curSeg = 'all';
 const today = new Date().toISOString().slice(0,10);
@@ -581,10 +716,12 @@ function putLetter(id, obj) {
 }
 function saveLetter() {
   if (!cur) return;
-  const body    = document.getElementById('letter-body')?.value||'';
-  const written = document.getElementById('lchk-written')?.checked||false;
-  const made    = document.getElementById('lchk-made')?.checked||false;
-  const sent    = document.getElementById('lchk-sent')?.checked||false;
+  if (!can('made')) { toast('❌ 権限がありません'); return; }
+  const prev    = getLetter(cur.id);
+  const body    = can('admin') ? (document.getElementById('letter-body')?.value||'') : (prev.body||'');
+  const written = can('admin') ? (document.getElementById('lchk-written')?.checked||false) : (prev.written||false);
+  const made    = can('made')  ? (document.getElementById('lchk-made')?.checked||false)    : (prev.made||false);
+  const sent    = can('admin') ? (document.getElementById('lchk-sent')?.checked||false)    : (prev.sent||false);
   const now     = new Date().toLocaleString('ja-JP');
   putLetter(cur.id, {body, written, made, sent, saved_at:now});
   renderList();
@@ -948,7 +1085,6 @@ function getRows() {
   const fi  = document.getElementById('fi').value;
   const fc  = document.getElementById('fc').value;
   const fr  = document.getElementById('fr').value;
-  const flt = document.getElementById('flt')?.value||'';
   const fs  = document.getElementById('fs')?.value||'';
   let rows = cos.filter(c=>{
     const industry = c.industry||c.i||'';
@@ -967,15 +1103,20 @@ function getRows() {
     } else if (curF!=='all') {
       if (c.phase!==curF) return false;
     }
-    if (flt) {
+    if (activeFlt.size > 0) {
       const ltr = getLetter(c.id);
-      const dm  = (c.source_data||{}).dm_mailed;
-      if (flt==='written'  && !ltr.written) return false;
-      if (flt==='made'     && !ltr.made)    return false;
-      if (flt==='ltr_sent' && !ltr.sent)    return false;
-      if (flt==='dm'       && !dm)          return false;
-      if (flt==='none'     && (ltr.written||ltr.made||ltr.sent||dm)) return false;
-    }
+      const sd  = c.source_data||{};
+      if (activeFlt.has('none')) {
+        if (ltr.written||ltr.made||ltr.sent||sd.dm_ready||sd.dm_mailed) return false;
+      } else {
+        let match = false;
+        if (activeFlt.has('written')  && ltr.written)   match = true;
+        if (activeFlt.has('made')     && ltr.made)       match = true;
+        if (activeFlt.has('ltr_sent') && ltr.sent)       match = true;
+        if (activeFlt.has('dm_ready') && sd.dm_ready)    match = true;
+        if (activeFlt.has('dm')       && sd.dm_mailed)   match = true;
+        if (!match) return false;
+      }    }
     if (q) {
       const h = ((c.company_name||'')+' '+(c.ceo_name||'')+' '+(c.phone||'')+' '+(c.city||'')).toLowerCase();
       if (!h.includes(q)) return false;
@@ -1014,10 +1155,19 @@ function getRows() {
   return rows;
 }
 
+function updateBulkBar() {
+  const n = cos.filter(c=>{const sd=c.source_data||{}; return sd.dm_ready && !sd.dm_mailed;}).length;
+  const bar = document.getElementById('bulk-bar');
+  const cnt = document.getElementById('bulk-cnt');
+  if (bar) bar.style.display = (n > 0 && can('admin')) ? 'flex' : 'none';
+  if (cnt) cnt.textContent = n;
+}
+
 function renderList() {
   const rows = getRows();
   const w = document.getElementById('lwrap');
-  if (!rows.length) { w.innerHTML='<div class="empty">条件に合う会社がありません</div>'; return; }
+  if (!rows.length) { w.innerHTML='<div class="empty">条件に合う会社がありません</div>'; updateBulkBar(); return; }
+  updateBulkBar();
   w.innerHTML = rows.map(c=>{
     const phase   = c.phase||'pending';
     const ph      = PHASES[phase]||PHASES.pending;
@@ -1032,9 +1182,8 @@ function renderList() {
     const hasSns  = c.instagram_url||c.x_url||c.facebook_url||c.tiktok_url;
     const hasJob  = c.indeed_url||c.own_recruit_url||c.job_antenna_url;
     const ltr     = getLetter(c.id);
-    const dmMailed= (c.source_data||{}).dm_mailed;
-    const ltrBadge= (dmMailed?'<span class="ls ls-dm">📮DM済</span>':'')+(ltr.sent?'<span class="ls ls-sent">📬お渡し済</span>':ltr.made?'<span class="ls ls-made">✅制作済</span>':ltr.written?'<span class="ls ls-written">✏️作文済</span>':'');
-
+    const sd      = c.source_data||{};
+    const ltrBadge= (sd.dm_mailed?'<span class="ls ls-dm">📮DM済</span>':sd.dm_ready?'<span class="ls ls-ready">📋DM準備済</span>':'')+(ltr.sent?'<span class="ls ls-sent">📬お渡し済</span>':ltr.made?'<span class="ls ls-made">✅制作済</span>':ltr.written?'<span class="ls ls-written">✏️作文済</span>':'');
     let ntHtml='';
     if (c.next_date) {
       const nc = c.next_date<today?'past':(c.next_date===today?'due':'');
@@ -1096,20 +1245,24 @@ function renderTab() {
   const b   = document.getElementById('mbody');
 
   if (curTab==='action') {
+    const sd = cur.source_data||{};
+    const actGrid = can('action')
+      ? `<div class="agrid">${ACTS.map(a=>`<button class="abtn ${a.cls}" onclick="doAct('${a.k}')">${a.lab}</button>`).join('')}</div>`
+      : `<div style="padding:10px;font-size:12px;color:var(--muted);background:var(--bg);border-radius:8px;margin-bottom:12px;">📋 閲覧のみ（アクション記入は権限なし）</div>`;
+    const dmReadyBtn = can('dm_ready') ? (sd.dm_ready
+      ? `<button class="abtn" style="width:100%;background:#ede9fe;color:#5b21b6;font-size:12px;margin-bottom:7px;" onclick="markDmReady(false)">📋 DM準備済（解除）</button>`
+      : `<button class="abtn" style="width:100%;background:#f5f3ff;color:#5b21b6;margin-bottom:7px;" onclick="markDmReady(true)">📋 DM準備済にマーク</button>`) : '';
+    const dmMailBtn = can('admin') ? (sd.dm_mailed
+      ? `<button class="abtn" style="width:100%;background:#bfdbfe;color:#1e3a8a;font-size:12px;" onclick="markDmMailed(false)">📮 DM郵送済（取消）</button>`
+      : `<button class="abtn" style="width:100%;background:#dbeafe;color:#1e40af;" onclick="markDmMailed(true)">📮 DM郵送済にマーク</button>`) : '';
     b.innerHTML = `
-      <div class="agrid">${ACTS.map(a=>`<button class="abtn ${a.cls}" onclick="doAct('${a.k}')">${a.lab}</button>`).join('')}</div>
-      <div style="margin-bottom:12px;">
-        ${(cur&&(cur.source_data||{}).dm_mailed)
-          ?`<button class="abtn" style="width:100%;background:#bfdbfe;color:#1e3a8a;font-size:12px;" onclick="markDmMailed(false)">📮 DM郵送済（取消）</button>`
-          :`<button class="abtn" style="width:100%;background:#dbeafe;color:#1e40af;" onclick="markDmMailed(true)">📮 DM郵送済にマーク</button>`
-        }
-      </div>
-      <div class="section-label">メモ（任意）</div>
-      <textarea class="note-ta" id="act-note" placeholder="例：担当者名・伝言内容など..."></textarea>
+      ${actGrid}
+      <div style="margin-bottom:12px;">${dmReadyBtn}${dmMailBtn}</div>      <div class="section-label">メモ（任意）</div>
+      <textarea class="note-ta" id="act-note" placeholder="例：担当者名・伝言内容など..." ${!can('action')?'disabled':''}></textarea>
       <div class="date-row">
         <span style="font-size:12px;color:var(--muted)">次回フォロー日:</span>
-        <input type="date" class="date-inp" id="nd-inp" value="${c.next_date||''}">
-        <button class="save-btn" onclick="saveNd()">保存</button>
+        <input type="date" class="date-inp" id="nd-inp" value="${c.next_date||''}" ${!can('action')?'disabled':''}>
+        ${can('action')?`<button class="save-btn" onclick="saveNd()">保存</button>`:''}
       </div>`;
 
   } else if (curTab==='log') {
@@ -1126,18 +1279,20 @@ function renderTab() {
 
   } else if (curTab==='letter') {
     const ltr = getLetter(c.id);
+    const isAdmin  = can('admin');
+    const canMade  = can('made');
     b.innerHTML = `
       <div class="section-label">手紙・はがきの内容</div>
-      <textarea class="letter-ta" id="letter-body" placeholder="ここに手紙の文面を書いてください...">${esc(ltr.body||'')}</textarea>
+      <textarea class="letter-ta" id="letter-body" placeholder="ここに手紙の文面を書いてください..." ${!isAdmin?'disabled style="opacity:.6"':''}>${esc(ltr.body||'')}</textarea>
       <div class="letter-checks">
-        <label class="lchk lchk-written">
-          <input type="checkbox" id="lchk-written" ${ltr.written?'checked':''}> ✏️ 作文済
+        <label class="lchk lchk-written" style="${!isAdmin?'opacity:.5;pointer-events:none':''}">
+          <input type="checkbox" id="lchk-written" ${ltr.written?'checked':''} ${!isAdmin?'disabled':''}> ✏️ 作文済
         </label>
         <label class="lchk lchk-made">
-          <input type="checkbox" id="lchk-made" ${ltr.made?'checked':''}> ✅ 制作済
+          <input type="checkbox" id="lchk-made" ${ltr.made?'checked':''} ${!canMade?'disabled':''}> ✅ 制作済
         </label>
-        <label class="lchk lchk-sent">
-          <input type="checkbox" id="lchk-sent" ${ltr.sent?'checked':''}> 📬 お渡し済
+        <label class="lchk lchk-sent" style="${!isAdmin?'opacity:.5;pointer-events:none':''}">
+          <input type="checkbox" id="lchk-sent" ${ltr.sent?'checked':''} ${!isAdmin?'disabled':''}> 📬 お渡し済
         </label>
       </div>
       <div style="display:flex;align-items:center;gap:10px;margin-top:4px;">
@@ -1243,6 +1398,7 @@ function renderTab() {
 
 // ── ACTIONS ───────────────────────────────────────────
 async function doAct(key) {
+  if (!can('action')) { toast('❌ 権限がありません'); return; }
   const c   = cur;
   const act = ACTS.find(a=>a.k===key);
   if (!act) return;
@@ -1281,6 +1437,7 @@ async function saveNd() {
 }
 
 async function saveInfoFields() {
+  if (!can('admin')) { toast('❌ 権限がありません'); return; }
   const g = id => (document.getElementById(id)?.value||'').trim();
   let pc = g('ie-pc').replace(/[〒\s]/g,'').replace(/^(\d{3})(\d{4})$/,'$1-$2');
   const ayRaw = g('ie-ay');
@@ -1304,19 +1461,66 @@ async function saveInfoFields() {
   toast('✅ 宛先・情報を保存しました');
 }
 
-async function markDmMailed(flag) {
+async function markDmReady(flag) {
   if (!cur) return;
+  if (!can('dm_ready')) { toast('❌ 権限がありません'); return; }
   const src = {...(cur.source_data||{})};
-  if (flag) { src.dm_mailed = true; src.dm_mailed_at = new Date().toISOString(); }
-  else { delete src.dm_mailed; delete src.dm_mailed_at; }
+  if (flag) { src.dm_ready = true; src.dm_ready_at = new Date().toISOString(); }
+  else { delete src.dm_ready; delete src.dm_ready_at; }
   const {error} = await sb.from('ceremony_attacks').update({source_data:src}).eq('id',cur.id);
   if (error) { toast('❌ 保存失敗: '+error.message); return; }
   cur.source_data = src;
   const idx=cos.findIndex(x=>x.id===cur.id); if (idx>=0) cos[idx].source_data=src;
   renderList(); renderTab();
+  toast(flag?'📋 DM準備済にしました':'🔄 DM準備済を解除しました');
+}
+
+async function markDmMailed(flag) {
+  if (!cur) return;
+  if (!can('admin')) { toast('❌ 権限がありません'); return; }
+  const src = {...(cur.source_data||{})};
+  if (flag) { src.dm_mailed = true; src.dm_mailed_at = new Date().toISOString(); delete src.dm_ready; delete src.dm_ready_at; }  else { delete src.dm_mailed; delete src.dm_mailed_at; }
+  const {error} = await sb.from('ceremony_attacks').update({source_data:src}).eq('id',cur.id);
+  if (error) { toast('❌ 保存失敗: '+error.message); return; }
+  cur.source_data = src;
+  const idx=cos.findIndex(x=>x.id===cur.id); if (idx>=0) cos[idx].source_data=src;
+  renderList(); renderTab(); updateBulkBar();
   toast(flag?'📮 DM郵送済を記録しました':'🔄 DM郵送済を取消しました');
 }
 
+async function bulkMarkDmMailed() {
+  if (!can('admin')) { toast('❌ 権限がありません'); return; }
+  const targets = cos.filter(c=>{const sd=c.source_data||{}; return sd.dm_ready && !sd.dm_mailed;});
+  if (!targets.length) { toast('DM準備済の会社がありません'); return; }
+  if (!confirm(targets.length+'社をDM郵送済にしますか？\n（DM準備済フラグも解除されます）')) return;
+  const now = new Date().toISOString();
+  let ok=0, errs=0;
+  for (const c of targets) {
+    const src = {...(c.source_data||{}), dm_mailed:true, dm_mailed_at:now};
+    delete src.dm_ready; delete src.dm_ready_at;
+    const {error} = await sb.from('ceremony_attacks').update({source_data:src}).eq('id',c.id);
+    if (error) errs++;
+    else { c.source_data=src; ok++; }
+  }
+  renderList(); updateBulkBar();
+  toast(errs ? `⚠️ ${ok}件完了、${errs}件失敗` : `📮 ${ok}社をDM郵送済にしました`);
+}
+
+async function bulkClearDmReady() {
+  if (!can('admin')) { toast('❌ 権限がありません'); return; }
+  const targets = cos.filter(c=>(c.source_data||{}).dm_ready);
+  if (!targets.length) { toast('DM準備済の会社がありません'); return; }
+  if (!confirm(targets.length+'社のDM準備済を全解除しますか？')) return;
+  let ok=0;
+  for (const c of targets) {
+    const src = {...(c.source_data||{})};
+    delete src.dm_ready; delete src.dm_ready_at;
+    const {error} = await sb.from('ceremony_attacks').update({source_data:src}).eq('id',c.id);
+    if (!error) { c.source_data=src; ok++; }
+  }
+  renderList(); updateBulkBar();
+  toast(`🔄 ${ok}社の準備済を解除しました`);
+}
 async function saveMemo() {
   const memo = document.getElementById('info-memo')?.value||'';
   const src  = {...(cur.source_data||{}), memo};
@@ -1376,7 +1580,18 @@ function toast(msg) {
 }
 
 // ── INIT ──────────────────────────────────────────────
-loadData();
+(function init() {
+  const sess = getSession();
+  if (sess && USERS[sess.name] && USERS[sess.name].role === sess.role) {
+    currentUser = sess;
+    updateUserChip();
+    loadData();
+  } else {
+    document.getElementById('lwrap').innerHTML = '<div class="empty">ログインしてください</div>';
+    showLogin();
+    setTimeout(()=>document.getElementById('l-name')?.focus(), 80);
+  }
+})();
 </script>
 </body>
 </html>

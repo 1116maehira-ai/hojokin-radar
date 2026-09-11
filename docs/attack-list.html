@@ -1154,18 +1154,19 @@ function renderTab() {
       <div class="irow"><div class="ilabel">${l}</div><div class="ival">${v}</div></div>
     `).join('') + vHtml + `
       <div style="margin-top:14px;">
-        <div class="section-label">DM宛先・振り分け情報</div>
+        <div class="section-label">周年情報</div>
         <div class="info-edit">
-          <input id="ie-pc" placeholder="郵便番号" value="${esc(c.postal_code||'')}">
-          <input id="ie-fd" placeholder="創業年（例 1985）" value="${esc(c.founding_date||'')}">
-          <input id="ie-ad" class="full" placeholder="住所（DM宛先）" value="${esc(c.address||'')}">
-          <input id="ie-em" placeholder="従業員数" value="${esc(c.employees||'')}">
-          <input id="ie-ceo" placeholder="代表者名" value="${esc(ceo)}">
+          <input id="ie-ay" placeholder="周年年数（例 30）" value="${esc(c.anniversary_years||'')}" type="number" min="1">
+          <input id="ie-ab" placeholder="周年基準（例 創業・設立）" value="${esc(c.anniversary_basis||'')}">
+          <select id="ie-ar" style="padding:7px 10px;border:1px solid var(--border);border-radius:7px;background:var(--bg);color:var(--text);font-size:13px;font-family:inherit;cursor:pointer;">
+            <option value="">ランク: 未設定</option>
+            <option value="S" ${(c.anniversary_rank||'')==='S'?'selected':''}>S（最優先）</option>
+            <option value="A" ${(c.anniversary_rank||'')==='A'?'selected':''}>A</option>
+            <option value="B" ${(c.anniversary_rank||'')==='B'?'selected':''}>B</option>
+            <option value="C" ${(c.anniversary_rank||'')==='C'?'selected':''}>C</option>
+          </select>
         </div>
-        <button class="save-btn" style="margin-top:8px;" onclick="saveInfoFields()">宛先・情報を保存</button>
-      </div>
-      <div style="margin-top:14px;">
-        <div class="section-label">DM宛先・振り分け情報</div>
+        <div class="section-label" style="margin-top:12px;">DM宛先・振り分け情報</div>
         <div class="info-edit">
           <input id="ie-pc" placeholder="郵便番号" value="${esc(c.postal_code||'')}">
           <input id="ie-fd" placeholder="創業年（例 1985）" value="${esc(c.founding_date||'')}">
@@ -1225,12 +1226,17 @@ async function saveNd() {
 async function saveInfoFields() {
   const g = id => (document.getElementById(id)?.value||'').trim();
   let pc = g('ie-pc').replace(/[〒\s]/g,'').replace(/^(\d{3})(\d{4})$/,'$1-$2');
+  const ayRaw = g('ie-ay');
+  const arVal = document.getElementById('ie-ar')?.value||null;
   const upd = {
-    postal_code:   pc||null,
-    address:       g('ie-ad')||null,
-    founding_date: g('ie-fd')||null,
-    employees:     g('ie-em')||null,
-    ceo_name:      g('ie-ceo')||null,
+    postal_code:       pc||null,
+    address:           g('ie-ad')||null,
+    founding_date:     g('ie-fd')||null,
+    employees:         g('ie-em')||null,
+    ceo_name:          g('ie-ceo')||null,
+    anniversary_years: ayRaw ? parseInt(ayRaw, 10) : null,
+    anniversary_basis: g('ie-ab')||null,
+    anniversary_rank:  arVal||null,
   };
   if (!cur.city && upd.address) { const cty=cityFromAddress(upd.address); if (cty) upd.city=cty; }
   const {error} = await sb.from('ceremony_attacks').update(upd).eq('id',cur.id);

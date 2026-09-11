@@ -256,7 +256,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
 .bulk-btn:hover{background:#dbeafe}
 .bulk-clr{padding:7px 12px;background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:8px;font-weight:600;cursor:pointer;font-size:12px;font-family:inherit}
 .ls-ready{background:#ede9fe;color:#5b21b6}
-
 /* ── IMPORT ── */
 .imp-hint{font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.8;background:var(--bg);padding:10px 12px;border-radius:8px;border:1px solid var(--border)}
 .imp-hint code{font-family:'SF Mono',Menlo,Consolas,monospace;background:var(--border);padding:1px 4px;border-radius:3px}
@@ -326,8 +325,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
     <button class="ftgl" data-flt="dm_ready" onclick="toggleFlt('dm_ready')">📋 DM準備済</button>
     <button class="ftgl" data-flt="dm"       onclick="toggleFlt('dm')">📮 DM郵送済</button>
     <button class="ftgl" data-flt="none"     onclick="toggleFlt('none')">未着手</button>
-  </div>
-  <select id="fs" onchange="renderList()">
+  </div>  <select id="fs" onchange="renderList()">
     <option value="">並べ替え: デフォルト</option>
     <option value="rank">ランク順</option>
     <option value="years_asc">周年年数（少→多）</option>
@@ -1118,8 +1116,7 @@ function getRows() {
         if (activeFlt.has('dm_ready') && sd.dm_ready)    match = true;
         if (activeFlt.has('dm')       && sd.dm_mailed)   match = true;
         if (!match) return false;
-      }
-    }
+      }    }
     if (q) {
       const h = ((c.company_name||'')+' '+(c.ceo_name||'')+' '+(c.phone||'')+' '+(c.city||'')).toLowerCase();
       if (!h.includes(q)) return false;
@@ -1187,7 +1184,6 @@ function renderList() {
     const ltr     = getLetter(c.id);
     const sd      = c.source_data||{};
     const ltrBadge= (sd.dm_mailed?'<span class="ls ls-dm">📮DM済</span>':sd.dm_ready?'<span class="ls ls-ready">📋DM準備済</span>':'')+(ltr.sent?'<span class="ls ls-sent">📬お渡し済</span>':ltr.made?'<span class="ls ls-made">✅制作済</span>':ltr.written?'<span class="ls ls-written">✏️作文済</span>':'');
-
     let ntHtml='';
     if (c.next_date) {
       const nc = c.next_date<today?'past':(c.next_date===today?'due':'');
@@ -1261,8 +1257,7 @@ function renderTab() {
       : `<button class="abtn" style="width:100%;background:#dbeafe;color:#1e40af;" onclick="markDmMailed(true)">📮 DM郵送済にマーク</button>`) : '';
     b.innerHTML = `
       ${actGrid}
-      <div style="margin-bottom:12px;">${dmReadyBtn}${dmMailBtn}</div>
-      <div class="section-label">メモ（任意）</div>
+      <div style="margin-bottom:12px;">${dmReadyBtn}${dmMailBtn}</div>      <div class="section-label">メモ（任意）</div>
       <textarea class="note-ta" id="act-note" placeholder="例：担当者名・伝言内容など..." ${!can('action')?'disabled':''}></textarea>
       <div class="date-row">
         <span style="font-size:12px;color:var(--muted)">次回フォロー日:</span>
@@ -1484,8 +1479,7 @@ async function markDmMailed(flag) {
   if (!cur) return;
   if (!can('admin')) { toast('❌ 権限がありません'); return; }
   const src = {...(cur.source_data||{})};
-  if (flag) { src.dm_mailed = true; src.dm_mailed_at = new Date().toISOString(); delete src.dm_ready; delete src.dm_ready_at; }
-  else { delete src.dm_mailed; delete src.dm_mailed_at; }
+  if (flag) { src.dm_mailed = true; src.dm_mailed_at = new Date().toISOString(); delete src.dm_ready; delete src.dm_ready_at; }  else { delete src.dm_mailed; delete src.dm_mailed_at; }
   const {error} = await sb.from('ceremony_attacks').update({source_data:src}).eq('id',cur.id);
   if (error) { toast('❌ 保存失敗: '+error.message); return; }
   cur.source_data = src;
@@ -1527,7 +1521,6 @@ async function bulkClearDmReady() {
   renderList(); updateBulkBar();
   toast(`🔄 ${ok}社の準備済を解除しました`);
 }
-
 async function saveMemo() {
   const memo = document.getElementById('info-memo')?.value||'';
   const src  = {...(cur.source_data||{}), memo};

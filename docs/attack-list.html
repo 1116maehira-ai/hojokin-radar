@@ -1150,6 +1150,17 @@ function renderTab() {
         <button class="save-btn" style="margin-top:8px;" onclick="saveInfoFields()">宛先・情報を保存</button>
       </div>
       <div style="margin-top:14px;">
+        <div class="section-label">DM宛先・振り分け情報</div>
+        <div class="info-edit">
+          <input id="ie-pc" placeholder="郵便番号" value="${esc(c.postal_code||'')}">
+          <input id="ie-fd" placeholder="創業年（例 1985）" value="${esc(c.founding_date||'')}">
+          <input id="ie-ad" class="full" placeholder="住所（DM宛先）" value="${esc(c.address||'')}">
+          <input id="ie-em" placeholder="従業員数" value="${esc(c.employees||'')}">
+          <input id="ie-ceo" placeholder="代表者名" value="${esc(ceo)}">
+        </div>
+        <button class="save-btn" style="margin-top:8px;" onclick="saveInfoFields()">宛先・情報を保存</button>
+      </div>
+      <div style="margin-top:14px;">
         <div class="section-label">メモ</div>
         <textarea class="note-ta" id="info-memo" placeholder="メモを入力...">${esc(src.memo||'')}</textarea>
         <button class="save-btn" style="margin-top:8px;" onclick="saveMemo()">メモを保存</button>

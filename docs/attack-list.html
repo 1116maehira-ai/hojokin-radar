@@ -205,6 +205,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
 .cancel-scr-btn{padding:8px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--muted);cursor:pointer}
 .reset-scr-btn{padding:8px 12px;background:var(--bg);border:1px solid #fca5a5;border-radius:8px;font-size:11px;color:#dc2626;cursor:pointer;margin-left:auto}
 
+/* ── VERIFIED BLOCK ── */
+.v-block{margin:14px 0;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px}
+.v-hantei{font-weight:600;padding:2px 8px;border-radius:6px;display:inline-block}
+.v-ok{background:#d1fae5;color:#065f46}
+.v-warn{background:#fef3c7;color:#92400e}
+.v-unk{background:#e5e7eb;color:#374151}
+.v-notes{display:block;font-size:12px;color:var(--muted);line-height:1.6;white-space:pre-wrap}
 /* ── LETTER TAB ── */
 .letter-ta{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-size:13px;line-height:1.8;min-height:280px;resize:vertical;font-family:inherit}
 .letter-ta:focus{outline:none;border-color:var(--primary)}
@@ -1104,9 +1111,33 @@ function renderTab() {
       ['求人',     jobHtml?`<div class="sns-wrap">${jobHtml}</div>`:'-'],
     ];
 
+    const vf = (c.source_data||{}).verified||null;
+    const vHtml = vf ? (()=>{
+      const hantei = vf.hantei||'';
+      const hcls = hantei.startsWith('✓') ? 'v-ok' : hantei.startsWith('⚠') ? 'v-warn' : 'v-unk';
+      const vrows = [
+        ['総合判定',      `<span class="v-hantei ${hcls}">${esc(hantei)}</span>`],
+        ['主な修正・注意', vf.notes ? `<span class="v-notes">${esc(vf.notes)}</span>` : null],
+        ['情報源レベル',  vf.source_level || null],
+        ['周年の主基準',  vf.kijun || null],
+        ['主基準年',      vf.base_year || null],
+        ['設立年月日',    vf.setsu || null],
+        ['創業・創立年月日', vf.sogyou || null],
+        ['その他の起点',  vf.other_kijun || null],
+        ['2026年に迎える周年', vf.yr_2026 || null],
+        ['2027年に迎える周年', vf.yr_2027 || null],
+        ['主要根拠URL',   vf.url1 ? `<a href="${esc(vf.url1)}" target="_blank" rel="noopener">${esc(vf.url1)}</a>` : null],
+        ['補助根拠URL',   vf.url2 ? `<a href="${esc(vf.url2)}" target="_blank" rel="noopener">${esc(vf.url2)}</a>` : null],
+      ].filter(([,v])=>v!=null);
+      return `<div class="v-block">
+        <div class="section-label">✅ 検証済み情報</div>
+        ${vrows.map(([l,v])=>`<div class="irow"><div class="ilabel">${esc(l)}</div><div class="ival">${v}</div></div>`).join('')}
+      </div>`;
+    })() : '';
+
     b.innerHTML = rows.map(([l,v])=>`
       <div class="irow"><div class="ilabel">${l}</div><div class="ival">${v}</div></div>
-    `).join('') + `
+    `).join('') + vHtml + `
       <div style="margin-top:14px;">
         <div class="section-label">DM宛先・振り分け情報</div>
         <div class="info-edit">

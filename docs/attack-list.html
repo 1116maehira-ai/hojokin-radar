@@ -823,7 +823,7 @@ async function doImpAll() {
 // ── DATA ──────────────────────────────────────────────
 async function loadData() {
   document.getElementById('lwrap').innerHTML = '<div class="empty">読み込み中...</div>';
-  const {data, error} = await sb.from('ceremony_attacks').select('*');
+  const {data, error} = await sb.from('ceremony_attacks').select('*').limit(10000);
   if (error) { document.getElementById('lwrap').innerHTML = '<div class="empty">❌ 読み込みエラー: '+esc(error.message)+'</div>'; return; }
   cos = data || [];
   buildFilters();

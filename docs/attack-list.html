@@ -288,6 +288,35 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
 .iact-all{background:var(--primary);color:#fff}
 .iact-can{background:var(--bg);border:1px solid var(--border);color:var(--muted)}
 .imp-back{padding:5px 12px;background:var(--bg);border:1px solid var(--border);border-radius:7px;font-size:12px;color:var(--muted);cursor:pointer;margin-bottom:12px}
+
+/* ── VERIFY MODE ── */
+.vfy-bar{padding:8px 14px;background:var(--ok-bg);border-bottom:1px solid var(--ok);font-size:13px;font-weight:700;display:none;align-items:center;gap:10px;flex-wrap:wrap}
+.vfy-bar.show{display:flex}
+.vfy-prog{flex:1;min-width:100px;background:rgba(0,0,0,.1);border-radius:999px;height:6px;overflow:hidden}
+.vfy-fill{height:100%;background:var(--ok);border-radius:999px;transition:width .4s}
+.vfy-count{white-space:nowrap;color:var(--ok);font-size:13px}
+.btn-vfy{padding:6px 12px;border-radius:8px;font-size:12px;font-weight:700;border:1px solid rgba(255,255,255,.35);cursor:pointer;font-family:inherit;white-space:nowrap;transition:all .12s}
+.btn-vfy-off{background:rgba(255,255,255,.15);color:#fff}
+.btn-vfy-on{background:#fff;color:#065f46;border-color:#a7f3d0}
+.btn-vfy-off:hover,.btn-vfy-on:hover{opacity:.85}
+.vfy-badge{display:inline-block;padding:1px 7px;border-radius:5px;font-size:10px;font-weight:800}
+.vb-done{background:#d1fae5;color:#065f46}
+.vb-ng{background:#fef9c3;color:#713f12}
+.card.vfy-ok{border-left-color:#10b981!important;background:var(--won-bg)!important}
+/* assign badge */
+.asn{display:inline-block;padding:1px 7px;border-radius:5px;font-size:10px;font-weight:800}
+.asn-hibiki{background:#dbeafe;color:#1e3a8a}
+.asn-megu{background:#fce7f3;color:#9d174d}
+/* inline quick-edit */
+.qe-form{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:8px}
+.qe-inp{padding:6px 9px;border:1px solid var(--border);border-radius:7px;background:var(--bg);color:var(--text);font-size:12px;font-family:inherit;min-width:0}
+.qe-inp.full{grid-column:1/-1}
+.qe-save{padding:7px 12px;background:var(--ok);color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;grid-column:1/-1}
+.qe-save:hover{opacity:.85}
+/* letter template */
+.ltpl-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.ltpl-btn{padding:6px 13px;border:1px solid var(--border);border-radius:7px;background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .12s}
+.ltpl-btn:hover{border-color:var(--primary);background:var(--primary-l);color:var(--primary)}
 </style>
 </head>
 <body>
@@ -297,6 +326,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
     <h1>📋 営業CRMリスト</h1>
   </div>
   <button class="btn-refresh" onclick="loadData()" title="再読込">🔄</button>
+  <button class="btn-vfy btn-vfy-off" id="btn-vfy" onclick="toggleVerifyMode()" title="住所・代表者を確認する（hibiki用）">🔍 住所チェック</button>
   <button class="btn-add" onclick="openImp()" style="background:rgba(255,255,255,.12);">📥 インポート</button>
   <button class="btn-add" onclick="exportDmCsv()" style="background:rgba(255,255,255,.12);" title="今の絞り込み結果をDM発送用CSVで保存">📤 DM用CSV</button>
   <button class="btn-add" onclick="openAdd()">＋ 追加</button>
@@ -304,6 +334,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
 </div>
 
 <div class="stats" id="stats"></div>
+<div class="vfy-bar" id="vfy-bar">
+  <span class="vfy-count" id="vfy-count">確認済 0 / 0 社</span>
+  <div class="vfy-prog"><div class="vfy-fill" id="vfy-fill" style="width:0%"></div></div>
+  <span style="font-size:11px;color:var(--muted)">全部確認できたら管理者がDM郵送済にしてください</span>
+</div>
 <div class="segbar" id="segbar"></div>
 
 <div class="fbar">
@@ -325,6 +360,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
     <button class="ftgl" data-flt="dm_ready" onclick="toggleFlt('dm_ready')">📋 DM準備済</button>
     <button class="ftgl" data-flt="dm"       onclick="toggleFlt('dm')">📮 DM郵送済</button>
     <button class="ftgl" data-flt="none"     onclick="toggleFlt('none')">未着手</button>
+    <button class="ftgl" data-flt="my_calls" onclick="toggleFlt('my_calls')" style="border-color:#7c3aed">📞 自分の担当</button>
+    <button class="ftgl" data-flt="unassigned" onclick="toggleFlt('unassigned')" style="color:var(--muted)">🔀 未割当</button>
   </div>  <select id="fs" onchange="renderList()">
     <option value="">並べ替え: デフォルト</option>
     <option value="rank">ランク順</option>
@@ -425,8 +462,8 @@ const sb = window.supabase.createClient(SB_URL, SB_KEY);
 // ── AUTH ──────────────────────────────────────────────
 const USERS = {
   mage:   { pass: '07051116', role: 'admin' },
-  hibiki: { pass: '6666',     role: 'maker' },
-  megu:   { pass: '0528',     role: 'action' },
+  hibiki: { pass: '6666',     role: 'sales' },   // 営業担当: 電話+手紙+住所確認
+  megu:   { pass: '0528',     role: 'action' },  // 電話専任
 };
 let currentUser = null;
 
@@ -442,10 +479,11 @@ function clearSession() {
 function can(perm) {
   if (!currentUser) return false;
   const r = currentUser.role;
-  if (r === 'admin')  return true;
-  if (perm === 'action' && r === 'action') return true;
-  if (perm === 'made'   && r === 'maker')  return true;
-  if (perm === 'dm_ready' && (r === 'action' || r === 'maker')) return true;
+  if (r === 'admin')   return true;
+  if (perm === 'action'   && (r === 'action' || r === 'sales')) return true;
+  if (perm === 'verify'   && (r === 'sales'))  return true;
+  if (perm === 'made'     && (r === 'maker' || r === 'sales'))  return true;
+  if (perm === 'dm_ready' && (r === 'action' || r === 'maker' || r === 'sales')) return true;
   return false;
 }
 function showLogin() {
@@ -487,16 +525,21 @@ function doLogout() {
 function updateUserChip() {
   const chip = document.getElementById('u-chip');
   if (!chip || !currentUser) return;
-  const lab = {admin:'管理者',maker:'制作担当',action:'営業担当'}[currentUser.role]||currentUser.role;
+  const lab = {admin:'管理者',maker:'制作担当',sales:'石川（営業）',action:'megu（電話）'}[currentUser.role]||currentUser.role;
   chip.textContent = '👤 '+currentUser.name+' ('+lab+') → ログアウト';
 }
 
 // ── MULTI FILTER ──────────────────────────────────────
 let activeFlt = new Set();
+// AND-type filters (applied on top of OR group)
+const AND_FLTS = new Set(['my_calls', 'unassigned']);
 function toggleFlt(key) {
   if (key === 'none') {
     if (activeFlt.has('none')) activeFlt.clear();
     else { activeFlt.clear(); activeFlt.add('none'); }
+  } else if (AND_FLTS.has(key)) {
+    if (activeFlt.has(key)) activeFlt.delete(key);
+    else activeFlt.add(key);
   } else {
     activeFlt.delete('none');
     if (activeFlt.has(key)) activeFlt.delete(key);
@@ -716,12 +759,13 @@ function putLetter(id, obj) {
 }
 function saveLetter() {
   if (!cur) return;
-  if (!can('made')) { toast('❌ 権限がありません'); return; }
+  const canEdit = can('admin') || can('made');
+  if (!canEdit) { toast('❌ 権限がありません'); return; }
   const prev    = getLetter(cur.id);
-  const body    = can('admin') ? (document.getElementById('letter-body')?.value||'') : (prev.body||'');
-  const written = can('admin') ? (document.getElementById('lchk-written')?.checked||false) : (prev.written||false);
-  const made    = can('made')  ? (document.getElementById('lchk-made')?.checked||false)    : (prev.made||false);
-  const sent    = can('admin') ? (document.getElementById('lchk-sent')?.checked||false)    : (prev.sent||false);
+  const body    = canEdit     ? (document.getElementById('letter-body')?.value||'') : (prev.body||'');
+  const written = canEdit     ? (document.getElementById('lchk-written')?.checked||false) : (prev.written||false);
+  const made    = canEdit     ? (document.getElementById('lchk-made')?.checked||false)    : (prev.made||false);
+  const sent    = can('admin') ? (document.getElementById('lchk-sent')?.checked||false)   : (prev.sent||false);
   const now     = new Date().toLocaleString('ja-JP');
   putLetter(cur.id, {body, written, made, sent, saved_at:now});
   renderList();
@@ -1106,17 +1150,29 @@ function getRows() {
     if (activeFlt.size > 0) {
       const ltr = getLetter(c.id);
       const sd  = c.source_data||{};
-      if (activeFlt.has('none')) {
-        if (ltr.written||ltr.made||ltr.sent||sd.dm_ready||sd.dm_mailed) return false;
-      } else {
-        let match = false;
-        if (activeFlt.has('written')  && ltr.written)   match = true;
-        if (activeFlt.has('made')     && ltr.made)       match = true;
-        if (activeFlt.has('ltr_sent') && ltr.sent)       match = true;
-        if (activeFlt.has('dm_ready') && sd.dm_ready)    match = true;
-        if (activeFlt.has('dm')       && sd.dm_mailed)   match = true;
-        if (!match) return false;
-      }    }
+      // AND filters: applied independently
+      if (activeFlt.has('my_calls') && currentUser) {
+        if ((sd.call_assignee||'') !== currentUser.name) return false;
+      }
+      if (activeFlt.has('unassigned')) {
+        if (sd.call_assignee || !sd.dm_mailed) return false;
+      }
+      // OR filters
+      const orFlt = [...activeFlt].filter(k => !AND_FLTS.has(k));
+      if (orFlt.length > 0) {
+        if (orFlt.includes('none')) {
+          if (ltr.written||ltr.made||ltr.sent||sd.dm_ready||sd.dm_mailed) return false;
+        } else {
+          let match = false;
+          if (activeFlt.has('written')  && ltr.written)   match = true;
+          if (activeFlt.has('made')     && ltr.made)       match = true;
+          if (activeFlt.has('ltr_sent') && ltr.sent)       match = true;
+          if (activeFlt.has('dm_ready') && sd.dm_ready)    match = true;
+          if (activeFlt.has('dm')       && sd.dm_mailed)   match = true;
+          if (!match) return false;
+        }
+      }
+    }
     if (q) {
       const h = ((c.company_name||'')+' '+(c.ceo_name||'')+' '+(c.phone||'')+' '+(c.city||'')).toLowerCase();
       if (!h.includes(q)) return false;
@@ -1164,6 +1220,7 @@ function updateBulkBar() {
 }
 
 function renderList() {
+  if (verifyMode) { renderVerifyList(); renderVerifyProgress(); return; }
   const rows = getRows();
   const w = document.getElementById('lwrap');
   if (!rows.length) { w.innerHTML='<div class="empty">条件に合う会社がありません</div>'; updateBulkBar(); return; }
@@ -1183,6 +1240,9 @@ function renderList() {
     const hasJob  = c.indeed_url||c.own_recruit_url||c.job_antenna_url;
     const ltr     = getLetter(c.id);
     const sd      = c.source_data||{};
+    const assignee = sd.call_assignee||'';
+    const asnBadge = assignee ? `<span class="asn asn-${assignee}">📞${assignee}</span>` : '';
+    const vfyBadge = sd.addr_verified ? '<span class="vfy-badge vb-done">✓住所確認済</span>' : '';
     const ltrBadge= (sd.dm_mailed?'<span class="ls ls-dm">📮DM済</span>':sd.dm_ready?'<span class="ls ls-ready">📋DM準備済</span>':'')+(ltr.sent?'<span class="ls ls-sent">📬お渡し済</span>':ltr.made?'<span class="ls ls-made">✅制作済</span>':ltr.written?'<span class="ls ls-written">✏️作文済</span>':'');
     let ntHtml='';
     if (c.next_date) {
@@ -1206,6 +1266,8 @@ function renderList() {
           ${ntHtml}
           ${logs.length?`<span class="log-cnt">📝${logs.length}件</span>`:''}
           ${ltrBadge}
+          ${asnBadge}
+          ${vfyBadge}
           ${hasSns?'<span style="color:#8b5cf6;font-size:10px;">SNS</span>':''}
           ${hasJob?'<span style="color:#3730a3;font-size:10px;">求人</span>':''}
         </div>
@@ -1280,16 +1342,26 @@ function renderTab() {
   } else if (curTab==='letter') {
     const ltr = getLetter(c.id);
     const isAdmin  = can('admin');
-    const canMade  = can('made');
+    const canSales = can('made');  // sales role can write letters
+    const canEdit  = isAdmin || canSales;
+    const segsArr  = segsOf(c);
+    const tplBtns  = canEdit ? `<div class="section-label">テンプレートから生成</div>
+      <div class="ltpl-row">
+        ${segsArr.includes('shiki') ? `<button class="ltpl-btn" onclick="generateLetter('shiki')">🎬 式典・周年向け</button>` : ''}
+        ${segsArr.includes('rinen') ? `<button class="ltpl-btn" onclick="generateLetter('rinen')">🎥 理念映像向け</button>` : ''}
+        ${segsArr.includes('ai')    ? `<button class="ltpl-btn" onclick="generateLetter('ai')">🤖 AI研修向け</button>` : ''}
+        <button class="ltpl-btn" onclick="generateLetter('basic')">✉️ 基本テンプレ</button>
+      </div>` : '';
     b.innerHTML = `
+      ${tplBtns}
       <div class="section-label">手紙・はがきの内容</div>
-      <textarea class="letter-ta" id="letter-body" placeholder="ここに手紙の文面を書いてください..." ${!isAdmin?'disabled style="opacity:.6"':''}>${esc(ltr.body||'')}</textarea>
+      <textarea class="letter-ta" id="letter-body" placeholder="ここに手紙の文面を書くか、上のテンプレートから生成してください..." ${!canEdit?'disabled style="opacity:.6"':''}>${esc(ltr.body||'')}</textarea>
       <div class="letter-checks">
-        <label class="lchk lchk-written" style="${!isAdmin?'opacity:.5;pointer-events:none':''}">
-          <input type="checkbox" id="lchk-written" ${ltr.written?'checked':''} ${!isAdmin?'disabled':''}> ✏️ 作文済
+        <label class="lchk lchk-written" style="${!canEdit?'opacity:.5;pointer-events:none':''}">
+          <input type="checkbox" id="lchk-written" ${ltr.written?'checked':''} ${!canEdit?'disabled':''}> ✏️ 作文済
         </label>
         <label class="lchk lchk-made">
-          <input type="checkbox" id="lchk-made" ${ltr.made?'checked':''} ${!canMade?'disabled':''}> ✅ 制作済
+          <input type="checkbox" id="lchk-made" ${ltr.made?'checked':''} ${!canEdit?'disabled':''}> ✅ 制作済
         </label>
         <label class="lchk lchk-sent" style="${!isAdmin?'opacity:.5;pointer-events:none':''}">
           <input type="checkbox" id="lchk-sent" ${ltr.sent?'checked':''} ${!isAdmin?'disabled':''}> 📬 お渡し済
@@ -1492,18 +1564,33 @@ async function bulkMarkDmMailed() {
   if (!can('admin')) { toast('❌ 権限がありません'); return; }
   const targets = cos.filter(c=>{const sd=c.source_data||{}; return sd.dm_ready && !sd.dm_mailed;});
   if (!targets.length) { toast('DM準備済の会社がありません'); return; }
-  if (!confirm(targets.length+'社をDM郵送済にしますか？\n（DM準備済フラグも解除されます）')) return;
+  if (!confirm(targets.length+'社をDM郵送済にしますか？\n（DM準備済フラグも解除、hibiki/meguに自動振り分け）')) return;
   const now = new Date().toISOString();
   let ok=0, errs=0;
-  for (const c of targets) {
+  // Sort alphabetically for consistent assignment
+  const sorted = [...targets].sort((a,b)=>(a.company_name||'').localeCompare(b.company_name||'','ja'));
+  const ASSIGNEES = ['hibiki','megu'];
+  let assignIdx = 0;
+  for (const c of sorted) {
     const src = {...(c.source_data||{}), dm_mailed:true, dm_mailed_at:now};
     delete src.dm_ready; delete src.dm_ready_at;
+    // Auto-assign only if not already assigned
+    if (!src.call_assignee) {
+      src.call_assignee = ASSIGNEES[assignIdx % ASSIGNEES.length];
+      src.call_assigned_at = now;
+      assignIdx++;
+    }
     const {error} = await sb.from('ceremony_attacks').update({source_data:src}).eq('id',c.id);
     if (error) errs++;
     else { c.source_data=src; ok++; }
   }
   renderList(); updateBulkBar();
-  toast(errs ? `⚠️ ${ok}件完了、${errs}件失敗` : `📮 ${ok}社をDM郵送済にしました`);
+  const hibikiN = sorted.filter(c=>(c.source_data||{}).call_assignee==='hibiki').length;
+  const meguN   = sorted.filter(c=>(c.source_data||{}).call_assignee==='megu').length;
+  toast(errs
+    ? `⚠️ ${ok}件完了、${errs}件失敗`
+    : `📮 ${ok}社DM郵送済 → hibiki ${hibikiN}社 / megu ${meguN}社 に振り分けました`
+  );
 }
 
 async function bulkClearDmReady() {
@@ -1577,6 +1664,202 @@ function toast(msg) {
   const t = document.getElementById('toast');
   t.textContent=msg; t.classList.add('show');
   clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),2600);
+}
+
+// ── VERIFY MODE ───────────────────────────────────────
+let verifyMode = false;
+
+function toggleVerifyMode() {
+  verifyMode = !verifyMode;
+  const btn = document.getElementById('btn-vfy');
+  if (btn) {
+    btn.textContent = verifyMode ? '✅ チェックモード中' : '🔍 住所チェック';
+    btn.className = 'btn-add ' + (verifyMode ? 'btn-vfy-on' : 'btn-vfy-off');
+  }
+  document.getElementById('vfy-bar').classList.toggle('show', verifyMode);
+  if (verifyMode) {
+    activeFlt.clear(); activeFlt.add('dm_ready');
+    document.querySelectorAll('.ftgl').forEach(el => el.classList.toggle('on', activeFlt.has(el.dataset.flt)));
+  }
+  renderVerifyProgress();
+  renderList();
+}
+
+function renderVerifyProgress() {
+  const targets = cos.filter(c => (c.source_data||{}).dm_ready);
+  const done    = targets.filter(c => (c.source_data||{}).addr_verified).length;
+  const total   = targets.length;
+  document.getElementById('vfy-count').textContent = `確認済 ${done} / ${total} 社`;
+  document.getElementById('vfy-fill').style.width  = total ? (done/total*100)+'%' : '0%';
+}
+
+function renderVerifyList() {
+  const rows = getRows();
+  const el   = document.getElementById('lwrap');
+  if (!rows.length) { el.innerHTML = '<div class="empty">DM準備済の会社がありません</div>'; return; }
+  el.innerHTML = rows.map(c => {
+    const sd   = c.source_data || {};
+    const done = !!sd.addr_verified;
+    const vbadge = done ? '<span class="vfy-badge vb-done">✓確認済</span>' : '<span class="vfy-badge vb-ng">要確認</span>';
+    return `<div class="card${done?' vfy-ok':''}" style="padding:14px 16px;margin-bottom:10px;cursor:default">
+      <div style="display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap">
+        <div style="flex:1;min-width:200px">
+          <div style="font-weight:700;font-size:14px">${esc(c.company_name)} ${vbadge}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px">${esc(c.industry||'')} / ${esc(c.city||'')}</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+          ${!done ? `<button class="btn-vfy btn-vfy-off" style="font-size:11px;padding:5px 10px" onclick="markVerified('${c.id}',true)">✅ 確認OK</button>` : ''}
+          ${done  ? `<button class="btn-vfy btn-vfy-off" style="font-size:11px;padding:5px 10px;opacity:.6" onclick="markVerified('${c.id}',false)">↩ 取消</button>` : ''}
+        </div>
+      </div>
+      <div class="qe-form" style="margin-top:10px">
+        <input class="qe-inp" id="qe-addr-${c.id}" placeholder="住所" value="${esc(c.address||sd.address||'')}">
+        <input class="qe-inp" id="qe-ceo-${c.id}"  placeholder="代表者名" value="${esc(c.ceo_name||sd.ceo_name||'')}">
+        <button class="qe-save" onclick="quickEditSave('${c.id}')">💾 保存して確認済にする</button>
+      </div>
+    </div>`;
+  }).join('');
+  renderVerifyProgress();
+}
+
+async function markVerified(id, flag) {
+  const c = cos.find(x => x.id == id);
+  if (!c) return;
+  const src = {...(c.source_data||{})};
+  if (flag) { src.addr_verified = true; src.addr_verified_at = new Date().toISOString(); }
+  else { delete src.addr_verified; delete src.addr_verified_at; }
+  const {error} = await sb.from('ceremony_attacks').update({source_data: src}).eq('id', id);
+  if (error) { toast('❌ 保存失敗: '+error.message); return; }
+  c.source_data = src;
+  toast(flag ? '✅ 確認済にしました' : '↩ 取消しました');
+  renderList();
+}
+
+async function quickEditSave(id) {
+  const c = cos.find(x => x.id == id);
+  if (!c) return;
+  const newAddr = document.getElementById('qe-addr-'+id)?.value.trim()||'';
+  const newCeo  = document.getElementById('qe-ceo-'+id)?.value.trim()||'';
+  const updates = {};
+  if (newAddr) updates.address  = newAddr;
+  if (newCeo)  updates.ceo_name = newCeo;
+  const src = {...(c.source_data||{}), addr_verified: true, addr_verified_at: new Date().toISOString()};
+  updates.source_data = src;
+  const {error} = await sb.from('ceremony_attacks').update(updates).eq('id', id);
+  if (error) { toast('❌ 保存失敗: '+error.message); return; }
+  if (newAddr) c.address  = newAddr;
+  if (newCeo)  c.ceo_name = newCeo;
+  c.source_data = src;
+  toast('💾 保存・確認済にしました');
+  renderList();
+}
+
+// ── LETTER TEMPLATES ──────────────────────────────────
+const LETTER_TEMPLATES = {
+  shiki: {
+    label: '式典・周年向け',
+    body: (c) => {
+      const ceo  = c.ceo_name  || '代表取締役';
+      const name = c.company_name || '御社';
+      const city = c.city || '';
+      return `拝啓　時下ますますご清栄のこととお慶び申し上げます。
+
+このたびは突然のお手紙にて大変恐縮でございます。
+
+私どもは${city}を拠点に、企業様の式典・周年記念行事の映像制作を専門に手がける「TENOHIRA」と申します。
+
+${name} 様のこれまでのご活躍を拝見し、ぜひ貴社の節目を映像という形で永遠に残すお手伝いができればと思い、ご連絡差し上げました。
+
+式典映像・社史映像・記念ムービーなど、大切な瞬間を高品質な映像作品として残すことで、社内外への強いメッセージとなります。
+
+ご多用中のところ誠に恐れ入りますが、一度お話しをお聞かせいただけますと幸いです。
+
+敬具
+
+TENOHIRA　映像制作部
+担当：石川
+TEL：000-0000-0000`;
+    }
+  },
+  rinen: {
+    label: '理念映像向け',
+    body: (c) => {
+      const name = c.company_name || '御社';
+      const city = c.city || '';
+      return `拝啓　時下ますますご清栄のこととお慶び申し上げます。
+
+このたびは突然のお手紙にて大変恐縮でございます。
+
+私どもは${city}を拠点に、企業様の理念・ブランドストーリーを映像化する「TENOHIRA」と申します。
+
+${name} 様の企業理念や大切にされている想いを、映像という形で社員や取引先・採用候補者に伝えることで、組織の求心力を高める取り組みをご支援しております。
+
+採用強化・社内浸透・ブランディングなど様々な場面でご活用いただける理念映像を、貴社に合わせてご提案いたします。
+
+ご多用中のところ誠に恐れ入りますが、一度お話しをお聞かせいただけますと幸いです。
+
+敬具
+
+TENOHIRA　映像制作部
+担当：石川
+TEL：000-0000-0000`;
+    }
+  },
+  ai: {
+    label: 'AI研修向け',
+    body: (c) => {
+      const name = c.company_name || '御社';
+      return `拝啓　時下ますますご清栄のこととお慶び申し上げます。
+
+このたびは突然のお手紙にて大変恐縮でございます。
+
+私どもは企業様向けにAI活用研修・映像制作を組み合わせたサービスをご提供する「TENOHIRA」と申します。
+
+昨今、AI技術の急速な進展により、業種を問わず業務効率化・競争力強化への取り組みが急務となっております。${name} 様においても、現場でのAI活用を早期に推進されることで、大きな成果が期待できると考えております。
+
+実践的な研修プログラムをご提案できますので、ぜひ一度お話しをお聞かせいただければ幸いです。
+
+敬具
+
+TENOHIRA　研修事業部
+担当：石川
+TEL：000-0000-0000`;
+    }
+  },
+  basic: {
+    label: '基本テンプレ',
+    body: (c) => {
+      const ceo  = c.ceo_name  || '代表取締役';
+      const name = c.company_name || '御社';
+      return `拝啓　時下ますますご清栄のこととお慶び申し上げます。
+
+このたびは突然のお手紙にて大変恐縮でございます。
+
+私どもは映像制作を通じて企業様のブランド価値向上を支援する「TENOHIRA」と申します。
+
+${name} 様のご事業に何かお役に立てることがございましたら、ぜひご一考いただけますと幸いです。
+
+ご多用中のところ恐れ入りますが、何卒よろしくお願い申し上げます。
+
+敬具
+
+TENOHIRA
+担当：石川
+TEL：000-0000-0000`;
+    }
+  }
+};
+
+function generateLetter(key) {
+  if (!cur) return;
+  const tpl = LETTER_TEMPLATES[key];
+  if (!tpl) return;
+  const body = tpl.body(cur);
+  const ta = document.getElementById('ltr-body');
+  if (!ta) return;
+  ta.value = body;
+  saveLetter();
+  toast('✉️ テンプレートを生成しました');
 }
 
 // ── INIT ──────────────────────────────────────────────

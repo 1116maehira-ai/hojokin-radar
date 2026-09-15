@@ -253,7 +253,9 @@ let S = {tab:'list', tf:'all', cf:'', q:'', exp:null, addCatName:'',
 function render(){renderSb();renderMain();renderHdr()}
 
 function renderHdr(){
-  document.getElementById('hdr-tot').textContent = PRODS.length+' 商品';
+  try{const n=JSON.parse(localStorage.getItem(LS_KEY)||'[]').length;
+    document.getElementById('hdr-tot').textContent = PRODS.length+' 商品'+(n?` (+${n}件追加)`:'');
+  }catch(e){document.getElementById('hdr-tot').textContent = PRODS.length+' 商品';}
   const rc = PRODS.filter(p=>p.rev).length;
   const re = document.getElementById('hdr-rev');
   re.hidden = !rc; if(rc) re.textContent = '要確認 '+rc+'件';
@@ -566,7 +568,81 @@ function toast(msg){
   _tid=setTimeout(()=>el.classList.remove('on'),2600);
 }
 
-render();
+// ── PERSISTENCE ──
+const LS_KEY = 'ginoden_prods_v1';
+let _db = null;
+
+function initDB(){
+  return new Promise(res=>{
+    try{
+      const req=indexedDB.open('ginoden_photos',1);
+      req.onupgradeneeded=e=>e.target.result.createObjectStore('photos',{keyPath:'code'});
+      req.onsuccess=e=>{_db=e.target.result;res()};
+      req.onerror=()=>res();
+    }catch(e){res()}
+  });
+}
+
+function loadLocalProds(){
+  try{
+    const saved=JSON.parse(localStorage.getItem(LS_KEY)||'[]');
+    saved.forEach(p=>{if(!PRODS.find(x=>x.code===p.code))PRODS.push(p)});
+  }catch(e){}
+}
+
+function loadPhotosDB(){
+  if(!_db)return Promise.resolve();
+  return new Promise(res=>{
+    const tx=_db.transaction('photos','readonly');
+    const req=tx.objectStore('photos').getAll();
+    req.onsuccess=e=>{e.target.result.forEach(r=>{PHOTOS[r.code]=r.photos});res()};
+    req.onerror=()=>res();
+  });
+}
+
+function saveProdLocal(prod){
+  try{
+    const saved=JSON.parse(localStorage.getItem(LS_KEY)||'[]');
+    saved.push(prod);
+    localStorage.setItem(LS_KEY,JSON.stringify(saved));
+  }catch(e){}
+}
+
+function savePhotosDB(code,photos){
+  if(!_db)return Promise.resolve();
+  return new Promise(res=>{
+    const tx=_db.transaction('photos','readwrite');
+    const store=tx.objectStore('photos');
+    photos.length>0?store.put({code,photos}):store.delete(code);
+    tx.oncomplete=res;tx.onerror=res;
+  });
+}
+
+// Override sub() to persist
+const _subOrig=sub;
+async function sub(){
+  const g=S.f;
+  if(!g.code.trim()||!g.name.trim()||!g.cat||!g.cost){toast('必須項目を入力してください');return}
+  if(PRODS.some(p=>p.code===g.code.trim())){toast('このコードはすでに登録されています');return}
+  const c=parseFloat(g.cost)||0, s=parseFloat(g.sell)||0, co=CATS.find(x=>x.name===g.cat);
+  const prod={code:g.code.trim(),name:g.name.trim(),t:g.t,cat:g.cat,unit:g.unit||'個',
+    cost:c,sell:s||(co?Math.round(c*co.mk):c),sup:g.sup,dt:g.dt||new Date().toISOString().slice(0,10),rev:g.rev};
+  PRODS.push(prod);
+  saveProdLocal(prod);
+  if(g.photos&&g.photos.length){
+    PHOTOS[prod.code]=g.photos;
+    await savePhotosDB(prod.code,g.photos);
+  }
+  toast(`「${prod.name}」を登録しました（ローカル保存済）`);go('list');
+}
+
+async function startup(){
+  await initDB();
+  loadLocalProds();
+  await loadPhotosDB();
+  render();
+}
+startup();
 </script>
 </body>
 </html>

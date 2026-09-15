@@ -469,39 +469,22 @@ function rForm(){
 
 // ── SETTINGS ──
 function rSettings(){
-  const key=localStorage.getItem('ginoden_apikey')||'';
-  const hasKey=key.startsWith('sk-ant-');
   return`<div class="stcard">
     <div class="stcard-ttl">⚙ 設定</div>
-    <div class="stcard-sub">APIキーはこのデバイスのlocalStorageにのみ保存されます。外部サーバーには送信しません。</div>
+    <div class="stcard-sub">このツールはすべてのデータをこのデバイスにのみ保存します。外部サーバーには送信しません。</div>
     <div class="fg" style="margin-bottom:18px">
-      <label class="fl">Anthropic APIキー（OCR機能用）</label>
-      <div class="key-wrap">
-        <input type="password" id="key-inp" value="${esc(key)}" placeholder="sk-ant-..." autocomplete="off">
-        <button class="key-eye" onclick="toggleKeyVis()">👁</button>
+      <label class="fl">OCR機能について</label>
+      <div class="key-status"><span class="key-ok">✓ Claude AI (window.claude) を使用 — APIキー不要</span></div>
+      <div style="margin-top:8px;font-size:12px;color:var(--text-mid);line-height:1.7">
+        写真からの文字読み取りは、Claudeのビルトイン機能を使います。<br>
+        初回使用時に同意確認が表示されます。
       </div>
-      <div class="key-status">${hasKey?'<span class="key-ok">✓ APIキー設定済み — OCR機能が使えます</span>':'<span class="key-ng">未設定 — 入力すると写真からAI自動入力が使えます</span>'}</div>
-    </div>
-    <div class="factions" style="margin-top:0;padding-top:14px">
-      <button class="btn btn-s" onclick="clearKey()">削除</button>
-      <button class="btn btn-p" onclick="saveKey()">保存</button>
     </div>
   </div>`;
 }
-function toggleKeyVis(){const i=document.getElementById('key-inp');i.type=i.type==='password'?'text':'password'}
-function saveKey(){
-  const v=document.getElementById('key-inp').value.trim();
-  if(!v){toast('APIキーを入力してください');return}
-  if(!v.startsWith('sk-ant-')){toast('sk-ant- で始まるキーを入力してください');return}
-  localStorage.setItem('ginoden_apikey',v);
-  renderMain();toast('APIキーを保存しました');
-}
-function clearKey(){localStorage.removeItem('ginoden_apikey');renderMain();toast('APIキーを削除しました')}
 
 // ── OCR ──
 async function ocr(){
-  const key=localStorage.getItem('ginoden_apikey')||'';
-  if(!key.startsWith('sk-ant-')){toast('設定でAPIキーを入力してください');go('settings');return}
   const photos=S.f.photos||[];
   if(!photos.length){toast('先に写真を選択してください');return}
   const btn=document.getElementById('ocr-btn');
@@ -510,35 +493,22 @@ async function ocr(){
   btn.disabled=true;
   btn.innerHTML='<span class="ocr-spin"></span>読み取り中…';
   msg.innerHTML='';
-  const b64=photos[0].split(',')[1];
-  const mediaType=photos[0].match(/data:([^;]+)/)?.[1]||'image/jpeg';
   try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{
-        'content-type':'application/json',
-        'x-api-key':key,
-        'anthropic-version':'2023-06-01',
-        'anthropic-dangerous-direct-browser-access':'true'
-      },
-      body:JSON.stringify({
-        model:'claude-haiku-4-5-20251001',
-        max_tokens:512,
-        messages:[{role:'user',content:[
-          {type:'image',source:{type:'base64',media_type:mediaType,data:b64}},
-          {type:'text',text:`この画像から電気工事部材・照明器具の商品情報を抽出してください。
+    const sample=await window.claude?.use('sample');
+    if(!sample)throw new Error('OCR機能はClaudeのArtifact上でのみ使えます');
+    // dataURL → Blob
+    const dataUrl=photos[0];
+    const arr=dataUrl.split(',');
+    const mime=(arr[0].match(/:(.*?);/)||[])[1]||'image/jpeg';
+    const bstr=atob(arr[1]);
+    const ia=new Uint8Array(bstr.length);
+    for(let i=0;i<bstr.length;i++)ia[i]=bstr.charCodeAt(i);
+    const blob=new Blob([ia],{type:mime});
+    const prompt=`この画像から電気工事部材・照明器具の商品情報を抽出してください。
 JSONのみ返してください（説明文不要）：
 {"code":"品番・型番（英数字）","name":"商品名","unit":"単位（台/個/m/本/式等）","cost":仕入価格の数値,"sup":"メーカー・仕入先名"}
-見つからない項目はnullにしてください。`}
-        ]}]
-      })
-    });
-    const data=await res.json();
-    if(!res.ok)throw new Error(data.error?.message||'APIエラー');
-    const text=data.content?.[0]?.text||'';
-    const m=text.match(/\{[\s\S]*\}/);
-    if(!m)throw new Error('データを抽出できませんでした');
-    const ex=JSON.parse(m[0]);
+見つからない項目はnullにしてください。`;
+    const ex=await sample.json(prompt,{images:[blob],modelTier:'quick',cache:false});
     let filled=[];
     if(ex.code){S.f.code=ex.code;filled.push('品番')}
     if(ex.name){S.f.name=ex.name;filled.push('品名')}
@@ -553,7 +523,8 @@ JSONのみ返してください（説明文不要）：
     if(msgEl)msgEl.innerHTML=`<div class="ocr-result">✓ 自動入力: ${filled.join('・')}</div>`;
   }catch(e){
     btn.disabled=false;btn.innerHTML='OCRで読み取る';
-    toast('読み取りエラー: '+e.message);
+    const msgEl2=document.getElementById('ocr-msg');
+    if(msgEl2)msgEl2.innerHTML=`<div style="margin-top:8px;padding:10px 14px;background:var(--red-bg);border:1px solid var(--red);border-radius:5px;font-size:12px;color:var(--red);word-break:break-all">⚠ エラー: ${esc(e.message)}</div>`;
   }
 }
 

@@ -173,6 +173,27 @@ td.c{text-align:center}
 .photo-item img{width:80px;height:80px;object-fit:cover;border-radius:6px;border:2px solid var(--border);display:block}
 .photo-del{position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;background:var(--red);color:#fff;font-size:11px;line-height:18px;text-align:center;cursor:pointer;font-weight:700;border:none;box-shadow:0 1px 4px rgba(0,0,0,.3)}
 
+/* OCR */
+.ocr-bar{display:flex;align-items:center;gap:10px;margin-top:10px;padding:10px 14px;background:var(--amber-bg);border:1px solid var(--amber);border-radius:6px}
+.ocr-bar .ocr-txt{flex:1;font-size:12px;color:#92400e}
+.btn-ocr{background:var(--amber);color:#fff;border:none;border-radius:5px;padding:7px 14px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .15s}
+.btn-ocr:hover{background:#d97706}
+.btn-ocr:disabled{background:var(--text-lo);cursor:wait}
+.ocr-spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:5px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ocr-result{margin-top:8px;padding:8px 12px;background:var(--green-bg);border:1px solid var(--green);border-radius:5px;font-size:12px;color:#065f46}
+
+/* SETTINGS */
+.stcard{background:var(--card);border-radius:8px;box-shadow:var(--sh);padding:22px;max-width:540px}
+.stcard-ttl{font-size:15px;font-weight:700;margin-bottom:6px}
+.stcard-sub{font-size:12px;color:var(--text-mid);margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--border)}
+.key-wrap{display:flex;gap:8px;align-items:center}
+.key-wrap input{flex:1;padding:9px 12px;border:1px solid var(--border);border-radius:5px;background:var(--card);color:var(--text);font-family:monospace;font-size:13px;outline:none;transition:border-color .15s}
+.key-wrap input:focus{border-color:var(--sky)}
+.key-eye{background:none;border:1px solid var(--border);border-radius:5px;padding:8px 10px;cursor:pointer;font-size:13px;color:var(--text-mid)}
+.key-status{margin-top:8px;font-size:12px}
+.key-ok{color:var(--green)} .key-ng{color:var(--text-lo)}
+
 /* CATEGORY */
 .ch{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .ch h2{font-size:15px;font-weight:700}
@@ -268,7 +289,7 @@ function renderSb(){
   const nf=(tf,lb,n,cl)=>`<div class="sb-flt ${S.tf===tf?'on':''}" onclick="stf('${tf}')">${lb}<span class="ct ${cl||''}">${n}</span></div>`;
   document.getElementById('sb').innerHTML=`
     <div class="sb-sec">メニュー</div>
-    ${ni('list','≡','商品一覧')}${ni('new','＋','新規登録')}${ni('cats','◆','カテゴリ管理')}
+    ${ni('list','≡','商品一覧')}${ni('new','＋','新規登録')}${ni('cats','◆','カテゴリ管理')}${ni('settings','⚙','設定')}
     <div class="sb-div"></div>
     <div class="sb-sec">区分</div>
     ${nf('all','全商品',PRODS.length,'')}${nf('A','A材（機器）',ac,'a')}${nf('B','B材（部材）',bc,'b')}
@@ -282,6 +303,7 @@ function renderMain(){
   const m=document.getElementById('main');
   if(S.tab==='list') m.innerHTML=rList();
   else if(S.tab==='new') m.innerHTML=rForm();
+  else if(S.tab==='settings') m.innerHTML=rSettings();
   else m.innerHTML=rCats();
 }
 
@@ -429,7 +451,12 @@ function rForm(){
             <div class="photo-zone-txt">クリックまたはドラッグ＆ドロップで写真を追加</div>
             <div class="photo-zone-sub">JPG・PNG・HEIC対応 / 複数枚選択可</div>
           </div>
-          ${(g.photos||[]).length>0?`<div class="photo-grid" id="pgrid">${photoItems}</div>`:''}
+          ${(g.photos||[]).length>0?`<div class="photo-grid" id="pgrid">${photoItems}</div>
+          <div class="ocr-bar">
+            <span class="ocr-txt">📷 写真からAIで品番・品名・価格を自動入力できます</span>
+            <button class="btn-ocr" id="ocr-btn" onclick="ocr()">OCRで読み取る</button>
+          </div>`:''}
+          <div id="ocr-msg"></div>
         </div>
       </div>
       <div class="factions">
@@ -438,6 +465,96 @@ function rForm(){
       </div>
     </div>
   </div>`;
+}
+
+// ── SETTINGS ──
+function rSettings(){
+  const key=localStorage.getItem('ginoden_apikey')||'';
+  const hasKey=key.startsWith('sk-ant-');
+  return`<div class="stcard">
+    <div class="stcard-ttl">⚙ 設定</div>
+    <div class="stcard-sub">APIキーはこのデバイスのlocalStorageにのみ保存されます。外部サーバーには送信しません。</div>
+    <div class="fg" style="margin-bottom:18px">
+      <label class="fl">Anthropic APIキー（OCR機能用）</label>
+      <div class="key-wrap">
+        <input type="password" id="key-inp" value="${esc(key)}" placeholder="sk-ant-..." autocomplete="off">
+        <button class="key-eye" onclick="toggleKeyVis()">👁</button>
+      </div>
+      <div class="key-status">${hasKey?'<span class="key-ok">✓ APIキー設定済み — OCR機能が使えます</span>':'<span class="key-ng">未設定 — 入力すると写真からAI自動入力が使えます</span>'}</div>
+    </div>
+    <div class="factions" style="margin-top:0;padding-top:14px">
+      <button class="btn btn-s" onclick="clearKey()">削除</button>
+      <button class="btn btn-p" onclick="saveKey()">保存</button>
+    </div>
+  </div>`;
+}
+function toggleKeyVis(){const i=document.getElementById('key-inp');i.type=i.type==='password'?'text':'password'}
+function saveKey(){
+  const v=document.getElementById('key-inp').value.trim();
+  if(!v){toast('APIキーを入力してください');return}
+  if(!v.startsWith('sk-ant-')){toast('sk-ant- で始まるキーを入力してください');return}
+  localStorage.setItem('ginoden_apikey',v);
+  renderMain();toast('APIキーを保存しました');
+}
+function clearKey(){localStorage.removeItem('ginoden_apikey');renderMain();toast('APIキーを削除しました')}
+
+// ── OCR ──
+async function ocr(){
+  const key=localStorage.getItem('ginoden_apikey')||'';
+  if(!key.startsWith('sk-ant-')){toast('設定でAPIキーを入力してください');go('settings');return}
+  const photos=S.f.photos||[];
+  if(!photos.length){toast('先に写真を選択してください');return}
+  const btn=document.getElementById('ocr-btn');
+  const msg=document.getElementById('ocr-msg');
+  if(!btn||!msg)return;
+  btn.disabled=true;
+  btn.innerHTML='<span class="ocr-spin"></span>読み取り中…';
+  msg.innerHTML='';
+  const b64=photos[0].split(',')[1];
+  const mediaType=photos[0].match(/data:([^;]+)/)?.[1]||'image/jpeg';
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{
+        'content-type':'application/json',
+        'x-api-key':key,
+        'anthropic-version':'2023-06-01',
+        'anthropic-dangerous-direct-browser-access':'true'
+      },
+      body:JSON.stringify({
+        model:'claude-haiku-4-5-20251001',
+        max_tokens:512,
+        messages:[{role:'user',content:[
+          {type:'image',source:{type:'base64',media_type:mediaType,data:b64}},
+          {type:'text',text:`この画像から電気工事部材・照明器具の商品情報を抽出してください。
+JSONのみ返してください（説明文不要）：
+{"code":"品番・型番（英数字）","name":"商品名","unit":"単位（台/個/m/本/式等）","cost":仕入価格の数値,"sup":"メーカー・仕入先名"}
+見つからない項目はnullにしてください。`}
+        ]}]
+      })
+    });
+    const data=await res.json();
+    if(!res.ok)throw new Error(data.error?.message||'APIエラー');
+    const text=data.content?.[0]?.text||'';
+    const m=text.match(/\{[\s\S]*\}/);
+    if(!m)throw new Error('データを抽出できませんでした');
+    const ex=JSON.parse(m[0]);
+    let filled=[];
+    if(ex.code){S.f.code=ex.code;filled.push('品番')}
+    if(ex.name){S.f.name=ex.name;filled.push('品名')}
+    if(ex.unit){S.f.unit=ex.unit;filled.push('単位')}
+    if(ex.cost){S.f.cost=String(ex.cost);filled.push('仕入値');
+      const co=CATS.find(c=>c.name===S.f.cat);
+      if(co&&!S.f.over)S.f.sell=String(Math.round(ex.cost*co.mk));
+    }
+    if(ex.sup){S.f.sup=ex.sup;filled.push('仕入先')}
+    renderMain();
+    const msgEl=document.getElementById('ocr-msg');
+    if(msgEl)msgEl.innerHTML=`<div class="ocr-result">✓ 自動入力: ${filled.join('・')}</div>`;
+  }catch(e){
+    btn.disabled=false;btn.innerHTML='OCRで読み取る';
+    toast('読み取りエラー: '+e.message);
+  }
 }
 
 // ── CATS ──
@@ -473,6 +590,7 @@ function rCats(){
 function go(tab){
   S.tab=tab;
   if(tab==='new') S.f={code:'',name:'',cat:'',t:'A',unit:'',cost:'',sell:'',sup:'',dt:'',rev:false,over:false,photos:[]};
+  if(tab==='settings'||tab==='cats'||tab==='list') {} // no form reset needed
   render();
   if(tab==='list'){const si=document.getElementById('si');if(si)si.focus()}
 }

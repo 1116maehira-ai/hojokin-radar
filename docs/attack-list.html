@@ -317,6 +317,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
 .ltpl-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
 .ltpl-btn{padding:6px 13px;border:1px solid var(--border);border-radius:7px;background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .12s}
 .ltpl-btn:hover{border-color:var(--primary);background:var(--primary-l);color:var(--primary)}
+/* ── AUTO-SELECT & PROGRESS ── */
+.ftgl[data-flt="letter_top30"].on{border-color:#059669;background:#d1fae5;color:#065f46}
+.bulk-prog{font-size:12px;color:rgba(255,255,255,.85);background:rgba(0,0,0,.2);padding:4px 10px;border-radius:6px;white-space:nowrap}
+.bulk-auto-btn{padding:8px 18px;background:#10b981;color:#fff;border:none;border-radius:8px;font-weight:800;cursor:pointer;font-size:13px;font-family:inherit}
+.bulk-auto-btn:hover{background:#059669}
 </style>
 </head>
 <body>
@@ -362,6 +367,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
     <button class="ftgl" data-flt="none"     onclick="toggleFlt('none')">未着手</button>
     <button class="ftgl" data-flt="my_calls" onclick="toggleFlt('my_calls')" style="border-color:#7c3aed">📞 自分の担当</button>
     <button class="ftgl" data-flt="unassigned" onclick="toggleFlt('unassigned')" style="color:var(--muted)">🔀 未割当</button>
+    <button class="ftgl" data-flt="letter_top30" onclick="toggleFlt('letter_top30')" style="border-color:#059669">✉️ 手紙候補30社</button>
   </div>  <select id="fs" onchange="renderList()">
     <option value="">並べ替え: デフォルト</option>
     <option value="rank">ランク順</option>
@@ -388,9 +394,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
 
 <!-- bulk action bar -->
 <div class="bulk-bar" id="bulk-bar">
-  <span>📋 DM準備済 <strong id="bulk-cnt">0</strong> 社が郵送待ち</span>
-  <button class="bulk-btn" onclick="bulkMarkDmMailed()">📮 一括DM郵送済にする</button>
-  <button class="bulk-clr" onclick="bulkClearDmReady()">準備済を全解除</button>
+  <span class="bulk-prog" id="dm-progress">未配布 0 / 全0社</span>
+  <button class="bulk-auto-btn" id="btn-auto300" onclick="autoSelectNext300()" style="display:none">🎯 次の300社を自動選別</button>
+  <span style="margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+    <span>📋 DM準備済 <strong id="bulk-cnt">0</strong> 社が郵送待ち</span>
+    <button class="bulk-btn" onclick="bulkMarkDmMailed()">📮 一括DM郵送済にする</button>
+    <button class="bulk-clr" onclick="bulkClearDmReady()">準備済を全解除</button>
+  </span>
 </div>
 
 <!-- company modal -->
@@ -532,7 +542,7 @@ function updateUserChip() {
 // ── MULTI FILTER ──────────────────────────────────────
 let activeFlt = new Set();
 // AND-type filters (applied on top of OR group)
-const AND_FLTS = new Set(['my_calls', 'unassigned']);
+const AND_FLTS = new Set(['my_calls', 'unassigned', 'letter_top30']);
 function toggleFlt(key) {
   if (key === 'none') {
     if (activeFlt.has('none')) activeFlt.clear();
@@ -1157,6 +1167,9 @@ function getRows() {
       if (activeFlt.has('unassigned')) {
         if (sd.call_assignee || !sd.dm_mailed) return false;
       }
+      if (activeFlt.has('letter_top30')) {
+        if (!sd.dm_mailed || ltr.sent) return false;
+      }
       // OR filters
       const orFlt = [...activeFlt].filter(k => !AND_FLTS.has(k));
       if (orFlt.length > 0) {
@@ -1208,15 +1221,29 @@ function getRows() {
       return ra-rb;
     });
   }
+  // 手紙候補30社: override sort by rank, limit to 30
+  if (activeFlt.has('letter_top30')) {
+    rows.sort((a,b)=>{
+      const ra=ro[a.anniversary_rank||a.ar]??99, rb=ro[b.anniversary_rank||b.ar]??99;
+      return ra-rb||(a.company_name||'').localeCompare(b.company_name||'','ja');
+    });
+    rows = rows.slice(0, 30);
+  }
   return rows;
 }
 
 function updateBulkBar() {
   const n = cos.filter(c=>{const sd=c.source_data||{}; return sd.dm_ready && !sd.dm_mailed;}).length;
+  const unmailed = cos.filter(c=>!(c.source_data||{}).dm_mailed).length;
   const bar = document.getElementById('bulk-bar');
   const cnt = document.getElementById('bulk-cnt');
-  if (bar) bar.style.display = (n > 0 && can('admin')) ? 'flex' : 'none';
+  const prog = document.getElementById('dm-progress');
+  const btn300 = document.getElementById('btn-auto300');
+  if (!can('admin') || !cos.length) { if (bar) bar.style.display='none'; return; }
+  if (bar) bar.style.display='flex';
   if (cnt) cnt.textContent = n;
+  if (prog) prog.textContent = `未配布 ${unmailed} / 全${cos.length}社`;
+  if (btn300) btn300.style.display = unmailed > 0 ? '' : 'none';
 }
 
 function renderList() {
@@ -1608,6 +1635,43 @@ async function bulkClearDmReady() {
   renderList(); updateBulkBar();
   toast(`🔄 ${ok}社の準備済を解除しました`);
 }
+
+async function autoSelectNext300() {
+  if (!can('admin')) { toast('❌ 権限がありません'); return; }
+  const undelivered = cos.filter(c=>!(c.source_data||{}).dm_mailed);
+  if (!undelivered.length) {
+    toast('📮 全社への配布が完了しています'); return;
+  }
+  const ro2 = {S:0,A:1,B:2,C:3,'':4};
+  const sorted = [...undelivered].sort((a,b)=>{
+    const ra=ro2[a.anniversary_rank||a.ar]??99, rb=ro2[b.anniversary_rank||b.ar]??99;
+    return ra-rb||(a.company_name||'').localeCompare(b.company_name||'','ja');
+  });
+  const top300 = sorted.slice(0, 300);
+  const top300Ids = new Set(top300.map(c=>c.id));
+  const toSet   = top300.filter(c=>!(c.source_data||{}).dm_ready);
+  const toClear = cos.filter(c=>{const sd=c.source_data||{}; return sd.dm_ready && !sd.dm_mailed && !top300Ids.has(c.id);});
+  if (!confirm(`上位${top300.length}社をDM準備済に選別します。\n追加: ${toSet.length}社 ／ 解除: ${toClear.length}社\n\n実行しますか？`)) return;
+  const now = new Date().toISOString();
+  let ok=0, errs=0;
+  for (const c of toSet) {
+    const src={...(c.source_data||{}), dm_ready:true, dm_ready_at:now};
+    const {error}=await sb.from('ceremony_attacks').update({source_data:src}).eq('id',c.id);
+    if (error) errs++; else { c.source_data=src; ok++; }
+  }
+  for (const c of toClear) {
+    const src={...(c.source_data||{})};
+    delete src.dm_ready; delete src.dm_ready_at;
+    const {error}=await sb.from('ceremony_attacks').update({source_data:src}).eq('id',c.id);
+    if (error) errs++; else { c.source_data=src; }
+  }
+  renderList(); updateBulkBar();
+  toast(errs
+    ? `⚠️ 選別完了（エラー${errs}件）`
+    : `🎯 上位${top300.length}社を選別しました（残り未配布: ${undelivered.length-top300.length}社）`
+  );
+}
+
 async function saveMemo() {
   const memo = document.getElementById('info-memo')?.value||'';
   const src  = {...(cur.source_data||{}), memo};

@@ -322,6 +322,45 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
 .bulk-prog{font-size:12px;color:rgba(255,255,255,.85);background:rgba(0,0,0,.2);padding:4px 10px;border-radius:6px;white-space:nowrap}
 .bulk-auto-btn{padding:8px 18px;background:#10b981;color:#fff;border:none;border-radius:8px;font-weight:800;cursor:pointer;font-size:13px;font-family:inherit}
 .bulk-auto-btn:hover{background:#059669}
+/* ── CONVERSATION TREE ── */
+.ct-header{display:flex;align-items:center;gap:7px;margin-bottom:10px;flex-wrap:wrap}
+.ct-step{font-size:11px;font-weight:800;color:var(--muted);background:var(--bg);padding:3px 9px;border-radius:6px;border:1px solid var(--border)}
+.ct-back,.ct-reset,.ct-edit-btn{padding:5px 11px;border-radius:7px;border:1px solid var(--border);background:var(--bg);color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .12s}
+.ct-back:hover,.ct-reset:hover,.ct-edit-btn:hover{border-color:var(--primary);color:var(--primary)}
+.ct-breadcrumb{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin-bottom:10px}
+.ct-breadcrumb span{background:var(--border);color:var(--muted);padding:2px 8px;border-radius:5px;font-size:11px}
+.ct-lbl{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;margin-top:12px}
+.ct-say{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px 16px;font-size:14px;line-height:1.9;color:var(--text);white-space:pre-wrap;margin-bottom:10px}
+.ct-reactions{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 14px}
+.ct-rbtn{padding:10px 18px;border-radius:10px;border:2px solid var(--border);background:var(--bg);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .12s;text-align:left}
+.ct-rbtn:hover{border-color:var(--primary);background:var(--primary-l);color:var(--primary);transform:translateY(-1px)}
+.ct-end-banner{text-align:center;font-size:22px;font-weight:800;padding:18px;border-radius:12px;margin-bottom:14px;border:2px solid}
+.ct-end-banner.won{background:#d1fae5;color:#065f46;border-color:#10b981}
+.ct-end-banner.doc{background:#dbeafe;color:#1e40af;border-color:#3b82f6}
+.ct-end-banner.cb{background:#fef3c7;color:#92400e;border-color:#f59e0b}
+.ct-end-banner.hold{background:#f3f4f6;color:#374151;border-color:#9ca3af}
+.ct-end-banner.decline{background:#fee2e2;color:#991b1b;border-color:#f87171}
+.ct-memo-ta{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-size:13px;line-height:1.7;min-height:80px;resize:vertical;font-family:inherit;margin-bottom:9px}
+.ct-memo-ta:focus{outline:none;border-color:var(--primary)}
+.ct-memo-save{padding:9px 20px;background:var(--primary);color:#fff;border:none;border-radius:8px;font-weight:800;cursor:pointer;font-size:13px;font-family:inherit}
+/* edit mode */
+.ct-edit-hd{display:flex;gap:8px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.ct-back-play{padding:7px 14px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
+.ct-reset-tree{padding:7px 14px;border-radius:8px;border:1px solid #fca5a5;background:transparent;color:#dc2626;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
+.ct-node-card{border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:10px}
+.ct-node-hd{display:flex;align-items:center;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.ct-node-id{font-size:11px;font-weight:800;color:var(--muted);background:var(--border);padding:2px 8px;border-radius:5px;font-family:monospace}
+.ct-root-chip{font-size:10px;font-weight:800;background:#dbeafe;color:#1e40af;padding:2px 7px;border-radius:5px}
+.ct-end-chip{font-size:10px;font-weight:800;background:#d1fae5;color:#065f46;padding:2px 7px;border-radius:5px}
+.ct-node-ta{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:7px;background:var(--bg);color:var(--text);font-size:13px;line-height:1.7;resize:vertical;font-family:inherit}
+.ct-node-ta:focus,.ct-react-inp:focus,.ct-react-sel:focus{outline:none;border-color:var(--primary)}
+.ct-react-row{display:flex;gap:5px;align-items:center;margin-bottom:6px;flex-wrap:wrap}
+.ct-react-inp{flex:1;min-width:100px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font-size:12px;font-family:inherit}
+.ct-arrow{color:var(--muted);font-size:13px;flex-shrink:0}
+.ct-react-sel{padding:5px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font-size:12px;font-family:inherit;max-width:160px}
+.ct-del-react{padding:4px 8px;border:1px solid #fca5a5;border-radius:6px;background:transparent;color:#dc2626;font-size:11px;cursor:pointer;font-family:inherit;flex-shrink:0}
+.ct-add-react{display:block;width:100%;padding:6px;border:1px dashed var(--border);border-radius:7px;background:transparent;color:var(--muted);font-size:12px;cursor:pointer;font-family:inherit;margin:4px 0 10px;text-align:center}
+.ct-save-node{padding:6px 16px;background:var(--primary);color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
 </style>
 </head>
 <body>
@@ -706,7 +745,7 @@ function renderScriptTab() {
   scrEditing = false;
   const tabs = ['A','B','C'].map(k=>
     `<button class="stab ${k===curScr?'on':''}" onclick="setScrTab('${k}')">${scrs[k]?.name||SCR_DEFAULTS[k].name}</button>`
-  ).join('');
+  ).join('') + `<button class="stab" onclick="setScrTab('tree')">🌳 会話ツリー</button>`;
   document.getElementById('mbody').innerHTML = `
     <div class="stabs">${tabs}</div>
     <div class="script-name-row">
@@ -725,7 +764,11 @@ function renderScriptTab() {
     </div>`;
 }
 
-function setScrTab(k) { curScr=k; renderScriptTab(); }
+function setScrTab(k) {
+  curScr=k;
+  if (k==='tree') { convoHistory=[]; convoTreeMode='play'; renderConvoTree(); }
+  else renderScriptTab();
+}
 
 function startEditScript() {
   scrEditing=true;
@@ -757,6 +800,182 @@ function resetScript() {
   putScripts(scrs);
   toast('🔄 デフォルトに戻しました');
   renderScriptTab();
+}
+
+// ── CONVERSATION TREE ──────────────────────────────────
+const CONVO_KEY = 'crm_convo_tree_v1';
+const CONVO_DEFAULTS = {
+  rootId: 'open',
+  nodes: {
+    open: { id:'open', say:'はじめまして、TENOHIRAの○○と申します。御社の周年をお祝いする記念映像のご提案でご連絡しました。少々お時間よろしいでしょうか？', reactions:[{label:'はい、どうぞ',next:'pitch'},{label:'今忙しい',next:'busy'},{label:'担当者不在',next:'absent'},{label:'いらない・必要ない',next:'hard_no'}] },
+    pitch: { id:'pitch', say:'御社は今年で○○周年とのことで、記念式典や社内イベントのご予定はございますか？弊社では周年記念映像の制作を専門としており、多くの企業様の式典でご活用いただいております。', reactions:[{label:'式典あり・興味あり',next:'strong_interest'},{label:'話は聞く',next:'soft_interest'},{label:'必要ない',next:'soft_no'}] },
+    strong_interest: { id:'strong_interest', say:'ありがとうございます！一度、御社に合ったご提案資料をお送りできればと思います。担当の方のお名前とメールアドレスをお伺いできますか？', reactions:[{label:'連絡先をもらえた',next:'end_won'},{label:'後で改めて',next:'followup'}] },
+    soft_interest: { id:'soft_interest', say:'かしこまりました。まずは実績事例のご紹介資料だけでもお送りしてよろしいですか？', reactions:[{label:'送ってOK',next:'end_doc'},{label:'必要ない',next:'soft_no'}] },
+    busy: { id:'busy', say:'お忙しいところ失礼しました。では改めてご連絡させてください。来週はいかがでしょうか？', reactions:[{label:'来週OK',next:'end_cb'},{label:'いつでも良い',next:'end_cb'},{label:'必要ない',next:'soft_no'}] },
+    absent: { id:'absent', say:'ご不在でしたか。○○（名前）という者からお電話があった旨、お伝えいただけますか？また改めてお電話いたします。', reactions:[{label:'伝言OK',next:'end_cb'},{label:'繋いでもらえない',next:'hard_no'}] },
+    soft_no: { id:'soft_no', say:'そうですか、ありがとうございました。もし周年の際にご検討されることがあれば、ぜひお声がけください。', reactions:[{label:'わかった',next:'end_hold'}] },
+    hard_no: { id:'hard_no', say:'ご検討いただきありがとうございました。またご縁があれば。', reactions:[{label:'終了',next:'end_decline'}] },
+    followup: { id:'followup', say:'ありがとうございます。では改めてご連絡いたします。ご都合の良いお時間を教えていただけますか？', reactions:[{label:'時間を教えてもらった',next:'end_cb'},{label:'都合が悪い・未定',next:'end_hold'}] },
+    end_won:     { id:'end_won',     say:'商談のアポを確定させましょう。日時・担当者名・連絡先を確認してください。', isEnd:true, endLabel:'🎯 商談獲得',    endCls:'won',     reactions:[] },
+    end_doc:     { id:'end_doc',     say:'資料を送付します。送付後3〜5日後にフォローの電話を入れましょう。',         isEnd:true, endLabel:'📄 資料送付',    endCls:'doc',     reactions:[] },
+    end_cb:      { id:'end_cb',      say:'折り返し日程をメモして、必ず時間通りにかけ直しましょう。',                 isEnd:true, endLabel:'📅 折り返し',    endCls:'cb',      reactions:[] },
+    end_hold:    { id:'end_hold',    say:'今は保留。次の周年前や節目にフォローできるよう日程を記録しておきましょう。', isEnd:true, endLabel:'⏸️ 保留',        endCls:'hold',    reactions:[] },
+    end_decline: { id:'end_decline', say:'今回はご縁がありませんでした。次のサイクルで再度検討しましょう。',          isEnd:true, endLabel:'❌ お断り',      endCls:'decline', reactions:[] },
+  }
+};
+
+let convoHistory = [], convoTreeMode = 'play';
+
+function getConvoTree() {
+  try { const s=localStorage.getItem(CONVO_KEY); return s?JSON.parse(s):JSON.parse(JSON.stringify(CONVO_DEFAULTS)); } catch { return JSON.parse(JSON.stringify(CONVO_DEFAULTS)); }
+}
+function putConvoTree(t) { try { localStorage.setItem(CONVO_KEY, JSON.stringify(t)); } catch {} }
+
+function renderConvoTree() {
+  const scrs = getScripts();
+  const tree = getConvoTree();
+  const b = document.getElementById('mbody');
+  if (!b) return;
+
+  const treeTabs = `<div class="stabs">${['A','B','C'].map(k=>`<button class="stab" onclick="setScrTab('${k}')">${scrs[k]?.name||SCR_DEFAULTS[k].name}</button>`).join('')}<button class="stab on">🌳 会話ツリー</button></div>`;
+
+  if (convoTreeMode === 'edit') {
+    const allIds = Object.keys(tree.nodes);
+    const nodeCards = Object.values(tree.nodes).map(node=>`
+      <div class="ct-node-card">
+        <div class="ct-node-hd">
+          <span class="ct-node-id">${esc(node.id)}</span>
+          ${node.id===tree.rootId?'<span class="ct-root-chip">▶ スタート</span>':''}
+          ${node.isEnd?`<span class="ct-end-chip">${esc(node.endLabel||'END')}</span>`:''}
+        </div>
+        <div class="ct-lbl">💬 あなたの言葉</div>
+        <textarea class="ct-node-ta" id="ctsay-${esc(node.id)}" rows="3">${esc(node.say)}</textarea>
+        ${!node.isEnd?`
+          <div class="ct-lbl">相手のリアクション</div>
+          ${node.reactions.map((r,i)=>`
+            <div class="ct-react-row">
+              <input class="ct-react-inp" id="ctrl-${esc(node.id)}-${i}" value="${esc(r.label)}" placeholder="リアクション">
+              <span class="ct-arrow">→</span>
+              <select class="ct-react-sel" id="ctrs-${esc(node.id)}-${i}">
+                ${allIds.map(nid=>`<option value="${esc(nid)}" ${r.next===nid?'selected':''}>${esc(nid)}</option>`).join('')}
+              </select>
+              <button class="ct-del-react" onclick="convoDelReact('${esc(node.id)}',${i})">✕</button>
+            </div>
+          `).join('')}
+          <button class="ct-add-react" onclick="convoAddReact('${esc(node.id)}')">＋ リアクション追加</button>
+        `:''}
+        <button class="ct-save-node" onclick="convoSaveNode('${esc(node.id)}')">💾 このノードを保存</button>
+      </div>`).join('');
+    b.innerHTML = treeTabs + `
+      <div class="ct-edit-hd">
+        <button class="ct-back-play" onclick="convoTreeMode='play';convoHistory=[];renderConvoTree()">← プレイに戻る</button>
+        <button class="ct-reset-tree" onclick="convoResetTree()">🔄 デフォルトに戻す</button>
+      </div>${nodeCards}`;
+    return;
+  }
+
+  // ── PLAY MODE ──
+  const nodeId = convoHistory.length ? convoHistory[convoHistory.length-1] : tree.rootId;
+  const node = tree.nodes[nodeId];
+  if (!node) { b.innerHTML=treeTabs+'<div class="empty">ノードが見つかりません</div>'; return; }
+
+  const isEnd = node.isEnd || !node.reactions.length;
+  const step = convoHistory.length;
+
+  const crumbs = convoHistory.slice(0,-1).map((id,idx)=>{
+    const n=tree.nodes[id], nextId=convoHistory[idx+1];
+    const r=n?.reactions?.find(r=>r.next===nextId);
+    return `<span>${esc(r?.label||nextId)}</span>`;
+  });
+  const breadcrumb = crumbs.length ? `<div class="ct-breadcrumb">${crumbs.join('<span style="color:var(--muted)">→</span>')}</div>` : '';
+
+  const todayNote = (cur?.source_data?.convo_notes||[]).find(n=>n.date===today);
+  const existingMemo = todayNote?.memo||'';
+
+  const content = isEnd ? `
+    <div class="ct-end-banner ${node.endCls||''}">${esc(node.endLabel||'終了')}</div>
+    <div class="ct-lbl">💬 最後の一言</div>
+    <div class="ct-say">${esc(node.say)}</div>
+    <div class="ct-lbl">📝 この会社のメモ（今日）</div>
+    <textarea class="ct-memo-ta" id="ct-memo" placeholder="例: 担当者名、折り返し日時、要望など...">${esc(existingMemo)}</textarea>
+    <button class="ct-memo-save" onclick="convoSaveMemo()">💾 保存</button>
+  ` : `
+    <div class="ct-lbl">💬 あなたの言葉</div>
+    <div class="ct-say">${esc(node.say)}</div>
+    <div class="ct-lbl">相手のリアクションを選んでください</div>
+    <div class="ct-reactions">${node.reactions.map(r=>`<button class="ct-rbtn" onclick="convoNext('${esc(r.next)}')">${esc(r.label)}</button>`).join('')}</div>
+  `;
+
+  b.innerHTML = treeTabs + `
+    <div class="ct-header">
+      <span class="ct-step">Step ${step+1}</span>
+      <div style="margin-left:auto;display:flex;gap:6px;flex-wrap:wrap">
+        ${step>0?`<button class="ct-back" onclick="convoBack()">← 戻る</button>`:''}
+        <button class="ct-reset" onclick="convoReset()">🔄 最初から</button>
+        <button class="ct-edit-btn" onclick="convoTreeMode='edit';renderConvoTree()">✏️ 編集</button>
+      </div>
+    </div>
+    ${breadcrumb}${content}`;
+}
+
+function convoNext(nodeId) { convoHistory.push(nodeId); renderConvoTree(); }
+function convoBack()       { convoHistory.pop();         renderConvoTree(); }
+function convoReset()      { convoHistory=[];             renderConvoTree(); }
+
+async function convoSaveMemo() {
+  if (!cur) return;
+  const memo = document.getElementById('ct-memo')?.value||'';
+  const tree = getConvoTree();
+  const nodeId = convoHistory[convoHistory.length-1];
+  const node = tree.nodes[nodeId];
+  const src = {...(cur.source_data||{})};
+  const entry = {date:today, outcome:node?.endLabel||'終了', path:[...convoHistory], memo};
+  src.convo_notes = [...(src.convo_notes||[]).filter(n=>n.date!==today), entry];
+  const {error} = await sb.from('ceremony_attacks').update({source_data:src}).eq('id',cur.id);
+  if (error) { toast('❌ 保存失敗: '+error.message); return; }
+  cur.source_data=src;
+  const idx=cos.findIndex(x=>x.id===cur.id); if (idx>=0) cos[idx].source_data=src;
+  toast('✅ メモを保存しました');
+}
+
+function convoSaveNode(nodeId) {
+  const tree = getConvoTree();
+  const node = tree.nodes[nodeId];
+  if (!node) return;
+  node.say = document.getElementById('ctsay-'+nodeId)?.value ?? node.say;
+  if (!node.isEnd) {
+    node.reactions = node.reactions.map((r,i)=>({
+      label: document.getElementById('ctrl-'+nodeId+'-'+i)?.value ?? r.label,
+      next:  document.getElementById('ctrs-'+nodeId+'-'+i)?.value ?? r.next,
+    }));
+  }
+  putConvoTree(tree);
+  toast('✅ 保存しました（全社に反映）');
+  renderConvoTree();
+}
+
+function convoDelReact(nodeId, idx) {
+  const tree = getConvoTree();
+  if (!tree.nodes[nodeId]) return;
+  tree.nodes[nodeId].reactions.splice(idx, 1);
+  putConvoTree(tree);
+  renderConvoTree();
+}
+
+function convoAddReact(nodeId) {
+  const tree = getConvoTree();
+  if (!tree.nodes[nodeId]) return;
+  tree.nodes[nodeId].reactions.push({label:'新しいリアクション', next: tree.rootId});
+  putConvoTree(tree);
+  renderConvoTree();
+}
+
+function convoResetTree() {
+  if (!confirm('会話ツリーをデフォルトに戻しますか？\n（全ての編集が消えます）')) return;
+  putConvoTree(JSON.parse(JSON.stringify(CONVO_DEFAULTS)));
+  convoHistory=[]; convoTreeMode='play';
+  toast('🔄 デフォルトに戻しました');
+  renderConvoTree();
 }
 
 // ── LETTER (localStorage) ─────────────────────────────

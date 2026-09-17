@@ -730,114 +730,98 @@ const SCR_DEFAULTS = {
 P.S. まずはお電話でお話しできれば嬉しいです。` },
 };
 
-let curScr = 'A', scrEditing = false;
-function getScripts() {
-  try { const s=localStorage.getItem(SCR_KEY); return s?JSON.parse(s):{...SCR_DEFAULTS}; } catch { return {...SCR_DEFAULTS}; }
-}
-function putScripts(obj) {
-  try { localStorage.setItem(SCR_KEY, JSON.stringify(obj)); } catch {}
-}
+let curScr = 'tree1';
 
-// ── SCRIPT TAB ────────────────────────────────────────
-function renderScriptTab() {
-  const scrs = getScripts();
-  const s = scrs[curScr] || SCR_DEFAULTS[curScr];
-  scrEditing = false;
-  const tabs = ['A','B','C'].map(k=>
-    `<button class="stab ${k===curScr?'on':''}" onclick="setScrTab('${k}')">${scrs[k]?.name||SCR_DEFAULTS[k].name}</button>`
-  ).join('') + `<button class="stab" onclick="setScrTab('tree')">🌳 会話ツリー</button>`;
-  document.getElementById('mbody').innerHTML = `
-    <div class="stabs">${tabs}</div>
-    <div class="script-name-row">
-      <span class="sname" id="cur-sname">${esc(s.name)}</span>
-      <button class="edit-btn" onclick="startEditScript()">✏️ 編集</button>
-    </div>
-    <div id="scr-view"><div class="script-box">${esc(s.body)}</div></div>
-    <div id="scr-edit" style="display:none">
-      <input class="script-name-inp" id="sn-inp" value="${esc(s.name)}" placeholder="スクリプト名">
-      <textarea class="script-edit-ta" id="sb-inp">${esc(s.body)}</textarea>
-      <div class="edit-actions">
-        <button class="save-scr-btn" onclick="saveScript()">💾 保存</button>
-        <button class="cancel-scr-btn" onclick="cancelEditScript()">キャンセル</button>
-        <button class="reset-scr-btn" onclick="resetScript()">デフォルトに戻す</button>
-      </div>
-    </div>`;
-}
+function renderScriptTab() { renderConvoTree(); }
 
 function setScrTab(k) {
-  curScr=k;
-  if (k==='tree') { convoHistory=[]; convoTreeMode='play'; renderConvoTree(); }
-  else renderScriptTab();
+  curScr = k;
+  convoHistory = []; convoTreeMode = 'play';
+  renderConvoTree();
 }
 
-function startEditScript() {
-  scrEditing=true;
-  document.getElementById('scr-view').style.display='none';
-  document.getElementById('scr-edit').style.display='';
-}
+// ── CONVERSATION TREES ────────────────────────────────────
+const CONVO_KEYS  = { tree1:'crm_ct_v1_1', tree2:'crm_ct_v1_2', tree3:'crm_ct_v1_3' };
+const CONVO_NAMES = { tree1:'①丁寧フォロー', tree2:'②実績・信頼訴求', tree3:'③フレンドリー' };
 
-function cancelEditScript() {
-  scrEditing=false;
-  document.getElementById('scr-view').style.display='';
-  document.getElementById('scr-edit').style.display='none';
-}
+const _END_NODES = {
+  end_won:     { id:'end_won',     isEnd:true, endLabel:'🎯 商談獲得', endCls:'won',     say:'商談確定！日時・担当者名・連絡先をメモしてください。', reactions:[] },
+  end_doc:     { id:'end_doc',     isEnd:true, endLabel:'📄 資料送付', endCls:'doc',     say:'資料を送付します。送付後3〜5日後にフォローコールを入れましょう。', reactions:[] },
+  end_cb:      { id:'end_cb',      isEnd:true, endLabel:'📅 折り返し', endCls:'cb',      say:'折り返し日時をカレンダーに記録して、必ず時間通りにかけ直しましょう。', reactions:[] },
+  end_hold:    { id:'end_hold',    isEnd:true, endLabel:'⏸️ 保留',    endCls:'hold',    say:'今回は保留。3ヶ月後などにフォローコールの予定を入れておきましょう。', reactions:[] },
+  end_decline: { id:'end_decline', isEnd:true, endLabel:'❌ お断り',   endCls:'decline', say:'今回はご縁がありませんでした。次のサイクルで再検討しましょう。', reactions:[] },
+};
 
-function saveScript() {
-  const name = document.getElementById('sn-inp')?.value.trim();
-  const body = document.getElementById('sb-inp')?.value;
-  if (!name||body===undefined) return;
-  const scrs = getScripts();
-  scrs[curScr] = {name, body};
-  putScripts(scrs);
-  toast('✅ スクリプトを保存しました');
-  renderScriptTab();
-}
-
-function resetScript() {
-  if (!confirm(curScr+'スクリプトをデフォルトに戻しますか？')) return;
-  const scrs = getScripts();
-  scrs[curScr] = {...SCR_DEFAULTS[curScr]};
-  putScripts(scrs);
-  toast('🔄 デフォルトに戻しました');
-  renderScriptTab();
-}
-
-// ── CONVERSATION TREE ──────────────────────────────────
-const CONVO_KEY = 'crm_convo_tree_v1';
 const CONVO_DEFAULTS = {
-  rootId: 'open',
-  nodes: {
-    open: { id:'open', say:'はじめまして、TENOHIRAの○○と申します。御社の周年をお祝いする記念映像のご提案でご連絡しました。少々お時間よろしいでしょうか？', reactions:[{label:'はい、どうぞ',next:'pitch'},{label:'今忙しい',next:'busy'},{label:'担当者不在',next:'absent'},{label:'いらない・必要ない',next:'hard_no'}] },
-    pitch: { id:'pitch', say:'御社は今年で○○周年とのことで、記念式典や社内イベントのご予定はございますか？弊社では周年記念映像の制作を専門としており、多くの企業様の式典でご活用いただいております。', reactions:[{label:'式典あり・興味あり',next:'strong_interest'},{label:'話は聞く',next:'soft_interest'},{label:'必要ない',next:'soft_no'}] },
-    strong_interest: { id:'strong_interest', say:'ありがとうございます！一度、御社に合ったご提案資料をお送りできればと思います。担当の方のお名前とメールアドレスをお伺いできますか？', reactions:[{label:'連絡先をもらえた',next:'end_won'},{label:'後で改めて',next:'followup'}] },
-    soft_interest: { id:'soft_interest', say:'かしこまりました。まずは実績事例のご紹介資料だけでもお送りしてよろしいですか？', reactions:[{label:'送ってOK',next:'end_doc'},{label:'必要ない',next:'soft_no'}] },
-    busy: { id:'busy', say:'お忙しいところ失礼しました。では改めてご連絡させてください。来週はいかがでしょうか？', reactions:[{label:'来週OK',next:'end_cb'},{label:'いつでも良い',next:'end_cb'},{label:'必要ない',next:'soft_no'}] },
-    absent: { id:'absent', say:'ご不在でしたか。○○（名前）という者からお電話があった旨、お伝えいただけますか？また改めてお電話いたします。', reactions:[{label:'伝言OK',next:'end_cb'},{label:'繋いでもらえない',next:'hard_no'}] },
-    soft_no: { id:'soft_no', say:'そうですか、ありがとうございました。もし周年の際にご検討されることがあれば、ぜひお声がけください。', reactions:[{label:'わかった',next:'end_hold'}] },
-    hard_no: { id:'hard_no', say:'ご検討いただきありがとうございました。またご縁があれば。', reactions:[{label:'終了',next:'end_decline'}] },
-    followup: { id:'followup', say:'ありがとうございます。では改めてご連絡いたします。ご都合の良いお時間を教えていただけますか？', reactions:[{label:'時間を教えてもらった',next:'end_cb'},{label:'都合が悪い・未定',next:'end_hold'}] },
-    end_won:     { id:'end_won',     say:'商談のアポを確定させましょう。日時・担当者名・連絡先を確認してください。', isEnd:true, endLabel:'🎯 商談獲得',    endCls:'won',     reactions:[] },
-    end_doc:     { id:'end_doc',     say:'資料を送付します。送付後3〜5日後にフォローの電話を入れましょう。',         isEnd:true, endLabel:'📄 資料送付',    endCls:'doc',     reactions:[] },
-    end_cb:      { id:'end_cb',      say:'折り返し日程をメモして、必ず時間通りにかけ直しましょう。',                 isEnd:true, endLabel:'📅 折り返し',    endCls:'cb',      reactions:[] },
-    end_hold:    { id:'end_hold',    say:'今は保留。次の周年前や節目にフォローできるよう日程を記録しておきましょう。', isEnd:true, endLabel:'⏸️ 保留',        endCls:'hold',    reactions:[] },
-    end_decline: { id:'end_decline', say:'今回はご縁がありませんでした。次のサイクルで再度検討しましょう。',          isEnd:true, endLabel:'❌ お断り',      endCls:'decline', reactions:[] },
-  }
+  tree1: {
+    rootId: 'open',
+    nodes: {
+      open:         { id:'open',         say:'はじめまして、TENOHIRAと申します。先日、{{代表者}}様宛にお手紙をお送りしたのですが、{{代表者}}様はいらっしゃいますか？', reactions:[{label:'担当者に繋いでもらえた',next:'pitch'},{label:'「どんな件ですか？」と聞かれた',next:'explain_gate'},{label:'担当者が不在',next:'absent'},{label:'今は対応できない',next:'busy'}] },
+      explain_gate: { id:'explain_gate', say:'先日お送りしたご案内の件でございます。弊社は建設・塗装・リフォーム会社様向けに、施工事例や会社紹介の動画制作を行っております。{{代表者}}様にぜひお取り次ぎいただけますか？', reactions:[{label:'繋いでもらえた',next:'pitch'},{label:'必要ないと断られた',next:'soft_no'}] },
+      pitch:        { id:'pitch',        say:'{{代表者}}様、先日弊社TENOHIRAよりお手紙でご案内いたしました動画制作の件でご連絡いたしました。御社の施工実績や強みを映像でPRすることで、お客様からの信頼向上や採用強化につながります。少々お時間よろしいでしょうか？', reactions:[{label:'話を聞いてみる',next:'detail'},{label:'チラシは見た',next:'saw_flyer'},{label:'今は特に考えていない',next:'soft_no'},{label:'必要ない',next:'hard_no'}] },
+      detail:       { id:'detail',       say:'たとえば、施工前後のビフォーアフターや職人の技術を映像でご紹介することで、ホームページやSNSでのPR効果が大きく向上します。まずは御社に合ったご提案資料をお送りしてよろしいでしょうか？', reactions:[{label:'資料を送ってほしい',next:'end_doc'},{label:'直接話を聞きたい',next:'end_won'},{label:'少し考えてみる',next:'end_hold'}] },
+      saw_flyer:    { id:'saw_flyer',    say:'ご覧いただきありがとうございます。何かご質問やお気になりの点はございましたか？', reactions:[{label:'詳しく聞きたい',next:'detail'},{label:'検討中',next:'end_hold'},{label:'今は必要ない',next:'soft_no'}] },
+      absent:       { id:'absent',       say:'お忙しいところ失礼いたしました。{{代表者}}様にTENOHIRAからお電話があった旨、お伝えいただけますか？改めてご連絡いたします。ご都合の良い時間帯はございますか？', reactions:[{label:'時間を教えてもらえた',next:'end_cb'},{label:'またかけてきてと言われた',next:'end_cb'}] },
+      busy:         { id:'busy',         say:'お忙しいところ失礼いたしました。では改めてご連絡いたします。ご都合のよい時間帯をお教えいただけますか？', reactions:[{label:'時間を教えてもらえた',next:'end_cb'},{label:'またかけてきてと言われた',next:'end_cb'}] },
+      soft_no:      { id:'soft_no',      say:'承知いたしました。もし今後、会社のPRや採用でお困りの際は、ぜひお気軽にご連絡ください。本日はありがとうございました。', reactions:[{label:'わかった',next:'end_hold'}] },
+      hard_no:      { id:'hard_no',      say:'ご丁寧にありがとうございました。またご縁があればよろしくお願いいたします。', reactions:[{label:'終了',next:'end_decline'}] },
+      ..._END_NODES,
+    }
+  },
+  tree2: {
+    rootId: 'open',
+    nodes: {
+      open:         { id:'open',         say:'はじめまして、動画制作のTENOHIRAと申します。先日、建設・リフォーム会社様の施工PR動画についてお手紙をお送りしました。弊社はこれまで100社以上の施工業者様の映像を制作してまいりました。{{代表者}}様はいらっしゃいますか？', reactions:[{label:'繋いでもらえた',next:'pitch'},{label:'「どんな件ですか？」と聞かれた',next:'explain_gate'},{label:'不在',next:'absent'},{label:'忙しい',next:'busy'}] },
+      explain_gate: { id:'explain_gate', say:'建設・塗装・リフォーム会社様の施工実績動画の制作でご連絡しています。多くの会社様で「問い合わせが増えた」「採用がうまくいった」というご実績があります。{{代表者}}様にお取り次ぎいただけますか？', reactions:[{label:'繋いでもらえた',next:'pitch'},{label:'必要ない',next:'soft_no'}] },
+      pitch:        { id:'pitch',        say:'{{代表者}}様、先日のお手紙はご覧いただけましたか？弊社TENOHIRAは施工会社様の動画制作で実績があり、「ホームページに載せたら問い合わせが2倍になった」というお声もいただいています。御社の強みを映像でPRし、競合との差別化に活用できます。', reactions:[{label:'詳しく聞きたい',next:'detail'},{label:'チラシ見たよ',next:'saw_flyer'},{label:'今は必要ない',next:'soft_no'},{label:'絶対いらない',next:'hard_no'}] },
+      detail:       { id:'detail',       say:'施工前後のビフォーアフター映像、職人の技術紹介、お客様インタビューなどを組み合わせた2〜3分の動画は、ホームページやSNSに掲載するだけで集客力が大きく変わります。費用感や事例を資料でご紹介できますが、いかがでしょうか？', reactions:[{label:'資料がほしい',next:'end_doc'},{label:'直接話したい',next:'end_won'},{label:'少し考える',next:'end_hold'}] },
+      saw_flyer:    { id:'saw_flyer',    say:'ありがとうございます！ご覧いただいて、何かご感想や気になる点はありましたか？', reactions:[{label:'話を詳しく聞きたい',next:'detail'},{label:'まだ検討中',next:'end_hold'},{label:'今は不要',next:'soft_no'}] },
+      absent:       { id:'absent',       say:'失礼いたしました。{{代表者}}様にTENOHIRAからご連絡があった旨、お伝えいただけますか？改めてご連絡します。', reactions:[{label:'伝言OK',next:'end_cb'},{label:'繋いでもらえない',next:'hard_no'}] },
+      busy:         { id:'busy',         say:'お忙しいところ失礼しました。いつ頃おかけするとよろしいでしょうか？', reactions:[{label:'時間を教えてもらえた',next:'end_cb'},{label:'またかけてきて',next:'end_cb'}] },
+      soft_no:      { id:'soft_no',      say:'わかりました。もし今後、会社のPRや採用でお困りの際は、ぜひご相談ください。ありがとうございました。', reactions:[{label:'わかった',next:'end_hold'}] },
+      hard_no:      { id:'hard_no',      say:'ご検討いただきありがとうございました。またの機会によろしくお願いいたします。', reactions:[{label:'終了',next:'end_decline'}] },
+      ..._END_NODES,
+    }
+  },
+  tree3: {
+    rootId: 'open',
+    nodes: {
+      open:         { id:'open',         say:'こんにちは〜！TENOHIRAという動画制作の会社なんですけど、少し前にお手紙送ったんです。{{代表者}}さんいらっしゃいますか？', reactions:[{label:'繋いでもらえた',next:'pitch'},{label:'「何の件ですか？」と聞かれた',next:'explain_gate'},{label:'不在',next:'absent'},{label:'今は無理',next:'busy'}] },
+      explain_gate: { id:'explain_gate', say:'あ、建設とかリフォーム会社さんの施工事例を動画にして、集客や採用に使えるようにするお手伝いをしてるんです！一度{{代表者}}さんに直接ご挨拶できれば嬉しいんですが、お取り次ぎいただけますか？', reactions:[{label:'繋いでもらえた',next:'pitch'},{label:'必要ないと言われた',next:'soft_no'}] },
+      pitch:        { id:'pitch',        say:'{{代表者}}さん、先日お手紙届きましたか？うちは建設・塗装・リフォームの会社さんの施工事例とか、会社の魅力を動画にして、ホームページやSNSで使えるようにするお手伝いをしています。「これ欲しかった！」ってなる会社さんが多いんですよ〜！', reactions:[{label:'話を聞こうか',next:'detail'},{label:'チラシ見たよ',next:'saw_flyer'},{label:'今は考えてないかな',next:'soft_no'},{label:'いらない',next:'hard_no'}] },
+      detail:       { id:'detail',       say:'たとえば施工のビフォーアフターとか、職人さんの技術をカッコよく映像にしたり、お客様の声も入れたりすると、ウェブで見た人がグッと「この会社に頼みたい」ってなるんです。まず資料だけでも見てみませんか？', reactions:[{label:'資料送ってほしい',next:'end_doc'},{label:'直接話してみたい',next:'end_won'},{label:'ちょっと考えてみる',next:'end_hold'}] },
+      saw_flyer:    { id:'saw_flyer',    say:'見てもらえたんですね、ありがとうございます！何か気になることとかありましたか？', reactions:[{label:'もっと詳しく聞きたい',next:'detail'},{label:'まだわからないな',next:'end_hold'},{label:'今はいいかな',next:'soft_no'}] },
+      absent:       { id:'absent',       say:'あ、そうでしたか。ではまた改めますね！{{代表者}}さんがいらっしゃる時間帯、教えてもらえますか？', reactions:[{label:'教えてもらえた',next:'end_cb'},{label:'またかけてきて',next:'end_cb'}] },
+      busy:         { id:'busy',         say:'あ、ごめんなさい！じゃあ改めてご連絡しますね。いつ頃がよさそうですか？', reactions:[{label:'時間を教えてもらえた',next:'end_cb'},{label:'こっちからかけてきて',next:'end_cb'}] },
+      soft_no:      { id:'soft_no',      say:'そうですよね、わかりました！もし今後、PR動画や採用で気になることがあったら気軽に声かけてください。ありがとうございました！', reactions:[{label:'わかった',next:'end_hold'}] },
+      hard_no:      { id:'hard_no',      say:'わかりました、ありがとうございました！またご縁があれば！', reactions:[{label:'終了',next:'end_decline'}] },
+      ..._END_NODES,
+    }
+  },
 };
 
 let convoHistory = [], convoTreeMode = 'play';
 
 function getConvoTree() {
-  try { const s=localStorage.getItem(CONVO_KEY); return s?JSON.parse(s):JSON.parse(JSON.stringify(CONVO_DEFAULTS)); } catch { return JSON.parse(JSON.stringify(CONVO_DEFAULTS)); }
+  const key = CONVO_KEYS[curScr] || CONVO_KEYS.tree1;
+  const def = CONVO_DEFAULTS[curScr] || CONVO_DEFAULTS.tree1;
+  try { const s=localStorage.getItem(key); return s?JSON.parse(s):JSON.parse(JSON.stringify(def)); } catch { return JSON.parse(JSON.stringify(def)); }
 }
-function putConvoTree(t) { try { localStorage.setItem(CONVO_KEY, JSON.stringify(t)); } catch {} }
+function putConvoTree(t) {
+  const key = CONVO_KEYS[curScr] || CONVO_KEYS.tree1;
+  try { localStorage.setItem(key, JSON.stringify(t)); } catch {}
+}
+function sayText(text) {
+  const name = cur?.ceo_name || cur?.ceo || '担当者様';
+  return (text||'').replace(/\{\{代表者\}\}/g, name);
+}
 
 function renderConvoTree() {
-  const scrs = getScripts();
   const tree = getConvoTree();
   const b = document.getElementById('mbody');
   if (!b) return;
 
-  const treeTabs = `<div class="stabs">${['A','B','C'].map(k=>`<button class="stab" onclick="setScrTab('${k}')">${scrs[k]?.name||SCR_DEFAULTS[k].name}</button>`).join('')}<button class="stab on">🌳 会話ツリー</button></div>`;
+  const treeTabs = `<div class="stabs">${Object.keys(CONVO_NAMES).map(k=>`<button class="stab ${k===curScr?'on':''}" onclick="setScrTab('${k}')">${CONVO_NAMES[k]}</button>`).join('')}</div>`;
 
   if (convoTreeMode === 'edit') {
     const allIds = Object.keys(tree.nodes);
@@ -892,16 +876,17 @@ function renderConvoTree() {
   const todayNote = (cur?.source_data?.convo_notes||[]).find(n=>n.date===today);
   const existingMemo = todayNote?.memo||'';
 
+  const nodeSay = sayText(node.say);
   const content = isEnd ? `
     <div class="ct-end-banner ${node.endCls||''}">${esc(node.endLabel||'終了')}</div>
     <div class="ct-lbl">💬 最後の一言</div>
-    <div class="ct-say">${esc(node.say)}</div>
+    <div class="ct-say">${esc(nodeSay)}</div>
     <div class="ct-lbl">📝 この会社のメモ（今日）</div>
     <textarea class="ct-memo-ta" id="ct-memo" placeholder="例: 担当者名、折り返し日時、要望など...">${esc(existingMemo)}</textarea>
     <button class="ct-memo-save" onclick="convoSaveMemo()">💾 保存</button>
   ` : `
     <div class="ct-lbl">💬 あなたの言葉</div>
-    <div class="ct-say">${esc(node.say)}</div>
+    <div class="ct-say">${esc(nodeSay)}</div>
     <div class="ct-lbl">相手のリアクションを選んでください</div>
     <div class="ct-reactions">${node.reactions.map(r=>`<button class="ct-rbtn" onclick="convoNext('${esc(r.next)}')">${esc(r.label)}</button>`).join('')}</div>
   `;
@@ -971,8 +956,9 @@ function convoAddReact(nodeId) {
 }
 
 function convoResetTree() {
-  if (!confirm('会話ツリーをデフォルトに戻しますか？\n（全ての編集が消えます）')) return;
-  putConvoTree(JSON.parse(JSON.stringify(CONVO_DEFAULTS)));
+  if (!confirm(CONVO_NAMES[curScr]+'をデフォルトに戻しますか？\n（全ての編集が消えます）')) return;
+  const def = CONVO_DEFAULTS[curScr] || CONVO_DEFAULTS.tree1;
+  putConvoTree(JSON.parse(JSON.stringify(def)));
   convoHistory=[]; convoTreeMode='play';
   toast('🔄 デフォルトに戻しました');
   renderConvoTree();

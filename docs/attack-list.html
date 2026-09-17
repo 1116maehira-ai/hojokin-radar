@@ -757,44 +757,53 @@ const CONVO_DEFAULTS = {
     rootId: 'open',
     nodes: {
       open:         { id:'open',         say:'はじめまして、TENOHIRAと申します。先日、{{代表者}}様宛にお手紙をお送りしたのですが、{{代表者}}様はいらっしゃいますか？', reactions:[{label:'担当者に繋いでもらえた',next:'pitch'},{label:'「どんな件ですか？」と聞かれた',next:'explain_gate'},{label:'担当者が不在',next:'absent'},{label:'今は対応できない',next:'busy'}] },
-      explain_gate: { id:'explain_gate', say:'先日お送りしたご案内の件でございます。弊社は建設・塗装・リフォーム会社様向けに、施工事例や会社紹介の動画制作を行っております。{{代表者}}様にぜひお取り次ぎいただけますか？', reactions:[{label:'繋いでもらえた',next:'pitch'},{label:'必要ないと断られた',next:'soft_no'}] },
-      pitch:        { id:'pitch',        say:'{{代表者}}様、先日弊社TENOHIRAよりお手紙でご案内いたしました動画制作の件でご連絡いたしました。御社の施工実績や強みを映像でPRすることで、お客様からの信頼向上や採用強化につながります。少々お時間よろしいでしょうか？', reactions:[{label:'話を聞いてみる',next:'detail'},{label:'チラシは見た',next:'saw_flyer'},{label:'今は特に考えていない',next:'soft_no'},{label:'必要ない',next:'hard_no'}] },
-      detail:       { id:'detail',       say:'たとえば、施工前後のビフォーアフターや職人の技術を映像でご紹介することで、ホームページやSNSでのPR効果が大きく向上します。まずは御社に合ったご提案資料をお送りしてよろしいでしょうか？', reactions:[{label:'資料を送ってほしい',next:'end_doc'},{label:'直接話を聞きたい',next:'end_won'},{label:'少し考えてみる',next:'end_hold'}] },
-      saw_flyer:    { id:'saw_flyer',    say:'ご覧いただきありがとうございます。何かご質問やお気になりの点はございましたか？', reactions:[{label:'詳しく聞きたい',next:'detail'},{label:'検討中',next:'end_hold'},{label:'今は必要ない',next:'soft_no'}] },
+      explain_gate: { id:'explain_gate', say:'先日お送りしたご案内の件でございます。弊社は「Legacy-Om（レガシオム）」という創業史動画のサービスをご提供しており、御社の創業からの歩みや想いを映像に残すご支援をしております。{{代表者}}様にぜひお取り次ぎいただけますか？', reactions:[{label:'繋いでもらえた',next:'pitch'},{label:'必要ないと断られた',next:'soft_no'}] },
+      pitch:        { id:'pitch',        say:'{{代表者}}様、先日お手紙でご案内いたしました「Legacy-Om（レガシオム）」の件でご連絡いたしました。御社の創業からのご苦労や想いを動画にまとめることで、社員の理念共有・採用強化・ブランディングに活用いただけます。まずは30分だけお話をお聞かせいただけますでしょうか？', reactions:[{label:'話を聞いてみる',next:'detail'},{label:'チラシは見た',next:'saw_flyer'},{label:'今は特に考えていない',next:'soft_no'},{label:'必要ない',next:'hard_no'}] },
+      detail:       { id:'detail',       say:'創業の想い、乗り越えてきた苦労、今の御社があるまでの歩みを映像に残すことで、「なぜこの会社で働くのか」が社員にも採用候補者にも届きます。御社にしか語れない言葉が、必ずございます。まずは企画のご提案資料をお送りしてよろしいでしょうか？', reactions:[{label:'資料を送ってほしい',next:'end_doc'},{label:'直接話を聞きたい',next:'end_won'},{label:'少し考えてみる',next:'end_hold'}] },
+      saw_flyer:    { id:'saw_flyer',    say:'ご覧いただきありがとうございます。「創業の魂を紐解く」というコンセプト、いかがでしたでしょうか？何かご質問やお気になりの点はございましたか？', reactions:[{label:'詳しく聞きたい',next:'detail'},{label:'検討中',next:'end_hold'},{label:'今は必要ない',next:'soft_no'}] },
       absent:       { id:'absent',       say:'お忙しいところ失礼いたしました。{{代表者}}様にTENOHIRAからお電話があった旨、お伝えいただけますか？改めてご連絡いたします。ご都合の良い時間帯はございますか？', reactions:[{label:'時間を教えてもらえた',next:'end_cb'},{label:'またかけてきてと言われた',next:'end_cb'}] },
       busy:         { id:'busy',         say:'お忙しいところ失礼いたしました。では改めてご連絡いたします。ご都合のよい時間帯をお教えいただけますか？', reactions:[{label:'時間を教えてもらえた',next:'end_cb'},{label:'またかけてきてと言われた',next:'end_cb'}] },
-      soft_no:      { id:'soft_no',      say:'承知いたしました。もし今後、会社のPRや採用でお困りの際は、ぜひお気軽にご連絡ください。本日はありがとうございました。', reactions:[{label:'わかった',next:'end_hold'}] },
-      hard_no:      { id:'hard_no',      say:'ご丁寧にありがとうございました。またご縁があればよろしくお願いいたします。', reactions:[{label:'終了',next:'end_decline'}] },
+      soft_no:      { id:'soft_no',      say:'さようでございますか。では、総務や採用のご担当者様はいらっしゃいますでしょうか？', reactions:[{label:'担当者に繋いでもらえた',next:'pitch'},{label:'それも断られた',next:'persist_2'}] },
+      hard_no:      { id:'hard_no',      say:'さようでございますか。では、総務や採用のご担当者様はいらっしゃいますでしょうか？', reactions:[{label:'担当者に繋いでもらえた',next:'pitch'},{label:'それも断られた',next:'persist_2'}] },
+      persist_2:    { id:'persist_2',    say:'そうですか。御社は{{市区町村}}にご所在の{{業種}}の会社様でお間違いないですよね。採用にも積極的に取り組まれていましたものね。', reactions:[{label:'はい（どんな反応でも）',next:'persist_3'},{label:'違う',next:'persist_3'}] },
+      persist_3:    { id:'persist_3',    say:'御社だからこそ、届けられる御社の言葉が必ずおありですので、ぜひお話をお聞かせいただけませんか？', reactions:[{label:'話を聞いてもらえた',next:'pitch'},{label:'それでも断られた',next:'persist_mail'}] },
+      persist_mail: { id:'persist_mail', say:'かしこまりました。では資料だけでもお送り差し上げたく思います。メールアドレスをお伺いできますか？', reactions:[{label:'メールアドレスをもらえた',next:'end_doc'},{label:'断られた',next:'end_decline'}] },
       ..._END_NODES,
     }
   },
   tree2: {
     rootId: 'open',
     nodes: {
-      open:         { id:'open',         say:'はじめまして、動画制作のTENOHIRAと申します。先日、建設・リフォーム会社様の施工PR動画についてお手紙をお送りしました。弊社はこれまで100社以上の施工業者様の映像を制作してまいりました。{{代表者}}様はいらっしゃいますか？', reactions:[{label:'繋いでもらえた',next:'pitch'},{label:'「どんな件ですか？」と聞かれた',next:'explain_gate'},{label:'不在',next:'absent'},{label:'忙しい',next:'busy'}] },
-      explain_gate: { id:'explain_gate', say:'建設・塗装・リフォーム会社様の施工実績動画の制作でご連絡しています。多くの会社様で「問い合わせが増えた」「採用がうまくいった」というご実績があります。{{代表者}}様にお取り次ぎいただけますか？', reactions:[{label:'繋いでもらえた',next:'pitch'},{label:'必要ない',next:'soft_no'}] },
-      pitch:        { id:'pitch',        say:'{{代表者}}様、先日のお手紙はご覧いただけましたか？弊社TENOHIRAは施工会社様の動画制作で実績があり、「ホームページに載せたら問い合わせが2倍になった」というお声もいただいています。御社の強みを映像でPRし、競合との差別化に活用できます。', reactions:[{label:'詳しく聞きたい',next:'detail'},{label:'チラシ見たよ',next:'saw_flyer'},{label:'今は必要ない',next:'soft_no'},{label:'絶対いらない',next:'hard_no'}] },
-      detail:       { id:'detail',       say:'施工前後のビフォーアフター映像、職人の技術紹介、お客様インタビューなどを組み合わせた2〜3分の動画は、ホームページやSNSに掲載するだけで集客力が大きく変わります。費用感や事例を資料でご紹介できますが、いかがでしょうか？', reactions:[{label:'資料がほしい',next:'end_doc'},{label:'直接話したい',next:'end_won'},{label:'少し考える',next:'end_hold'}] },
-      saw_flyer:    { id:'saw_flyer',    say:'ありがとうございます！ご覧いただいて、何かご感想や気になる点はありましたか？', reactions:[{label:'話を詳しく聞きたい',next:'detail'},{label:'まだ検討中',next:'end_hold'},{label:'今は不要',next:'soft_no'}] },
-      absent:       { id:'absent',       say:'失礼いたしました。{{代表者}}様にTENOHIRAからご連絡があった旨、お伝えいただけますか？改めてご連絡します。', reactions:[{label:'伝言OK',next:'end_cb'},{label:'繋いでもらえない',next:'hard_no'}] },
+      open:         { id:'open',         say:'はじめまして、動画制作のTENOHIRAと申します。先日、御社の創業史を映像に残す「Legacy-Om」というサービスについてお手紙をお送りしました。弊社はこれまで多くの建設・リフォーム会社様の動画を制作してまいりました。{{代表者}}様はいらっしゃいますか？', reactions:[{label:'繋いでもらえた',next:'pitch'},{label:'「どんな件ですか？」と聞かれた',next:'explain_gate'},{label:'不在',next:'absent'},{label:'忙しい',next:'busy'}] },
+      explain_gate: { id:'explain_gate', say:'御社の創業からの歩みや想いを動画にまとめる「Legacy-Om（レガシオム）」というサービスでご連絡しています。多くの会社様で「採用がうまくいった」「社員の理念理解が深まった」というご実績があります。{{代表者}}様にお取り次ぎいただけますか？', reactions:[{label:'繋いでもらえた',next:'pitch'},{label:'必要ない',next:'soft_no'}] },
+      pitch:        { id:'pitch',        say:'{{代表者}}様、先日のお手紙はご覧いただけましたか？「Legacy-Om」は御社の創業の魂を映像で紐解くサービスです。「社員のモチベーションが上がった」「共感する採用候補者が増えた」というお声をいただいています。まずは30分、お話をお聞かせいただけますか？', reactions:[{label:'詳しく聞きたい',next:'detail'},{label:'チラシ見たよ',next:'saw_flyer'},{label:'今は必要ない',next:'soft_no'},{label:'絶対いらない',next:'hard_no'}] },
+      detail:       { id:'detail',       say:'創業期のエピソード、乗り越えてきた壁、今に至るまでの想いを2〜3分の動画に。ホームページや採用サイトに掲載するだけで、御社のブランド力が大きく変わります。費用感や事例を資料でご紹介できますが、いかがでしょうか？', reactions:[{label:'資料がほしい',next:'end_doc'},{label:'直接話したい',next:'end_won'},{label:'少し考える',next:'end_hold'}] },
+      saw_flyer:    { id:'saw_flyer',    say:'ありがとうございます！「創業の魂を紐解く」というコンセプト、ご覧いただけましたか？何かご感想はありましたか？', reactions:[{label:'話を詳しく聞きたい',next:'detail'},{label:'まだ検討中',next:'end_hold'},{label:'今は不要',next:'soft_no'}] },
+      absent:       { id:'absent',       say:'失礼いたしました。{{代表者}}様にTENOHIRAからご連絡があった旨、お伝えいただけますか？改めてご連絡します。', reactions:[{label:'伝言OK',next:'end_cb'},{label:'繋いでもらえない',next:'persist_2'}] },
       busy:         { id:'busy',         say:'お忙しいところ失礼しました。いつ頃おかけするとよろしいでしょうか？', reactions:[{label:'時間を教えてもらえた',next:'end_cb'},{label:'またかけてきて',next:'end_cb'}] },
-      soft_no:      { id:'soft_no',      say:'わかりました。もし今後、会社のPRや採用でお困りの際は、ぜひご相談ください。ありがとうございました。', reactions:[{label:'わかった',next:'end_hold'}] },
-      hard_no:      { id:'hard_no',      say:'ご検討いただきありがとうございました。またの機会によろしくお願いいたします。', reactions:[{label:'終了',next:'end_decline'}] },
+      soft_no:      { id:'soft_no',      say:'そうですか。では、総務や採用のご担当者様はいらっしゃいますでしょうか？', reactions:[{label:'担当者に繋いでもらえた',next:'pitch'},{label:'それも断られた',next:'persist_2'}] },
+      hard_no:      { id:'hard_no',      say:'そうですか。では、総務や採用のご担当者様はいらっしゃいますでしょうか？', reactions:[{label:'担当者に繋いでもらえた',next:'pitch'},{label:'それも断られた',next:'persist_2'}] },
+      persist_2:    { id:'persist_2',    say:'そうですか。御社は{{市区町村}}にご所在の{{業種}}の会社様でお間違いないですよね。採用にも積極的に取り組まれていましたものね。', reactions:[{label:'はい（どんな反応でも）',next:'persist_3'},{label:'違う',next:'persist_3'}] },
+      persist_3:    { id:'persist_3',    say:'御社だからこそ、届けられる御社の言葉が必ずおありですので、ぜひお話をお聞かせいただけませんか？', reactions:[{label:'話を聞いてもらえた',next:'pitch'},{label:'それでも断られた',next:'persist_mail'}] },
+      persist_mail: { id:'persist_mail', say:'かしこまりました。では資料だけでもお送り差し上げたく思います。メールアドレスをお伺いできますか？', reactions:[{label:'メールアドレスをもらえた',next:'end_doc'},{label:'断られた',next:'end_decline'}] },
       ..._END_NODES,
     }
   },
   tree3: {
     rootId: 'open',
     nodes: {
-      open:         { id:'open',         say:'こんにちは〜！TENOHIRAという動画制作の会社なんですけど、少し前にお手紙送ったんです。{{代表者}}さんいらっしゃいますか？', reactions:[{label:'繋いでもらえた',next:'pitch'},{label:'「何の件ですか？」と聞かれた',next:'explain_gate'},{label:'不在',next:'absent'},{label:'今は無理',next:'busy'}] },
-      explain_gate: { id:'explain_gate', say:'あ、建設とかリフォーム会社さんの施工事例を動画にして、集客や採用に使えるようにするお手伝いをしてるんです！一度{{代表者}}さんに直接ご挨拶できれば嬉しいんですが、お取り次ぎいただけますか？', reactions:[{label:'繋いでもらえた',next:'pitch'},{label:'必要ないと言われた',next:'soft_no'}] },
-      pitch:        { id:'pitch',        say:'{{代表者}}さん、先日お手紙届きましたか？うちは建設・塗装・リフォームの会社さんの施工事例とか、会社の魅力を動画にして、ホームページやSNSで使えるようにするお手伝いをしています。「これ欲しかった！」ってなる会社さんが多いんですよ〜！', reactions:[{label:'話を聞こうか',next:'detail'},{label:'チラシ見たよ',next:'saw_flyer'},{label:'今は考えてないかな',next:'soft_no'},{label:'いらない',next:'hard_no'}] },
-      detail:       { id:'detail',       say:'たとえば施工のビフォーアフターとか、職人さんの技術をカッコよく映像にしたり、お客様の声も入れたりすると、ウェブで見た人がグッと「この会社に頼みたい」ってなるんです。まず資料だけでも見てみませんか？', reactions:[{label:'資料送ってほしい',next:'end_doc'},{label:'直接話してみたい',next:'end_won'},{label:'ちょっと考えてみる',next:'end_hold'}] },
-      saw_flyer:    { id:'saw_flyer',    say:'見てもらえたんですね、ありがとうございます！何か気になることとかありましたか？', reactions:[{label:'もっと詳しく聞きたい',next:'detail'},{label:'まだわからないな',next:'end_hold'},{label:'今はいいかな',next:'soft_no'}] },
+      open:         { id:'open',         say:'こんにちは〜！TENOHIRAという動画制作の会社なんですけど、少し前にお手紙送ったんです。御社の創業の歩みを動画にするやつです！{{代表者}}さんいらっしゃいますか？', reactions:[{label:'繋いでもらえた',next:'pitch'},{label:'「何の件ですか？」と聞かれた',next:'explain_gate'},{label:'不在',next:'absent'},{label:'今は無理',next:'busy'}] },
+      explain_gate: { id:'explain_gate', say:'あ、「Legacy-Om（レガシオム）」っていう創業史動画のサービスなんですけど、会社の歴史や想いを映像にして、採用とか社員の理念共有に使えるんです！一度{{代表者}}さんにご挨拶できれば嬉しいんですが、お取り次ぎいただけますか？', reactions:[{label:'繋いでもらえた',next:'pitch'},{label:'必要ないと言われた',next:'soft_no'}] },
+      pitch:        { id:'pitch',        say:'{{代表者}}さん、先日お手紙届きましたか？うちの「Legacy-Om」って、御社が創業してから今まで歩んできた歴史、苦労、想いを動画にまとめるんです。「社員が泣いた」「採用の面接官が見せたら内定承諾が増えた」って喜ばれてますよ！', reactions:[{label:'話を聞こうか',next:'detail'},{label:'チラシ見たよ',next:'saw_flyer'},{label:'今は考えてないかな',next:'soft_no'},{label:'いらない',next:'hard_no'}] },
+      detail:       { id:'detail',       say:'創業のとき何で始めたのか、大変だったこと、今の会社にした理由とか、そういう{{代表者}}さんにしか語れない言葉を映像にするんです。ホームページに載せると「この会社に入りたい」って人が増えるんですよ。まず資料だけでも見てみませんか？', reactions:[{label:'資料送ってほしい',next:'end_doc'},{label:'直接話してみたい',next:'end_won'},{label:'ちょっと考えてみる',next:'end_hold'}] },
+      saw_flyer:    { id:'saw_flyer',    say:'見てもらえたんですね、ありがとうございます！「創業の魂を紐解く」ってコピー、どうでしたか？何か気になることとかありましたか？', reactions:[{label:'もっと詳しく聞きたい',next:'detail'},{label:'まだわからないな',next:'end_hold'},{label:'今はいいかな',next:'soft_no'}] },
       absent:       { id:'absent',       say:'あ、そうでしたか。ではまた改めますね！{{代表者}}さんがいらっしゃる時間帯、教えてもらえますか？', reactions:[{label:'教えてもらえた',next:'end_cb'},{label:'またかけてきて',next:'end_cb'}] },
       busy:         { id:'busy',         say:'あ、ごめんなさい！じゃあ改めてご連絡しますね。いつ頃がよさそうですか？', reactions:[{label:'時間を教えてもらえた',next:'end_cb'},{label:'こっちからかけてきて',next:'end_cb'}] },
-      soft_no:      { id:'soft_no',      say:'そうですよね、わかりました！もし今後、PR動画や採用で気になることがあったら気軽に声かけてください。ありがとうございました！', reactions:[{label:'わかった',next:'end_hold'}] },
-      hard_no:      { id:'hard_no',      say:'わかりました、ありがとうございました！またご縁があれば！', reactions:[{label:'終了',next:'end_decline'}] },
+      soft_no:      { id:'soft_no',      say:'そうですか。では、総務や採用のご担当者さんはいらっしゃいますか？', reactions:[{label:'担当者に繋いでもらえた',next:'pitch'},{label:'それも断られた',next:'persist_2'}] },
+      hard_no:      { id:'hard_no',      say:'そうですか。では、総務や採用のご担当者さんはいらっしゃいますか？', reactions:[{label:'担当者に繋いでもらえた',next:'pitch'},{label:'それも断られた',next:'persist_2'}] },
+      persist_2:    { id:'persist_2',    say:'そうですか。御社って{{市区町村}}にある{{業種}}の会社さんですよね。採用にも積極的に取り組まれていましたものね。', reactions:[{label:'はい（どんな反応でも）',next:'persist_3'},{label:'違う',next:'persist_3'}] },
+      persist_3:    { id:'persist_3',    say:'御社だからこそ、届けられる御社の言葉が必ずおありですので、お話をお聞かせいただけませんか？', reactions:[{label:'話を聞いてもらえた',next:'pitch'},{label:'それでも断られた',next:'persist_mail'}] },
+      persist_mail: { id:'persist_mail', say:'かしこまりました。では資料だけでもお送りしますね。メールアドレスを教えてもらえますか？', reactions:[{label:'メールアドレスをもらえた',next:'end_doc'},{label:'断られた',next:'end_decline'}] },
       ..._END_NODES,
     }
   },
@@ -813,7 +822,12 @@ function putConvoTree(t) {
 }
 function sayText(text) {
   const name = cur?.ceo_name || cur?.ceo || '担当者様';
-  return (text||'').replace(/\{\{代表者\}\}/g, name);
+  const city = cur?.city || '御社エリア';
+  const industry = cur?.industry || '御社の業界';
+  return (text||'')
+    .replace(/\{\{代表者\}\}/g, name)
+    .replace(/\{\{市区町村\}\}/g, city)
+    .replace(/\{\{業種\}\}/g, industry);
 }
 
 function renderConvoTree() {

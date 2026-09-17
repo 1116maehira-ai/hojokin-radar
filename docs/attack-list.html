@@ -322,6 +322,93 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
 .bulk-prog{font-size:12px;color:rgba(255,255,255,.85);background:rgba(0,0,0,.2);padding:4px 10px;border-radius:6px;white-space:nowrap}
 .bulk-auto-btn{padding:8px 18px;background:#10b981;color:#fff;border:none;border-radius:8px;font-weight:800;cursor:pointer;font-size:13px;font-family:inherit}
 .bulk-auto-btn:hover{background:#059669}
+/* ── MOBILE ────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  /* Header: compact, hide low-priority buttons */
+  .hdr { padding: 9px 12px; gap: 6px; }
+  .hdr h1 { font-size: 14px; }
+  .hdr-sub { display: none; }
+  .btn-vfy { display: none; }
+  .btn-add[onclick*="openImp"], .btn-add[onclick*="exportDm"] { display: none; }
+  .u-chip { padding: 2px 7px; font-size: 11px; }
+
+  /* Stats */
+  .sc { min-width: 52px; padding: 6px 8px; }
+  .sc .n { font-size: 17px; }
+  .sc .l { font-size: 9px; }
+
+  /* Segbar */
+  .segbar { padding: 6px 10px; gap: 5px; }
+  .segbtn { font-size: 11px; padding: 3px 9px; }
+
+  /* Filter bar: stack search full-width, selects in row */
+  .fbar { padding: 7px 10px; gap: 5px; }
+  .fbar input { min-width: 100%; order: -1; }
+  .fbar select { flex: 1; min-width: 0; font-size: 12px; padding: 6px 4px; }
+  .flt-grp { gap: 4px; padding-top: 3px; margin-top: 2px; }
+  .ftgl { font-size: 11px; padding: 3px 9px; }
+
+  /* List */
+  .lwrap { padding: 7px 8px; gap: 5px; }
+  .card { padding: 9px 11px; }
+  .co-name { font-size: 13px; }
+  .co-meta { font-size: 10px; gap: 4px; }
+
+  /* Modal: full-screen friendly */
+  .modal { max-height: 97vh; border-radius: 14px 14px 0 0; }
+  .mhd { padding: 11px 14px 9px; }
+  .mhd h2 { font-size: 14px; }
+  .mtab { padding: 8px 11px; font-size: 11px; }
+  .mbody { padding: 10px 12px; }
+
+  /* Action buttons */
+  .agrid { grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 10px; }
+  .abtn { padding: 10px 5px; font-size: 12px; }
+
+  /* Info grid */
+  .info-edit { grid-template-columns: 1fr; }
+  .info-edit input.full { grid-column: 1; }
+
+  /* Script tabs: horizontal scroll, no wrap */
+  .stabs { flex-wrap: nowrap; overflow-x: auto; gap: 4px; padding-bottom: 2px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .stabs::-webkit-scrollbar { display: none; }
+  .stab { font-size: 11px; padding: 5px 12px; flex-shrink: 0; white-space: nowrap; }
+
+  /* Conversation tree: touch-friendly */
+  .ct-say { font-size: 13px; padding: 12px 13px; line-height: 1.8; }
+  .ct-rbtn { padding: 12px 14px; font-size: 12px; width: 100%; display: block; text-align: left; }
+  .ct-reactions { flex-direction: column; gap: 6px; }
+  .ct-header { gap: 5px; }
+  .ct-back, .ct-reset, .ct-edit-btn { font-size: 11px; padding: 5px 9px; }
+  .ct-memo-ta { min-height: 70px; font-size: 13px; }
+  .ct-memo-save { width: 100%; padding: 12px; font-size: 14px; }
+  .ct-end-banner { font-size: 18px; padding: 14px; }
+  .ct-node-ta { font-size: 12px; }
+  .ct-react-row { flex-wrap: wrap; gap: 4px; }
+  .ct-react-sel { max-width: 100%; width: 100%; }
+
+  /* Quick edit */
+  .qe-form { grid-template-columns: 1fr; }
+
+  /* Letter */
+  .letter-checks { gap: 10px; padding: 10px 12px; }
+  .lchk { font-size: 13px; }
+  .letter-ta { min-height: 220px; font-size: 13px; }
+
+  /* Bulk bar */
+  .bulk-bar { padding: 8px 10px; gap: 6px; }
+  .bulk-btn { padding: 7px 12px; font-size: 12px; }
+  .bulk-auto-btn { padding: 7px 14px; font-size: 12px; }
+  .bulk-prog { font-size: 11px; }
+
+  /* Log */
+  .log-item { font-size: 12px; }
+
+  /* irow (info rows) */
+  .irow { flex-direction: column; gap: 2px; padding: 7px 0; }
+  .ilabel { width: auto; font-size: 11px; padding-top: 0; }
+}
+
 /* ── CONVERSATION TREE ── */
 .ct-header{display:flex;align-items:center;gap:7px;margin-bottom:10px;flex-wrap:wrap}
 .ct-step{font-size:11px;font-weight:800;color:var(--muted);background:var(--bg);padding:3px 9px;border-radius:6px;border:1px solid var(--border)}

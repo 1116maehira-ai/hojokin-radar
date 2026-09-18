@@ -182,6 +182,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
 .add-submit{padding:12px;background:var(--primary);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit}
 .add-submit:hover{background:var(--primary-d)}
 
+/* houjin search */
+.houjin-search-row{display:flex;align-items:center;gap:8px;margin:-3px 0 0}
+.houjin-srch-btn{padding:6px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;color:var(--text);font-family:inherit;white-space:nowrap}
+.houjin-srch-btn:hover{border-color:var(--primary);color:var(--primary)}
+.houjin-status{font-size:11px;color:var(--muted)}
+.houjin-results{display:flex;flex-direction:column;gap:3px;max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;background:var(--bg);padding:4px}
+.houjin-results:empty{display:none}
+.houjin-row{padding:6px 8px;border-radius:6px;cursor:pointer;display:grid;grid-template-columns:1fr auto;grid-template-rows:auto auto;gap:1px 6px}
+.houjin-row:hover{background:var(--hover)}
+.houjin-rname{font-size:13px;font-weight:700;color:var(--text);grid-column:1}
+.houjin-raddr{font-size:11px;color:var(--muted);grid-column:1}
+.houjin-rnum{font-size:10px;color:var(--muted);grid-row:1/3;align-self:center;font-variant-numeric:tabular-nums}
+
 /* toast */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;opacity:0;transition:opacity .25s;z-index:200;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1}
@@ -557,6 +570,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
     <div class="mbody">
       <div class="add-form">
         <input class="add-inp" id="an" placeholder="会社名 *">
+        <div class="houjin-search-row">
+          <button type="button" class="houjin-srch-btn" onclick="houjinSearch('add')">🔍 法人番号で検索</button>
+          <span id="houjin-add-status" class="houjin-status"></span>
+        </div>
+        <div id="houjin-add-results" class="houjin-results"></div>
+        <input class="add-inp" id="acn" placeholder="法人番号（検索後に自動入力）" readonly style="background:var(--hover);font-size:12px;color:var(--muted);">
         <input class="add-inp" id="ap" placeholder="電話番号">
         <input class="add-inp" id="aw" placeholder="ウェブサイト URL">
         <input class="add-inp" id="ac" placeholder="代表者名">
@@ -1790,7 +1809,13 @@ function renderTab() {
           <input id="ie-ad" class="full" placeholder="住所（DM宛先）" value="${esc(c.address||'')}">
           <input id="ie-em" placeholder="従業員数" value="${esc(c.employees||'')}">
           <input id="ie-ceo" placeholder="代表者名" value="${esc(ceo)}">
+          <input id="ie-cn" class="full" placeholder="法人番号（検索後に自動入力）" readonly style="background:var(--hover);font-size:12px;color:var(--muted);" value="${esc(src.corporate_number||'')}">
         </div>
+        <div class="houjin-search-row" style="margin-top:8px;">
+          <button type="button" class="houjin-srch-btn" onclick="houjinSearch('edit')">🔍 法人番号で検索・補完</button>
+          <span id="houjin-edit-status" class="houjin-status"></span>
+        </div>
+        <div id="houjin-edit-results" class="houjin-results"></div>
         <button class="save-btn" style="margin-top:8px;" onclick="saveInfoFields()">宛先・情報を保存</button>
       </div>
       <div style="margin-top:14px;">
@@ -1847,6 +1872,7 @@ async function saveInfoFields() {
   let pc = g('ie-pc').replace(/[〒\s]/g,'').replace(/^(\d{3})(\d{4})$/,'$1-$2');
   const ayRaw = g('ie-ay');
   const arVal = document.getElementById('ie-ar')?.value||null;
+  const cn = g('ie-cn');
   const upd = {
     postal_code:       pc||null,
     address:           g('ie-ad')||null,
@@ -1857,6 +1883,7 @@ async function saveInfoFields() {
     anniversary_basis: g('ie-ab')||null,
     anniversary_rank:  arVal||null,
   };
+  if (cn) { const sd={...(cur.source_data||{})}; sd.corporate_number=cn; upd.source_data=sd; }
   if (!cur.city && upd.address) { const cty=cityFromAddress(upd.address); if (cty) upd.city=cty; }
   const {error} = await sb.from('ceremony_attacks').update(upd).eq('id',cur.id);
   if (error) { toast('❌ 保存失敗: '+error.message); return; }
@@ -1998,6 +2025,7 @@ function closeAdd(e) {
 async function doAdd() {
   const name = document.getElementById('an').value.trim();
   if (!name) { toast('❌ 会社名は必須です'); return; }
+  const cn = (document.getElementById('acn')?.value||'').trim();
   const row = {
     company_name: name,
     phone:        document.getElementById('ap').value.trim()||null,
@@ -2013,6 +2041,7 @@ async function doAdd() {
     x_url:        document.getElementById('ax').value.trim()||null,
     indeed_url:   document.getElementById('aind').value.trim()||null,
     phase:        'pending',
+    ...(cn ? {source_data:{corporate_number:cn}} : {}),
   };
   const {data,error} = await sb.from('ceremony_attacks').insert(row).select().single();
   if (error) { toast('❌ 追加失敗: '+error.message); return; }
@@ -2020,8 +2049,68 @@ async function doAdd() {
   buildFilters(); renderStats(); renderList();
   document.getElementById('add-ovl').classList.remove('open');
   if (!row.city && row.address) { const cty=cityFromAddress(row.address); if (cty) { data.city=cty; sb.from('ceremony_attacks').update({city:cty}).eq('id',data.id); } }
-  ['an','ap','aw','ac','ai','acy','apc','aad','afd','aem','aig','ax','aind'].forEach(id=>{ document.getElementById(id).value=''; });
+  ['an','ap','aw','ac','ai','acy','apc','aad','afd','aem','aig','ax','aind','acn'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  const hrs=document.getElementById('houjin-add-results'); if(hrs) hrs.innerHTML='';
+  const hst=document.getElementById('houjin-add-status'); if(hst) hst.textContent='';
   toast('✅ '+name+' を追加しました');
+}
+
+// ── 法人番号API ────────────────────────────────────────
+const HOUJIN_EP = 'https://osipzwbsfbgbegjowydm.supabase.co/functions/v1/houjin-search';
+let _houjinRes = [];
+
+async function houjinSearch(mode) {
+  const query = mode === 'add'
+    ? (document.getElementById('an')?.value||'').trim()
+    : (cur?.company_name||'');
+  if (!query) { toast('❌ 会社名を入力してから検索してください'); return; }
+  const stEl = document.getElementById(`houjin-${mode}-status`);
+  const reEl = document.getElementById(`houjin-${mode}-results`);
+  if (!stEl || !reEl) return;
+  stEl.textContent = '🔄 検索中…';
+  reEl.innerHTML = '';
+  _houjinRes = [];
+  try {
+    const r = await fetch(`${HOUJIN_EP}?name=${encodeURIComponent(query)}`);
+    const d = await r.json();
+    if (d.error) { stEl.textContent = '❌ ' + d.error; return; }
+    const list = d?.corporations?.corporation || [];
+    _houjinRes = list;
+    if (!list.length) { stEl.textContent = '該当なし'; return; }
+    stEl.textContent = `${Math.min(list.length,10)}件ヒット`;
+    reEl.innerHTML = list.slice(0,10).map((c,i) => {
+      const addr = (c.prefectureName||'')+(c.cityName||'')+(c.streetNumber||'');
+      return `<div class="houjin-row" onclick="houjinSelect('${mode}',${i})"><span class="houjin-rname">${esc(c.name||'')}</span><span class="houjin-raddr">${esc(addr)}</span><span class="houjin-rnum">${esc(c.corporateNumber||'')}</span></div>`;
+    }).join('');
+  } catch(e) {
+    stEl.textContent = '❌ 通信エラー';
+  }
+}
+
+function houjinSelect(mode, idx) {
+  const c = _houjinRes[idx];
+  if (!c) return;
+  const addr = (c.prefectureName||'')+(c.cityName||'')+(c.streetNumber||'');
+  const city = (c.prefectureName||'')+(c.cityName||'');
+  const pc = (c.postCode||'').replace(/^(\d{3})(\d{4})$/,'$1-$2');
+  if (mode === 'add') {
+    if (c.name) document.getElementById('an').value = c.name;
+    if (pc) document.getElementById('apc').value = pc;
+    if (addr) document.getElementById('aad').value = addr;
+    if (city) document.getElementById('acy').value = city;
+    if (c.representativeName) document.getElementById('ac').value = c.representativeName;
+    const cnEl = document.getElementById('acn'); if (cnEl && c.corporateNumber) cnEl.value = c.corporateNumber;
+  } else {
+    if (pc) document.getElementById('ie-pc').value = pc;
+    if (addr) document.getElementById('ie-ad').value = addr;
+    if (c.representativeName) document.getElementById('ie-ceo').value = c.representativeName;
+    const cnEl = document.getElementById('ie-cn'); if (cnEl && c.corporateNumber) cnEl.value = c.corporateNumber;
+  }
+  const reEl = document.getElementById(`houjin-${mode}-results`);
+  const stEl = document.getElementById(`houjin-${mode}-status`);
+  if (reEl) reEl.innerHTML = '';
+  if (stEl) stEl.textContent = '✅ 入力しました';
+  toast('✅ ' + (c.name||'') + ' の情報を自動入力しました');
 }
 
 // ── UTILS ─────────────────────────────────────────────

@@ -189,6 +189,32 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
 .houjin-status{font-size:11px;color:var(--muted)}
 .houjin-results{display:flex;flex-direction:column;gap:3px;max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;background:var(--bg);padding:4px}
 .houjin-results:empty{display:none}
+
+/* discover modal */
+.disc-form{display:flex;flex-direction:column;gap:10px}
+.disc-row{display:flex;flex-direction:column;gap:4px}
+.disc-lbl{font-size:12px;font-weight:700;color:var(--muted)}
+.disc-sel,.disc-inp{padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-size:14px;font-family:inherit}
+.disc-sel:focus,.disc-inp:focus{outline:none;border-color:var(--primary)}
+.disc-start-btn{padding:12px;background:var(--primary);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;margin-top:4px}
+.disc-start-btn:hover{background:var(--primary-d)}
+.disc-prog-bar{height:8px;background:var(--hover);border-radius:999px;overflow:hidden;margin-bottom:4px}
+.disc-prog-fill{height:100%;background:var(--primary);border-radius:999px;width:0%;transition:width .3s}
+.disc-result-hd{font-size:12px;font-weight:700;color:var(--muted);padding:6px 0 8px;display:flex;justify-content:space-between;align-items:center}
+.disc-all-btn{font-size:11px;padding:3px 9px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);cursor:pointer;font-family:inherit}
+.disc-card{display:flex;align-items:flex-start;gap:10px;padding:9px 10px;border:1px solid var(--border);border-radius:8px;cursor:pointer;margin-bottom:5px;transition:border-color .1s}
+.disc-card:hover{border-color:var(--primary);background:var(--hover)}
+.disc-card-on{border-color:var(--primary)!important;background:var(--primary-l)!important}
+.disc-cb{margin-top:2px;width:16px;height:16px;accent-color:var(--primary);flex-shrink:0;cursor:pointer}
+.disc-card-body{display:flex;flex-direction:column;gap:2px;min-width:0}
+.disc-cname{font-size:14px;font-weight:700;color:var(--text)}
+.disc-ckind{display:inline-block;font-size:10px;font-weight:700;background:var(--hover);color:var(--muted);padding:1px 6px;border-radius:4px;width:fit-content;margin-top:1px}
+.disc-caddr{font-size:12px;color:var(--muted)}
+.disc-ccn{font-size:10px;color:var(--muted);font-variant-numeric:tabular-nums}
+.disc-add-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;position:sticky;bottom:0;background:var(--bg);padding:10px 0 2px;border-top:1px solid var(--border);margin-top:8px}
+.disc-add-btn{padding:10px 18px;background:var(--primary);color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit}
+.disc-add-btn:hover{background:var(--primary-d)}
+.disc-empty{padding:24px;text-align:center;color:var(--muted);font-size:14px}
 .houjin-row{padding:6px 8px;border-radius:6px;cursor:pointer;display:grid;grid-template-columns:1fr auto;grid-template-rows:auto auto;gap:1px 6px}
 .houjin-row:hover{background:var(--hover)}
 .houjin-rname{font-size:13px;font-weight:700;color:var(--text);grid-column:1}
@@ -473,6 +499,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
   <button class="btn-vfy btn-vfy-off" id="btn-vfy" onclick="toggleVerifyMode()" title="住所・代表者を確認する（hibiki用）">🔍 住所チェック</button>
   <button class="btn-add" onclick="openImp()" style="background:rgba(255,255,255,.12);">📥 インポート</button>
   <button class="btn-add" onclick="exportDmCsv()" style="background:rgba(255,255,255,.12);" title="今の絞り込み結果をDM発送用CSVで保存">📤 DM用CSV</button>
+  <button class="btn-add" id="btn-discover" onclick="openDiscover()" style="display:none;background:rgba(255,255,255,.22)">🔍 発掘</button>
   <button class="btn-add" onclick="openAdd()">＋ 追加</button>
   <span class="u-chip" id="u-chip" onclick="doLogout()" title="クリックでログアウト"></span>
 </div>
@@ -594,6 +621,53 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
   </div>
 </div>
 
+<!-- discover modal -->
+<div class="ovl" id="disc-ovl" onclick="closeDiscover(event)">
+  <div class="modal" style="max-height:88vh;display:flex;flex-direction:column">
+    <div class="mhd">
+      <h2>🔍 新規企業を発掘</h2>
+      <button class="mclose" onclick="closeDiscover()">×</button>
+    </div>
+    <div class="mbody" style="overflow-y:auto;flex:1">
+      <div class="disc-form">
+        <div class="disc-row">
+          <label class="disc-lbl">都道府県</label>
+          <select id="disc-pref" class="disc-sel" onchange="onDiscPrefChange()">
+            <option value="01">北海道</option><option value="02">青森県</option><option value="03">岩手県</option><option value="04">宮城県</option><option value="05">秋田県</option><option value="06">山形県</option><option value="07">福島県</option><option value="08">茨城県</option><option value="09">栃木県</option><option value="10">群馬県</option><option value="11">埼玉県</option><option value="12">千葉県</option><option value="13">東京都</option><option value="14">神奈川県</option><option value="15">新潟県</option><option value="16">富山県</option><option value="17">石川県</option><option value="18">福井県</option><option value="19">山梨県</option><option value="20">長野県</option><option value="21">岐阜県</option><option value="22">静岡県</option><option value="23">愛知県</option><option value="24">三重県</option><option value="25">滋賀県</option><option value="26">京都府</option><option value="27">大阪府</option><option value="28">兵庫県</option><option value="29">奈良県</option><option value="30">和歌山県</option><option value="31">鳥取県</option><option value="32">島根県</option><option value="33">岡山県</option><option value="34">広島県</option><option value="35">山口県</option><option value="36">徳島県</option><option value="37">香川県</option><option value="38">愛媛県</option><option value="39">高知県</option><option value="40">福岡県</option><option value="41">佐賀県</option><option value="42">長崎県</option><option value="43">熊本県</option><option value="44">大分県</option><option value="45">宮崎県</option><option value="46">鹿児島県</option><option value="47" selected>沖縄県</option>
+          </select>
+        </div>
+        <div class="disc-row">
+          <label class="disc-lbl">市区町村 <span style="font-weight:400;color:var(--muted)">（空欄=県全体）</span></label>
+          <select id="disc-city-sel" class="disc-sel">
+            <option value="">沖縄県全体</option>
+            <option value="201">那覇市</option><option value="202">宜野湾市</option><option value="203">石垣市</option><option value="204">浦添市</option><option value="205">名護市</option><option value="206">糸満市</option><option value="207">沖縄市</option><option value="208">豊見城市</option><option value="209">うるま市</option><option value="210">宮古島市</option><option value="211">南城市</option><option value="301">国頭村</option><option value="302">大宜味村</option><option value="303">東村</option><option value="305">今帰仁村</option><option value="307">本部町</option><option value="309">恩納村</option><option value="311">宜野座村</option><option value="312">金武町</option><option value="313">伊江村</option><option value="401">読谷村</option><option value="402">嘉手納町</option><option value="403">北谷町</option><option value="404">北中城村</option><option value="405">中城村</option><option value="406">西原町</option><option value="501">与那原町</option><option value="503">南風原町</option><option value="506">渡嘉敷村</option><option value="507">座間味村</option><option value="508">粟国村</option><option value="509">渡名喜村</option><option value="510">南大東村</option><option value="511">北大東村</option><option value="512">伊平屋村</option><option value="513">伊是名村</option><option value="514">久米島町</option><option value="515">八重瀬町</option><option value="601">多良間村</option><option value="602">竹富町</option><option value="603">与那国町</option>
+          </select>
+          <input id="disc-city-inp" class="disc-inp" placeholder="市区町村コード（3桁、空欄=県全体）" style="display:none">
+        </div>
+        <div class="disc-row">
+          <label class="disc-lbl">キーワード <span style="font-weight:400;color:var(--muted)">（業種名等 — これで業種絞り込み）</span></label>
+          <input id="disc-kw" class="disc-inp" placeholder="例: 建設　塗装　リフォーム　電気設備（未入力=広く検索）">
+        </div>
+        <div class="disc-row">
+          <label class="disc-lbl">取得件数（最大30）</label>
+          <input id="disc-limit" class="disc-inp" type="number" value="30" min="1" max="30" style="max-width:90px">
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-top:-4px">※ 既にリストに登録済みの法人番号は自動的に除外されます</div>
+        <button class="disc-start-btn" onclick="startResearch()">🔍 リサーチ開始</button>
+      </div>
+      <div id="disc-progress" style="display:none;margin-top:14px">
+        <div class="disc-prog-bar"><div id="disc-prog-fill" class="disc-prog-fill"></div></div>
+        <div id="disc-prog-text" style="font-size:12px;color:var(--muted);margin-top:4px;text-align:center"></div>
+      </div>
+      <div id="disc-results"></div>
+      <div id="disc-add-bar" class="disc-add-bar" style="display:none">
+        <span id="disc-sel-count" style="font-size:13px;font-weight:700;color:var(--muted)">0社選択中</span>
+        <button class="disc-add-btn" onclick="addDiscovered()">✅ 選択した会社を追加する</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- import modal -->
 <div class="ovl" id="imp-ovl" onclick="closeImp(event)">
   <div class="modal">
@@ -674,6 +748,7 @@ function doLogout() {
   document.getElementById('segbar').innerHTML='';
   document.getElementById('u-chip').textContent='';
   document.getElementById('bulk-bar').style.display='none';
+  const db=document.getElementById('btn-discover'); if(db) db.style.display='none';
   showLogin();
   setTimeout(()=>document.getElementById('l-name')?.focus(), 50);
 }
@@ -682,6 +757,8 @@ function updateUserChip() {
   if (!chip || !currentUser) return;
   const lab = {admin:'管理者',maker:'制作担当',sales:'石川（営業）',action:'megu（電話）'}[currentUser.role]||currentUser.role;
   chip.textContent = '👤 '+currentUser.name+' ('+lab+') → ログアウト';
+  const db = document.getElementById('btn-discover');
+  if (db) db.style.display = can('admin') ? '' : 'none';
 }
 
 // ── MULTI FILTER ──────────────────────────────────────
@@ -2058,6 +2135,148 @@ async function doAdd() {
 // ── 法人番号API ────────────────────────────────────────
 const HOUJIN_EP = 'https://osipzwbsfbgbegjowydm.supabase.co/functions/v1/houjin-search';
 let _houjinRes = [];
+
+// ── 企業発掘 ──────────────────────────────────────────
+let _discResults = [];
+let _discSelected = new Set();
+const CORP_KIND = {'301':'株式会社','302':'有限会社','303':'合名会社','304':'合資会社','305':'合同会社','399':'その他法人'};
+
+function openDiscover() {
+  if (!can('admin')) { toast('❌ 管理者のみ使用できます'); return; }
+  document.getElementById('disc-ovl').classList.add('open');
+}
+function closeDiscover(e) {
+  if (e && e.target !== document.getElementById('disc-ovl')) return;
+  document.getElementById('disc-ovl').classList.remove('open');
+  _discResults = []; _discSelected.clear();
+  document.getElementById('disc-results').innerHTML = '';
+  document.getElementById('disc-add-bar').style.display = 'none';
+  document.getElementById('disc-progress').style.display = 'none';
+}
+function onDiscPrefChange() {
+  const pref = document.getElementById('disc-pref').value;
+  const sel = document.getElementById('disc-city-sel');
+  const inp = document.getElementById('disc-city-inp');
+  if (pref === '47') { sel.style.display=''; inp.style.display='none'; }
+  else               { sel.style.display='none'; inp.style.display=''; }
+}
+async function startResearch() {
+  const pref = document.getElementById('disc-pref').value;
+  let cityCode = pref === '47'
+    ? (document.getElementById('disc-city-sel').value || '')
+    : ((document.getElementById('disc-city-inp')?.value||'').trim());
+  const keyword = (document.getElementById('disc-kw')?.value||'').trim() || '会社';
+  const limit = Math.min(30, Math.max(1, parseInt(document.getElementById('disc-limit')?.value||'30')||30));
+  const address = cityCode
+    ? (pref.padStart(2,'0') + cityCode.padStart(3,'0'))
+    : pref.padStart(2,'0');
+  const knownCNs = new Set(cos.map(c => c.source_data?.corporate_number).filter(Boolean));
+  const progEl = document.getElementById('disc-progress');
+  const progFill = document.getElementById('disc-prog-fill');
+  const progText = document.getElementById('disc-prog-text');
+  progEl.style.display = 'block';
+  progFill.style.width = '0%';
+  document.getElementById('disc-results').innerHTML = '';
+  document.getElementById('disc-add-bar').style.display = 'none';
+  _discResults = []; _discSelected.clear();
+  let page = 1, totalPages = 99, collected = [];
+  while (collected.length < limit && page <= totalPages && page <= 15) {
+    progText.textContent = `取得中… ${collected.length}/${limit}社`;
+    try {
+      const r = await fetch(`${HOUJIN_EP}?address=${encodeURIComponent(address)}&keyword=${encodeURIComponent(keyword)}&page=${page}`);
+      const d = await r.json();
+      if (d.error) { toast('❌ ' + d.error); break; }
+      const corps = Array.isArray(d?.corporations?.corporation)
+        ? d.corporations.corporation
+        : (d?.corporations?.corporation ? [d.corporations.corporation] : []);
+      const total = parseInt(d.count||'0')||0;
+      const perPg = corps.length || 10;
+      totalPages = total > 0 ? Math.ceil(total / perPg) : 1;
+      if (!corps.length) break;
+      for (const c of corps) {
+        if (!c.corporateNumber) continue;
+        if (knownCNs.has(c.corporateNumber)) continue;
+        if (collected.find(x => x.corporateNumber === c.corporateNumber)) continue;
+        collected.push(c);
+        if (collected.length >= limit) break;
+      }
+      progFill.style.width = Math.min(100, Math.round(collected.length / limit * 100)) + '%';
+      page++;
+    } catch(err) { toast('❌ 通信エラー'); break; }
+  }
+  progEl.style.display = 'none';
+  _discResults = collected;
+  const resEl = document.getElementById('disc-results');
+  if (!collected.length) {
+    resEl.innerHTML = '<div class="disc-empty">該当する企業が見つかりませんでした。<br>キーワードや地域を変えて試してください。</div>';
+    return;
+  }
+  _discSelected = new Set(collected.map(c => c.corporateNumber));
+  renderDiscResults();
+}
+function renderDiscResults() {
+  const el = document.getElementById('disc-results');
+  el.innerHTML = `<div class="disc-result-hd">
+      <span>${_discResults.length}社ヒット（既登録除外済）</span>
+      <button class="disc-all-btn" onclick="discToggleAll()">全選択 / 全解除</button>
+    </div>` +
+    _discResults.map(c => {
+      const addr = (c.prefectureName||'')+(c.cityName||'')+(c.streetNumber||'');
+      const kind = CORP_KIND[c.kind]||'';
+      const cn = c.corporateNumber||'';
+      const on = _discSelected.has(cn);
+      return `<div class="disc-card ${on?'disc-card-on':''}" onclick="toggleDiscCard('${cn}',this)">
+        <input type="checkbox" class="disc-cb" ${on?'checked':''} onclick="event.stopPropagation()">
+        <div class="disc-card-body">
+          <span class="disc-cname">${esc(c.name||'')}</span>
+          ${kind?`<span class="disc-ckind">${esc(kind)}</span>`:''}
+          <span class="disc-caddr">${esc(addr)}</span>
+          <span class="disc-ccn">法人番号: ${esc(cn)}</span>
+        </div>
+      </div>`;
+    }).join('');
+  document.getElementById('disc-add-bar').style.display = 'flex';
+  updateDiscSelCount();
+}
+function discToggleAll() {
+  if (_discSelected.size === _discResults.length) {
+    _discSelected.clear();
+  } else {
+    _discSelected = new Set(_discResults.map(c => c.corporateNumber));
+  }
+  renderDiscResults();
+}
+function toggleDiscCard(cn, el) {
+  if (_discSelected.has(cn)) { _discSelected.delete(cn); el.classList.remove('disc-card-on'); el.querySelector('.disc-cb').checked=false; }
+  else { _discSelected.add(cn); el.classList.add('disc-card-on'); el.querySelector('.disc-cb').checked=true; }
+  updateDiscSelCount();
+}
+function updateDiscSelCount() {
+  document.getElementById('disc-sel-count').textContent = `${_discSelected.size}社選択中`;
+}
+async function addDiscovered() {
+  if (!_discSelected.size) { toast('1社以上選択してください'); return; }
+  const toAdd = _discResults.filter(c => _discSelected.has(c.corporateNumber));
+  let added = 0, failed = 0;
+  for (const c of toAdd) {
+    const pc = (c.postCode||'').replace(/^(\d{3})(\d{4})$/, '$1-$2');
+    const addr = (c.prefectureName||'')+(c.cityName||'')+(c.streetNumber||'');
+    const city = (c.prefectureName||'')+(c.cityName||'');
+    const row = {
+      company_name: c.name||'（名称不明）',
+      postal_code: pc||null,
+      address: addr||null,
+      city: city||null,
+      phase: 'pending',
+      source_data: {corporate_number: c.corporateNumber, discover_source:'houjin_api'},
+    };
+    const {data,error} = await sb.from('ceremony_attacks').insert(row).select().single();
+    if (!error && data) { cos.push(data); added++; } else { failed++; }
+  }
+  buildFilters(); renderStats(); renderList();
+  closeDiscover();
+  toast(`✅ ${added}社を追加しました${failed?` (${failed}社失敗)`:''}`);
+}
 
 async function houjinSearch(mode) {
   const query = mode === 'add'

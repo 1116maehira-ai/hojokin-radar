@@ -2165,7 +2165,7 @@ async function startResearch() {
   let cityCode = pref === '47'
     ? (document.getElementById('disc-city-sel').value || '')
     : ((document.getElementById('disc-city-inp')?.value||'').trim());
-  const keyword = (document.getElementById('disc-kw')?.value||'').trim() || '会社';
+  const keyword = (document.getElementById('disc-kw')?.value||'').trim() || '株式会社';
   const limit = Math.min(30, Math.max(1, parseInt(document.getElementById('disc-limit')?.value||'30')||30));
   const address = cityCode
     ? (pref.padStart(2,'0') + cityCode.padStart(3,'0'))
@@ -2185,7 +2185,7 @@ async function startResearch() {
     try {
       const r = await fetch(`${HOUJIN_EP}?address=${encodeURIComponent(address)}&keyword=${encodeURIComponent(keyword)}&page=${page}`);
       const d = await r.json();
-      if (d.error) { toast('❌ ' + d.error); break; }
+      if (d.error) { toast('❌ ' + d.error + (d.detail ? '　' + d.detail.slice(0,80) : '')); console.error('disc err', d); break; }
       const corps = Array.isArray(d?.corporations?.corporation)
         ? d.corporations.corporation
         : (d?.corporations?.corporation ? [d.corporations.corporation] : []);

@@ -1,0 +1,520 @@
+<title>第6回 ハンズオン手順書</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap">
+<style>
+:root{
+  --bg:#F3F7FF;--s:#FFFFFF;--s2:#EBF2FF;
+  --deep:#0C2B6B;--blue:#1565C0;--acc:#42A5F5;
+  --lt:#DBEAFE;--t1:#0D1B2A;--t2:#3A5580;--t3:#7096B8;--bor:#C5D8F0;
+  --ok:#1B5E20;--ok-bg:#E8F5E9;--ok-bor:#A5D6A7;
+  --warn:#7B3800;--warn-bg:#FFF3E0;--warn-bor:#FFCC80;
+  --code-bg:#1A1F2E;--code-t:#E8F1FF;
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0A1628;--s:#0F2040;--s2:#162B50;--deep:#90CAF9;--blue:#64B5F6;
+  --acc:#42A5F5;--lt:#1A3560;--t1:#E8F1FF;--t2:#9BB8D8;--t3:#6A8FB0;
+  --bor:#2A4570;--ok:#A5D6A7;--ok-bg:#1B3A1E;--ok-bor:#2E5E30;
+  --warn:#FFCC80;--warn-bg:#3A2000;--warn-bor:#7B4000;
+}}
+:root[data-theme="dark"]{
+  --bg:#0A1628;--s:#0F2040;--s2:#162B50;--deep:#90CAF9;--blue:#64B5F6;
+  --acc:#42A5F5;--lt:#1A3560;--t1:#E8F1FF;--t2:#9BB8D8;--t3:#6A8FB0;
+  --bor:#2A4570;--ok:#A5D6A7;--ok-bg:#1B3A1E;--ok-bor:#2E5E30;
+  --warn:#FFCC80;--warn-bg:#3A2000;--warn-bor:#7B4000;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans JP','Hiragino Sans','Meiryo',sans-serif;background:var(--bg);color:var(--t1);padding-inline:16px;padding-block:28px 72px;line-height:1.6}
+.wrap{max-width:720px;margin-inline:auto;display:flex;flex-direction:column;gap:24px}
+
+/* page header */
+.page-hd{background:var(--deep);color:#fff;border-radius:16px;padding:28px 24px}
+.page-hd .eyebrow{font-size:11px;font-weight:700;letter-spacing:.15em;color:var(--acc);text-transform:uppercase;margin-bottom:8px}
+.page-hd h1{font-size:22px;font-weight:900;line-height:1.35;margin-bottom:6px;text-wrap:balance}
+.page-hd .sub{font-size:13px;opacity:.75}
+.meta-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.chip{background:rgba(255,255,255,.13);border-radius:99px;padding:4px 12px;font-size:12px;font-weight:700;color:#fff;white-space:nowrap}
+
+/* block header */
+.block-hd{display:flex;align-items:center;gap:12px;padding:14px 18px;border-radius:12px 12px 0 0;border-bottom:2px solid var(--bor)}
+.block-hd.a{background:#EBF5FF;border-color:#B3D4F0}
+.block-hd.b{background:#F3EBFF;border-color:#C9B3F0}
+.block-hd.c{background:#EDFBEE;border-color:#B3E8B5}
+.block-hd.d{background:#FFF5EB;border-color:#F0D0B3}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  .block-hd.a{background:#0D2035;border-color:#1E3D60}
+  .block-hd.b{background:#1A0D30;border-color:#3D1E60}
+  .block-hd.c{background:#0D200D;border-color:#1E501E}
+  .block-hd.d{background:#231500;border-color:#503010}
+}}
+:root[data-theme="dark"] .block-hd.a{background:#0D2035;border-color:#1E3D60}
+:root[data-theme="dark"] .block-hd.b{background:#1A0D30;border-color:#3D1E60}
+:root[data-theme="dark"] .block-hd.c{background:#0D200D;border-color:#1E501E}
+:root[data-theme="dark"] .block-hd.d{background:#231500;border-color:#503010}
+.block-tag{font-size:12px;font-weight:900;padding:4px 12px;border-radius:99px;color:#fff;letter-spacing:.06em;flex-shrink:0}
+.tag-a{background:#1565C0}.tag-b{background:#6A1B9A}.tag-c{background:#2E7D32}.tag-d{background:#C62828}
+.block-hd h2{font-size:17px;font-weight:900;color:var(--deep);flex:1;text-wrap:balance}
+.block-hd .dur{font-size:12px;color:var(--t3);flex-shrink:0}
+.block-body{background:var(--s);border:1px solid var(--bor);border-top:none;border-radius:0 0 12px 12px;padding:20px}
+
+/* step */
+.steps{display:flex;flex-direction:column;gap:0}
+.step{display:grid;grid-template-columns:36px 1fr;gap:0;padding-bottom:24px;position:relative}
+.step:last-child{padding-bottom:0}
+.step:not(:last-child)::before{content:'';position:absolute;left:17px;top:36px;bottom:0;width:2px;background:var(--bor)}
+.step-num{width:36px;height:36px;border-radius:50%;background:var(--blue);color:#fff;font-size:14px;font-weight:900;display:grid;place-items:center;flex-shrink:0;z-index:1;position:relative}
+.step-content{padding-left:14px;padding-top:6px}
+.step-title{font-size:15px;font-weight:700;color:var(--deep);margin-bottom:6px;line-height:1.4}
+.step-desc{font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:0}
+
+/* code block */
+.code-block{background:var(--code-bg);border-radius:8px;padding:14px 16px;margin-top:10px;overflow-x:auto}
+.code-block .lang{font-size:10px;font-weight:700;letter-spacing:.1em;color:#6A8FB0;text-transform:uppercase;margin-bottom:6px}
+.code-block pre{font-family:'Courier New','Osaka-Mono',monospace;font-size:13px;color:var(--code-t);white-space:pre;line-height:1.6;margin:0}
+.code-block pre .hl{color:#FFD700}
+.code-block pre .cm{color:#6A8FB0}
+.code-block pre .kw{color:#82B1FF}
+.code-block pre .str{color:#A5D6A7}
+
+/* prompt box */
+.prompt-box{background:var(--s2);border:1px solid var(--bor);border-radius:8px;padding:12px 14px;margin-top:10px}
+.prompt-box .prompt-label{font-size:10px;font-weight:700;letter-spacing:.12em;color:var(--acc);text-transform:uppercase;margin-bottom:6px}
+.prompt-box p{font-size:13px;color:var(--t2);line-height:1.7;white-space:pre-wrap;word-break:break-all}
+
+/* check box */
+.check-box{background:var(--ok-bg);border:1px solid var(--ok-bor);border-radius:8px;padding:10px 14px;margin-top:10px;font-size:13px;color:var(--ok);line-height:1.6}
+.check-box::before{content:'✅ 確認ポイント：'}
+
+/* warn box */
+.warn-box{background:var(--warn-bg);border:1px solid var(--warn-bor);border-radius:8px;padding:10px 14px;margin-top:10px;font-size:13px;color:var(--warn);line-height:1.6}
+
+/* info box */
+.info-box{background:var(--s2);border-left:3px solid var(--acc);border-radius:0 8px 8px 0;padding:10px 14px;margin-top:10px;font-size:13px;color:var(--t2);line-height:1.7}
+.info-box strong{color:var(--deep)}
+
+/* sub steps */
+.sub-steps{display:flex;flex-direction:column;gap:6px;margin-top:8px;padding-left:4px}
+.sub-step{display:flex;gap:8px;font-size:13px;color:var(--t2);line-height:1.6}
+.sub-step::before{content:'→';color:var(--acc);flex-shrink:0;font-weight:700}
+
+/* divider */
+.sec-divider{font-size:11px;font-weight:700;letter-spacing:.15em;color:var(--t3);text-transform:uppercase;display:flex;align-items:center;gap:10px}
+.sec-divider::after{content:'';flex:1;height:1px;background:var(--bor)}
+
+/* alert */
+.alert{border-radius:10px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.6}
+.alert.warn{background:var(--warn-bg);border:1px solid var(--warn-bor);color:var(--warn)}
+.alert.ok{background:var(--ok-bg);border:1px solid var(--ok-bor);color:var(--ok)}
+.alert-icon{font-size:16px;flex-shrink:0}
+
+/* table */
+.tbl-wrap{overflow-x:auto;margin-top:10px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:var(--s2);color:var(--deep);font-weight:700;padding:8px 12px;border:1px solid var(--bor);text-align:left}
+td{padding:8px 12px;border:1px solid var(--bor);color:var(--t1);vertical-align:top;line-height:1.5}
+td code{font-family:'Courier New',monospace;font-size:12px;color:var(--blue)}
+
+@media(max-width:480px){.meta-row{gap:6px}.block-hd h2{font-size:15px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important}}
+</style>
+
+<div class="wrap">
+
+  <header class="page-hd">
+    <div class="eyebrow">設備技研 AI外向け発信カリキュラム 第6回</div>
+    <h1>ハンズオン手順書<br>LP修正・CMS強化・スマホ画像更新</h1>
+    <div class="sub">この手順書を見ながら自分で操作できます。迷ったらClaudeに聞いてください。</div>
+    <div class="meta-row">
+      <span class="chip">📅 2026年9月23日</span>
+      <span class="chip">🔗 採用サイト: setsubi-gikenrecruit</span>
+      <span class="chip">🗄 Supabase: pvwktijtqtmvnqofuwro</span>
+    </div>
+  </header>
+
+  <div class="alert warn">
+    <span class="alert-icon">📌</span>
+    <div><strong>今日の前提</strong>：画像はすべてindex.htmlにハードコードされていてCMSでは変えられない状態。今日のBlock Cで「CMSから画像URLを変えられる仕組み」を初めて作ります。まず1枚だけ成功させることが目標。</div>
+  </div>
+
+  <!-- ===== BLOCK A ===== -->
+  <div class="sec-divider">Block A — LP修正タイム（10:20〜11:20）</div>
+  <div>
+    <div class="block-hd a">
+      <span class="block-tag tag-a">A</span>
+      <h2>LPを確認して気になるところを直す</h2>
+      <span class="dur">60分</span>
+    </div>
+    <div class="block-body">
+      <div class="steps">
+
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <div class="step-title">LPを開いて全員で確認する</div>
+            <div class="step-desc">ブラウザで採用サイトを開く。</div>
+            <div class="sub-steps">
+              <div class="sub-step">PC・スマホ両方で確認する</div>
+              <div class="sub-step">スマホ確認はブラウザの「デベロッパーツール → モバイルビュー」でもOK（F12キー）</div>
+              <div class="sub-step">気になる点をその場でメモ（付箋 or メモアプリ）。例：「Section03の画像が荒い」「余白が広すぎる」</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <div class="step-title">GitHubからindex.htmlを取得する</div>
+            <div class="step-desc">GitHubのWebサイトから操作します。</div>
+            <div class="sub-steps">
+              <div class="sub-step"><strong>github.com/1116maehira-ai/setsubi-gikenrecruit</strong> を開く</div>
+              <div class="sub-step">ファイル一覧から <code>index.html</code> をクリック</div>
+              <div class="sub-step">右上の「Raw」ボタンをクリック → 全文がブラウザに表示される</div>
+              <div class="sub-step">全選択（Ctrl+A）→ コピー（Ctrl+C）</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <div class="step-title">Claudeに修正を依頼する</div>
+            <div class="step-desc">新しいClaudeチャットを開いて、以下のプロンプトを使う。</div>
+            <div class="prompt-box">
+              <div class="prompt-label">Claudeへのプロンプト（コピーして使う）</div>
+              <p>採用サイトのHTMLを修正してほしいです。
+以下が現在のindex.htmlの全文です。
+
+[ここにコピーしたindex.htmlを貼る]
+
+以下の点を修正してください：
+・[気になる点1：例「Section03の画像が荒く見える原因と対処法を教えて」]
+・[気になる点2：例「スマホで見たときセクション○○のレイアウトが崩れる」]
+・[気になる点3]
+
+修正後のHTMLを丸ごと出力してください。</p>
+            </div>
+            <div class="warn-box">⚠️ index.htmlは1135行あります。Claudeが長いコードを出力するので待ちましょう。途中で止まったら「続きをください」と送る。</div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <div class="step-title">修正後のHTMLをGitHubに上げる</div>
+            <div class="sub-steps">
+              <div class="sub-step">Claudeが出力したHTMLを全選択→コピー</div>
+              <div class="sub-step">GitHubの <code>index.html</code> を開く → 右上の鉛筆アイコン（Edit）をクリック</div>
+              <div class="sub-step">エディタ内を全選択（Ctrl+A）→ 貼り付け（Ctrl+V）</div>
+              <div class="sub-step">下の「Commit changes」ボタンをクリック → 「Commit changes」で確定</div>
+              <div class="sub-step">2〜3分待ってからLPをリロードして確認</div>
+            </div>
+            <div class="check-box">LPを開いて修正した箇所が変わっていること。スマホでも確認する。</div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">5</div>
+          <div class="step-content">
+            <div class="step-title">まだ気になる箇所があれば繰り返す</div>
+            <div class="step-desc">修正→確認→追加修正のループ。1回で全部直そうとしなくていい。Block Aの時間内（11:20まで）に優先度が高い箇所を直す。</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== BLOCK B ===== -->
+  <div class="sec-divider">Block B — CMS改善（11:20〜12:00）</div>
+  <div>
+    <div class="block-hd b">
+      <span class="block-tag tag-b">B</span>
+      <h2>CMSを使いやすくリニューアルする</h2>
+      <span class="dur">40分</span>
+    </div>
+    <div class="block-body">
+      <div class="info-box">
+        <strong>現状の問題点</strong>：CMSには <code>content_key</code>（英語の技術名）がそのまま表示されている。labelはあるが目立たない。スマホでボタンが小さい。
+      </div>
+      <div class="steps">
+
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <div class="step-title">GitHubからcms.htmlを取得する</div>
+            <div class="sub-steps">
+              <div class="sub-step">GitHubの <code>cms.html</code> を開く → 「Raw」→ 全選択 → コピー</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <div class="step-title">ClaudeにCMS改善を依頼する</div>
+            <div class="prompt-box">
+              <div class="prompt-label">Claudeへのプロンプト</div>
+              <p>採用サイトのCMS管理画面のHTMLを改善してほしいです。
+以下が現在のcms.htmlの全文です。
+
+[ここにコピーしたcms.htmlを貼る]
+
+以下の点を改善してください：
+
+1. content_keyではなくlabelを大きく・見やすく表示する
+2. どのセクションを編集しているか常にわかるようにする
+3. スマホで使いやすいようにボタンを大きくする（最低44px以上のタップ領域）
+4. テキストを保存したあと「✅ 保存しました！」と画面上部にわかりやすく表示する
+5. 全体的なデザインをすっきりさせる
+
+修正後のcms.htmlを丸ごと出力してください。
+Supabaseの接続情報（URL・APIキー）はそのまま維持してください。</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <div class="step-title">GitHubにアップしてスマホで確認</div>
+            <div class="sub-steps">
+              <div class="sub-step">Claudeの出力をコピー → GitHubの cms.html をEdit → 貼り付け → Commit</div>
+              <div class="sub-step">スマホでCMSのURLを開く（パスワードを入力）</div>
+              <div class="sub-step">テキストを1つ変えて保存 → LPをリロードして反映確認</div>
+            </div>
+            <div class="check-box">スマホからCMSにアクセスしてテキストを更新できる。labelがわかりやすく表示されている。</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== BLOCK C ===== -->
+  <div class="sec-divider">Block C — 画像CMS対応（13:00〜14:30）今日の山場</div>
+  <div>
+    <div class="block-hd c">
+      <span class="block-tag tag-c">C</span>
+      <h2>画像をCMSから更新できるようにする</h2>
+      <span class="dur">90分</span>
+    </div>
+    <div class="block-body">
+
+      <div class="info-box" style="margin-bottom:16px">
+        <strong>仕組みの解説</strong>：今は画像パスがindex.htmlに書かれている。これを「SupabaseのDBに画像URLを保存して、LPがそのURLを読み込む」に変える。CMSで画像URLを書き換えるだけでLPの画像が変わるようになる。<br><br>
+        <strong>まず1枚だけ試す</strong>。Section-01の技術者の写真（一番上のメイン画像）から始める。成功したら他の画像も同じやり方で追加できる。
+      </div>
+
+      <div class="steps">
+
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <div class="step-title">Supabaseにデータを追加する（SQL実行）</div>
+            <div class="step-desc">Supabaseのダッシュボードを開く。左メニューの「SQL Editor」をクリック。</div>
+            <div class="code-block">
+              <div class="lang">SQL — このままコピーして SQL Editor に貼り付けて実行</div>
+              <pre><span class="cm">-- Section-01の技術者写真のURLをCMSで管理できるように追加</span>
+<span class="kw">INSERT INTO</span> site_content (content_key, value, section, label)
+<span class="kw">VALUES</span>
+  (<span class="str">'img_s01_technician'</span>, <span class="str">''</span>, <span class="str">'section-01'</span>, <span class="str">'Section01：技術者の写真URL'</span>),
+  (<span class="str">'img_s01_office'</span>,     <span class="str">''</span>, <span class="str">'section-01'</span>, <span class="str">'Section01：オフィス社員の写真URL'</span>);</pre>
+            </div>
+            <div class="check-box">「Success. 2 rows affected」と表示されたらOK。</div>
+            <div class="warn-box">⚠️ valueは空文字「''」のままでいい。空のときはLPが元の画像を表示する（後で確認）。</div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <div class="step-title">index.htmlにコードを追加する（Claudeに依頼）</div>
+            <div class="step-desc">GitHubからindex.htmlのRawをコピーして、Claudeに以下を依頼する。</div>
+            <div class="prompt-box">
+              <div class="prompt-label">Claudeへのプロンプト</div>
+              <p>採用サイトのindex.htmlを修正してほしいです。
+以下が現在の全文です。
+
+[index.htmlをここに貼る]
+
+Supabaseから取得したデータで、以下の2つの画像のsrcを書き換えるコードを追加してください。
+
+・content_key = "img_s01_technician" の値を
+  src="./assets/section-01/photos/technician-extended.webp" の img タグに反映
+  （valueが空文字のときは元のsrcのままにしてください）
+
+・content_key = "img_s01_office" の値を
+  src="./assets/section-01/photos/office-staff-extended.webp" の img タグに反映
+  （valueが空文字のときは元のsrcのままにしてください）
+
+Supabaseのデータ取得処理はもうindex.htmlにあります（mapという変数でkey→valueが入っています）。
+そのmapを使って、データ取得後に画像srcを上書きするコードを追加してください。
+
+修正後のindex.htmlを丸ごと出力してください。</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <div class="step-title">修正したindex.htmlをGitHubにアップする</div>
+            <div class="sub-steps">
+              <div class="sub-step">Claudeの出力をコピー → GitHubの index.html をEdit → 貼り付け → Commit</div>
+              <div class="sub-step">2〜3分待ってLPをリロード → この時点では画像は変わっていない（valueが空だから）。これはOK。</div>
+            </div>
+            <div class="check-box">LPが正常に表示されていること（画像が消えたりエラーが出ていないこと）。</div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <div class="step-title">テスト用の画像URLをCMSに入れてみる</div>
+            <div class="step-desc">まずテスト用の画像URLで動作確認する。本物の写真に変える前にちゃんと動くか確認するため。</div>
+            <div class="sub-steps">
+              <div class="sub-step">CMSを開く（cms.html）→ ログイン</div>
+              <div class="sub-step">「section-01」を選択</div>
+              <div class="sub-step">「Section01：技術者の写真URL」の欄に以下を貼り付ける：</div>
+            </div>
+            <div class="code-block">
+              <div class="lang">テスト用画像URL（これで動作確認）</div>
+              <pre>https://picsum.photos/seed/tech/1774/887</pre>
+            </div>
+            <div class="sub-steps">
+              <div class="sub-step">保存ボタンをクリック</div>
+              <div class="sub-step">LPをリロード（Ctrl+Shift+R）</div>
+            </div>
+            <div class="check-box">Section-01の技術者の写真がランダムな写真に変わったらCMS→LP連動の成功！</div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">5</div>
+          <div class="step-content">
+            <div class="step-title">本物の画像に切り替える（スマホから写真をアップしてURLを取得）</div>
+            <div class="step-desc">スマホで撮った写真をインターネット上に置いてURLを取得する方法を選ぶ。</div>
+            <div class="tbl-wrap">
+              <table>
+                <tr>
+                  <th>方法</th><th>手順</th><th>向いている用途</th>
+                </tr>
+                <tr>
+                  <td><strong>Google フォト</strong></td>
+                  <td>写真を開く → 共有 → リンクをコピー<br><span style="color:var(--t3)">※直接リンクの取得に手順が必要</span></td>
+                  <td>普段使いのGoogle アカウントがある場合</td>
+                </tr>
+                <tr>
+                  <td><strong>Imgur</strong><br>（無料画像ホスティング）</td>
+                  <td>imgur.com → New post → 写真を選択 → アップ → 「Direct link」をコピー</td>
+                  <td>手軽に試したいとき</td>
+                </tr>
+                <tr>
+                  <td><strong>GitHub に直接アップ</strong></td>
+                  <td>GitHubのassetsフォルダを開く → 「Add file」→ 「Upload files」→ ファイルを選択 → Commit → Raw URLをコピー</td>
+                  <td>写真を assets フォルダで管理したいとき（本番運用に向く）</td>
+                </tr>
+              </table>
+            </div>
+            <div class="sub-steps">
+              <div class="sub-step">URLが取得できたらCMSで「Section01：技術者の写真URL」に貼り付けて保存</div>
+              <div class="sub-step">LPをリロードして本物の写真に変わることを確認</div>
+            </div>
+            <div class="check-box">LPのSection01に新しい写真が表示されること。</div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">6</div>
+          <div class="step-content">
+            <div class="step-title">他の画像も同じように追加する（余裕があれば）</div>
+            <div class="step-desc">Step 1〜5で成功したら、他のセクションの画像も同じ手順で対応できる。優先度が高い写真から順番に追加していく。</div>
+            <div class="prompt-box">
+              <div class="prompt-label">Claudeへのプロンプト（追加のSQLを生成してもらう）</div>
+              <p>Supabaseのsite_contentテーブルに、Section-03の以下の画像URLを管理できるように
+INSERT文を書いてください。
+
+・src="./assets/section-03/photos/hero-male.webp"  → label「Section03：男性ヒーロー写真URL」
+・src="./assets/section-03/photos/hero-female.webp" → label「Section03：女性ヒーロー写真URL」
+
+content_keyは英数字とアンダースコアだけで命名してください。</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== BLOCK D ===== -->
+  <div class="sec-divider">Block D — スマホテスト（14:30〜15:00）</div>
+  <div>
+    <div class="block-hd d">
+      <span class="block-tag tag-d">D</span>
+      <h2>全員スマホからCMSで更新してみる</h2>
+      <span class="dur">30分</span>
+    </div>
+    <div class="block-body">
+      <div class="steps">
+
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <div class="step-title">スマホでCMSを開いてログインする</div>
+            <div class="sub-steps">
+              <div class="sub-step">スマホのブラウザで CMS のURL を開く</div>
+              <div class="sub-step">パスワードを入力してログイン</div>
+              <div class="sub-step">各自が担当するセクションを選ぶ（全員で同じでもOK）</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <div class="step-title">テキストを1つ変えて保存→LPを確認する</div>
+            <div class="sub-steps">
+              <div class="sub-step">何かテキストを少し変えて保存ボタンをタップ</div>
+              <div class="sub-step">LPを別タブで開いてリロード → 変更が反映されているか確認</div>
+              <div class="sub-step">元に戻したければCMSで元の文章に戻して保存</div>
+            </div>
+            <div class="check-box">全員がスマホからCMSを操作してLPに反映できること。</div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <div class="step-title">スマホで撮った写真をLPに反映してみる（Block C成功組）</div>
+            <div class="sub-steps">
+              <div class="sub-step">スマホで適当な写真を撮る or カメラロールから選ぶ</div>
+              <div class="sub-step">Imgur（imgur.com）を開く → New post → 写真をアップ → Direct linkをコピー</div>
+              <div class="sub-step">CMSで画像URLの欄にペーストして保存</div>
+              <div class="sub-step">LPをリロードして写真が変わることを確認</div>
+            </div>
+            <div class="check-box">スマホで撮った写真がそのままLPに表示される。</div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <div class="step-title">今日の振り返り：「AIで何ができたか」を話す</div>
+            <div class="step-desc">今日やったこと：コードを読まずにClaudeに修正してもらった → GitHubにアップ → 動作確認。このループが「AI活用の基本パターン」。採用サイト以外でも使える。</div>
+            <div class="info-box">
+              <strong>次回に向けて考えてみること</strong>：「自分の業務の中でこのパターンを使えそうな場面はありますか？」
+              例：書類のフォーマット作成 / メール文章の作成 / 集計・報告のテンプレート / 社内マニュアルのHTML化 など
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- アンケート -->
+  <div class="alert ok">
+    <span class="alert-icon">📝</span>
+    <div><strong>最後にアンケートを入力してください</strong>（匿名・2〜3分）<br>
+    今日の授業の感想・温度感・次にやりたいことなど。講師が次回のカリキュラムに活かします。</div>
+  </div>
+
+</div>

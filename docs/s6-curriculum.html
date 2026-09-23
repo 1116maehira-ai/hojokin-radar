@@ -1,0 +1,442 @@
+<title>第6回 採用サイト仕上げ</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap">
+<style>
+:root{
+  --bg:#F3F7FF;--s:#FFFFFF;--s2:#EBF2FF;
+  --deep:#0C2B6B;--blue:#1565C0;--acc:#42A5F5;
+  --lt:#DBEAFE;--t1:#0D1B2A;--t2:#3A5580;--t3:#7096B8;--bor:#C5D8F0;
+  --ok:#1B5E20;--ok-bg:#E8F5E9;--ok-bor:#A5D6A7;
+  --warn:#7B3800;--warn-bg:#FFF3E0;--warn-bor:#FFCC80;
+  --tag-a:#1565C0;--tag-b:#6A1B9A;--tag-c:#2E7D32;--tag-d:#C62828;
+}
+@media(prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0A1628;--s:#0F2040;--s2:#162B50;
+    --deep:#90CAF9;--blue:#64B5F6;--acc:#42A5F5;
+    --lt:#1A3560;--t1:#E8F1FF;--t2:#9BB8D8;--t3:#6A8FB0;--bor:#2A4570;
+    --ok:#A5D6A7;--ok-bg:#1B3A1E;--ok-bor:#2E5E30;
+    --warn:#FFCC80;--warn-bg:#3A2000;--warn-bor:#7B4000;
+    --tag-a:#64B5F6;--tag-b:#CE93D8;--tag-c:#A5D6A7;--tag-d:#EF9A9A;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0A1628;--s:#0F2040;--s2:#162B50;
+  --deep:#90CAF9;--blue:#64B5F6;--acc:#42A5F5;
+  --lt:#1A3560;--t1:#E8F1FF;--t2:#9BB8D8;--t3:#6A8FB0;--bor:#2A4570;
+  --ok:#A5D6A7;--ok-bg:#1B3A1E;--ok-bor:#2E5E30;
+  --warn:#FFCC80;--warn-bg:#3A2000;--warn-bor:#7B4000;
+  --tag-a:#64B5F6;--tag-b:#CE93D8;--tag-c:#A5D6A7;--tag-d:#EF9A9A;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans JP','Hiragino Sans','Meiryo',sans-serif;background:var(--bg);color:var(--t1);padding-inline:16px;padding-block:28px 64px;line-height:1.6}
+.wrap{max-width:760px;margin-inline:auto;display:flex;flex-direction:column;gap:20px}
+
+/* header */
+.page-hd{background:var(--deep);color:#fff;border-radius:16px;padding:28px 24px}
+.page-hd .eyebrow{font-size:11px;font-weight:700;letter-spacing:.15em;color:var(--acc);text-transform:uppercase;margin-bottom:8px}
+.page-hd h1{font-size:22px;font-weight:900;text-wrap:balance;line-height:1.35;margin-bottom:6px}
+.page-hd .sub{font-size:13px;opacity:.75;line-height:1.7}
+.meta-row{display:flex;gap:16px;flex-wrap:wrap;margin-top:14px}
+.meta-chip{background:rgba(255,255,255,.12);border-radius:99px;padding:4px 12px;font-size:12px;font-weight:700;color:#fff;white-space:nowrap}
+
+/* alert */
+.alert{border-radius:12px;padding:14px 16px;display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.6}
+.alert.warn{background:var(--warn-bg);border:1px solid var(--warn-bor);color:var(--warn)}
+.alert.ok{background:var(--ok-bg);border:1px solid var(--ok-bor);color:var(--ok)}
+.alert-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+
+/* goal card */
+.goal-card{background:var(--s2);border:1px solid var(--bor);border-radius:14px;padding:20px}
+.goal-card h2{font-size:14px;font-weight:700;color:var(--deep);margin-bottom:10px;letter-spacing:.04em}
+.goal-list{display:flex;flex-direction:column;gap:8px}
+.goal-item{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:var(--t1)}
+.goal-dot{width:22px;height:22px;border-radius:50%;background:var(--blue);color:#fff;font-size:11px;font-weight:700;display:grid;place-items:center;flex-shrink:0;margin-top:1px}
+
+/* schedule */
+.schedule-grid{display:flex;flex-direction:column;gap:0}
+.sched-row{display:grid;grid-template-columns:80px 1fr;gap:0;border-bottom:1px solid var(--bor)}
+.sched-row:last-child{border-bottom:none}
+.sched-time{font-size:13px;font-weight:700;color:var(--acc);padding:14px 0 14px 4px;font-variant-numeric:tabular-nums}
+.sched-content{padding:14px 4px 14px 16px;border-left:2px solid var(--bor)}
+.sched-label{font-size:14px;font-weight:700;color:var(--t1)}
+.sched-note{font-size:12px;color:var(--t3);margin-top:2px}
+
+/* block cards */
+.block{border-radius:14px;overflow:hidden;border:1px solid var(--bor)}
+.block-hd{padding:16px 18px;display:flex;align-items:center;gap:12px}
+.block-hd.a{background:#EBF5FF;border-bottom:1px solid #C5DCF5}
+.block-hd.b{background:#F3EBFF;border-bottom:1px solid #D8C5F5}
+.block-hd.c{background:#EDFBEE;border-bottom:1px solid #C5EAC7}
+.block-hd.d{background:#FFF5EB;border-bottom:1px solid #F5D8C5}
+@media(prefers-color-scheme:dark){
+  :root:not([data-theme="light"]) .block-hd.a{background:#122540;border-color:#1E3D60}
+  :root:not([data-theme="light"]) .block-hd.b{background:#1E1230;border-color:#3D1E60}
+  :root:not([data-theme="light"]) .block-hd.c{background:#122512;border-color:#1E501E}
+  :root:not([data-theme="light"]) .block-hd.d{background:#2A1800;border-color:#503010}
+}
+:root[data-theme="dark"] .block-hd.a{background:#122540;border-color:#1E3D60}
+:root[data-theme="dark"] .block-hd.b{background:#1E1230;border-color:#3D1E60}
+:root[data-theme="dark"] .block-hd.c{background:#122512;border-color:#1E501E}
+:root[data-theme="dark"] .block-hd.d{background:#2A1800;border-color:#503010}
+
+.block-tag{font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;color:#fff;letter-spacing:.06em}
+.block-tag.a{background:var(--tag-a)}
+.block-tag.b{background:var(--tag-b)}
+.block-tag.c{background:var(--tag-c)}
+.block-tag.d{background:var(--tag-d)}
+.block-hd h3{font-size:16px;font-weight:900;color:var(--deep);text-wrap:balance;flex:1}
+.block-hd .dur{font-size:12px;color:var(--t3);white-space:nowrap}
+.block-body{background:var(--s);padding:18px}
+
+/* step list */
+.step-list{display:flex;flex-direction:column;gap:12px}
+.step{display:flex;gap:12px;align-items:flex-start}
+.step-num{width:24px;height:24px;border-radius:50%;background:var(--lt);color:var(--blue);font-size:12px;font-weight:700;display:grid;place-items:center;flex-shrink:0;margin-top:1px}
+.step-body{flex:1}
+.step-title{font-size:14px;font-weight:700;color:var(--t1);margin-bottom:2px}
+.step-desc{font-size:13px;color:var(--t2);line-height:1.6}
+
+/* prompt box */
+.prompt-box{background:var(--s2);border:1px solid var(--bor);border-radius:8px;padding:10px 14px;margin-top:8px;font-size:12px;color:var(--t2);line-height:1.7}
+.prompt-box .label{font-size:10px;font-weight:700;letter-spacing:.12em;color:var(--acc);text-transform:uppercase;margin-bottom:4px}
+.prompt-box code{font-family:'Courier New',monospace;color:var(--deep);white-space:pre-wrap;word-break:break-all}
+
+/* tech note */
+.tech-note{background:var(--s2);border-left:3px solid var(--acc);padding:12px 14px;border-radius:0 8px 8px 0;margin-top:10px;font-size:13px;color:var(--t2);line-height:1.7}
+.tech-note strong{color:var(--deep)}
+
+/* divider */
+.section-label{font-size:11px;font-weight:700;letter-spacing:.15em;color:var(--t3);text-transform:uppercase;display:flex;align-items:center;gap:10px}
+.section-label::after{content:'';flex:1;height:1px;background:var(--bor)}
+
+/* choice cards */
+.choices{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.choice{background:var(--bg);border:1px solid var(--bor);border-radius:10px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start}
+.choice-badge{font-size:11px;font-weight:700;padding:3px 8px;border-radius:99px;color:#fff;flex-shrink:0;margin-top:2px}
+.choice-badge.rec{background:#1565C0}
+.choice-badge.alt{background:#757575}
+.choice-text strong{font-size:13px;color:var(--t1);display:block;margin-bottom:2px}
+.choice-text span{font-size:12px;color:var(--t3)}
+
+/* summary */
+.summary-card{background:var(--deep);color:#fff;border-radius:14px;padding:22px 20px}
+.summary-card h2{font-size:15px;font-weight:900;margin-bottom:14px;opacity:.85;letter-spacing:.04em}
+.summary-list{display:flex;flex-direction:column;gap:8px}
+.summary-item{font-size:14px;display:flex;gap:8px;align-items:flex-start;line-height:1.5}
+.summary-item::before{content:'✓';color:var(--acc);font-weight:700;flex-shrink:0}
+
+@media(max-width:520px){
+  .sched-row{grid-template-columns:64px 1fr}
+  .meta-row{gap:8px}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important}}
+</style>
+
+<div class="wrap">
+
+  <header class="page-hd">
+    <div class="eyebrow">設備技研 AI外向け発信カリキュラム</div>
+    <h1>第6回 — 採用サイト仕上げ<br>LP修正・CMS強化・スマホ更新対応</h1>
+    <div class="sub">「自分たちで作って、自分たちで直す」を本日完成させる</div>
+    <div class="meta-row">
+      <span class="meta-chip">📅 2026年9月23日</span>
+      <span class="meta-chip">⏱ 4時間</span>
+      <span class="meta-chip">🎯 スマホからLP更新できる状態を作る</span>
+    </div>
+  </header>
+
+  <div class="alert warn">
+    <span class="alert-icon">🔍</span>
+    <div><strong>現状の整理（コード確認済み）</strong><br>
+    画像はすべて index.html にハードコード → CMSでは更新できない。CMSはテキストのみ管理中。今日のメインテーマは「画像もCMSから更新できる仕組みを作ること」。</div>
+  </div>
+
+  <!-- goals -->
+  <div class="goal-card">
+    <h2>🎯 今日のゴール</h2>
+    <div class="goal-list">
+      <div class="goal-item"><div class="goal-dot">1</div>LPの気になる箇所（画像・デザイン）を直してGitHubに上げる</div>
+      <div class="goal-item"><div class="goal-dot">2</div>CMSの使い勝手を改善する（ラベルをわかりやすく、スマホ対応）</div>
+      <div class="goal-item"><div class="goal-dot">3</div>画像をCMSから更新できる仕組みを1箇所でも動かす</div>
+      <div class="goal-item"><div class="goal-dot">4</div>スマホからCMSにアクセスして更新できることを全員が体験する</div>
+    </div>
+  </div>
+
+  <!-- schedule -->
+  <div class="section-label">時間割</div>
+  <div class="block" style="border-radius:14px;overflow:hidden">
+    <div class="block-body" style="padding:0 16px">
+      <div class="schedule-grid">
+        <div class="sched-row">
+          <div class="sched-time">10:00</div>
+          <div class="sched-content"><div class="sched-label">全員でLP確認 → 修正リスト作成</div><div class="sched-note">画面共有 or 各自で開く。気になる箇所をその場でメモ</div></div>
+        </div>
+        <div class="sched-row">
+          <div class="sched-time">10:20</div>
+          <div class="sched-content"><div class="sched-label">🔵 Block A — LP修正タイム</div><div class="sched-note">画像差し替え・デザイン修正・GitHubへアップ</div></div>
+        </div>
+        <div class="sched-row">
+          <div class="sched-time">11:20</div>
+          <div class="sched-content"><div class="sched-label">🟣 Block B — CMS使い勝手改善</div><div class="sched-note">cms.htmlをClaudeと一緒にリニューアル</div></div>
+        </div>
+        <div class="sched-row">
+          <div class="sched-time">12:00</div>
+          <div class="sched-content"><div class="sched-label">昼休み</div><div class="sched-note"></div></div>
+        </div>
+        <div class="sched-row">
+          <div class="sched-time">13:00</div>
+          <div class="sched-content"><div class="sched-label">🟢 Block C — 画像をCMSで管理できるようにする</div><div class="sched-note">今日の山場。Supabaseに画像URL列を追加 → CMSとLPを改修</div></div>
+        </div>
+        <div class="sched-row">
+          <div class="sched-time">14:30</div>
+          <div class="sched-content"><div class="sched-label">🟠 Block D — スマホからテスト + 振り返り</div><div class="sched-note">全員スマホでCMSにアクセス → 画像URL変えてみる → LP確認</div></div>
+        </div>
+        <div class="sched-row">
+          <div class="sched-time">15:00</div>
+          <div class="sched-content"><div class="sched-label">終了</div><div class="sched-note">次回テーマの共有</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Block A -->
+  <div class="section-label">Block A</div>
+  <div class="block">
+    <div class="block-hd a">
+      <span class="block-tag a">A</span>
+      <h3>LP修正タイム</h3>
+      <span class="dur">10:20〜11:20（60分）</span>
+    </div>
+    <div class="block-body">
+      <div class="step-list">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <div class="step-title">全員でLPを開いて「気になるリスト」を声に出して作る</div>
+            <div class="step-desc">ファーストビュー・各セクション・スマホ表示を順番に確認。「ここの画像が荒い」「このテキストの余白が変」をその場でメモ。</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <div class="step-title">画像の問題を特定して解決する</div>
+            <div class="step-desc">画像が荒い原因は主に2つ：①元の画像ファイルが低解像度 ②圧縮・サイズ指定が間違っている。</div>
+            <div class="prompt-box">
+              <div class="label">Claudeへのプロンプト例</div>
+              <code>このLPの画像が荒く見えます。index.htmlのこの部分を確認してください。
+[該当のimgタグをコピペ]
+画像の画質を改善するために何ができますか？
+画像ファイルそのものの問題なのか、HTMLの書き方の問題なのかも教えてください。</code>
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <div class="step-title">デザインの修正をClaudeに依頼する</div>
+            <div class="step-desc">リストアップした修正点をClaudeに伝える。cssファイルやindex.htmlを渡して「ここを直して」と具体的に指示。</div>
+            <div class="prompt-box">
+              <div class="label">Claudeへのプロンプト例</div>
+              <code>採用サイトのLPを修正したいです。
+[index.html or 該当のcssをそのまま貼る]
+
+以下の点を修正してください：
+・セクション○○の余白が広すぎる
+・スマホで見たとき○○が崩れている
+・フォントサイズを○○に変えたい</code>
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <div class="step-title">修正したファイルをGitHubにアップ → LPを確認</div>
+            <div class="step-desc">GitHub Web（github.com）からファイルを直接編集してコミット。2〜3分でGitHub Pagesに反映される。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Block B -->
+  <div class="section-label">Block B</div>
+  <div class="block">
+    <div class="block-hd b">
+      <span class="block-tag b">B</span>
+      <h3>CMS使い勝手改善</h3>
+      <span class="dur">11:20〜12:00（40分）</span>
+    </div>
+    <div class="block-body">
+      <div class="alert warn" style="margin-bottom:14px">
+        <span class="alert-icon">⚠️</span>
+        <div><strong>現状の問題点（コード確認済み）</strong>：CMSには <code>content_key</code>（英語のシステム名）がそのまま表示されている。<code>label</code> 列はあるが目立たない。スマホ対応も不十分。</div>
+      </div>
+      <div class="step-list">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <div class="step-title">cms.htmlをまるごとClaudeに渡してUI改善を依頼</div>
+            <div class="prompt-box">
+              <div class="label">Claudeへのプロンプト例</div>
+              <code>このCMSのHTMLを改善してください。
+[cms.htmlをそのまま貼る]
+
+改善してほしいこと：
+・content_keyではなくlabelを大きく表示する
+・スマホで使いやすいようにボタンを大きくする
+・どのセクションを編集しているかわかりやすくする
+・保存後に「保存しました！」とわかりやすく表示する</code>
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <div class="step-title">改善版をGitHubにアップして全員でスマホ確認</div>
+            <div class="step-desc">スマホでcms.htmlを開いてみる。タップしやすいか、文字が読みやすいかを確認。まだ気になれば追加で修正依頼。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Block C -->
+  <div class="section-label">Block C — 今日の山場</div>
+  <div class="block">
+    <div class="block-hd c">
+      <span class="block-tag c">C</span>
+      <h3>画像をCMSから更新できるようにする</h3>
+      <span class="dur">13:00〜14:30（90分）</span>
+    </div>
+    <div class="block-body">
+
+      <div class="tech-note" style="margin-bottom:16px">
+        <strong>仕組みの解説</strong>：今は画像のパスが index.html に書かれていて、変えるにはGitHubでコードを編集する必要がある。これを「SupabaseのDBに画像URLを保存して、LPがそのURLを読み込む」に変えると、CMSから画像URLを更新するだけでLPの画像が変わるようになる。
+      </div>
+
+      <div class="section-label" style="margin-bottom:12px;font-size:10px">解決策の選択肢</div>
+      <div class="choices" style="margin-bottom:18px">
+        <div class="choice">
+          <span class="choice-badge rec">今日やる</span>
+          <div class="choice-text">
+            <strong>① 画像URLをSupabaseに追加（一番シンプル）</strong>
+            <span>Supabaseの site_content テーブルに画像URL用の行を追加 → index.htmlがそのURLで img src を上書き → CMSで画像URLを貼るだけで更新できる。画像は外部サービス（Imgur, Google Photos など）に上げてURLをコピー。</span>
+          </div>
+        </div>
+        <div class="choice">
+          <span class="choice-badge alt">余裕あれば</span>
+          <div class="choice-text">
+            <strong>② Supabase Storageを使う</strong>
+            <span>Supabaseに画像を直接アップロードできるストレージを作る。CMSに画像アップロードボタンを追加。完全スマホ完結。実装が少し複雑。</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="step-list">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <div class="step-title">Supabaseで「どの画像から始めるか」を決める</div>
+            <div class="step-desc">まず1枚だけ試す。たとえば「section-01のメイン画像」を選ぶ。全部一気にやろうとしない。</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <div class="step-title">Supabaseにデータを追加する（Claudeが書くSQLを実行）</div>
+            <div class="prompt-box">
+              <div class="label">Claudeへのプロンプト例</div>
+              <code>Supabaseの site_content テーブルに画像URL用の行を追加したいです。
+テーブルの構成は content_key, value, section, label です。
+
+section-01のメイン画像（技術者の写真）のURLを管理できるように
+INSERT文を書いてください。
+content_keyの名前も一緒に提案してください。</code>
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <div class="step-title">index.htmlを修正してSupabaseから画像URLを読み込む</div>
+            <div class="prompt-box">
+              <div class="label">Claudeへのプロンプト例</div>
+              <code>index.htmlのSupabaseからデータを取得している部分を修正してください。
+[index.htmlのSupabase接続コードをコピペ]
+
+site_contentに "section01_main_image" というkeyで画像URLを保存しました。
+この値を取得して、以下のimgタグのsrcを差し替えるコードを追加してください。
+[対象のimgタグをコピペ]</code>
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <div class="step-title">CMSでも画像URLを編集できるように cms.html を更新</div>
+            <div class="step-desc">Block B で改善したCMSに、画像のsectionも表示されるようになっているはず。CMSを開いて「section-01」→ 画像URL行を確認。</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">5</div>
+          <div class="step-body">
+            <div class="step-title">テスト用の画像URLを入れてLPで確認</div>
+            <div class="step-desc">無料で使えるテスト画像URL（例：picsum.photos）をCMSに貼って保存 → LPをリロードして画像が変わることを確認。動いたら本物の画像URLに戻す。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Block D -->
+  <div class="section-label">Block D</div>
+  <div class="block">
+    <div class="block-hd d">
+      <span class="block-tag d">D</span>
+      <h3>スマホからテスト + 振り返り</h3>
+      <span class="dur">14:30〜15:00（30分）</span>
+    </div>
+    <div class="block-body">
+      <div class="step-list">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <div class="step-title">全員スマホでCMSを開いてみる</div>
+            <div class="step-desc">URLを共有 → スマホのブラウザで開く → ログイン → テキストを1つ変えて保存 → LPをリロードして反映確認。</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <div class="step-title">Block Cで作った画像更新もスマホから試す</div>
+            <div class="step-desc">スマホで撮った写真をGoogle フォトやImgurにアップ → URLをコピー → CMSに貼り付けて保存 → LPに反映されるか確認。</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <div class="step-title">振り返り：今日できたこと・次に向けてやりたいこと</div>
+            <div class="step-desc">アンケートフォームで感想を入力してもらう（匿名OK）。次回やりたいことも聞いておく。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- summary -->
+  <div class="summary-card">
+    <h2>今日終わったらこの状態になっている</h2>
+    <div class="summary-list">
+      <div class="summary-item">LPの気になっていた箇所が直っている</div>
+      <div class="summary-item">CMSがスマホでも使いやすくなっている</div>
+      <div class="summary-item">少なくとも1枚の画像がCMSから更新できるようになっている</div>
+      <div class="summary-item">スマホから採用サイトを更新する体験ができた</div>
+    </div>
+  </div>
+
+  <div class="alert ok">
+    <span class="alert-icon">💡</span>
+    <div><strong>AIの活用視点で振り返る</strong>：今日やったことは「エラーを読む・Claudeに渡す・コードを直す・確認する」のループ。これが「AIで業務を楽にする」の基本パターン。LP以外でも同じことができる。</div>
+  </div>
+
+</div>

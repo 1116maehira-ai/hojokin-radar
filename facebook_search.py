@@ -12,8 +12,9 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.service import Service
 
 
 class FacebookSearcher:
@@ -43,11 +44,16 @@ class FacebookSearcher:
         options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
 
         try:
-            self.driver = webdriver.Chrome(options=options)
+            service = Service(ChromeDriverManager().install())
+            self.driver = webdriver.Chrome(service=service, options=options)
         except Exception as e:
             print(f"⚠️  Chrome起動失敗: {e}")
-            print("   ChromeDriverがインストールされているか確認してください")
-            raise
+            print("   webdriver-manager でChromeDriverを自動管理します")
+            try:
+                self.driver = webdriver.Chrome(options=options)
+            except Exception as e2:
+                print(f"❌ Chrome起動完全失敗: {e2}")
+                raise
 
     def search_person(self, name: str, company: str = None, max_results: int = 5) -> list:
         """

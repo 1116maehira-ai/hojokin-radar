@@ -28,3 +28,105 @@ GitHub Pagesのダッシュボード表示＋LINE通知するツール。
 - 分類精度が悪いと感じたら `company_profile.md` を具体化する（採択実績・狙う公募の実例を足す）
 - ⚠ 厚労省系「助成金」の提出代行は社労士独占業務。`needs_sharoushi: true` の案件は提携社労士へ
 - 次フェーズ候補: 公募要領PDFの自動取得→申請書骨子の自動生成 / 締切カウントダウン / Supabase移行
+
+---
+
+## 📱 新機能：メルマガ登録者 × Facebook 友達申請支援システム
+
+ニュースレター登録者をFacebookで検索し、友達申請・メッセージ送信を支援するシステム。
+
+### 使用方法
+
+#### 1️⃣ **新規登録フロー** （名刺から登録＋Facebook検索）
+
+```bash
+python newsletter_facebook_integration.py register <名刺画像パス> [--category 分類]
+```
+
+**動作フロー：**
+1. 📸 名刺の画像から Claude Vision で情報抽出（氏名、会社、役職、電話等）
+2. 🗄️ Supabase `mailing_list` に登録
+3. 🔍 Facebook で該当者を検索（最大5件）
+4. 💬 メッセージテンプレートを自動生成
+5. 👤 ユーザーが確認して友達申請＆メッセージを送信
+
+**例：**
+```bash
+python newsletter_facebook_integration.py register business_card.jpg --category 直クライアント
+```
+
+**出力例：**
+```json
+{
+  "contact_info": {
+    "name": "花井豊",
+    "company": "株式会社UKANO",
+    "role": "代表取締役",
+    "email": "y.hanai@ukano.jp",
+    "phone": "090-4391-9598"
+  },
+  "facebook_candidates": [
+    {
+      "name": "花井 豊",
+      "profile_url": "https://www.facebook.com/profile.php?id=123456789",
+      "company": "UKANO"
+    }
+  ],
+  "message_template": "先日、お名刺を交換させていただきありがとうございました...",
+  "next_step": "👤 上記の候補から正しい人を選んで、友達申請＆メッセージを送ってください"
+}
+```
+
+#### 2️⃣ **既存登録者の一括検索** （カテゴリ指定でFacebook検索）
+
+```bash
+python newsletter_facebook_integration.py search <カテゴリ名> [--limit 10]
+```
+
+**動作フロー：**
+1. 🗄️ Supabase から指定カテゴリの登録者を取得（最大10人）
+2. 🔍 各人を Facebook で検索（最大3件の候補）
+3. 💬 各人のメッセージテンプレートを生成
+4. 👤 ユーザーが確認して一括申請可能
+
+**例：**
+```bash
+python newsletter_facebook_integration.py search 直クライアント --limit 10
+```
+
+### 環境変数設定
+
+```bash
+# .env ファイルに以下を設定
+SUPABASE_URL=https://vfgujkocemgezvcuixpp.supabase.co
+SUPABASE_KEY=<your-supabase-key>
+ANTHROPIC_API_KEY=<your-claude-api-key>
+```
+
+### 必要な環境
+
+- **Chrome/Chromium** … Selenium でFacebook自動検索に使用
+- **Python 3.8+**
+- **必要ライブラリ** … `pip install -r requirements.txt`
+
+### メッセージテンプレート
+
+自動生成されるメッセージ例：
+
+```
+先日、お名刺を交換させていただきありがとうございました。株式会社テノヒラの
+前平 雄一朗です。
+
+Facebookの方でももしよければつながってくださいますと嬉しいです
+
+どこかのタイミングで、また詳しくお話もお聞かせ下さい
+よろしくお願いいたします🙏
+
+追伸・{相手の名前}さんは、インスタにもいらっしゃいますでしょうか？
+```
+
+### 注意点
+
+- ⚠️ Facebook は自動化を制限しているため、検索結果は完全ではない可能性があります
+- ⚠️ 友達申請数が多い場合、アカウント制限のリスクがあるため、**1日の申請数は10件程度に抑えることをお勧めします**
+- ⚠️ 検索結果は最大5件（新規登録時）または3件（一括検索時）です

@@ -1,0 +1,66 @@
+======================================================================
+📊 Facebook 検索結果サマリー
+======================================================================
+
+✅ 10人の検索結果を生成しました
+カテゴリ: 直クライアント
+モード: manual_url（ネットワーク制限によりブラウザ自動化は使用不可）
+
+======================================================================
+
+【1】 花井豊（UKANO）
+   会社: 株式会社UKANO
+   役職: 代表取締役
+   📱 Facebook検索: https://www.facebook.com/search/people/?q=%E8%8A%B1%E4%BA%95%E8%B1%8A%EF%BC%88UKANO%EF%BC%89%20%E6%A0%AA%E5%BC%8F%E4%BC%9A%E7%A4%BEUKANO
+
+【2】 川満尚彦（Reha GRIT）
+   会社: Reha GRIT
+   役職: 代表取締役/作業療法士
+   📱 Facebook検索: https://www.facebook.com/search/people/?q=%E5%B7%9D%E6%BA%80%E5%B0%9A%E5%BD%A6%EF%BC%88Reha%20GRIT%EF%BC%89%20Reha%20GRIT
+
+【3】 又吉盛綾（設備技研）
+   会社: 株式会社 設備技研
+   役職: 工事部
+   📱 Facebook検索: https://www.facebook.com/search/people/?q=%E5%8F%88%E5%90%89%E7%9B%9B%E7%B6%BE%EF%BC%88%E8%A8%AD%E5%82%99%E6%8A%80%E7%A0%94%EF%BC%89%20%E6%A0%AA%E5%BC%8F%E4%BC%9A%E7%A4%BE%20%E8%A8%AD%E5%82%99%E6%8A%80%E7%A0%94
+
+【4】 宮城 大
+   会社: 株式会社ミヤセ商会
+   役職: 代表取締役／古物査定士
+   📱 Facebook検索: https://www.facebook.com/search/people/?q=%E5%AE%AE%E5%9F%8E%20%E5%A4%A7%20%E6%A0%AA%E5%BC%8F%E4%BC%9A%E7%A4%BE%E3%83%9F%E3%83%A4%E3%82%BB%E5%95%86%E4%BC%9A
+
+【5】 東恩納 大一
+   会社: coloredtree（カラードツリー）
+   役職: 代表取締役
+   📱 Facebook検索: https://www.facebook.com/search/people/?q=%E6%9D%B1%E6%81%A9%E7%B4%8D%20%E5%A4%A7%E4%B8%80%20coloredtree%EF%BC%88%E3%82%AB%E3%83%A9%E3%83%BC%E3%83%89%E3%83%84%E3%83%AA%E3%83%BC%EF%BC%89
+
+【6】 久場 良洋
+   会社: 一般社団法人 千和 ちより学童クラブ
+   役職: 副代表／放課後児童支援員
+   📱 Facebook検索: https://www.facebook.com/search/people/?q=%E4%B9%85%E5%A0%B4%20%E8%89%AF%E6%B4%8B%20%E4%B8%80%E8%88%AC%E7%A4%BE%E5%9B%A3%E6%B3%95%E4%BA%BA%20%E5%8D%83%E5%92%8C%20%E3%81%A1%E3%82%88%E3%82%8A%E5%AD%A6%E7%AB%A5%E3%82%AF%E3%83%A9%E3%83%96
+
+【7】 糸満 盛希
+   会社: 有限会社 糸工房
+   役職: 代表取締役社長
+   📱 Facebook検索: https://www.facebook.com/search/people/?q=%E7%B3%B8%E6%BA%80%20%E7%9B%9B%E5%B8%8C%20%E6%9C%89%E9%99%90%E4%BC%9A%E7%A4%BE%20%E7%B3%B8%E5%B7%A5%E6%88%BF
+
+【8】 伊波 就子
+   会社: 一般社団法人 たっくたっく
+   役職: 代表理事
+   📱 Facebook検索: https://www.facebook.com/search/people/?q=%E4%BC%8A%E6%B3%A2%20%E5%B0%B1%E5%AD%90%20%E4%B8%80%E8%88%AC%E7%A4%BE%E5%9B%A3%E6%B3%95%E4%BA%BA%20%E3%81%9F%E3%81%A3%E3%81%8F%E3%81%9F%E3%81%A3%E3%81%8F
+
+【9】 大城 裕弥
+   会社: 株式会社478COMPANY
+   役職: サステナビリティ事業部・宅地建物取引士
+   📱 Facebook検索: https://www.facebook.com/search/people/?q=%E5%A4%A7%E5%9F%8E%20%E8%A3%95%E5%BC%A5%20%E6%A0%AA%E5%BC%8F%E4%BC%9A%E7%A4%BE478COMPANY
+
+【10】 玉城佐恵子
+   会社: RYUSABI GROUP
+   役職: 役員/アスリートネイルトレーナー
+   📱 Facebook検索: https://www.facebook.com/search/people/?q=%E7%8E%89%E5%9F%8E%E4%BD%90%E6%81%B5%E5%AD%90%20RYUSABI%20GROUP
+
+✅ 完全な検索結果を保存しました: facebook_search_results.json
+
+使い方:
+1. 上記のFacebook検索URLを開く（またはfacebook_search_results.jsonから確認）
+2. 検索結果から正しい相手を見つける
+3. 上記のメッセージテンプレートを使用して友達申請＆メッセージを送信

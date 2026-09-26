@@ -88,6 +88,11 @@
             box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
         }
 
+        .contact-card.completed {
+            opacity: 0.6;
+            background: #f9f9f9;
+        }
+
         .contact-index {
             display: inline-block;
             background: #667eea;
@@ -146,10 +151,12 @@
             margin-top: 20px;
             padding-top: 20px;
             border-top: 1px solid #f0f0f0;
+            flex-wrap: wrap;
         }
 
         .btn {
             flex: 1;
+            min-width: 100px;
             padding: 10px 15px;
             border: none;
             border-radius: 6px;
@@ -177,6 +184,36 @@
 
         .btn-copy:hover {
             background: #e0e0e0;
+        }
+
+        .btn-complete {
+            background: #22c55e;
+            color: white;
+        }
+
+        .btn-complete:hover {
+            background: #16a34a;
+        }
+
+        .btn-undo {
+            background: #94a3b8;
+            color: white;
+            flex: 1;
+        }
+
+        .btn-undo:hover {
+            background: #64748b;
+        }
+
+        .status-badge {
+            display: inline-block;
+            background: #22c55e;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            margin-left: 10px;
+            font-weight: 600;
         }
 
         .toast {
@@ -213,6 +250,24 @@
             border-radius: 8px;
             margin: 20px 0;
         }
+
+        .section-title {
+            color: white;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        #completedSection {
+            margin-top: 40px;
+        }
+
+        .header-with-badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
     </style>
 </head>
 <body>
@@ -238,28 +293,47 @@
 
         <div id="error" class="error" style="display: none;"></div>
 
-        <div class="contacts-grid" id="contactsGrid">
-            <!-- コンタクトカードが動的に挿入されます -->
+        <div id="pendingSection">
+            <div class="section-title">📝 対応待ち <span id="pendingCount"></span></div>
+            <div class="contacts-grid" id="contactsGrid"></div>
+        </div>
+
+        <div id="completedSection" style="display: none;">
+            <div class="section-title">✅ 済み <span id="completedCount"></span></div>
+            <div class="contacts-grid" id="completedGrid" style="opacity: 0.6;"></div>
         </div>
 
         <footer>
             💡 使い方：
-            1️⃣「Facebook検索」をクリック → 2️⃣「コピー」でメッセージをコピー
-            → 3️⃣ 友達申請後、メッセージを貼り付けて送信
+            1️⃣「Facebook検索」をクリック → 2️⃣「メッセージをコピー」で送信 → 3️⃣「完了」をマーク
         </footer>
     </div>
 
     <div class="toast" id="toast"></div>
 
     <script>
+        let allData = null;
+        let completedIds = new Set();
+
         async function loadData() {
             try {
                 const response = await fetch('facebook_search_results.json');
                 if (!response.ok) {
                     throw new Error(`HTTPエラー: ${response.status}`);
                 }
-                const data = await response.json();
-                renderDashboard(data);
+                allData = await response.json();
+
+                try {
+                    const completedResponse = await fetch('contacted.json');
+                    if (completedResponse.ok) {
+                        const completedData = await completedResponse.json();
+                        completedIds = new Set(completedData.completed_ids || []);
+                    }
+                } catch (e) {
+                    completedIds = new Set();
+                }
+
+                renderDashboard(allData);
             } catch (error) {
                 showError(`データ読み込みエラー: ${error.message}`);
                 console.error('Error:', error);
@@ -267,7 +341,6 @@
         }
 
         function renderDashboard(data) {
-            // サマリーを更新
             document.getElementById('totalCount').textContent = data.total_contacts;
             document.getElementById('categoryDisplay').textContent = data.category;
 
@@ -278,26 +351,69 @@
             });
             document.getElementById('generatedDate').textContent = formattedDate;
 
-            // コンタクトカードを描画
-            const grid = document.getElementById('contactsGrid');
-            grid.innerHTML = '';
+            const pendingContacts = [];
+            const completedContacts = [];
 
             data.contacts.forEach(contact => {
-                const card = createContactCard(contact);
+                if (completedIds.has(contact.contact_id)) {
+                    completedContacts.push(contact);
+                } else {
+                    pendingContacts.push(contact);
+                }
+            });
+
+            const grid = document.getElementById('contactsGrid');
+            grid.innerHTML = '';
+            pendingContacts.forEach(contact => {
+                const card = createContactCard(contact, false);
                 grid.appendChild(card);
             });
+            document.getElementById('pendingCount').textContent = `(${pendingContacts.length})`;
+
+            if (completedContacts.length > 0) {
+                document.getElementById('completedSection').style.display = 'block';
+                const completedGrid = document.getElementById('completedGrid');
+                completedGrid.innerHTML = '';
+                completedContacts.forEach(contact => {
+                    const card = createContactCard(contact, true);
+                    completedGrid.appendChild(card);
+                });
+                document.getElementById('completedCount').textContent = `(${completedContacts.length})`;
+            } else {
+                document.getElementById('completedSection').style.display = 'none';
+            }
         }
 
-        function createContactCard(contact) {
+        function createContactCard(contact, isCompleted = false) {
             const card = document.createElement('div');
-            card.className = 'contact-card';
+            card.className = isCompleted ? 'contact-card completed' : 'contact-card';
 
             const info = contact.contact_info;
             const fb = contact.facebook_search;
             const msg = contact.message_template;
 
+            const statusBadge = isCompleted ? '<span class="status-badge">済み</span>' : '';
+
+            let actionButtons = '';
+            if (isCompleted) {
+                actionButtons = `<button class="btn btn-undo" onclick="markIncomplete('${contact.contact_id}')">↶ やり直す</button>`;
+            } else {
+                actionButtons = `
+                    <a href="${fb.search_url}" target="_blank" class="btn btn-facebook">
+                        🔍 Facebook検索
+                    </a>
+                    <button class="btn btn-copy" onclick="copyToClipboard('${escapeForJs(msg)}')">
+                        📋 メッセージをコピー
+                    </button>
+                    <button class="btn btn-complete" onclick="markComplete('${contact.contact_id}')">✅ 完了</button>
+                `;
+            }
+
             card.innerHTML = `
-                <div class="contact-index">${contact.index}</div>
+                <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                    <div class="contact-index">${contact.index}</div>
+                    ${statusBadge}
+                </div>
                 <div class="contact-name">${info.name}</div>
                 <div class="contact-company">${info.company}</div>
 
@@ -317,12 +433,7 @@
                 </div>
 
                 <div class="contact-actions">
-                    <a href="${fb.search_url}" target="_blank" class="btn btn-facebook">
-                        🔍 Facebook検索
-                    </a>
-                    <button class="btn btn-copy" onclick="copyToClipboard('${escapeForJs(msg)}')">
-                        📋 メッセージをコピー
-                    </button>
+                    ${actionButtons}
                 </div>
             `;
 
@@ -337,7 +448,6 @@
         }
 
         function copyToClipboard(text) {
-            // 実際のテキストに戻す
             const actualText = text
                 .replace(/\\n/g, '\n')
                 .replace(/\\'/g, "'")
@@ -346,6 +456,41 @@
             navigator.clipboard.writeText(actualText)
                 .then(() => showToast('✅ メッセージをコピーしました'))
                 .catch(() => showToast('⚠️ コピーに失敗しました'));
+        }
+
+        async function markComplete(contactId) {
+            completedIds.add(contactId);
+            await saveCompleted();
+            showToast('✅ 完了にマークしました');
+            renderDashboard(allData);
+        }
+
+        async function markIncomplete(contactId) {
+            completedIds.delete(contactId);
+            await saveCompleted();
+            showToast('↶ やり直しにしました');
+            renderDashboard(allData);
+        }
+
+        async function saveCompleted() {
+            const data = {
+                completed_ids: Array.from(completedIds),
+                updated_at: new Date().toISOString()
+            };
+
+            try {
+                const response = await fetch('contacted.json', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data, null, 2)
+                });
+
+                if (!response.ok) {
+                    localStorage.setItem('completedIds', JSON.stringify(Array.from(completedIds)));
+                }
+            } catch (e) {
+                localStorage.setItem('completedIds', JSON.stringify(Array.from(completedIds)));
+            }
         }
 
         function showToast(message) {
@@ -364,7 +509,6 @@
             errorDiv.style.display = 'block';
         }
 
-        // ページ読み込み時にデータを読み込む
         loadData();
     </script>
 </body>

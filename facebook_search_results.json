@@ -1,0 +1,238 @@
+{
+  "category": "直クライアント",
+  "generated_at": "2026-09-26T00:53:56.731717",
+  "total_contacts": 10,
+  "search_mode": "manual_url（ネットワーク制限によりブラウザ自動化は使用不可）",
+  "contacts": [
+    {
+      "index": 1,
+      "contact_id": "0a98a1cf-9cde-47ba-aa36-e0ff07afe984",
+      "contact_info": {
+        "name": "花井豊（UKANO）",
+        "company": "株式会社UKANO",
+        "email": "y.hanai@ukano.jp",
+        "phone": "090-4391-9598",
+        "role": "代表取締役"
+      },
+      "facebook_search": {
+        "query": "花井豊（UKANO） 株式会社UKANO",
+        "search_url": "https://www.facebook.com/search/people/?q=%E8%8A%B1%E4%BA%95%E8%B1%8A%EF%BC%88UKANO%EF%BC%89%20%E6%A0%AA%E5%BC%8F%E4%BC%9A%E7%A4%BEUKANO",
+        "instructions": "このURLをブラウザで開き、検索結果から正しい相手を確認してください"
+      },
+      "message_template": "先日、お名刺を交換させていただきありがとうございました。株式会社テノヒラの\n前平 雄一朗です。\n\nFacebookの方でももしよければつながってくださいますと嬉しいです\n\nどこかのタイミングで、また詳しくお話もお聞かせ下さい\nよろしくお願いいたします🙏\n\n追伸・花井豊さんは、インスタにもいらっしゃいますでしょうか？",
+      "next_steps": [
+        "1. 上記のFacebook検索URLを開く",
+        "2. 検索結果から正しい相手を見つける",
+        "3. 友達申請を送る",
+        "4. 上記のメッセージを送信する"
+      ]
+    },
+    {
+      "index": 2,
+      "contact_id": "e33b1e47-33da-4a16-a725-9b62a33a65c8",
+      "contact_info": {
+        "name": "川満尚彦（Reha GRIT）",
+        "company": "Reha GRIT",
+        "email": "rehogrit@gmail.com",
+        "phone": "098-943-2077",
+        "role": "代表取締役/作業療法士"
+      },
+      "facebook_search": {
+        "query": "川満尚彦（Reha GRIT） Reha GRIT",
+        "search_url": "https://www.facebook.com/search/people/?q=%E5%B7%9D%E6%BA%80%E5%B0%9A%E5%BD%A6%EF%BC%88Reha%20GRIT%EF%BC%89%20Reha%20GRIT",
+        "instructions": "このURLをブラウザで開き、検索結果から正しい相手を確認してください"
+      },
+      "message_template": "先日、お名刺を交換させていただきありがとうございました。株式会社テノヒラの\n前平 雄一朗です。\n\nFacebookの方でももしよければつながってくださいますと嬉しいです\n\nどこかのタイミングで、また詳しくお話もお聞かせ下さい\nよろしくお願いいたします🙏\n\n追伸・川満尚彦さんは、インスタにもいらっしゃいますでしょうか？",
+      "next_steps": [
+        "1. 上記のFacebook検索URLを開く",
+        "2. 検索結果から正しい相手を見つける",
+        "3. 友達申請を送る",
+        "4. 上記のメッセージを送信する"
+      ]
+    },
+    {
+      "index": 3,
+      "contact_id": "49aa563b-32b8-4ece-9808-f3c21194da0c",
+      "contact_info": {
+        "name": "又吉盛綾（設備技研）",
+        "company": "株式会社 設備技研",
+        "email": "matayoshi.s0223@setsubi-giken.co.jp",
+        "phone": "098-934-1313",
+        "role": "工事部"
+      },
+      "facebook_search": {
+        "query": "又吉盛綾（設備技研） 株式会社 設備技研",
+        "search_url": "https://www.facebook.com/search/people/?q=%E5%8F%88%E5%90%89%E7%9B%9B%E7%B6%BE%EF%BC%88%E8%A8%AD%E5%82%99%E6%8A%80%E7%A0%94%EF%BC%89%20%E6%A0%AA%E5%BC%8F%E4%BC%9A%E7%A4%BE%20%E8%A8%AD%E5%82%99%E6%8A%80%E7%A0%94",
+        "instructions": "このURLをブラウザで開き、検索結果から正しい相手を確認してください"
+      },
+      "message_template": "先日、お名刺を交換させていただきありがとうございました。株式会社テノヒラの\n前平 雄一朗です。\n\nFacebookの方でももしよければつながってくださいますと嬉しいです\n\nどこかのタイミングで、また詳しくお話もお聞かせ下さい\nよろしくお願いいたします🙏\n\n追伸・又吉盛綾さんは、インスタにもいらっしゃいますでしょうか？",
+      "next_steps": [
+        "1. 上記のFacebook検索URLを開く",
+        "2. 検索結果から正しい相手を見つける",
+        "3. 友達申請を送る",
+        "4. 上記のメッセージを送信する"
+      ]
+    },
+    {
+      "index": 4,
+      "contact_id": "005283b6-27b7-4d47-ab00-5fe72ed7effb",
+      "contact_info": {
+        "name": "宮城 大",
+        "company": "株式会社ミヤセ商会",
+        "email": "info@miyase-shoukai.co.jp",
+        "phone": "090-9959-4836",
+        "role": "代表取締役／古物査定士"
+      },
+      "facebook_search": {
+        "query": "宮城 大 株式会社ミヤセ商会",
+        "search_url": "https://www.facebook.com/search/people/?q=%E5%AE%AE%E5%9F%8E%20%E5%A4%A7%20%E6%A0%AA%E5%BC%8F%E4%BC%9A%E7%A4%BE%E3%83%9F%E3%83%A4%E3%82%BB%E5%95%86%E4%BC%9A",
+        "instructions": "このURLをブラウザで開き、検索結果から正しい相手を確認してください"
+      },
+      "message_template": "先日、お名刺を交換させていただきありがとうございました。株式会社テノヒラの\n前平 雄一朗です。\n\nFacebookの方でももしよければつながってくださいますと嬉しいです\n\nどこかのタイミングで、また詳しくお話もお聞かせ下さい\nよろしくお願いいたします🙏\n\n追伸・大さんは、インスタにもいらっしゃいますでしょうか？",
+      "next_steps": [
+        "1. 上記のFacebook検索URLを開く",
+        "2. 検索結果から正しい相手を見つける",
+        "3. 友達申請を送る",
+        "4. 上記のメッセージを送信する"
+      ]
+    },
+    {
+      "index": 5,
+      "contact_id": "9fe62cd4-35ff-4248-a0c0-1852fcd578ca",
+      "contact_info": {
+        "name": "東恩納 大一",
+        "company": "coloredtree（カラードツリー）",
+        "email": "t.higashionna@coloredtree.co.jp",
+        "phone": "080-6483-7890",
+        "role": "代表取締役"
+      },
+      "facebook_search": {
+        "query": "東恩納 大一 coloredtree（カラードツリー）",
+        "search_url": "https://www.facebook.com/search/people/?q=%E6%9D%B1%E6%81%A9%E7%B4%8D%20%E5%A4%A7%E4%B8%80%20coloredtree%EF%BC%88%E3%82%AB%E3%83%A9%E3%83%BC%E3%83%89%E3%83%84%E3%83%AA%E3%83%BC%EF%BC%89",
+        "instructions": "このURLをブラウザで開き、検索結果から正しい相手を確認してください"
+      },
+      "message_template": "先日、お名刺を交換させていただきありがとうございました。株式会社テノヒラの\n前平 雄一朗です。\n\nFacebookの方でももしよければつながってくださいますと嬉しいです\n\nどこかのタイミングで、また詳しくお話もお聞かせ下さい\nよろしくお願いいたします🙏\n\n追伸・大一さんは、インスタにもいらっしゃいますでしょうか？",
+      "next_steps": [
+        "1. 上記のFacebook検索URLを開く",
+        "2. 検索結果から正しい相手を見つける",
+        "3. 友達申請を送る",
+        "4. 上記のメッセージを送信する"
+      ]
+    },
+    {
+      "index": 6,
+      "contact_id": "7a100ef3-ef90-4df1-ba42-915020a295c8",
+      "contact_info": {
+        "name": "久場 良洋",
+        "company": "一般社団法人 千和 ちより学童クラブ",
+        "email": "chiyorigakudou@gmail.com",
+        "phone": "090-1341-3041",
+        "role": "副代表／放課後児童支援員"
+      },
+      "facebook_search": {
+        "query": "久場 良洋 一般社団法人 千和 ちより学童クラブ",
+        "search_url": "https://www.facebook.com/search/people/?q=%E4%B9%85%E5%A0%B4%20%E8%89%AF%E6%B4%8B%20%E4%B8%80%E8%88%AC%E7%A4%BE%E5%9B%A3%E6%B3%95%E4%BA%BA%20%E5%8D%83%E5%92%8C%20%E3%81%A1%E3%82%88%E3%82%8A%E5%AD%A6%E7%AB%A5%E3%82%AF%E3%83%A9%E3%83%96",
+        "instructions": "このURLをブラウザで開き、検索結果から正しい相手を確認してください"
+      },
+      "message_template": "先日、お名刺を交換させていただきありがとうございました。株式会社テノヒラの\n前平 雄一朗です。\n\nFacebookの方でももしよければつながってくださいますと嬉しいです\n\nどこかのタイミングで、また詳しくお話もお聞かせ下さい\nよろしくお願いいたします🙏\n\n追伸・良洋さんは、インスタにもいらっしゃいますでしょうか？",
+      "next_steps": [
+        "1. 上記のFacebook検索URLを開く",
+        "2. 検索結果から正しい相手を見つける",
+        "3. 友達申請を送る",
+        "4. 上記のメッセージを送信する"
+      ]
+    },
+    {
+      "index": 7,
+      "contact_id": "fc85cd15-9e34-4d25-8c96-454fe2e61876",
+      "contact_info": {
+        "name": "糸満 盛希",
+        "company": "有限会社 糸工房",
+        "email": "info@itokoubou.jp",
+        "phone": "090-2583-8945",
+        "role": "代表取締役社長"
+      },
+      "facebook_search": {
+        "query": "糸満 盛希 有限会社 糸工房",
+        "search_url": "https://www.facebook.com/search/people/?q=%E7%B3%B8%E6%BA%80%20%E7%9B%9B%E5%B8%8C%20%E6%9C%89%E9%99%90%E4%BC%9A%E7%A4%BE%20%E7%B3%B8%E5%B7%A5%E6%88%BF",
+        "instructions": "このURLをブラウザで開き、検索結果から正しい相手を確認してください"
+      },
+      "message_template": "先日、お名刺を交換させていただきありがとうございました。株式会社テノヒラの\n前平 雄一朗です。\n\nFacebookの方でももしよければつながってくださいますと嬉しいです\n\nどこかのタイミングで、また詳しくお話もお聞かせ下さい\nよろしくお願いいたします🙏\n\n追伸・盛希さんは、インスタにもいらっしゃいますでしょうか？",
+      "next_steps": [
+        "1. 上記のFacebook検索URLを開く",
+        "2. 検索結果から正しい相手を見つける",
+        "3. 友達申請を送る",
+        "4. 上記のメッセージを送信する"
+      ]
+    },
+    {
+      "index": 8,
+      "contact_id": "01bc4f19-ea20-4971-9035-ac7f32649ded",
+      "contact_info": {
+        "name": "伊波 就子",
+        "company": "一般社団法人 たっくたっく",
+        "email": "taktak.okinawa@gmail.com",
+        "phone": "090-1179-1199",
+        "role": "代表理事"
+      },
+      "facebook_search": {
+        "query": "伊波 就子 一般社団法人 たっくたっく",
+        "search_url": "https://www.facebook.com/search/people/?q=%E4%BC%8A%E6%B3%A2%20%E5%B0%B1%E5%AD%90%20%E4%B8%80%E8%88%AC%E7%A4%BE%E5%9B%A3%E6%B3%95%E4%BA%BA%20%E3%81%9F%E3%81%A3%E3%81%8F%E3%81%9F%E3%81%A3%E3%81%8F",
+        "instructions": "このURLをブラウザで開き、検索結果から正しい相手を確認してください"
+      },
+      "message_template": "先日、お名刺を交換させていただきありがとうございました。株式会社テノヒラの\n前平 雄一朗です。\n\nFacebookの方でももしよければつながってくださいますと嬉しいです\n\nどこかのタイミングで、また詳しくお話もお聞かせ下さい\nよろしくお願いいたします🙏\n\n追伸・就子さんは、インスタにもいらっしゃいますでしょうか？",
+      "next_steps": [
+        "1. 上記のFacebook検索URLを開く",
+        "2. 検索結果から正しい相手を見つける",
+        "3. 友達申請を送る",
+        "4. 上記のメッセージを送信する"
+      ]
+    },
+    {
+      "index": 9,
+      "contact_id": "2419e0c3-2d35-4939-8829-37ee1b464059",
+      "contact_info": {
+        "name": "大城 裕弥",
+        "company": "株式会社478COMPANY",
+        "email": "yuya.478company@gmail.com",
+        "phone": "050-5364-9634",
+        "role": "サステナビリティ事業部・宅地建物取引士"
+      },
+      "facebook_search": {
+        "query": "大城 裕弥 株式会社478COMPANY",
+        "search_url": "https://www.facebook.com/search/people/?q=%E5%A4%A7%E5%9F%8E%20%E8%A3%95%E5%BC%A5%20%E6%A0%AA%E5%BC%8F%E4%BC%9A%E7%A4%BE478COMPANY",
+        "instructions": "このURLをブラウザで開き、検索結果から正しい相手を確認してください"
+      },
+      "message_template": "先日、お名刺を交換させていただきありがとうございました。株式会社テノヒラの\n前平 雄一朗です。\n\nFacebookの方でももしよければつながってくださいますと嬉しいです\n\nどこかのタイミングで、また詳しくお話もお聞かせ下さい\nよろしくお願いいたします🙏\n\n追伸・裕弥さんは、インスタにもいらっしゃいますでしょうか？",
+      "next_steps": [
+        "1. 上記のFacebook検索URLを開く",
+        "2. 検索結果から正しい相手を見つける",
+        "3. 友達申請を送る",
+        "4. 上記のメッセージを送信する"
+      ]
+    },
+    {
+      "index": 10,
+      "contact_id": "9e9a281e-2a42-4114-9a5b-210710aeb354",
+      "contact_info": {
+        "name": "玉城佐恵子",
+        "company": "RYUSABI GROUP",
+        "email": "tamashiro@ryusabi.co.jp",
+        "phone": "080-3188-2379",
+        "role": "役員/アスリートネイルトレーナー"
+      },
+      "facebook_search": {
+        "query": "玉城佐恵子 RYUSABI GROUP",
+        "search_url": "https://www.facebook.com/search/people/?q=%E7%8E%89%E5%9F%8E%E4%BD%90%E6%81%B5%E5%AD%90%20RYUSABI%20GROUP",
+        "instructions": "このURLをブラウザで開き、検索結果から正しい相手を確認してください"
+      },
+      "message_template": "先日、お名刺を交換させていただきありがとうございました。株式会社テノヒラの\n前平 雄一朗です。\n\nFacebookの方でももしよければつながってくださいますと嬉しいです\n\nどこかのタイミングで、また詳しくお話もお聞かせ下さい\nよろしくお願いいたします🙏\n\n追伸・玉城佐恵子さんは、インスタにもいらっしゃいますでしょうか？",
+      "next_steps": [
+        "1. 上記のFacebook検索URLを開く",
+        "2. 検索結果から正しい相手を見つける",
+        "3. 友達申請を送る",
+        "4. 上記のメッセージを送信する"
+      ]
+    }
+  ]
+}

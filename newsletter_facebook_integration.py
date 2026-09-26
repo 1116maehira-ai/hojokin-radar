@@ -14,6 +14,13 @@ from datetime import datetime
 import base64
 from pathlib import Path
 
+# .env ファイルを読み込み
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
 # Supabase
 try:
     from supabase import create_client, Client
@@ -46,7 +53,16 @@ class NewsletterFacebookIntegration:
 
         self.supabase: Client = create_client(self.supabase_url, self.supabase_key)
         self.anthropic_client = anthropic.Anthropic(api_key=self.anthropic_key)
-        self.fb_searcher = FacebookSearcher(headless=True)
+
+        # Seleniumを試す。失敗したらフォールバックモード
+        try:
+            self.fb_searcher = FacebookSearcher(headless=True, fallback_mode=False)
+            self.fb_mode = "automated"
+        except Exception as e:
+            print(f"⚠️  Selenium起動失敗（ネットワーク制限の可能性）: {e}")
+            print("   フォールバックモード（検索URLのみ生成）に切り替えます")
+            self.fb_searcher = FacebookSearcher(headless=True, fallback_mode=True)
+            self.fb_mode = "fallback"
 
     def extract_business_card_info(self, image_path: str) -> Dict[str, str]:
         """

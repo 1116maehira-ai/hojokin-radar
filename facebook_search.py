@@ -18,16 +18,19 @@ from selenium.webdriver.chrome.service import Service
 
 
 class FacebookSearcher:
-    def __init__(self, headless=False):
+    def __init__(self, headless=False, fallback_mode=False):
         """
         Seleniumドライバの初期化
 
         Args:
             headless: True時はヘッドレスモード（画面非表示）
+            fallback_mode: True時は検索URLのみ生成（Seleniumが使えない環境向け）
         """
         self.driver = None
         self.headless = headless
-        self._setup_driver()
+        self.fallback_mode = fallback_mode
+        if not fallback_mode:
+            self._setup_driver()
 
     def _setup_driver(self):
         """Chrome WebDriverの設定"""
@@ -67,11 +70,15 @@ class FacebookSearcher:
         Returns:
             [{
                 'name': 氏名,
-                'profile_url': FacebookプロフィールURL,
+                'profile_url': FacebookプロフィールURL or 検索URLパターン,
                 'company': 会社名（表示されている場合）,
-                'thumbnail': プロフィール画像URL
+                'thumbnail': プロフィール画像URL,
+                'search_mode': 'automated' or 'manual_url'
             }, ...]
         """
+        if self.fallback_mode:
+            return self._search_person_fallback(name, company, max_results)
+
         try:
             # Facebook検索ページへ
             search_query = f"{name} {company}" if company else name
@@ -112,7 +119,8 @@ class FacebookSearcher:
                             'name': profile_name,
                             'profile_url': profile_url,
                             'company': company_info,
-                            'thumbnail': None
+                            'thumbnail': None,
+                            'search_mode': 'automated'
                         })
                         print(f"  ✓ {profile_name} - {profile_url}")
                 except Exception as e:
@@ -124,6 +132,34 @@ class FacebookSearcher:
         except Exception as e:
             print(f"❌ 検索エラー: {e}")
             return []
+
+    def _search_person_fallback(self, name: str, company: str = None, max_results: int = 5) -> list:
+        """
+        フォールバックモード: Seleniumなしで検索URLを生成
+        クラウド環境など、ブラウザ自動化ができない環境用
+        """
+        import urllib.parse
+
+        search_query = f"{name} {company}" if company else name
+        encoded_query = urllib.parse.quote(search_query)
+        search_url = f"https://www.facebook.com/search/people/?q={encoded_query}"
+
+        print(f"🔍 検索URL生成中: {search_query}")
+
+        # ファイアウォール/ネットワーク制限がある環境での代替結果
+        results = [
+            {
+                'name': f'{name}（Facebook検索中に確認してください）',
+                'profile_url': search_url,
+                'company': company or '',
+                'thumbnail': None,
+                'search_mode': 'manual_url',
+                'note': 'このURLをブラウザで開いて、正しい相手を確認してください'
+            }
+        ]
+
+        print(f"  📱 検索URL: {search_url}")
+        return results
 
     def close(self):
         """ドライバのクローズ"""

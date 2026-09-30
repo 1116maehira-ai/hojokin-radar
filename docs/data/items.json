@@ -1,5 +1,21 @@
 [
  {
+  "url": "https://www.jgrants-portal.go.jp/subsidy/a0WJ200000CDdjfMAD",
+  "title": "[３次公募]中小企業成長加速化補助金",
+  "deadline": "2026-11-12",
+  "subsidy_max_limit": 500000000,
+  "target_area": "全国",
+  "target_employees": "従業員数の制約なし",
+  "id": "cdde3d6e311faef0",
+  "source": "jGrants（デジタル庁 補助金API）",
+  "found_at": "2026-09-30",
+  "direction": "both",
+  "category": "新規事業型",
+  "score": 85,
+  "reason": "上限5億円の成長加速化支援は自社の新規事業展開（AI研修事業拡大・ポスマネ全国展開等）にも使え、顧客企業のDX・事業拡大案件でTENOHIRAが制作・システム開発・マーケ支援の受託者として入る提案も可能。",
+  "needs_sharoushi": false
+ },
+ {
   "url": "https://www.jgrants-portal.go.jp/subsidy/a0WfQ000003cYWnUAM",
   "title": "情報通信利用促進支援事業費補助金「先進的設備等を活用した放送コンテンツ製作促進事業」三次公募",
   "deadline": "2026-10-05",

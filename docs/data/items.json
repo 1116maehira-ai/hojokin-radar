@@ -1,5 +1,21 @@
 [
  {
+  "url": "https://www.jgrants-portal.go.jp/subsidy/a0WJ200000CDe6cMAD",
+  "title": "【沖縄】令和８年度中小企業最低賃金引上げ支援対策費補助金（業務改善助成金）",
+  "deadline": "2026-11-30",
+  "subsidy_max_limit": 6000000,
+  "target_area": "沖縄県",
+  "target_employees": "従業員数の制約なし",
+  "id": "62a65cdb7c2a6a30",
+  "source": "jGrants（デジタル庁 補助金API）",
+  "found_at": "2026-10-01",
+  "direction": "both",
+  "category": "設備・ツール導入型",
+  "score": 75,
+  "reason": "最低賃金引上げと生産性向上設備導入を組み合わせる制度で、自社の業務システム導入や顧客へのDX提案双方に活用でき上限600万は魅力だが、賃金引上げ要件が必須条件となる。",
+  "needs_sharoushi": true
+ },
+ {
   "url": "https://www.jgrants-portal.go.jp/subsidy/a0WJ200000CDdjfMAD",
   "title": "[３次公募]中小企業成長加速化補助金",
   "deadline": "2026-11-12",

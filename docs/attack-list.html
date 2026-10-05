@@ -488,6 +488,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
 .ct-add-react{display:block;width:100%;padding:6px;border:1px dashed var(--border);border-radius:7px;background:transparent;color:var(--muted);font-size:12px;cursor:pointer;font-family:inherit;margin:4px 0 10px;text-align:center}
 .ct-save-node{padding:6px 16px;background:var(--primary);color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
 </style>
+<link rel="stylesheet" href="sales-ops.css?v=20261005">
 </head>
 <body>
 
@@ -504,11 +505,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
   <span class="u-chip" id="u-chip" onclick="doLogout()" title="クリックでログアウト"></span>
 </div>
 
+<div id="sales-ops-dashboard" class="so-dashboard"></div>
 <div class="stats" id="stats"></div>
 <div class="vfy-bar" id="vfy-bar">
   <span class="vfy-count" id="vfy-count">確認済 0 / 0 社</span>
   <div class="vfy-prog"><div class="vfy-fill" id="vfy-fill" style="width:0%"></div></div>
-  <span style="font-size:11px;color:var(--muted)">全部確認できたら管理者がDM郵送済にしてください</span>
+  <span style="font-size:11px;color:var(--muted)">郵送準備と発送の実績は「郵送・商談」で別々に記録</span>
 </div>
 <div class="segbar" id="segbar"></div>
 
@@ -582,6 +584,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
       <div class="mtab" onclick="switchTab('script')">📜 トークスクリプト</div>
       <div class="mtab" onclick="switchTab('info')">ℹ️ 情報</div>
       <div class="mtab" onclick="switchTab('letter')">✉️ 手紙</div>
+      <div class="mtab" onclick="switchTab('evidence')">🔎 根拠・確認</div>
+      <div class="mtab" onclick="switchTab('workflow')">📮 郵送・商談</div>
     </div>
     <div class="mbody" id="mbody"></div>
   </div>
@@ -1441,6 +1445,7 @@ async function loadData() {
   while (true) {
     const {data, error} = await sb.from('ceremony_attacks')
       .select('*')
+      .order('id')
       .range(page * PAGE, (page + 1) * PAGE - 1);
     if (error) { document.getElementById('lwrap').innerHTML = '<div class="empty">❌ 読み込みエラー: '+esc(error.message)+'</div>'; return; }
     if (data && data.length > 0) all = all.concat(data);
@@ -1671,7 +1676,7 @@ function renderList() {
     const sd      = c.source_data||{};
     const assignee = sd.call_assignee||'';
     const asnBadge = assignee ? `<span class="asn asn-${assignee}">📞${assignee}</span>` : '';
-    const vfyBadge = sd.addr_verified ? '<span class="vfy-badge vb-done">✓住所確認済</span>' : '';
+    const vfyBadge = typeof SalesOps!=='undefined' && !SalesOps.mailReasons(c).length ? '<span class="vfy-badge vb-done">✓宛先・商流確認済</span>' : '<span class="vfy-badge vb-ng">根拠確認待ち</span>';
     const ltrBadge= (sd.dm_mailed?'<span class="ls ls-dm">📮DM済</span>':sd.dm_ready?'<span class="ls ls-ready">📋DM準備済</span>':'')+(ltr.sent?'<span class="ls ls-sent">📬お渡し済</span>':ltr.made?'<span class="ls ls-made">✅制作済</span>':ltr.written?'<span class="ls ls-written">✏️作文済</span>':'');
     let ntHtml='';
     if (c.next_date) {
@@ -2365,7 +2370,7 @@ function toggleVerifyMode() {
 
 function renderVerifyProgress() {
   const targets = cos.filter(c => (c.source_data||{}).dm_ready);
-  const done    = targets.filter(c => (c.source_data||{}).addr_verified).length;
+  const done    = targets.filter(c => typeof SalesOps!=='undefined' && !SalesOps.mailReasons(c).length).length;
   const total   = targets.length;
   document.getElementById('vfy-count').textContent = `確認済 ${done} / ${total} 社`;
   document.getElementById('vfy-fill').style.width  = total ? (done/total*100)+'%' : '0%';
@@ -2377,7 +2382,7 @@ function renderVerifyList() {
   if (!rows.length) { el.innerHTML = '<div class="empty">DM準備済の会社がありません</div>'; return; }
   el.innerHTML = rows.map(c => {
     const sd   = c.source_data || {};
-    const done = !!sd.addr_verified;
+    const done = typeof SalesOps!=='undefined' && !SalesOps.mailReasons(c).length;
     const vbadge = done ? '<span class="vfy-badge vb-done">✓確認済</span>' : '<span class="vfy-badge vb-ng">要確認</span>';
     return `<div class="card${done?' vfy-ok':''}" style="padding:14px 16px;margin-bottom:10px;cursor:default">
       <div style="display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap">
@@ -2393,7 +2398,7 @@ function renderVerifyList() {
       <div class="qe-form" style="margin-top:10px">
         <input class="qe-inp" id="qe-addr-${c.id}" placeholder="住所" value="${esc(c.address||sd.address||'')}">
         <input class="qe-inp" id="qe-ceo-${c.id}"  placeholder="代表者名" value="${esc(c.ceo_name||sd.ceo_name||'')}">
-        <button class="qe-save" onclick="quickEditSave('${c.id}')">💾 保存して確認済にする</button>
+        <button class="qe-save" onclick="quickEditSave('${c.id}')">🔎 根拠を付けて確認する</button>
       </div>
     </div>`;
   }).join('');
@@ -2554,5 +2559,7 @@ function generateLetter(key) {
   }
 })();
 </script>
+<script src="sales-ops-core.js?v=20261005"></script>
+<script src="sales-ops.js?v=20261005"></script>
 </body>
 </html>

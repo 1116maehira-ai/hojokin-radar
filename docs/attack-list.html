@@ -1702,6 +1702,7 @@ function renderList() {
           ${ltrBadge}
           ${asnBadge}
           ${vfyBadge}
+          ${typeof SalesOps!=='undefined'?SalesOps.events(c).filter(e=>['flyer_prepared','flyer_sent','letter_made','letter_prepared','letter_sent','delivered','meeting_confirmed','meeting_held'].includes(e.type)).slice(-3).map(e=>'<span class="vfy-badge vb-done">'+({flyer_prepared:'チラシ準備済',flyer_sent:'チラシ発送済',letter_made:'手紙製造済',letter_prepared:'手紙郵送準備済',letter_sent:'手紙発送済',delivered:'到着確認',meeting_confirmed:'商談日時確定',meeting_held:'商談実施'})[e.type]+'</span>').join(''):''}
           ${hasSns?'<span style="color:#8b5cf6;font-size:10px;">SNS</span>':''}
           ${hasJob?'<span style="color:#3730a3;font-size:10px;">求人</span>':''}
         </div>

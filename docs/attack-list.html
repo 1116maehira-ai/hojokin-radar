@@ -488,7 +488,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
 .ct-add-react{display:block;width:100%;padding:6px;border:1px dashed var(--border);border-radius:7px;background:transparent;color:var(--muted);font-size:12px;cursor:pointer;font-family:inherit;margin:4px 0 10px;text-align:center}
 .ct-save-node{padding:6px 16px;background:var(--primary);color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
 </style>
-<link rel="stylesheet" href="sales-ops.css?v=20261005">
+<link rel="stylesheet" href="sales-ops.css?v=20261006-workbench">
 </head>
 <body>
 
@@ -533,7 +533,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic UI'
     <button class="ftgl" data-flt="dm_ready" onclick="toggleFlt('dm_ready')">📋 DM準備済</button>
     <button class="ftgl" data-flt="dm"       onclick="toggleFlt('dm')">📮 DM郵送済</button>
     <button class="ftgl" data-flt="none"     onclick="toggleFlt('none')">未着手</button>
-    <button class="ftgl" data-flt="my_calls" onclick="toggleFlt('my_calls')" style="border-color:#7c3aed">📞 自分の担当</button>
+    <button class="ftgl" data-flt="my_calls" onclick="toggleFlt('my_calls')" style="border-color:#7c3aed">📞 自分の担当（電話）</button>
     <button class="ftgl" data-flt="unassigned" onclick="toggleFlt('unassigned')" style="color:var(--muted)">🔀 未割当</button>
     <button class="ftgl" data-flt="letter_top30" onclick="toggleFlt('letter_top30')" style="border-color:#059669">✉️ 手紙候補30社</button>
   </div>  <select id="fs" onchange="renderList()">
@@ -1569,10 +1569,10 @@ function getRows() {
       const sd  = c.source_data||{};
       // AND filters: applied independently
       if (activeFlt.has('my_calls') && currentUser) {
-        if ((sd.call_assignee||'') !== currentUser.name) return false;
+        if (typeof SalesOps!=='undefined' ? (!SalesOps.callWork(c)||SalesOps.assignee(c)!==soIdentity()) : ((sd.call_assignee||'') !== currentUser.name)) return false;
       }
       if (activeFlt.has('unassigned')) {
-        if (sd.call_assignee || !sd.dm_mailed) return false;
+        if (typeof SalesOps!=='undefined' ? (!SalesOps.callWork(c)||SalesOps.assignee(c)) : (sd.call_assignee || !sd.dm_mailed)) return false;
       }
       if (activeFlt.has('letter_top30')) {
         if (!sd.dm_mailed || ltr.sent) return false;
@@ -1587,15 +1587,16 @@ function getRows() {
           if (activeFlt.has('written')  && ltr.written)   match = true;
           if (activeFlt.has('made')     && ltr.made)       match = true;
           if (activeFlt.has('ltr_sent') && ltr.sent)       match = true;
-          if (activeFlt.has('dm_ready') && sd.dm_ready)    match = true;
-          if (activeFlt.has('dm')       && sd.dm_mailed)   match = true;
+          if (activeFlt.has('dm_ready') && (typeof SalesOps!=='undefined'?SalesOps.prepared(c):sd.dm_ready))    match = true;
+          if (activeFlt.has('dm')       && (typeof SalesOps!=='undefined'?SalesOps.mailed(c):sd.dm_mailed))   match = true;
           if (!match) return false;
         }
       }
     }
     if (q) {
-      const h = ((c.company_name||'')+' '+(c.ceo_name||'')+' '+(c.phone||'')+' '+(c.city||'')).toLowerCase();
-      if (!h.includes(q)) return false;
+      const h = [c.company_name,c.ceo_name,c.phone,c.city,c.address,c.postal_code,c.website,c.id,c.corporate_number].filter(Boolean).join(' ').normalize('NFKC').toLowerCase();
+      const query=q.normalize('NFKC');
+      if (!h.includes(query)&&!h.replace(/[\s\-－]/g,'').includes(query.replace(/[\s\-－]/g,''))) return false;
     }
     return true;
   });
@@ -2560,7 +2561,7 @@ function generateLetter(key) {
   }
 })();
 </script>
-<script src="sales-ops-core.js?v=20261005"></script>
-<script src="sales-ops.js?v=20261005"></script>
+<script src="sales-ops-core.js?v=20261006-workbench"></script>
+<script src="sales-ops.js?v=20261006-workbench"></script>
 </body>
 </html>

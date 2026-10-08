@@ -1,5 +1,21 @@
 [
  {
+  "url": "https://www.jgrants-portal.go.jp/subsidy/a0WJ200000CDdtMMAT",
+  "title": "【経済産業省】ものづくり・商業・サービス生産性向上促進補助金（23次締切）",
+  "deadline": "2028-03-31",
+  "subsidy_max_limit": 0,
+  "target_area": "全国",
+  "target_employees": "従業員数の制約なし",
+  "id": "8a2cff0d8287bb75",
+  "source": "jGrants（デジタル庁 補助金API）",
+  "found_at": "2026-10-08",
+  "direction": "both",
+  "category": "設備・ツール導入型",
+  "score": 85,
+  "reason": "自社のシステム開発設備やDX投資にも使え、顧客企業のWeb・映像制作設備導入や業務システム構築案件でも受託側として関われるため。",
+  "needs_sharoushi": false
+ },
+ {
   "url": "https://www.pref.okinawa.lg.jp/shigoto/nyusatsukeiyaku/1015342/1025075/1041589.html",
   "title": "令和8年度島工芸おきなわ販路拡大推進事業販売促進プロモーション業務委託 公募",
   "deadline": null,

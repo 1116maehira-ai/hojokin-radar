@@ -30,7 +30,7 @@
     const facts=(ops(c).facts||[]).filter(f=>factOK(f,now));if(!facts.length)throw Error('根拠付きの企業発信を一つ確認してください');
     const f=facts[0];
     if(kind==='call'&&phoneReasons(c,now).length)throw Error('宛先・電話・商流・実発送の確認が必要です');
-    if(kind==='call')return `株式会社TENOHIRAの${caller}と申します。${c.ceo_name}様、または経営・総務のご担当者様はいらっしゃいますか。\n先日、企業の歩みを映像で残すご案内を郵送いたしました。${f.text}という御社の発信を拝見し、ご連絡しました。採用や社内での継承に映像を活用するご予定があるか、まずお話を伺えればと思っております。ご関心がありましたら、30分ほどお話しできる機会をいただけますでしょうか。`;
+    if(kind==='call')return `株式会社TENOHIRAの${caller}と申します。${c.ceo_name}様、または経営・総務のご担当者様はいらっしゃいますか。\n先日、企業の歩みや想いを映像で残す取り組みについて、簡単なリーフレットをお送りしました。${f.text}という御社の発信を拝見し、ご連絡しました。採用や社内での継承に映像を活用するご予定があるか、まずお話を伺えればと思っております。代表者様でなくても、経営・総務・採用のご担当者様に、まず30分ほどお話を伺う機会をいただけますでしょうか。`;
     return `${c.company_name}\n${c.ceo_name} 様\n\n突然のお便り、失礼いたします。沖縄で映像制作を行う株式会社TENOHIRAの前平雄一朗と申します。\n\n御社の公式発信を拝見し、${f.text}という点が心に残りました。大切にされている考えや現場の仕事を、社員の皆様の声とともに映像で残し、採用や社内の継承に生かすお手伝いができればと思い、お便りいたしました。\n\nまずは御社のお考えを伺いたく、30分ほどお話しする機会をいただけますと幸いです。\n\n株式会社TENOHIRA\n代表取締役 前平雄一朗`;
   }
   function monthly(rows,month){const out={flyer_sent:0,call:0,meeting_confirmed:0,meeting_held:0,letter_sent:0};for(const type of Object.keys(out)){const ids=new Set;for(const c of rows)for(const e of events(c)){const dt=type.startsWith('meeting_')?e.meeting_at:e.occurred_on;if(e.type===type&&String(dt||'').startsWith(month)&&(!type.startsWith('meeting_')||(e.accepted===true&&e.qualified===true&&e.meeting_id)))ids.add(type.startsWith('meeting_')?e.meeting_id:entity(c));}out[type]=ids.size;}return out;}

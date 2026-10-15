@@ -14,7 +14,7 @@
   const uid=()=>root.crypto.randomUUID();
   async function digest(s){const a=await root.crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return Array.from(new Uint8Array(a),v=>v.toString(16).padStart(2,'0')).join('');}
   function recipient(text,c){const line=body(text).split('\n').slice(0,7).find(l=>/様\s*$/.test(l));return line?line.replace(/様\s*$/,'').trim():String(c.ceo_name||'');}
-  function evidenceQuote(text){const p=body(text).split(/\n\s*\n/).map(x=>x.trim());return p.find(x=>/拝見|拝読|心に残|共感|理念|御社が|大城様が/.test(x)&&!/^突然/.test(x))||'';}
+  function evidenceQuote(text){const p=body(text).split(/\n\s*\n/).map(x=>x.trim());return p.find(x=>/拝見|拝読|心に残|共感|理念|御社が|大城様が/.test(x)&&!/^突然/.test(x))||p.find(x=>x.length>25&&!/様\s*$/.test(x))||'';}
   function defaults(c,letter=currentLetter(c)){
     const text=body(letter.body),quote=evidenceQuote(text);
     return {recipient:recipient(text,c),interest:quote,question:'会社として大切にされてきた考えや、これからの世代にも残したいことについて、お聞かせいただけますでしょうか。',evidence_quote:quote,offer:'consultation',offer_terms:'',author:'前平雄一朗'};
@@ -29,17 +29,17 @@
     const n=(title,say,options,note='')=>({title,say,options,note});
     return {
       start:n('① 受付の方へ','{{intro}} ご本人へお渡しいただけたか分かりますでしょうか。',[['本人へ渡っている','purpose'],['まだ渡っていない・分からない','unseen'],['どんな用件？','purpose'],['担当者につながった','person'],['代表者が不在','absent'],['今は忙しい','busy'],['不要・営業お断り','declined']],'受付での受領と本人の受領・閲覧を分けます。'),
-      purpose:n('② 手紙を書いた理由','弊社は企業の歩みや想いを映像で伝える仕事をしております。お手紙では、'+interest+'という点への関心をお伝えしました。まずは、そのお考えについて直接お話を伺う機会をご相談したく、ご連絡しました。',[['つないでもらえた','person'],['社長へ伝えておきます','relay'],['代表者は不在','absent'],['費用は？','price'],['不要','declined']]),
+      purpose:n('② 手紙を書いた理由','弊社は企業の歩みや想いを映像で伝える仕事をしております。お手紙では、'+interest+'という点への関心をお伝えしました。まずは撮影のお約束ではなく、これまでの歩みや大切にされてきたことを伺いたく、ご連絡しました。代表者様、または会社の発信・採用などをご担当の方に、お取り次ぎいただけますでしょうか。',[['今は考えていない・動画はいらない','notnow'],['インタビューが苦手','camera'],['つないでもらえた','person'],['社長へ伝えておきます','relay'],['代表者は不在','absent'],['費用は？','price'],['不要','declined']]),
       unseen:n('手紙が本人へ渡ったか不明','承知いたしました。ご覧いただいた前提でお話ししてしまわないよう、まず確認させていただきました。差し支えなければ、お手紙にお目通しいただけるようお伝えいただけますでしょうか。',[['用件を聞かれた','purpose'],['社長へ伝えておく','relay'],['再連絡してよい','callback'],['今回は終了','end'],['不要','declined']]),
       person:n('③ ご本人または担当者につながった','お時間をいただきありがとうございます。株式会社TENOHIRAの{{caller}}と申します。{{person_intro}} 今、1分ほどお話ししてもよろしいでしょうか。',[['話してよい','listen'],['手紙を見ていない','unseen'],['今は忙しい','busy'],['不要','declined']]),
       listen:n('④ 手紙に沿ってお話を伺う','お手紙に書かせていただいた、'+interest+'という点が心に残りました。'+question,[['お話ししてくれた','invite'],['今は動画を考えていない','notnow'],['インタビューが苦手','camera'],['無料ですか？','price'],['不要','declined']],'一度に質問を重ねず、相手の回答を聞きます。'),
       invite:n('⑤ 面会をお願いする','お聞かせいただきありがとうございます。今のお話をもう少し詳しく伺い、必要であれば映像でお手伝いできることもご一緒に考えられればと思います。まずは30分ほど、{{host}}がお話を伺う機会をいただけますでしょうか。',[['会ってもよい','date'],['今は忙しい','busy'],['費用を聞かれた','price'],['今回は見送り','end']]),
       absent:n('代表者が不在','承知いたしました。会社の発信や人材育成をご担当の方に、お話を伺うことは可能でしょうか。お取次ぎが難しければ、改めてご連絡しても差し支えないかだけ伺えますでしょうか。',[['担当者につながった','person'],['再連絡してよい','callback'],['伝えておく','relay'],['取り次げない','end'],['営業お断り','declined']],'代表者本人にしか伺えない内容は、担当者に回答を求めません。'),
       notnow:n('今は動画を考えていない','承知いたしました。現時点では制作をお考えでないということですね。お聞かせいただきありがとうございます。',[['相手が会話を続けてくれる','greeting'],['今回は不要とのこと','end'],['今後も営業不要','declined']],'お断りの後に、採用や事業承継の価値を重ねて説明しません。'),
-      greeting:n('話を伺う機会だけ相談する','今すぐ制作を決めていただくお願いではなく、お手紙に書いたお考えについて、まずご挨拶を兼ねてお話を伺いたかったのですが、そのような機会も今は難しいでしょうか。',[['挨拶ならよい','date'],['今は難しい','end'],['営業不要','declined']],'相手が会話を続ける場合に一度だけ。再度断られたら終了します。'),
+      greeting:n('話を伺う機会だけ相談する','今すぐ制作を決めていただくお願いではなく、お手紙に書いたお考えについて、撮影なしでまずご挨拶を兼ねてお話を伺えればと思っています。代表者様のご都合が難しければ、ご担当の方に会社のお話を伺う機会をいただくことは可能でしょうか。',[['挨拶ならよい','date'],['今は難しい','end'],['営業不要','declined']],'相手が会話を続ける場合に一度だけ。再度断られたら終了します。'),
       camera:n('インタビューが苦手','承知いたしました。撮影を伴わず、まずご挨拶としてお話を伺う形も可能ですが、そのような面会もご負担でしょうか。',[['撮影なしなら話せる','date'],['無料か知りたい','price'],['今回は不要','end']],'撮影なしの面会を実際に提供できる場合のみ使用。撮影の了承とは別です。'),
       price:n('無料と有料について','{{offer}}',[['相談したい','date'],['条件を確認して連絡','callback_permission'],['今回は見送り','end']],'この手紙にない無料撮影を勝手に追加しません。'),
-      relay:n('社長へ伝えておきます','ありがとうございます。お手紙に書いたお考えについてお話を伺いたいことと、映像制作のご案内を含むことをお伝えいただけますと幸いです。後日、こちらから改めてご連絡しても差し支えないでしょうか。',[['再連絡してよい','callback'],['関心があれば先方から連絡','end'],['今回は終了','end']],'伝言を受けてもらったことを面会の承諾として記録しません。'),
+      relay:n('社長へ伝えておきます','ありがとうございます。「お手紙に書いた御社の歩みや大切にされていることについて、まず撮影なしでお話を伺いたい。映像制作のご案内も含む」とお伝えいただけますと幸いです。代表者様が難しければ、ご担当の方へのご挨拶でも結構です。後日、こちらから確認のお電話をしても差し支えないでしょうか。',[['再連絡してよい','callback'],['関心があれば先方から連絡','end'],['今回は終了','end']],'伝言を受けてもらったことを面会の承諾として記録しません。'),
       busy:n('今は忙しい','お忙しいところ失礼いたしました。改めてご連絡しても差し支えないでしょうか。',[['了承された','callback'],['今回は不要','end'],['今後も連絡不要','declined']]),
       callback_permission:n('確認後のご連絡','正確な条件を確認してからご案内いたします。改めてご連絡しても差し支えないでしょうか。',[['連絡してよい','callback'],['不要','end']]),
       callback:n('了承された再連絡','ありがとうございます。ご都合のよい曜日や時間帯を伺えますでしょうか。本日はお時間をいただき、ありがとうございました。',[['電話結果を記録','record']],'了承された時期と内容だけを人が記録します。'),
@@ -91,16 +91,16 @@
     return [...new Set(out)];
   }
   function renderNode(s,key,c,caller){
-    const node=s.nodes[key];if(!node)return null;
+    const node=nodes(s.context)[key]||s.nodes[key];if(!node)return null;
     const d=delivery(c,s),ctx=s.context,author=ctx.author||'前平雄一朗';
     const self=/前平|MAGE/i.test(caller),host=self?'私':'弊社代表の前平';
     const writer=self?'私':`弊社の${author}`;
-    let intro='株式会社TENOHIRAの'+caller+'と申します。お届け記録が未確認のため、この冒頭はまだ使用できません。';
+    let intro='株式会社TENOHIRAの'+caller+'と申します。弊社の前平が'+ctx.recipient+'様宛てにしたためたお手紙の件で、ご連絡いたしました。';
     if(d){const who=d.delivered_by===caller?'私':`弊社の${d.delivered_by}`;const name=ctx.recipient+'様';const lead=`株式会社TENOHIRAの${caller}と申します。${d.occurred_on}に${who}が${name}宛てのお手紙を`;
       intro=lead+({deposited:'直接お届けし、受付の方にお預かりいただいた件でお電話しました。',recipient:'直接お渡しした件でお電話しました。',staff:'お届けし、ご担当の方にお預かりいただいた件でお電話しました。',post:'お送りした件でお電話しました。'}[d.method]);
     }
     const offer=ctx.offer==='raw_interview'?`今回追加でご案内する条件として、インタビューの撮影と編集・加工をしないデータのお渡しは無料、編集して映像に仕上げる場合は別途有料です。具体的な範囲は、${ctx.offer_terms}`:ctx.offer==='consultation'?'最初の30分のお話・ご相談は無料です。映像制作は有料で、企業ストーリーは税別50万円定額、周年向けは税別70〜100万円、内容を広げたプランは税別100〜150万円が目安です。内容に合わせてお見積りをご確認いただきます。':'費用や提供の範囲は、正確な条件を確認してからご案内いたします。';
-    const tokens={intro,caller,host,offer,person_intro:d?`${writer}がお届けしたお手紙に書いた内容について、ご連絡しました。`:'手紙のお届けが未確認のため、このセリフは下書きです。'};
+    const tokens={intro,caller,host,offer,person_intro:d?`${writer}がお届けしたお手紙に書いた内容について、ご連絡しました。`:`${writer}がしたためたお手紙に書いた内容について、ご連絡しました。`};
     let say=node.say.replace(/\{\{(\w+)\}\}/g,(m,k)=>tokens[k]||m);
     if(key==='start'&&d?.method==='recipient')say=say.replace(' ご本人へお渡しいただけたか分かりますでしょうか。',' 今、お取り次ぎをお願いできますでしょうか。');
     return {...node,say};

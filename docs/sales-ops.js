@@ -2,12 +2,17 @@
 'use strict';
 const SO=SalesOps;
 let salesView='all';
+let soCallFilter='all';
 const soEsc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const soLink=u=>SO.url(u)?`<a href="${soEsc(SO.url(u))}" target="_blank" rel="noopener noreferrer">${soEsc(u)}</a>`:'URL未確認';
 const soValue=id=>document.getElementById(id)?.value.trim()||'';
 const soCheck=id=>!!document.getElementById(id)?.checked;
 const soOldRenderTab=renderTab,soOldRenderList=renderList,soOldGetRows=getRows;
-getRows=function(){return soOldGetRows().filter(c=>soMatchesView(c));};
+getRows=function(){return soOldGetRows().filter(c=>soMatchesView(c)&&soMatchesCallFilter(c));};
+function soMatchesCallFilter(c){return soCallFilter==='called'?SO.called(c):soCallFilter==='uncalled'?!SO.called(c):true;}
+function soSetCallFilter(value){if(!['all','called','uncalled'].includes(value))return;soCallFilter=value;soPicked.clear();renderList();}
+function soOwnCompany(c){return SO.assignee(c)===soIdentity()&&(SO.callWork(c)||SO.called(c));}
+function soCallFilters(){const rows=soOldGetRows().filter(c=>soMatchesView(c)),done=rows.filter(SO.called).length;return `<section class="so-call-filters" aria-label="電話の記録で絞り込む"><h3>電話の記録で絞り込む</h3><div class="so-shortcuts" role="group" aria-label="電話済み・未架電">${[['all','すべて',rows.length],['uncalled','未架電',rows.length-done],['called','電話済み',done]].map(([value,label,count])=>`<button type="button" class="${soCallFilter===value?'on':''}" aria-pressed="${soCallFilter===value}" onclick="soSetCallFilter('${value}')">${label} ${count}社</button>`).join('')}</div><p>不在・番号不通・営業停止も、電話の記録があれば「電話済み」に含みます。「自分の担当」や会社名検索と組み合わせて使えます。</p></section>`;}
 renderList=function(){
   if(typeof verifyMode!=='undefined'&&verifyMode){soOldRenderList();return;}
   const rows=getRows(); const w=document.getElementById('lwrap');
@@ -42,9 +47,10 @@ function soGateHTML(c,phone=false){const r=phone?SO.phoneReasons(c):SO.mailReaso
 function soDashboard(){
  const el=document.getElementById('sales-ops-dashboard');if(!el||!currentUser||!cos.length)return;
  const month=document.getElementById('so-month')?.value||SO.jstDay().slice(0,7),m=SO.monthly(cos,month),team=soMembers();
- const sent=cos.filter(SO.mailed),queue=cos.filter(SO.callWork),ready=queue.filter(c=>!SO.phoneReasons(c).length),sel=cos.filter(c=>SO.selection(c)&&!SO.mailed(c)&&!SO.prepared(c)),prep=cos.filter(SO.prepared),mine=queue.filter(c=>SO.assignee(c)===soIdentity());
+ const sent=cos.filter(SO.mailed),queue=cos.filter(SO.callWork),ready=queue.filter(c=>!SO.phoneReasons(c).length),sel=cos.filter(c=>SO.selection(c)&&!SO.mailed(c)&&!SO.prepared(c)),prep=cos.filter(SO.prepared),mine=cos.filter(soOwnCompany);
  const metrics=[['今月のチラシ発送',m.flyer_sent,'目標300社'],['今月の電話実施',m.call,'会社数で集計'],['今月の適格商談・日時確定',m.meeting_confirmed,'目標40件'],['今月の商談実施',m.meeting_held,'実施済みのみ']];
  el.innerHTML=`<div class="so-head"><div><h2>今日の営業作業</h2><p>やりたい作業を選んで、会社を開いて進めてください。</p></div><div class="so-user">担当者名 <select aria-label="自分の担当者名" onchange="soSetIdentity(this.value)">${[...new Set([currentUser.name,...team])].map(n=>`<option value="${soEsc(n)}" ${soIdentity()===n?'selected':''}>${soEsc(soName(n))}</option>`).join('')}</select><button onclick="soShowMailView('mine')">自分の担当 ${mine.length}社</button></div></div>
+ ${soCallFilters()}
  <div class="so-stages">${[['selection','① 次の郵送候補',sel.length],['prepared','② 郵送準備済み',prep.length],['mailed','③ チラシ発送済み',sent.length],['calls','④ 電話の担当一覧',queue.length],['followup','⑤ 次回対応がある',queue.filter(c=>c.next_date||c.next_action).length]].map(([v,l,n])=>`<button class="${salesView===v?'on':''}" onclick="soShowMailView('${v}')"><span>${l}</span><strong>${n}社</strong></button>`).join('')}</div>
  <div class="so-mailing"><b>9月30日発送済み ${cos.filter(soSeptemberMail).length}社</b><button onclick="soShowMailView('sep30')">この300社を見る</button><span>到着・電話実施の記録は別です。</span></div>
  <div class="so-shortcuts">${soCanSelectMail()?'<button class="so-primary" onclick="autoSelectNext300()">次に送る300社を選ぶ</button>':''}<button onclick="soShowMailView('call')">電話準備OK ${ready.length}社</button><button onclick="soShowMailView('phone_pending')">電話前の確認待ち ${queue.length-ready.length}社</button><button onclick="soShowMailView('all')">全ての会社を見る</button></div>
@@ -85,16 +91,16 @@ function soIdentity(){try{return sessionStorage.getItem('so_identity_'+currentUs
 function soSetIdentity(n){if(![currentUser.name,...soMembers()].includes(n))return;try{sessionStorage.setItem('so_identity_'+currentUser.name,n);}catch{}soShowMailView('mine');}
 function soMatchesView(c){switch(salesView){
  case 'selection':return !!SO.selection(c)&&!SO.mailed(c)&&!SO.prepared(c);case 'prepared':return SO.prepared(c);case 'mailed':return SO.mailed(c);case 'sep30':return soSeptemberMail(c);
- case 'calls':return SO.callWork(c);case 'mine':return SO.callWork(c)&&SO.assignee(c)===soIdentity();case 'call':return SO.callWork(c)&&SO.nextCall(c)&&!SO.phoneReasons(c).length;
+ case 'calls':return SO.callWork(c);case 'mine':return soOwnCompany(c);case 'call':return SO.callWork(c)&&SO.nextCall(c)&&!SO.phoneReasons(c).length;
  case 'phone_pending':return SO.callWork(c)&&SO.phoneReasons(c).length>0;case 'followup':return SO.callWork(c)&&!!(c.next_date||c.next_action);
  case 'pending':return !SO.blocked(c)&&SO.mailReasons(c).length>0;case 'mail':return !SO.mailed(c)&&!SO.mailReasons(c).length;case 'letter':return !!SO.ops(c).letter?.body;
  case 'delivered':return SO.events(c).some(e=>e.type==='delivered');default:return true;
 }}
 function soHideLegacy(){const b=document.getElementById('bulk-bar');if(b)b.style.display='none';document.querySelectorAll('.ftgl').forEach(el=>el.classList.toggle('on',activeFlt.has(el.dataset.flt)));}
-soShowMailView=function(view){salesView=view;activeFlt.clear();curF='all';curSeg='all';soPicked.clear();for(const id of ['q','fi','fc','fr','fs']){const el=document.getElementById(id);if(el)el.value='';}if(typeof renderStats==='function')renderStats();renderList();};
+soShowMailView=function(view){salesView=view;if(view==='all')soCallFilter='all';activeFlt.clear();curF='all';curSeg='all';soPicked.clear();for(const id of ['q','fi','fc','fr','fs']){const el=document.getElementById(id);if(el)el.value='';}if(typeof renderStats==='function')renderStats();renderList();};
 function soResults(rows){let el=document.getElementById('so-results');if(!el){el=document.createElement('section');el.id='so-results';document.getElementById('lwrap')?.before(el);}if(!el)return;
  for(const id of [...soPicked])if(!rows.some(c=>String(c.id)===String(id)))soPicked.delete(id);
- el.innerHTML=`<div class="so-result-count"><div><b>${soEsc(soViews[salesView]||'会社一覧')}</b>　表示 <strong>${rows.length}社</strong> ／ 全${cos.length}社</div><button onclick="soShowMailView('all')">絞り込みを解除</button></div><div class="so-bulk-actions"><label><input type="checkbox" ${rows.length&&rows.every(c=>soPicked.has(c.id))?'checked':''} onchange="soPickAll(this.checked)">表示中を全て選ぶ</label><b>選択 ${soPicked.size}社</b>${can('dm_ready')?'<button onclick="soBatchDialog(\'flyer_prepared\')">選んだ会社を郵送準備完了にする</button>':''}${can('admin')?'<button class="so-primary" onclick="soBatchDialog(\'flyer_sent\')">選んだ会社を発送完了にする</button>':''}<button onclick="soExportPicked()">選んだ会社の宛名を出す</button></div><div id="so-batch-editor"></div>`;
+ el.innerHTML=`<div class="so-result-count"><div><b>${soEsc((soViews[salesView]||'会社一覧')+(soCallFilter==='all'?'':soCallFilter==='called'?' ／ 電話済み':' ／ 未架電'))}</b>　表示 <strong>${rows.length}社</strong> ／ 全${cos.length}社</div><button onclick="soShowMailView('all')">絞り込みを解除</button></div><div class="so-bulk-actions"><label><input type="checkbox" ${rows.length&&rows.every(c=>soPicked.has(c.id))?'checked':''} onchange="soPickAll(this.checked)">表示中を全て選ぶ</label><b>選択 ${soPicked.size}社</b>${can('dm_ready')?'<button onclick="soBatchDialog(\'flyer_prepared\')">選んだ会社を郵送準備完了にする</button>':''}${can('admin')?'<button class="so-primary" onclick="soBatchDialog(\'flyer_sent\')">選んだ会社を発送完了にする</button>':''}<button onclick="soExportPicked()">選んだ会社の宛名を出す</button></div><div id="so-batch-editor"></div>`;
 }
 function soPick(id,on){if(on)soPicked.add(id);else soPicked.delete(id);soResults(getRows());}
 function soPickAll(on){for(const c of getRows()){if(on)soPicked.add(c.id);else soPicked.delete(c.id);}renderList();}

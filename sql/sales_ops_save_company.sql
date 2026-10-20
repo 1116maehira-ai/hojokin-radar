@@ -27,7 +27,9 @@ begin
   if not found then raise exception '対象企業が見つからないか、保存権限がありません'; end if;
   if coalesce(r.source_data,'null'::jsonb) is distinct from p_change->'expected_source'
     or (to_jsonb(r)-'source_data') is distinct from p_change->'expected_row' then
-    raise exception using errcode='40001', message='別の更新がありました。再読込してやり直してください';
+    -- 40001 triggers PostgREST transaction retries. This is an application CAS
+    -- conflict, so return HTTP 409 and let the client fetch the latest row.
+    raise sqlstate 'PT409' using message='別の更新がありました。再読込してやり直してください';
   end if;
   v := jsonb_populate_record(r, cols);
   update public.ceremony_attacks set

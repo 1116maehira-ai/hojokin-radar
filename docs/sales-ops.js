@@ -41,7 +41,7 @@ async function soMutate(id,change,columns={},sourceChange=null){
     const next={...src,sales_ops:op};if(sourceChange)sourceChange(next,c);
     // Compare on the server, in a POST body. Large JSON in eq() exceeds URL limits.
     const {data:saved,error:err}=await sb.rpc('sales_ops_save_company_v1',{p_change:{...soBuildChange(c,next),columns}});
-    if(err){if(err.code==='40001')continue;throw err;}
+    if(err){if(err.code==='PT409'||err.code==='40001')continue;throw err;}
     if(!Array.isArray(saved)||saved.length!==1||String(saved[0].id)!==String(id))throw Error('保存結果を確認できません。入力はそのままにして、もう一度保存してください');
     const i=cos.findIndex(x=>x.id===id);if(i>=0)cos[i]=saved[0];if(cur?.id===id){cur=saved[0];document.getElementById('m-name').textContent=cur.company_name;}soSaveStatus('保存しました');return saved[0];
   }throw Error('別の更新がありました。再読込してやり直してください');

@@ -4,6 +4,8 @@ const SO=SalesOps;
 let salesView='all';
 let soCallFilter='all';
 let soCallHomeUser=null;
+let soMailBatchFilter=null;
+let soBatchDraft=null;
 function soInitCallHome(){if(!currentUser||!cos.length||soCallHomeUser===currentUser.name)return;soCallHomeUser=currentUser.name;const personal=['hibiki','megu'].includes(currentUser.name);try{if(personal)sessionStorage.removeItem('so_identity_'+currentUser.name);}catch{}salesView=personal?'mine':'all';soCallFilter=personal?'uncalled':'all';activeFlt.clear();curF='all';curSeg='all';soPicked.clear();for(const id of ['q','fi','fc','fr','fs']){const el=document.getElementById(id);if(el)el.value='';}}
 if(typeof doLogin==='function'){const soOriginalLogin=doLogin;doLogin=function(){soCallHomeUser=null;return soOriginalLogin();};}
 const soEsc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -60,7 +62,7 @@ function soDashboard(){
  ${soCallProgress()}
  ${soCallFilters()}
  <div class="so-stages">${[['selection','① 次の郵送候補',sel.length],['prepared','② 郵送準備済み',prep.length],['mailed','③ チラシ発送済み',sent.length],['calls','④ 電話の担当一覧',queue.length],['followup','⑤ 次回対応がある',queue.filter(c=>c.next_date||c.next_action).length]].map(([v,l,n])=>`<button class="${salesView===v?'on':''}" onclick="soShowMailView('${v}')"><span>${l}</span><strong>${n}社</strong></button>`).join('')}</div>
- <div class="so-mailing"><b>9月30日発送済み ${cos.filter(soSeptemberMail).length}社</b><button onclick="soShowMailView('sep30')">この300社を見る</button><span>到着・電話実施の記録は別です。</span></div>
+ ${soMailHistoryHTML()}
  <div class="so-shortcuts">${soCanSelectMail()?'<button class="so-primary" onclick="autoSelectNext300()">次に送る300社を選ぶ</button>':''}<button onclick="soShowMailView('call')">電話準備OK ${ready.length}社</button><button onclick="soShowMailView('phone_pending')">電話前の確認待ち ${queue.length-ready.length}社</button><button onclick="soShowMailView('all')">全ての会社を見る</button></div>
  <details class="so-details" id="so-team"><summary>電話担当の振り分け・人数変更</summary><p>未着手だけをランダムに均等振り分け。電話履歴がある会社は担当を変えません。</p><div class="so-team-grid">${[...new Set([...team,...queue.map(SO.assignee).filter(Boolean)])].map(n=>{const a=queue.filter(c=>SO.assignee(c)===n);return `<div><b>${soEsc(soName(n))}</b><span>担当 ${a.length}社</span><span>電話準備OK ${a.filter(c=>!SO.phoneReasons(c).length&&SO.nextCall(c)).length}社</span><span>未着手 ${a.filter(c=>!SO.called(c)).length}社 ／ 電話済み ${a.filter(SO.called).length}社</span><span>次回対応 ${a.filter(c=>c.next_date||c.next_action).length}社</span></div>`;}).join('')}<div><b>担当不明</b><span>${queue.filter(c=>!SO.assignee(c)).length}社</span></div></div>${can('admin')?`<label>担当者のログイン名（1行に1人。新しい担当者も追加できます）<textarea id="so-members" rows="3">${soEsc(team.join('\n'))}</textarea></label><button onclick="soReassign(true)">担当者を保存して、未着手を振り分け直す</button><button onclick="soReassign(false)">同じ担当者で未着手を振り分け直す</button><p>新しいログインの発行は別途必要です。担当一覧は上の担当者選択で確認できます。</p>`:''}</details>
  <details class="so-details"><summary>月ごとの実績・企業情報の確認状況</summary><label>実績を見る月 <input id="so-month" type="month" value="${soEsc(month)}" onchange="soDashboard()"></label><div class="so-metrics">${metrics.map(([l,n,h])=>`<span>${l}<b>${n}</b>${h}</span>`).join('')}</div><p>根拠記録がある会社：${cos.filter(c=>Object.keys(SO.ops(c).fields||{}).length).length}社 ／ 未発送で郵送条件の確認済み：${SO.selected(cos,cos.length).length}社。入力しただけの情報や古い情報は、確認済みとは表示しません。</p><button onclick="soShowMailView('pending')">企業情報の確認待ちを見る</button><button onclick="soExportEvidence()">根拠URL付き一覧を出す</button></details>
@@ -91,13 +93,14 @@ const soOldSay=sayText;sayText=function(text){if(cur&&!SO.verified(cur,'ceo_name
 /* Task-oriented workbench. Shared changes use atomic optimistic batches. */
 const soPicked=new Set();
 let soBusy=false;
-const soViews={all:'全ての会社',selection:'次の郵送候補',prepared:'郵送準備済み',mailed:'チラシ発送済み',sep30:'9月30日発送済み',calls:'電話の担当一覧',mine:'自分の担当',call:'電話準備OK',phone_pending:'電話前の確認待ち',followup:'次回対応がある会社',pending:'企業情報の確認待ち',letter:'手紙原稿あり',mail:'郵送条件の確認済み',delivered:'到着確認済み'};
+const soViews={mail_batch:'郵送の保存済み一覧',all:'全ての会社',selection:'次の郵送候補',prepared:'郵送準備済み',mailed:'チラシ発送済み',sep30:'9月30日発送済み',calls:'電話の担当一覧',mine:'自分の担当',call:'電話準備OK',phone_pending:'電話前の確認待ち',followup:'次回対応がある会社',pending:'企業情報の確認待ち',letter:'手紙原稿あり',mail:'郵送条件の確認済み',delivered:'到着確認済み'};
 function soName(n){return ({mage:'前平',hibiki:'石川',megu:'MEGU'})[n]||n||'未割当';}
 function soTeamRow(){return cos.find(c=>SO.ops(c).call_team)||cos.filter(SO.mailed).slice().sort((a,b)=>String(a.id).localeCompare(String(b.id)))[0];}
 function soMembers(){const saved=SO.ops(soTeamRow()||{}).call_team?.members;if(saved?.length)return saved;return typeof USERS!=='undefined'?Object.keys(USERS).filter(n=>['sales','action'].includes(USERS[n].role)):['hibiki','megu'];}
 function soIdentity(){try{return sessionStorage.getItem('so_identity_'+currentUser.name)||currentUser.name;}catch{return currentUser.name;}}
 function soSetIdentity(n){if(![currentUser.name,...soMembers()].includes(n))return;try{sessionStorage.setItem('so_identity_'+currentUser.name,n);}catch{}soShowMailView('mine');}
 function soMatchesView(c){switch(salesView){
+ case 'mail_batch':return soMailBatchMatches(c,soMailBatchFilter);
  case 'selection':return !!SO.selection(c)&&!SO.mailed(c)&&!SO.prepared(c);case 'prepared':return SO.prepared(c);case 'mailed':return SO.mailed(c);case 'sep30':return soSeptemberMail(c);
  case 'calls':return SO.callWork(c);case 'mine':return soOwnCompany(c);case 'call':return SO.callWork(c)&&SO.nextCall(c)&&!SO.phoneReasons(c).length;
  case 'phone_pending':return SO.callWork(c)&&SO.phoneReasons(c).length>0;case 'followup':return SO.callWork(c)&&!!(c.next_date||c.next_action);
@@ -122,8 +125,85 @@ async function soReassign(fromEditor=false){if(!can('admin'))return toast('担�
  await soWork(async()=>{await soFreshRows();const plan=SO.assignmentPlan(cos,members),changes=new Map(),at=new Date().toISOString();for(const a of plan.changes){const c=cos.find(c=>c.id===a.id),src=structuredClone(c.source_data||{});src.call_assignee=a.owner;src.call_assigned_at=at;src.sales_ops={...src.sales_ops,assignment:{owner:a.owner,assigned_at:at,by:currentUser.name,mode:'random_balanced'}};changes.set(c.id,soBuildChange(c,src));}const anchor=soTeamRow();if(!anchor)throw Error('発送済みの会社がありません');const old=changes.get(anchor.id),src=old?.source_data||structuredClone(anchor.source_data||{});src.sales_ops={...src.sales_ops,call_team:{members:[...new Set(members)],updated_at:at,by:currentUser.name}};changes.set(anchor.id,soBuildChange(anchor,src));await soAtomic([...changes.values()]);await soFreshRows();renderList();soSetProgress(`未着手${plan.changes.length}社を振り分けました。電話履歴のある${plan.locked.length}社は担当を保持しました。`);});
 }
 autoSelectNext300=async function(){if(!soCanSelectMail())return;await soWork(async()=>{await soFreshRows();const existing=cos.filter(c=>SO.selection(c)&&!SO.mailed(c)&&!SO.prepared(c)&&!SO.blocked(c));if(existing.length){soShowMailView('selection');return soSetProgress(`保存済みの候補${existing.length}社を表示しました。重複して選びません。`);}const rows=SO.shortlist(cos);if(!rows.length)return soSetProgress('対象地域に、未発送で新しく選べる会社がありません');const ready=rows.filter(c=>!SO.mailReasons(c).length).length;if(!confirm(`${rows.length}社を次の郵送候補として保存します。\n郵送条件の確認済み${ready}社／確認待ち${rows.length-ready}社。\n候補を選ぶだけでは、準備済み・発送済みにはなりません。`))return;const batch='TENOHIRA-'+SO.jstDay().replaceAll('-','')+'-'+crypto.randomUUID().slice(0,8),at=new Date().toISOString();await soAtomic(rows.map(c=>{const src=structuredClone(c.source_data||{});src.sales_ops={...src.sales_ops,mail_selection:{batch_id:batch,selected_on:SO.jstDay(),selected_at:at,selected_by:currentUser.name}};return soBuildChange(c,src);}));await soFreshRows();soShowMailView('selection');soPickAll(true);soSetProgress(`${rows.length}社を候補として保存しました。確認待ち${rows.length-ready}社は、根拠を確認してから宛名出力・郵送準備へ進めます。`);});};
-function soBatchDialog(type){if(!soPicked.size)return toast('会社の左のチェックで対象を選んでください');if(type==='flyer_sent'&&!can('admin')||type==='flyer_prepared'&&!can('dm_ready'))return;const selected=getRows().filter(c=>soPicked.has(c.id));const invalid=selected.filter(c=>SO.mailReasons(c).length||SO.mailed(c)||(SO.selection(c)&&!soMailDoubleChecked(c)));const el=document.getElementById('so-batch-editor');el.innerHTML=`<div class="so-batch-form"><h3>${type==='flyer_sent'?'発送完了':'郵送準備完了'}を記録する：${selected.length}社</h3>${invalid.length?`<p class="so-error">${invalid.length}社に宛先・商流の確認待ち、または発送済みがあります。まず根拠を確認してください。今回は保存できません。</p>`:''}<label>実際に${type==='flyer_sent'?'発送':'準備'}した日 <input id="so-bulk-date" type="date" value="${SO.jstDay()}"></label><label>発送便の名前 <input id="so-bulk-batch" value="${soEsc(SO.selection(selected[0]||{})?.batch_id||'TENOHIRA-'+SO.jstDay().replaceAll('-',''))}" placeholder="例：2026-10-第1便"></label><label><input id="so-bulk-confirm" type="checkbox">選んだ${selected.length}社は実際に${type==='flyer_sent'?'発送':'宛名・封入の準備を完了'}しました</label><button class="so-primary" ${invalid.length?'disabled':''} onclick="soSaveBatch('${type}')">${selected.length}社の${type==='flyer_sent'?'発送完了':'準備完了'}を保存</button><button onclick="document.getElementById('so-batch-editor').innerHTML=''">閉じる</button></div>`;}
-async function soSaveBatch(type){if(!['flyer_prepared','flyer_sent'].includes(type)||!can(type==='flyer_sent'?'admin':'dm_ready'))return;const date=soValue('so-bulk-date'),batch=soValue('so-bulk-batch'),ids=[...soPicked];if(!ids.length||ids.length>300)return toast('1〜300社を選んでください');if(SO.day(date)===null||date>SO.jstDay()||!batch||!soCheck('so-bulk-confirm'))return toast('実際の日付・発送便・完了チェックを入力してください');await soWork(async()=>{await soFreshRows();const rows=cos.filter(c=>ids.includes(c.id));if(rows.length!==ids.length)throw Error('対象企業が変わりました。再選択してください');if(rows.some(c=>SO.mailReasons(c).length||SO.mailed(c)||(SO.selection(c)&&!soMailDoubleChecked(c))))throw Error('宛先・商流の確認待ち、または発送済みの会社があります。根拠を確認してください');const at=new Date().toISOString(),changes=rows.map(c=>{const src=structuredClone(c.source_data||{}),op=src.sales_ops||{};const id=type+'-'+batch+'-'+c.id;if(SO.events(c).some(e=>e.id===id))throw Error('この発送便は記録済みです');src.sales_ops={...op,events:[...(op.events||[]),{id,type,occurred_on:date,batch_id:batch,by:soIdentity(),recorded_by:currentUser.name,recorded_at:at}]};if(type==='flyer_sent'){src.dm_mailed=true;src.dm_mailed_at=date;delete src.dm_ready;delete src.dm_ready_at;}else{src.dm_ready=true;src.dm_ready_at=date;}return soBuildChange(c,src);});await soAtomic(changes);await soFreshRows();soShowMailView(type==='flyer_sent'?'mailed':'prepared');soSetProgress(`${rows.length}社の${type==='flyer_sent'?'発送完了':'郵送準備完了'}を保存しました。`);if(type==='flyer_sent')await soAssignUnassigned();});}
+// Selection dates and actual shipment dates are separate, persistent records.
+function soMailGroups(rows=cos){
+ const groups=new Map();
+ const add=(kind,batch,date,c)=>{const key=JSON.stringify([kind,batch,date]);if(!groups.has(key))groups.set(key,{kind,batch,date,ids:new Set()});groups.get(key).ids.add(c.id);};
+ for(const c of rows){
+  const sel=SO.selection(c);if(sel)add('selection',sel.batch_id||'',sel.selected_on||String(sel.selected_at||'').slice(0,10)||'',c);
+  for(const e of SO.events(c))if(e.type==='flyer_sent')add('sent',e.batch_id||'',e.occurred_on||'',c);
+  if(c.source_data?.dm_mailed&&!SO.events(c).some(e=>e.type==='flyer_sent'))add('legacy','',String(c.source_data.dm_mailed_at||'').slice(0,10),c);
+ }
+ return [...groups.values()].sort((a,b)=>b.date.localeCompare(a.date)||a.batch.localeCompare(b.batch));
+}
+function soMailBatchMatches(c,f){
+ if(!f)return false;
+ if(f.kind==='selection'){const s=SO.selection(c);return !!s&&(s.batch_id||'')===f.batch&&(s.selected_on||String(s.selected_at||'').slice(0,10)||'')===f.date;}
+ if(f.kind==='legacy')return !!c.source_data?.dm_mailed&&!SO.events(c).some(e=>e.type==='flyer_sent')&&String(c.source_data.dm_mailed_at||'').slice(0,10)===f.date;
+ return SO.events(c).some(e=>e.type==='flyer_sent'&&(e.batch_id||'')===f.batch&&(e.occurred_on||'')===f.date);
+}
+function soOpenMailBatch(kind,batch,date){
+ soMailBatchFilter={kind,batch,date};
+ soViews.mail_batch=(date||'日付不明')+(kind==='selection'?' 選んだ会社':' 発送済み')+' ／ '+(batch||'便名なし');
+ soShowMailView('mail_batch');
+ document.getElementById('so-results')?.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function soMailHistoryHTML(){
+ const groups=soMailGroups(),months=[...new Set(groups.map(g=>SO.day(g.date)===null?'unknown':g.date.slice(0,7)))].sort().reverse();
+ const saved=document.getElementById('so-mail-history-month')?.value;
+ const month=saved==='all'||months.includes(saved)?saved:'all';
+ const visible=groups.filter(g=>month==='all'||(SO.day(g.date)===null?'unknown':g.date.slice(0,7))===month);
+ const row=g=>{const members=cos.filter(c=>g.ids.has(c.id)),sent=members.filter(SO.mailed).length;return `<div class="so-mailing"><div><b>${soEsc(g.date||'日付不明')} ${g.kind==='selection'?'選定':'発送済み'} ${g.ids.size}社</b><p>${soEsc(g.batch||'便名なし')}${g.kind==='selection'?' ／ 発送記録あり '+sent+'社・未登録 '+(members.length-sent)+'社':''}</p></div><button data-kind="${g.kind}" data-batch="${soEsc(g.batch)}" data-date="${soEsc(g.date)}" onclick="soOpenMailBatch(this.dataset.kind,this.dataset.batch,this.dataset.date)">この会社一覧を見る</button></div>`;};
+ return `<section class="so-mail-history" aria-label="月別の郵送履歴"><h3>月別の郵送履歴・選んだ会社</h3><label>表示する月 <select id="so-mail-history-month" onchange="soDashboard()"><option value="all">すべての月</option>${months.map(m=>`<option value="${m}" ${month===m?'selected':''}>${m==='unknown'?'日付不明':soEsc(m)}</option>`).join('')}</select></label><p>発送日は実際に送った日です。選定日は会社を選んで保存した日です。過去に選んだ一覧も、発送後にここから開けます。</p><h4>発送済みの便</h4>${visible.filter(g=>g.kind!=='selection').map(row).join('')||'<p>この月の発送記録はありません。</p>'}<h4>保存した選定一覧</h4>${visible.filter(g=>g.kind==='selection').map(row).join('')||'<p>この月の選定記録はありません。</p>'}</section>`;
+}
+function soBatchIssues(c){return [...SO.mailReasons(c),...(SO.selection(c)&&!soMailDoubleChecked(c)?['住所・代表者のダブルチェック待ち']:[])];}
+function soBatchDialog(type){
+ if(!['flyer_sent','flyer_prepared'].includes(type)||!can(type==='flyer_sent'?'admin':'dm_ready'))return;
+ const selected=getRows().filter(c=>soPicked.has(c.id));
+ if(!selected.length||selected.length>300)return toast('実際に作業した会社を1〜300社選んでください');
+ const sent=type==='flyer_sent',already=selected.filter(SO.mailed),targets=selected.filter(c=>!SO.mailed(c)),pending=targets.filter(c=>soBatchIssues(c).length);
+ soBatchDraft={type,ids:selected.map(c=>c.id)};
+ const batches=[...new Set(targets.map(c=>SO.selection(c)?.batch_id).filter(Boolean))];
+ const batch=batches.length===1?batches[0]:'TENOHIRA-'+SO.jstDay().replaceAll('-','')+'-'+crypto.randomUUID().slice(0,8);
+ const disabled=!targets.length||(!sent&&(pending.length||already.length));
+ document.getElementById('so-batch-editor').innerHTML=`<div class="so-batch-form"><h3>${sent?'発送完了':'郵送準備完了'}を記録する：${targets.length}社</h3>
+ ${already.length?`<p class="so-notice">選択中の${already.length}社は発送記録があるため追加しません。未登録の${targets.length}社が対象です。</p>`:''}
+ ${pending.length?`<p class="${sent?'so-warn':'so-error'}">${pending.length}社に宛先・商流などの確認待ちがあります。${sent?'実際に発送した会社に限り、発送の事実を保存できます。確認待ちや営業停止は保持し、電話準備OKにはしません。':'準備完了には根拠確認が必要です。今回は保存できません。'}</p>`:''}
+ <details><summary>記録対象の会社を確認（${targets.length}社）</summary><ul>${targets.map(c=>`<li>${soEsc(c.company_name)}${soBatchIssues(c).length?'（確認待ちあり）':''}</li>`).join('')}</ul></details>
+ <label>実際に${sent?'発送':'準備'}した日 <input id="so-bulk-date" type="date" max="${SO.jstDay()}" value=""></label>
+ <label>発送便の名前 <input id="so-bulk-batch" value="${soEsc(batch)}" placeholder="例：2026-11-第1便"></label>
+ <label><input id="so-bulk-confirm" type="checkbox">対象の${targets.length}社すべてについて、実際に${sent?'発送':'宛名・封入の準備を完了'}したことと日付を確認しました</label>
+ <button class="so-primary" ${disabled?'disabled':''} onclick="soSaveBatch('${type}')">${targets.length}社の${sent?'発送完了':'準備完了'}を保存</button>
+ <button onclick="soBatchDraft=null;document.getElementById('so-batch-editor').innerHTML=''">閉じる</button></div>`;
+ document.getElementById('so-batch-editor')?.scrollIntoView({behavior:'smooth',block:'start'});
+}
+async function soSaveBatch(type){
+ if(!['flyer_prepared','flyer_sent'].includes(type)||!can(type==='flyer_sent'?'admin':'dm_ready'))return;
+ const date=soValue('so-bulk-date'),batch=soValue('so-bulk-batch'),ids=soBatchDraft?.type===type?[...soBatchDraft.ids]:[];
+ if(!ids.length||ids.length>300)return toast('会社を選び直して発送・準備の記録画面を開いてください');
+ if(SO.day(date)===null||date>SO.jstDay()||!batch||!soCheck('so-bulk-confirm'))return toast('実際の日付・発送便・完了チェックを入力してください');
+ await soWork(async()=>{
+  await soFreshRows();
+  const selected=cos.filter(c=>ids.includes(c.id));if(selected.length!==ids.length)throw Error('対象企業が変わりました。再選択してください');
+  const already=selected.filter(SO.mailed),rows=selected.filter(c=>!SO.mailed(c));
+  if(type==='flyer_prepared'&&(already.length||rows.some(c=>soBatchIssues(c).length)))throw Error('準備完了には宛先・商流の根拠確認が必要です。発送済みの会社も除いてください');
+  if(!rows.length){soBatchDraft=null;soShowMailView('mailed');return soSetProgress('選んだ会社はすべて発送記録済みです。二重登録はしていません。');}
+  const at=new Date().toISOString(),changes=rows.map(c=>{
+   const src=structuredClone(c.source_data||{}),op=src.sales_ops||{},id=type+'-'+batch+'-'+c.id;
+   if(SO.events(c).some(e=>e.id===id))throw Error('この発送便は記録済みです');
+   const e={id,type,occurred_on:date,batch_id:batch,by:soIdentity(),recorded_by:currentUser.name,recorded_at:at,actual_confirmed:true};
+   src.sales_ops={...op,events:[...(op.events||[]),e],audit:[...(op.audit||[]),{field:'events',old_value:null,new_value:e,checked_by:currentUser.name,checked_at:SO.jstDay(),source:'アプリでの実作業確認',at}]};
+   if(type==='flyer_sent'){src.dm_mailed=true;src.dm_mailed_at=date;delete src.dm_ready;delete src.dm_ready_at;}else{src.dm_ready=true;src.dm_ready_at=date;}
+   return soBuildChange(c,src);
+  });
+  await soAtomic(changes);
+  await soFreshRows();
+  if(!rows.every(c=>SO.events(cos.find(x=>x.id===c.id)||{}).some(e=>e.id===type+'-'+batch+'-'+c.id&&e.type===type&&e.occurred_on===date&&e.batch_id===batch)))throw Error('保存後の確認が完了していません。再読み込みして発送履歴を確認してください');
+  soBatchDraft=null;
+  if(type==='flyer_sent')soOpenMailBatch('sent',batch,date);else soShowMailView('prepared');
+  soSetProgress(`${rows.length}社の${type==='flyer_sent'?'発送完了':'郵送準備完了'}を保存し、読み戻して確認しました。${already.length?'発送記録済み'+already.length+'社は追加していません。':''}${type==='flyer_sent'?'電話担当は変更していません。':''}`);
+ });
+}
 async function soAssignUnassigned(){const team=soMembers(),allPlan=SO.assignmentPlan(cos,team),targets=allPlan.changes.filter(a=>!SO.assignee(cos.find(c=>c.id===a.id)));if(!targets.length)return;const at=new Date().toISOString();await soAtomic(targets.map(a=>{const c=cos.find(c=>c.id===a.id),src=structuredClone(c.source_data||{});src.call_assignee=a.owner;src.call_assigned_at=at;src.sales_ops={...src.sales_ops,assignment:{owner:a.owner,assigned_at:at,by:currentUser.name,mode:'random_balanced'}};return soBuildChange(c,src);}));await soFreshRows();renderList();soSetProgress(`${targets.length}社の電話担当も振り分けました。`);}
 function soExportPicked(){const rows=getRows().filter(c=>soPicked.has(c.id));if(!rows.length)return toast('出力する会社を選んでください');if(rows.some(c=>SO.mailReasons(c).length||(SO.selection(c)&&!soMailDoubleChecked(c))))return toast('企業の根拠と住所・代表者のダブルチェックを完了してください');soAddressCsv(rows);}
 function soAddressCsv(rows){soDownload('郵送宛名_'+SO.jstDay()+'.csv',['企業ID','正式企業名','郵便番号','住所','代表者名','敬称','企業名根拠URL','住所根拠URL','代表者根拠URL','確認日'],rows.map(c=>[c.id,c.company_name,c.postal_code,c.address,c.ceo_name,'様',SO.ops(c).fields?.company_name?.source_url,SO.ops(c).fields?.address?.source_url,SO.ops(c).fields?.ceo_name?.source_url,SO.ops(c).fields?.address?.checked_at]));toast(rows.length+'社を出力しました。発送記録は増えません');}
@@ -192,5 +272,6 @@ const soReviewAddressCsv=soAddressCsv;
 soAddressCsv=function(rows){if(rows.some(c=>SO.selection(c)&&!soMailDoubleChecked(c)))return toast('住所・代表者のダブルチェックを完了してから宛名を出してください');return soReviewAddressCsv(rows);};
 const soReviewCard=soCompanyCard;
 soCompanyCard=function(c){return soReviewCard(c).replace('<div class="so-tags">','<div class="so-tags">'+(SO.selection(c)?'<span class="'+(soMailDoubleChecked(c)?'good':'warn')+'">宛名ダブルチェック '+(soMailDoubleChecked(c)?'済み':'待ち')+'</span>':''));};
+
 
 

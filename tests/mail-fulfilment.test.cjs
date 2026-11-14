@@ -62,3 +62,17 @@ test('history escapes batch names and company names',()=>{
  const c=company('1');c.company_name='<script>alert(1)</script>';c.source_data.sales_ops.mail_selection.batch_id='"><script>';
  const h=harness([c]);assert.doesNotMatch(h.ctx.soMailHistoryHTML(),/<script>/);h.dialog();assert.doesNotMatch(h.element('so-batch-editor').innerHTML,/<script>/);
 });
+
+test('qualified verified selection can export and prepare without a second manual review; advisory history remains',async()=>{
+ const c=company('ready');delete c.phase;delete c.no_solicitation;
+ Object.assign(c,{company_name:'検証株式会社',address:'沖縄県那覇市泉崎1-1-1',postal_code:'900-0021',ceo_name:'検証 太郎',phone:'098-000-0000'});
+ const op=c.source_data.sales_ops;op.relationship={status:'unknown'};op.eligibility={status:'qualified'};op.fields={};op.call_result=null;
+ for(const k of ['company_name','address','postal_code','ceo_name','phone'])op.fields[k]={status:'verified',value:c[k],checked_at:'2026-11-14',source_kind:'official',source_url:'https://example.test/company',excerpt:'公式会社概要'};
+ const h=harness([c]);assert.equal(h.ctx.soMailDoubleChecked(c),false);assert.equal(h.ctx.soBatchIssues(c).length,0);
+ const gate=h.ctx.soGateHTML(c,true);assert.match(gate,/確認済み/);assert.match(gate,/照合は未完了/);assert.match(gate,/先行郵送は必須ではありません/);
+ h.run('soDownload=function(){globalThis.exported=true;};');h.ctx.soAddressCsv([c]);assert.equal(h.ctx.exported,true);
+ h.dialog('flyer_prepared');assert.doesNotMatch(h.element('so-batch-editor').innerHTML,/ disabled/);await h.ctx.soSaveBatch('flyer_prepared');assert.equal(h.calls,1);
+ assert.equal(h.db[0].source_data.sales_ops.events.at(-1).type,'flyer_prepared');assert.equal(h.db[0].source_data.sales_ops.relationship.status,'unknown');assert.equal(h.db[0].source_data.sales_ops.contact.phone_usable,false);
+ const nodes=h.ctx.soLeafletNodes(c,'前平');assert.doesNotMatch(nodes.start.say,/お送りした/);assert.ok(!nodes.start.options.some(x=>x[1]==='unseen'));
+});
+

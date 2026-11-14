@@ -100,8 +100,7 @@
     const person=v=>String(v||'').normalize('NFKC').replace(/代表取締役|取締役|代表理事|代表社員|会長|社長|CEO|様|\s/g,'');
     if(!person(c.ceo_name)||person(s.context.recipient)!==person(c.ceo_name))out.push('手紙の宛名と現在の代表者の一致確認待ち');
     if(!so)return [...out,'企業情報の確認機能が未読込'];
-    out.push(...so.mailReasons(c,today));if(!so.verified(c,'phone',today))out.push('電話番号の根拠確認待ち');
-    if(ops(c).contact?.phone_usable!==true)out.push('営業電話の窓口・利用条件確認待ち');
+    out.push(...so.phoneReasons(c,today));
     return [...new Set(out)];
   }
   function renderNode(s,key,c,caller){
@@ -123,3 +122,4 @@
   root.LetterFollowup={VERSION,addMonths,body,ops,bundle,scripts,revisions,deliveries,currentLetter,day,realDay,digest,recipient,evidenceQuote,defaults,revision,nodes,build,payload,reviewed,script,delivery,changed,state,insert,recordDelivery,reasons,renderNode,validate};
   if(typeof module!=='undefined')module.exports=root.LetterFollowup;
 })(typeof globalThis!=='undefined'?globalThis:this);
+

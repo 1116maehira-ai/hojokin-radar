@@ -11,26 +11,52 @@
   function entity(c){return ops(c).canonical_entity_key||c.corporate_number||c.source_data?.corporate_number||('name:'+norm(c.company_name).replace(/株式会社|有限会社|合同会社|合資会社|合名会社|\(株\)|\(有\)/g,''));}
   function blocked(c){return !!(c.excluded||c.no_solicitation||['declined','won'].includes(c.phase)||ops(c).duplicate_of);}
   function relation(c,now=jstDay()){const r=ops(c).relationship||{};return r.status==='clear'&&fresh(r.checked_at,30,now)&&Array.isArray(r.checks)&&['crm','gmail','source_history'].every(k=>r.checks.includes(k));}
-  function mailReasons(c,now=jstDay()){
+  // Known stops remain binding. Incomplete relationship checks are advisory;
+  // absence of an invitation to sales calls is not a refusal.
+  function channelReasons(c,channel){
+    const r=[],op=ops(c),aliases=channel==='mail'?['mail','postal','postal_mail','post','郵送']:['phone','tel','telephone','電話'];
+    for(const x of op.channel_restrictions||[]){
+      if(x.voided_at||x.status!=='prohibited')continue;
+      const channels=[x.channel,...(Array.isArray(x.channels)?x.channels:[])].filter(Boolean);
+      if(channels.some(v=>[...aliases,'all','all_channels','全媒体'].includes(v)))r.push(channel==='mail'?'郵送での営業を断る記録あり':'電話での営業を断る記録あり');
+    }
+    if(channel==='phone'){
+      let restriction=op.contact?.phone_restriction;
+      if(typeof restriction==='string'){try{restriction=JSON.parse(restriction);}catch{/* A recorded textual restriction still requires review. */}}
+      if(restriction&&!restriction.voided_at)r.push('電話の停止・制限記録あり');
+      const purpose=String(op.contact?.phone_purpose||op.contact?.purpose||'');
+      if(/^(applicant_only|customer_only|consumer_only)$|通販購入者用|(?:応募者|求職者|採用応募|購入者|顧客)専用|営業には使用しない|営業利用不可/.test(purpose))r.push('掲載番号は応募者・顧客等の専用窓口。代表・総務等の番号確認待ち');
+    }
+    return [...new Set(r)];
+  }
+  function readinessNotes(c,now=jstDay()){
+    const r=[];if(!relation(c,now)&&!['existing','blocked'].includes(ops(c).relationship?.status))r.push('既存商流の照合は未完了です。接点が分かった場合は既存経路へ引き継いでください。');
+    return r;
+  }
+  function baseReasons(c,now=jstDay()){
     const r=[];if(blocked(c))r.push('除外・停止・受注済・重複');
-    for(const k of ['company_name','postal_code','address','ceo_name'])if(!verified(c,k,now))r.push(labels[k]+'の根拠未確認／期限切れ');
-    if(!/^\d{3}-?\d{4}$/.test(norm(c.postal_code)))r.push('郵便番号不正');
-    if(!relation(c,now))r.push('既存商流・拒否履歴の照合待ち');
+    if(['existing','blocked'].includes(ops(c).relationship?.status))r.push('既存経路限定・接触停止');
+    for(const k of ['company_name','address','ceo_name'])if(!verified(c,k,now))r.push(labels[k]+'の根拠未確認／期限切れ');
     if(ops(c).eligibility?.status!=='qualified')r.push('地域・設立・売上の適格性確認待ち');
     return r;
   }
+  function mailReasons(c,now=jstDay()){
+    const r=baseReasons(c,now);if(!verified(c,'postal_code',now))r.push('郵便番号の根拠未確認／期限切れ');
+    if(!/^\d{3}-?\d{4}$/.test(norm(c.postal_code)))r.push('郵便番号不正');
+    return [...r,...channelReasons(c,'mail')];
+  }
   function events(c){return (ops(c).events||[]).filter(e=>!e.voided_at);}
   function mailed(c){return !!c.source_data?.dm_mailed||events(c).some(e=>e.type==='flyer_sent');}
-  function phoneReasons(c,now=jstDay()){const r=mailReasons(c,now);if(!verified(c,'phone',now))r.push('電話番号の根拠未確認／期限切れ');if(!mailed(c))r.push('チラシ発送実績なし');if(ops(c).contact?.phone_usable!==true)r.push('経営・総務への電話窓口と利用条件の確認待ち');return r;}
+  function phoneReasons(c,now=jstDay()){const r=baseReasons(c,now);if(!verified(c,'phone',now))r.push('電話番号の根拠未確認／期限切れ');return [...r,...channelReasons(c,'phone')];}
   function unique(rows){const seen=new Set;return rows.filter(c=>{const k=entity(c);if(seen.has(k))return false;seen.add(k);return true;});}
-  function selected(rows,limit=300,now=jstDay()){return unique(rows.filter(c=>!mailReasons(c,now).length&&!mailed(c))).sort((a,b)=>(b.priority||0)-(a.priority||0)||String(a.company_name).localeCompare(String(b.company_name),'ja')).slice(0,limit);}
+  function selected(rows,limit=300,now=jstDay()){return unique(rows.filter(c=>!mailReasons(c,now).length&&!mailed(c)&&!called(c))).sort((a,b)=>(b.priority||0)-(a.priority||0)||String(a.company_name).localeCompare(String(b.company_name),'ja')).slice(0,limit);}
   function factOK(f,now=jstDay()){return f.status==='verified'&&['official','government'].includes(f.source_kind)&&url(f.source_url)&&f.text&&fresh(f.checked_at,90,now);}
   function draft(c,kind='letter',now=jstDay(),caller='前平'){
     if(!verified(c,'company_name',now)||!verified(c,'ceo_name',now))throw Error('企業名と代表者名の根拠を確認してください');
     const facts=(ops(c).facts||[]).filter(f=>factOK(f,now));if(!facts.length)throw Error('根拠付きの企業発信を一つ確認してください');
     const f=facts[0];
-    if(kind==='call'&&phoneReasons(c,now).length)throw Error('宛先・電話・商流・実発送の確認が必要です');
-    if(kind==='call')return `株式会社TENOHIRAの${caller}と申します。${c.ceo_name}様、または経営・総務のご担当者様はいらっしゃいますか。\n先日、企業の歩みや想いを映像で残す取り組みについて、簡単なリーフレットをお送りしました。${f.text}という御社の発信を拝見し、ご連絡しました。採用や社内での継承に映像を活用するご予定があるか、まずお話を伺えればと思っております。代表者様でなくても、経営・総務・採用のご担当者様に、まず30分ほどお話を伺う機会をいただけますでしょうか。`;
+    if(kind==='call'&&phoneReasons(c,now).length)throw Error('企業情報・電話・対象条件と停止記録の確認が必要です');
+    if(kind==='call')return `株式会社TENOHIRAの${caller}と申します。${c.ceo_name}様、または経営・総務・人事のご担当者様はいらっしゃいますか。\n${mailed(c)?'先日、企業の歩みや想いを映像で残す取り組みについて、簡単なリーフレットをお送りしました。':'企業の歩みや想いを映像で残す取り組みについて、ご相談でお電話しました。'}${f.text}という御社の発信を拝見し、ご連絡しました。採用や社内での継承に映像を活用するご予定があるか、まずお話を伺えればと思っております。代表者様でなくても、経営・総務・採用のご担当者様に、まず30分ほどお話を伺う機会をいただけますでしょうか。`;
     return `${c.company_name}\n${c.ceo_name} 様\n\n突然のお便り、失礼いたします。沖縄で映像制作を行う株式会社TENOHIRAの前平雄一朗と申します。\n\n御社の公式発信を拝見し、${f.text}という点が心に残りました。大切にされている考えや現場の仕事を、社員の皆様の声とともに映像で残し、採用や社内の継承に生かすお手伝いができればと思い、お便りいたしました。\n\nまずは御社のお考えを伺いたく、30分ほどお話しする機会をいただけますと幸いです。\n\n株式会社TENOHIRA\n代表取締役 前平雄一朗`;
   }
   function monthly(rows,month){const out={flyer_sent:0,call:0,meeting_confirmed:0,meeting_held:0,letter_sent:0};for(const type of Object.keys(out)){const ids=new Set;for(const c of rows)for(const e of events(c)){const dt=type.startsWith('meeting_')?e.meeting_at:e.occurred_on;if(e.type===type&&String(dt||'').startsWith(month)&&(!type.startsWith('meeting_')||(e.accepted===true&&e.qualified===true&&e.meeting_id)))ids.add(type.startsWith('meeting_')?e.meeting_id:entity(c));}out[type]=ids.size;}return out;}
@@ -44,7 +70,7 @@
   function called(c){return !!c.last_called_at||callHistory(c).length>0||['contacted','pending_callback'].includes(c.phase);}
   function assignee(c){return ops(c).call_owner||(called(c)?callHistory(c).map(e=>e.by||e.user||e.actor||e.assignee).find(Boolean):'')||c.source_data?.call_assignee||'';}
   function callOwner(c){if(!called(c))return '';return ops(c).call_owner||callHistory(c).map(e=>e.by||e.user||e.actor||e.assignee).find(Boolean)||assignee(c)||'';}
-  function callWork(c){return mailed(c)&&!blocked(c)&&!['existing','blocked'].includes(ops(c).relationship?.status);}
+  function callWork(c){return (mailed(c)||!phoneReasons(c).length)&&!blocked(c)&&!['existing','blocked'].includes(ops(c).relationship?.status)&&!channelReasons(c,'phone').length;}
   function nextCall(c){if(!callWork(c))return false;if(!called(c))return true;return ['absent','callback','interested'].includes(ops(c).call_result?.outcome)||c.phase==='pending_callback';}
   function shuffled(a,rng=Math.random){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
   function assignmentPlan(rows,members,rng=Math.random){
@@ -64,6 +90,7 @@
     return unique(rows.filter(c=>!blocked(c)&&!mailed(c)&&!selection(c)&&!prepared(c)&&!called(c)&&!['existing','blocked'].includes(ops(c).relationship?.status)&&cities.some(x=>String(c.city||c.address||'').includes(x))))
       .sort((a,b)=>(mailReasons(a,now).length?1:0)-(mailReasons(b,now).length?1:0)||(b.priority||0)-(a.priority||0)||String(a.company_name).localeCompare(String(b.company_name),'ja')).slice(0,limit);
   }
-  const api={labels,norm,ops,url,day,jstDay,fresh,verified,entity,blocked,relation,mailReasons,phoneReasons,events,mailed,unique,selected,factOK,draft,monthly,callHistory,called,assignee,callOwner,callWork,nextCall,shuffled,assignmentPlan,selection,prepared,shortlist};
+  const api={labels,norm,ops,url,day,jstDay,fresh,verified,entity,blocked,relation,channelReasons,readinessNotes,baseReasons,mailReasons,phoneReasons,events,mailed,unique,selected,factOK,draft,monthly,callHistory,called,assignee,callOwner,callWork,nextCall,shuffled,assignmentPlan,selection,prepared,shortlist};
   root.SalesOps=api;if(typeof module!=='undefined')module.exports=api;
 })(typeof globalThis!=='undefined'?globalThis:this);
+
